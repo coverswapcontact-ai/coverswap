@@ -62,8 +62,8 @@ const services = [
     href: "/prestations/vitrages",
     emoji: "\uD83E\uDE9F",
     description:
-      "Intimité, décoration, protection solaire et anti-UV : nos films pour vitres s'adaptent à tous les espaces. Réduction de la chaleur jusqu'à 78 %, économies d'énergie et confort toute l'année.",
-    stat: "jusqu'\u00E0 \u221278\u00A0% chaleur",
+      "Intimité, décoration, protection solaire et anti-UV : nos films pour vitres s'adaptent à tous les espaces. Réduction de la chaleur jusqu'à 80 %, économies d'énergie et confort toute l'année.",
+    stat: "jusqu'\u00E0 \u221280\u00A0% chaleur",
     statLabel: "protection solaire",
     schemaDesc:
       "Films adhésifs pour vitrages : intimité, protection UV, décoration et économies d'énergie pour vitres et baies vitrées.",
@@ -84,7 +84,7 @@ const trustReasons = [
   {
     icon: "\u2B50",
     title: "Films Cover Styl' premium",
-    description: "Marque leader mondial du covering architectural, plus de 500 références.",
+    description: "Marque leader mondial du covering architectural, près de 500 références.",
   },
   {
     icon: "\uD83D\uDCE9",
@@ -328,6 +328,27 @@ export default function PrestationsPage() {
               </ScrollReveal>
             ))}
           </div>
+
+          {/* Catalogue banner */}
+          <ScrollReveal delay={0.5}>
+            <Link
+              href="/revetements"
+              className="block mt-12 glass-card p-8 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group text-center"
+            >
+              <h3 className="font-display text-2xl font-bold mb-2">
+                Catalogue de <span className="text-rouge">+490 r&eacute;f&eacute;rences</span> Cover&nbsp;Styl&rsquo;
+              </h3>
+              <p className="text-gris-400 mb-4 max-w-xl mx-auto">
+                Bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies, cuir&hellip; Parcourez l&rsquo;int&eacute;gralit&eacute; de notre catalogue pour trouver la finition id&eacute;ale.
+              </p>
+              <span className="inline-flex items-center gap-2 text-rouge font-semibold group-hover:gap-3 transition-all">
+                Explorer le catalogue
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </span>
+            </Link>
+          </ScrollReveal>
         </div>
       </section>
 

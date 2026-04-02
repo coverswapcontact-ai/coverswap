@@ -463,10 +463,43 @@ export default function MeublesPage() {
         </div>
       </section>
 
+      {/* Catalogue CTA */}
+      <section className="section-padding">
+        <div className="container-custom">
+          <ScrollReveal>
+            <Link href="/revetements" className="block glass-card p-10 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group">
+              <div className="flex flex-col lg:flex-row items-center gap-8">
+                <div className="w-16 h-16 rounded-2xl bg-rouge/10 flex items-center justify-center shrink-0 group-hover:bg-rouge/20 transition-colors">
+                  <svg className="w-8 h-8 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                  </svg>
+                </div>
+                <div className="text-center lg:text-left flex-1">
+                  <h3 className="font-display text-2xl font-bold mb-2">
+                    Parcourez nos <span className="text-rouge">497 references</span> pour trouver la finition ideale
+                  </h3>
+                  <p className="text-gris-400 leading-relaxed">
+                    Bois, marbre, beton, metal, couleurs unies : explorez le catalogue complet Cover Styl&apos; et trouvez la texture qui sublimera chacun de vos meubles.
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <span className="inline-flex items-center gap-2 text-rouge font-semibold group-hover:gap-3 transition-all">
+                    Voir le catalogue
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1566305977571-5666677c6e98?auto=format&fit=crop&w=1920&q=80"
+          src="https://images.unsplash.com/photo-1684846416931-dddf8cbfc2ad?auto=format&fit=crop&w=1920&q=80"
           overlay="rgba(0,0,0,0.80)"
           fadeTop
           fadeBottom

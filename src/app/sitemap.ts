@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
+import { articles } from '@/data/blog-articles';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://coverswap.fr';
   const now = new Date();
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/simulation`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/realisations`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
@@ -21,4 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/politique-confidentialite`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${baseUrl}/cgv`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];
+
+  const blogPages: MetadataRoute.Sitemap = articles.map((article) => ({
+    url: `${baseUrl}/blog/${article.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...blogPages];
 }

@@ -14,7 +14,7 @@ export default function CGV() {
           </section>
           <section>
             <h2 className="font-display text-xl font-bold text-white mb-3">Article 3 — Garantie</h2>
-            <p>CoverSwap garantit la qualité de ses revêtements et de la pose pendant une durée de 2 ans à compter de l&apos;intervention.</p>
+            <p>CoverSwap garantit la qualité de ses revêtements et de la pose pendant une durée de 10 ans à compter de l&apos;intervention. Les références haute température Cover Styl&apos; bénéficient d&apos;une garantie étendue de 15 ans couvrant notamment la résistance thermique, le non-décollement et le non-jaunissement.</p>
           </section>
           <section>
             <h2 className="font-display text-xl font-bold text-white mb-3">Article 4 — Délai d&apos;intervention</h2>

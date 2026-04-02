@@ -262,7 +262,7 @@ export default function VitragesPage() {
       {/* Applications */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1750036015902-c6f5ebca924e?auto=format&fit=crop&w=1920&q=80"
+          src="https://images.unsplash.com/photo-1745015446589-7ee6f702d8c1?auto=format&fit=crop&w=1920&q=80"
           overlay="rgba(0,0,0,0.88)"
           fadeTop
           fadeBottom

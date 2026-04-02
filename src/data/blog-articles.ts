@@ -31,7 +31,7 @@ export const articles: BlogArticle[] = [
       sections: [
         {
           title: "Le coût : un avantage net pour le covering",
-          text: "Repeindre une cuisine complète — façades de meubles, crédence, plan de travail — nécessite un ponçage minutieux, une sous-couche d'accrochage, deux à trois couches de peinture spéciale meubles et souvent l'intervention d'un professionnel. Le budget se situe généralement entre 1 500 et 3 000 euros selon la surface. Le covering adhésif, lui, revient en moyenne 2 à 3 fois moins cher, matériaux et pose comprise. Chez CoverSwap, une cuisine standard de 10 à 15 façades se rénove à partir de 600 euros, avec un résultat qui rivalise visuellement avec du neuf.",
+          text: "Repeindre une cuisine complète — façades de meubles, crédence, plan de travail — nécessite un ponçage minutieux, une sous-couche d'accrochage, deux à trois couches de peinture spéciale meubles et souvent l'intervention d'un professionnel. Le budget se situe généralement entre 1 500 et 3 000 euros selon la surface. Le covering adhésif, lui, revient en moyenne 2 à 3 fois moins cher, matériaux et pose comprise. Chez CoverSwap, une cuisine standard de 10 à 15 façades se rénove à partir de 890 euros, avec un résultat qui rivalise visuellement avec du neuf.",
         },
         {
           title: "La durée des travaux : 1 jour contre 3 à 5 jours",
@@ -43,7 +43,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Durabilité et résistance au quotidien",
-          text: "Une peinture de cuisine bien appliquée tient 3 à 5 ans avant de montrer des signes d'usure : écaillage autour des points d'eau, jaunissement près des plaques de cuisson, traces de doigts sur les façades mates. Le covering adhésif professionnel, quant à lui, est conçu pour résister à l'humidité, aux éclaboussures de graisse et aux nettoyages fréquents pendant 7 à 12 ans. Sa surface non poreuse empêche les taches de s'incruster, ce qui simplifie considérablement l'entretien.",
+          text: "Une peinture de cuisine bien appliquée tient 3 à 5 ans avant de montrer des signes d'usure : écaillage autour des points d'eau, jaunissement près des plaques de cuisson, traces de doigts sur les façades mates. Le covering adhésif professionnel, quant à lui, est conçu pour résister à l'humidité, aux éclaboussures de graisse et aux nettoyages fréquents pendant 7 à 10 ans. Sa surface non poreuse empêche les taches de s'incruster, ce qui simplifie considérablement l'entretien.",
         },
         {
           title: "Réversibilité : un atout majeur du covering",
@@ -92,7 +92,7 @@ export const articles: BlogArticle[] = [
       ],
       tip: "Le nettoyant pour vitres sans ammoniaque est votre meilleur allié pour un covering impeccable. Vaporisez, essuyez avec un chiffon microfibre, et le tour est joué. Il dégraisse en douceur sans attaquer le film protecteur.",
       conclusion:
-        "Avec ces gestes simples, votre covering conservera son éclat pendant 7 à 12 ans. Un entretien minimal pour un résultat maximal — c'est tout l'avantage de la rénovation adhésive. En adoptant les bons réflexes dès la pose, vous protégez votre investissement et profitez d'un intérieur toujours aussi beau qu'au premier jour.",
+        "Avec ces gestes simples, votre covering conservera son éclat pendant 7 à 10 ans. Un entretien minimal pour un résultat maximal — c'est tout l'avantage de la rénovation adhésive. En adoptant les bons réflexes dès la pose, vous protégez votre investissement et profitez d'un intérieur toujours aussi beau qu'au premier jour.",
     },
     relatedSlugs: ["covering-adhesif-durabilite", "covering-adhesif-vs-peinture-cuisine"],
   },
@@ -207,12 +207,12 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Durée de vie réelle et conditions de garantie",
-          text: "En conditions normales d'utilisation, un covering adhésif professionnel dure entre 7 et 12 ans. Cette fourchette dépend de l'emplacement (une crédence de cuisine sollicitée quotidiennement s'usera plus vite qu'un meuble de salon) et de l'entretien appliqué. À titre de comparaison, une peinture de rénovation tient 3 à 5 ans, un papier peint vinyle 5 à 7 ans et un stratifié entrée de gamme 8 à 10 ans. Chez CoverSwap, nous offrons une garantie de 5 ans couvrant tout défaut d'adhérence, de décoloration et de déformation dans des conditions normales d'usage. Cette garantie est transférable en cas de revente du logement.",
+          text: "En conditions normales d'utilisation, un covering adhésif professionnel dure entre 7 et 10 ans. Cette fourchette dépend de l'emplacement (une crédence de cuisine sollicitée quotidiennement s'usera plus vite qu'un meuble de salon) et de l'entretien appliqué. À titre de comparaison, une peinture de rénovation tient 3 à 5 ans, un papier peint vinyle 5 à 7 ans et un stratifié entrée de gamme 8 à 10 ans. Chez CoverSwap, nous offrons une garantie de 10 ans couvrant tout défaut d'adhérence, de décoloration et de déformation dans des conditions normales d'usage. Cette garantie est transférable en cas de revente du logement.",
         },
       ],
       tip: "Pour maximiser la durée de vie de votre covering, évitez simplement trois choses : la chaleur directe intense, les produits abrasifs et les outils coupants en contact avec la surface. Avec ces précautions élémentaires, votre revêtement passera la barre des 10 ans sans difficulté.",
       conclusion:
-        "Le covering adhésif professionnel est une solution authentiquement durable. Étanche, résistant à la chaleur et aux UV, protégé contre les rayures du quotidien, il offre une longévité de 7 à 12 ans qui surpasse celle de la plupart des alternatives de rénovation. Associé à un entretien adapté — simple et rapide — il constitue un investissement rentable et pérenne pour la transformation de votre intérieur.",
+        "Le covering adhésif professionnel est une solution authentiquement durable. Étanche, résistant à la chaleur et aux UV, protégé contre les rayures du quotidien, il offre une longévité de 7 à 10 ans qui surpasse celle de la plupart des alternatives de rénovation. Associé à un entretien adapté — simple et rapide — il constitue un investissement rentable et pérenne pour la transformation de votre intérieur.",
     },
     relatedSlugs: ["entretenir-revetement-adhesif", "marbre-bois-beton-quel-covering"],
   },

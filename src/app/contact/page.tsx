@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { BreadcrumbSchema } from "@/components/JsonLd";
@@ -15,6 +15,14 @@ const projectTypes = [
 ];
 
 export default function ContactPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactPageInner />
+    </Suspense>
+  );
+}
+
+function ContactPageInner() {
   const searchParams = useSearchParams();
   const refParam = searchParams.get("ref");
   const [sending, setSending] = useState(false);
@@ -28,14 +36,34 @@ export default function ContactPage() {
 
     const form = e.currentTarget;
     const data = new FormData(form);
+    const payload: Record<string, string> = {};
+    data.forEach((value, key) => {
+      if (typeof value === "string") payload[key] = value;
+    });
 
     try {
-      await fetch("https://coverswap.app.n8n.cloud/webhook/tally-form", {
+      const res = await fetch("/api/contact", {
         method: "POST",
-        body: data,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: payload.nom || "",
+          phone: payload.telephone || "",
+          email: payload.email || "",
+          type_projet: payload.type_projet || "",
+          surface: payload.surface || "",
+          style: payload.style || "",
+          message: payload.message || "",
+          reference: payload.reference || "",
+          website: payload.website || "",
+          source: "coverswap.fr/contact",
+        }),
       });
-      setSent(true);
-      form.reset();
+      if (!res.ok) {
+        setError(true);
+      } else {
+        setSent(true);
+        form.reset();
+      }
     } catch {
       setError(true);
     } finally {
@@ -56,7 +84,7 @@ export default function ContactPage() {
             Demandez votre <span className="text-rouge">devis gratuit</span>
           </h1>
           <p className="text-gris-400 max-w-2xl mx-auto text-lg">
-            Décrivez votre projet et recevez une estimation personnalisée sous 24 h.
+            Décrivez votre projet et recevez une estimation personnalisée sous 48 h.
           </p>
         </div>
 
@@ -71,7 +99,7 @@ export default function ContactPage() {
                   </svg>
                 </div>
                 <h2 className="font-display text-2xl font-bold mb-2">Message envoyé !</h2>
-                <p className="text-gris-400 mb-6">Nous vous répondons sous 24 h.</p>
+                <p className="text-gris-400 mb-6">Nous vous répondons sous 48 h.</p>
                 <button onClick={() => setSent(false)} className="btn-secondary text-sm px-6 py-3">
                   Envoyer un autre message
                 </button>
@@ -182,6 +210,17 @@ export default function ContactPage() {
                     <span className="text-sm text-gris-500">Cliquez ou glissez vos photos</span>
                     <input name="photos" type="file" accept="image/*" multiple className="hidden" />
                   </label>
+                </div>
+
+                {/* Honeypot - hidden from humans */}
+                <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
+                  <label htmlFor="website">Website</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="website"
+                    autoComplete="off"
+                  />
                 </div>
 
                 {error && (

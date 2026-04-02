@@ -8,5 +8,4 @@ export const SITE = {
   siret: "94518036200010",
   ape: "4334Z",
   owner: "Lucas Villemin",
-  webhookUrl: "https://coverswap.app.n8n.cloud/webhook/tally-form",
 } as const;

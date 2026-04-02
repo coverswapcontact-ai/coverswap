@@ -1,13 +1,32 @@
-"use client";
-
-import { useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
-import SimulationForm from "@/components/SimulationForm";
 import ScrollReveal from "@/components/ScrollReveal";
 import TextureBackground from "@/components/TextureBackground";
-import { FAQSchema } from "@/components/JsonLd";
+import { GallerySection, SimulationSection, FAQSection } from "@/components/HomeClient";
+
+/* ──────────────────────────────────────────────────────────────────
+   METADATA — SEO
+────────────────────────────────────────────────────────────────── */
+export const metadata: Metadata = {
+  title: "CoverSwap | Rénovation intérieure par revêtements adhésifs texturés",
+  description:
+    "Transformez votre intérieur en 1 journée avec nos revêtements adhésifs haut de gamme. Simulation IA gratuite en 60 secondes. Cuisine, salle de bain, meubles — 10x moins cher qu'une rénovation classique.",
+  keywords:
+    "covering adhésif, rénovation intérieure, revêtement adhésif, covering cuisine, covering salle de bain, covering meubles, covering professionnel, simulation IA, CoverSwap",
+  openGraph: {
+    title: "CoverSwap | Rénovation intérieure premium par covering adhésif",
+    description:
+      "Transformez votre intérieur en 1 journée. Simulation IA gratuite en 60 secondes. Effet marbre, bois, béton, métal — 10x moins cher qu'une rénovation classique.",
+    url: "https://coverswap.fr",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    type: "website",
+  },
+  alternates: {
+    canonical: "https://coverswap.fr",
+  },
+};
 
 /* ──────────────────────────────────────────────────────────────────
    TEXTURES — URLs Unsplash directes, images libres de droits
@@ -21,10 +40,6 @@ const TEXTURES = {
   /** Salle de bain élégante avec murs en marbre et éléments naturels */
   bathroom:
     "https://images.unsplash.com/photo-1754522711595-84428937b07a?auto=format&fit=crop&w=1920&q=80",
-
-  /** Intérieur moderne avec meubles et caissons en bois */
-  furniture:
-    "https://images.unsplash.com/photo-1764526624453-db32c24eca55?auto=format&fit=crop&w=1920&q=80",
 
   /** Comptoir de bar moderne avec surface en marbre */
   counter:
@@ -277,152 +292,63 @@ function HowItWorks() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SECTION 4 — GALERIE AVANT/APRÈS
-   Bois noyer foncé — overlay 0.78
+   SECTION 4b — CATALOGUE CTA
+   Fond noir — bannière visuelle vers /revetements
 ══════════════════════════════════════════════════════════════════ */
-function GallerySection() {
-  const projects = [
-    {
-      title: "Cuisine — Marbre Calacatta",
-      beforeImage: "https://images.unsplash.com/photo-1560185127-2d06c6d08d3d?auto=format&fit=crop&w=960&q=80",
-      afterImage:  "https://images.unsplash.com/photo-1682888813913-e13f18692019?auto=format&fit=crop&w=960&q=80",
-    },
-    {
-      title: "Salle de bain — Béton ciré",
-      beforeImage: "https://images.unsplash.com/photo-1764551164990-298160bcea48?auto=format&fit=crop&w=960&q=80",
-      afterImage:  "https://images.unsplash.com/photo-1750036015902-c6f5ebca924e?auto=format&fit=crop&w=960&q=80",
-    },
-    {
-      title: "Meuble TV — Bois noyer",
-      beforeImage: "https://images.unsplash.com/photo-1768609239321-1cfe14893e80?auto=format&fit=crop&w=960&q=80",
-      afterImage:  "https://images.unsplash.com/photo-1687942918532-69295473701d?auto=format&fit=crop&w=960&q=80",
-    },
-    {
-      title: "Bureau Pro — Métal brossé",
-      beforeImage: "https://images.unsplash.com/photo-1566305977571-5666677c6e98?auto=format&fit=crop&w=960&q=80",
-      afterImage:  "https://images.unsplash.com/photo-1601224503166-47e6afa2fc92?auto=format&fit=crop&w=960&q=80",
-    },
+function CatalogueSection() {
+  const families = [
+    { name: "Bois", count: "267", color: "from-amber-800 to-amber-600" },
+    { name: "Pierre & marbre", count: "58", color: "from-gray-400 to-gray-200" },
+    { name: "Béton & ciment", count: "24", color: "from-gray-600 to-gray-400" },
+    { name: "Couleurs unies", count: "89", color: "from-rouge to-red-400" },
+    { name: "Métal", count: "32", color: "from-zinc-500 to-zinc-300" },
+    { name: "Cuir & textile", count: "27", color: "from-amber-900 to-amber-700" },
   ];
 
-  const [active, setActive] = useState(0);
-
   return (
-    <section className="relative section-padding overflow-hidden">
-      {/* Texture bois */}
-      <TextureBackground
-        src={TEXTURES.furniture}
-        overlay="rgba(0,0,0,0.78)"
-        fadeTop
-        fadeBottom
-      />
+    <section className="relative section-padding bg-noir overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.15) 0%, transparent 70%)" }} />
 
-      <div className="container-custom relative z-20">
-        <div className="text-center mb-16">
+      <div className="container-custom relative z-10">
+        <div className="text-center mb-12">
           <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Portfolio</span>
+            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Catalogue</span>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">Avant / Après</h2>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
+              +490 r&eacute;f&eacute;rences <span className="text-rouge">Cover Styl&rsquo;</span>
+            </h2>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 max-w-xl mx-auto">
-              Découvrez les transformations réalisées par CoverSwap. Glissez pour comparer.
+            <p className="text-gris-300 max-w-2xl mx-auto">
+              Explorez notre catalogue complet de rev&ecirc;tements adh&eacute;sifs : bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies et bien plus. Chaque finition est disponible &agrave; la commande.
             </p>
           </ScrollReveal>
         </div>
 
-        <ScrollReveal direction="up" delay={0.1}>
-          <div className="flex flex-wrap justify-center gap-3 mb-10">
-            {projects.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => setActive(i)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                  active === i
-                    ? "bg-rouge text-white shadow-[0_0_16px_rgba(204,0,0,0.4)]"
-                    : "bg-white/5 text-gris-400 hover:bg-white/10 hover:text-white border border-white/10"
-                }`}
-              >
-                {p.title.split(" — ")[0]}
-              </button>
+        <ScrollReveal direction="up" delay={0.15}>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+            {families.map((f) => (
+              <div key={f.name} className="glass-card p-5 text-center hover:border-rouge/30 transition-all duration-300">
+                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${f.color} opacity-80`} />
+                <p className="font-display font-bold text-sm mb-0.5">{f.name}</p>
+                <p className="text-rouge text-xs font-semibold">{f.count} refs</p>
+              </div>
             ))}
           </div>
         </ScrollReveal>
 
-        <ScrollReveal direction="scale" delay={0.15}>
-          <div className="max-w-4xl mx-auto">
-            <BeforeAfterSlider
-              beforeImage={projects[active].beforeImage}
-              afterImage={projects[active].afterImage}
-              height="h-[280px] sm:h-[380px] md:h-[480px]"
-            />
-            <p className="text-center text-gris-300 mt-4 font-medium">{projects[active].title}</p>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.2}>
-          <div className="text-center mt-10">
-            <Link href="/realisations" className="btn-secondary">
-              Voir toutes nos réalisations
+        <ScrollReveal direction="up" delay={0.25}>
+          <div className="text-center">
+            <Link href="/revetements" className="btn-secondary inline-flex items-center gap-2">
+              Explorer tout le catalogue
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
             </Link>
           </div>
         </ScrollReveal>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   SECTION 5 — SIMULATION
-   Fond noir pur #1a1a1a — le rouge doit ressortir au maximum
-══════════════════════════════════════════════════════════════════ */
-function SimulationSection() {
-  return (
-    <section id="simulation" className="relative section-padding bg-noir overflow-hidden">
-      {/* Halo rouge droit */}
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[500px] h-[500px] pointer-events-none"
-        style={{ background: "radial-gradient(circle at right, rgba(204,0,0,0.08) 0%, transparent 70%)" }} />
-
-      <div className="container-custom relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <ScrollReveal direction="left">
-            <div>
-              <span className="text-rouge font-bold text-sm uppercase tracking-widest">Gratuit &amp; sans engagement</span>
-              <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-6">
-                Votre simulation IA
-                <br />
-                <span className="text-rouge">en 60 secondes</span>
-              </h2>
-              <p className="text-gris-300 text-lg mb-8 leading-relaxed">
-                Envoyez une simple photo de votre espace et recevez instantanément un rendu réaliste
-                avec le revêtement de votre choix.
-              </p>
-              <div className="space-y-4">
-                {[
-                  "Rendu photoréaliste en quelques secondes",
-                  "Choix parmi +50 textures Cover Styl'",
-                  "100% gratuit, sans engagement",
-                  "Devis personnalisé inclus",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-rouge/20 flex items-center justify-center shrink-0">
-                      <svg className="w-3.5 h-3.5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-gris-300">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal direction="right" delay={0.1}>
-            <div className="glass-card p-8 glow-border border-rouge/20">
-              <SimulationForm variant="compact" />
-            </div>
-          </ScrollReveal>
-        </div>
       </div>
     </section>
   );
@@ -516,81 +442,6 @@ function TestimonialsSection() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SECTION 7 — FAQ
-   Fond noir pur
-══════════════════════════════════════════════════════════════════ */
-function FAQSection() {
-  const faqs = [
-    {
-      q: "Combien de temps dure la pose ?",
-      a: "La majorité de nos interventions se font en une seule journée. Pour les projets plus importants (cuisine complète + salle de bain), comptez 1 à 2 jours maximum.",
-    },
-    {
-      q: "Les revêtements sont-ils résistants à l'eau ?",
-      a: "Oui ! Nos revêtements Cover Styl' sont 100% waterproof. Ils sont parfaitement adaptés aux cuisines et salles de bain, résistants à l'humidité, aux éclaboussures et à la chaleur modérée.",
-    },
-    {
-      q: "Peut-on retirer le revêtement sans abîmer le support ?",
-      a: "Absolument. Nos revêtements sont conçus pour être repositionnables et retirables sans laisser de traces. Idéal pour les locataires.",
-    },
-    {
-      q: "Quelle est la durée de vie du covering ?",
-      a: "Nos revêtements haut de gamme ont une durée de vie de 7 à 10 ans en utilisation normale. Ils résistent aux UV, aux rayures légères et au nettoyage régulier.",
-    },
-    {
-      q: "Intervenez-vous dans toute la France ?",
-      a: "Oui, nous intervenons sur l'ensemble du territoire français. Lucas se déplace partout en France métropolitaine.",
-    },
-    {
-      q: "Comment fonctionne la simulation IA ?",
-      a: "Envoyez une photo de votre espace via notre formulaire. Notre IA génère en moins de 60 secondes un rendu photoréaliste avec le revêtement de votre choix. Vous recevez le résultat par SMS.",
-    },
-  ];
-
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <section id="faq" className="relative section-padding bg-noir overflow-hidden">
-      <FAQSchema faqs={faqs} />
-      <div className="container-custom relative z-10 max-w-3xl mx-auto">
-        <div className="text-center mb-16">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">FAQ</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">Questions fréquentes</h2>
-          </ScrollReveal>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, i) => (
-            <ScrollReveal key={i} delay={i * 0.07} direction="up">
-              <div className="glass-card overflow-hidden">
-                <button
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full flex items-center justify-between p-6 text-left"
-                >
-                  <span className="font-display font-bold text-lg pr-4">{faq.q}</span>
-                  <svg
-                    className={`w-5 h-5 shrink-0 text-rouge transition-transform duration-300 ${openIndex === i ? "rotate-180" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className={`overflow-hidden transition-all duration-300 ${openIndex === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-                  <p className="px-6 pb-6 text-gris-400 leading-relaxed">{faq.a}</p>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
    PAGE ROOT
 ══════════════════════════════════════════════════════════════════ */
 export default function HomePage() {
@@ -600,6 +451,7 @@ export default function HomePage() {
       <KeyFigures />
       <HowItWorks />
       <GallerySection />
+      <CatalogueSection />
       <SimulationSection />
       <TestimonialsSection />
       <FAQSection />

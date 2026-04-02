@@ -46,13 +46,18 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-gris-400 text-sm leading-relaxed mb-6">
-              Leader français de la rénovation intérieure par revêtements adhésifs texturés haut de gamme. Transformez votre espace en une journée.
+              Spécialiste de la rénovation intérieure par revêtements adhésifs texturés haut de gamme. Transformez votre espace en une journée.
             </p>
             <div className="flex gap-4">
               {["instagram", "facebook", "tiktok", "linkedin"].map((social) => (
                 <a
                   key={social}
-                  href={`https://${social}.com/coverswap`}
+                  href={
+                    social === "instagram" ? "https://www.instagram.com/coverswap"
+                    : social === "facebook" ? "https://www.facebook.com/coverswap"
+                    : social === "tiktok" ? "https://www.tiktok.com/@coverswap"
+                    : "https://www.linkedin.com/company/coverswap"
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gris-400 hover:text-rouge hover:border-rouge/50 transition-all"
@@ -102,7 +107,7 @@ export default function Footer() {
                 { href: "/blog", label: "Blog & conseils" },
                 { href: "/contact", label: "Demander un devis" },
                 { href: "/revetements", label: "Catalogue Cover Styl'" },
-                { href: "#faq", label: "FAQ" },
+                { href: "/#faq", label: "FAQ" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link

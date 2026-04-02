@@ -50,8 +50,7 @@ export default function RootLayout({
         <LocalBusinessSchema />
         <OrganizationSchema />
         <Header />
-        <div id="main-content" />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer />
         <CookieBanner />
       </body>

@@ -3,8 +3,6 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 
-const WEBHOOK_URL = "https://coverswap.app.n8n.cloud/webhook/tally-form";
-
 const styles = [
   { id: "marbre-blanc", label: "Marbre blanc", color: "from-gray-100 to-gray-300" },
   { id: "marbre-noir", label: "Marbre noir", color: "from-gray-700 to-gray-900" },
@@ -21,6 +19,7 @@ export default function SimulationPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("");
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
@@ -41,18 +40,24 @@ export default function SimulationPage() {
     setSubmitting(true);
     setError(false);
     try {
-      const data = new FormData();
-      if (selectedFile) data.append("photo", selectedFile);
-      data.append("style", selectedStyle);
-      data.append("name", formData.name);
-      data.append("phone", formData.phone);
-      data.append("email", formData.email);
-      data.append("message", formData.message);
-      data.append("source", "coverswap.fr/simulation");
-      data.append("timestamp", new Date().toISOString());
-
-      await fetch(WEBHOOK_URL, { method: "POST", body: data });
-      setSubmitted(true);
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          style: selectedStyle,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          message: formData.message,
+          website: honeypot,
+          source: "coverswap.fr/simulation",
+        }),
+      });
+      if (!res.ok) {
+        setError(true);
+      } else {
+        setSubmitted(true);
+      }
     } catch {
       setError(true);
     } finally {
@@ -73,7 +78,7 @@ export default function SimulationPage() {
           <p className="text-gris-400 text-lg mb-8">
             Notre IA analyse votre photo. Vous recevrez votre simulation par SMS dans les prochaines minutes.
           </p>
-          <a href="/" className="btn-secondary">Retour à l&apos;accueil</a>
+          <Link href="/" className="btn-secondary">Retour à l&apos;accueil</Link>
         </div>
       </div>
     );
@@ -225,6 +230,19 @@ export default function SimulationPage() {
                     rows={4}
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge resize-none"
                     placeholder="Décrivez votre projet : espace concerné, dimensions, rendu souhaité..."
+                  />
+                </div>
+
+                {/* Honeypot - hidden from humans */}
+                <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
+                  <label htmlFor="website">Website</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="website"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                    autoComplete="off"
                   />
                 </div>
 

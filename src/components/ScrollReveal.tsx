@@ -23,23 +23,27 @@ export default function ScrollReveal({
     const el = ref.current;
     if (!el) return;
 
+    let timer: ReturnType<typeof setTimeout>;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           // Slight delay before applying transition-delay so initial state is set
-          const timer = setTimeout(() => {
+          timer = setTimeout(() => {
             el.style.transitionDelay = `${delay}s`;
             el.classList.add("revealed");
           }, 20);
           observer.disconnect();
-          return () => clearTimeout(timer);
         }
       },
       { threshold }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
   }, [delay, threshold]);
 
   const dirClass = {

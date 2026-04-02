@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-const WEBHOOK_URL = "https://coverswap.app.n8n.cloud/webhook/tally-form";
-
 const projectTypes = [
   { id: "cuisine", label: "Cuisine", icon: "M3 3h18v18H3z" },
   { id: "sdb", label: "Salle de bain", icon: "M3 3h18v18H3z" },
@@ -36,22 +34,29 @@ export default function SimulationForm({ variant = "full" }: SimulationFormProps
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setError(false);
     try {
-      await fetch(WEBHOOK_URL, {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
+          website: honeypot,
           source: "coverswap.fr",
-          timestamp: new Date().toISOString(),
         }),
       });
-      setSubmitted(true);
+      if (!res.ok) {
+        setError(true);
+      } else {
+        setSubmitted(true);
+      }
     } catch {
-      setSubmitted(true);
+      setError(true);
     } finally {
       setSubmitting(false);
     }
@@ -215,6 +220,25 @@ export default function SimulationForm({ variant = "full" }: SimulationFormProps
                 placeholder="Décrivez votre projet..."
               />
             </div>
+            {/* Honeypot - hidden from humans */}
+            <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
+              <label htmlFor="website">Website</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+                Une erreur est survenue. Veuillez réessayer.
+              </div>
+            )}
+
             <button
               onClick={handleSubmit}
               disabled={!formData.name || !formData.phone || submitting}

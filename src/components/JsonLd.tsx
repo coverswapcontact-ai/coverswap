@@ -157,19 +157,27 @@ export function ArticleSchema({
   url: string;
   images?: string[];
 }) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description,
+    url,
+    datePublished,
+    dateModified: datePublished,
+    author: [{ "@type": "Person", name: "Lucas Villemin", url: "https://coverswap.fr" }],
+    publisher: {
+      "@type": "Organization",
+      name: "CoverSwap",
+      logo: { "@type": "ImageObject", url: "https://coverswap.fr/logo.png" },
+    },
+    image: images || ["https://coverswap.fr/og-image.jpg"],
+  };
+
   return (
-    <ArticleJsonLd
-      scriptKey="article-schema"
-      type="Article"
-      url={url}
-      title={title}
-      description={description}
-      datePublished={datePublished}
-      dateModified={datePublished}
-      authorName={[{ name: "Lucas Villemin", url: "https://coverswap.fr" }]}
-      publisherName="CoverSwap"
-      publisherLogo="https://coverswap.fr/logo.png"
-      images={images || ["https://coverswap.fr/og-image.jpg"]}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   );
 }

@@ -163,7 +163,7 @@ export default function CatalogueClient() {
             className="text-lg sm:text-xl text-gris-300 max-w-2xl mx-auto"
             style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.25s" }}
           >
-            <span className="text-white font-semibold">+470</span> références disponibles &mdash; bois, pierre, béton, métal, couleur, textile, paillettes
+            <span className="text-white font-semibold">+490</span> références disponibles &mdash; bois, pierre, béton, métal, couleur, textile, paillettes
           </p>
         </div>
       </section>

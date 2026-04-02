@@ -7,43 +7,43 @@ import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd"
 export const metadata: Metadata = {
   title: "Covering Cuisine | Relooking Plan de Travail & Meubles Sans Travaux",
   description:
-    "Renovez votre cuisine en 1 journee avec le covering adhesif. Plans de travail, credences, facades de meubles. 50+ textures marbre, bois, beton. Garanti 10 ans. Devis gratuit.",
+    "Rénovez votre cuisine en 1 journée avec le covering adhésif. Plans de travail, crédences, façades de meubles. 50+ textures marbre, bois, béton. Garanti 10 ans. Devis gratuit.",
   keywords:
-    "covering cuisine, relooking cuisine sans travaux, film adhesif plan de travail, renovation cuisine adhesif, covering plan de travail, covering meuble cuisine, revetement adhesif cuisine",
+    "covering cuisine, relooking cuisine sans travaux, film adhésif plan de travail, rénovation cuisine adhésif, covering plan de travail, covering meuble cuisine, revêtement adhésif cuisine",
 };
 
 const faqs = [
   {
-    q: "Le covering resiste-t-il a la chaleur des plaques de cuisson ?",
-    a: "Nos films adhesifs sont certifies pour resister jusqu'a 75 °C en contact direct et prolonge. Autour des plaques de cuisson, nous posons un film technique haute temperature et recommandons l'usage de dessous-de-plat pour les casseroles brulantes. Aucun risque de decollement ni de deformation dans des conditions normales d'utilisation.",
+    q: "Le covering résiste-t-il à la chaleur des plaques de cuisson ?",
+    a: "Nos films adhésifs sont certifiés pour résister jusqu'à 75 °C en contact direct et prolongé. Autour des plaques de cuisson, nous posons un film technique haute température et recommandons l'usage de dessous-de-plat pour les casseroles brûlantes. Aucun risque de décollement ni de déformation dans des conditions normales d'utilisation.",
   },
   {
-    q: "Peut-on poser du covering sur un plan de travail stratifie ?",
-    a: "Oui, le stratifie est l'un des supports les plus adaptes au covering. Apres un nettoyage minutieux et l'application d'un primaire d'accroche, le film adhere parfaitement et durablement. Nous intervenons egalement sur le melamine, le carrelage, l'inox et le bois brut.",
+    q: "Peut-on poser du covering sur un plan de travail stratifié ?",
+    a: "Oui, le stratifié est l'un des supports les plus adaptés au covering. Après un nettoyage minutieux et l'application d'un primaire d'accroche, le film adhère parfaitement et durablement. Nous intervenons également sur le mélaminé, le carrelage, l'inox et le bois brut.",
   },
   {
     q: "Combien de temps dure un covering cuisine ?",
-    a: "Avec un entretien normal, nos revetements conservent leur aspect pendant 7 a 10 ans minimum. Ils sont garantis contre le decollement, le jaunissement et la delamination. Passe ce delai, le film peut etre retire et remplace par une nouvelle finition.",
+    a: "Avec un entretien normal, nos revêtements conservent leur aspect pendant 7 à 10 ans minimum. Ils sont garantis contre le décollement, le jaunissement et la délamination. Passé ce délai, le film peut être retiré et remplacé par une nouvelle finition.",
   },
   {
     q: "Le covering supporte-t-il l'eau et les projections ?",
-    a: "Absolument. Nos films sont 100 % impermeables et resistent aux projections d'eau, de graisse et de produits menagers courants. Les joints sont scelles avec un mastic alimentaire transparent pour une etancheite totale au niveau des eviers et credences.",
+    a: "Absolument. Nos films sont 100 % imperméables et résistent aux projections d'eau, de graisse et de produits ménagers courants. Les joints sont scellés avec un mastic alimentaire transparent pour une étanchéité totale au niveau des éviers et crédences.",
   },
   {
     q: "Peut-on mettre du covering sur des meubles de cuisine IKEA ?",
-    a: "C'est meme l'un de nos cas les plus frequents. Les facades IKEA en melamine sont un support ideal pour le covering. Nous transformons regulierement des cuisines METOD et KALLARP pour leur donner un aspect haut de gamme a une fraction du cout d'un remplacement.",
+    a: "C'est même l'un de nos cas les plus fréquents. Les façades IKEA en mélaminé sont un support idéal pour le covering. Nous transformons régulièrement des cuisines METOD et KALLARP pour leur donner un aspect haut de gamme à une fraction du coût d'un remplacement.",
   },
   {
     q: "Quel est le prix d'un covering cuisine complet ?",
-    a: "Le prix varie selon la surface a couvrir et les finitions choisies. En moyenne, un covering cuisine complet (plans de travail + facades + credence) revient entre 1 200 et 3 500 euros, soit 5 a 10 fois moins qu'une renovation classique. Chaque devis est personnalise et gratuit.",
+    a: "Le prix varie selon la surface à couvrir et les finitions choisies. En moyenne, un covering cuisine complet (plans de travail + façades + crédence) revient entre 1 200 et 3 500 euros, soit 5 à 10 fois moins qu'une rénovation classique. Chaque devis est personnalisé et gratuit.",
   },
   {
-    q: "Le covering est-il reversible ?",
-    a: "Oui, c'est l'un de ses grands avantages. Le film adhesif peut etre retire a tout moment sans endommager le support d'origine. Un decapeur thermique permet un retrait propre, et la surface retrouve son etat initial. Ideal pour les locataires ou ceux qui aiment changer de style.",
+    q: "Le covering est-il réversible ?",
+    a: "Oui, c'est l'un de ses grands avantages. Le film adhésif peut être retiré à tout moment sans endommager le support d'origine. Un décapeur thermique permet un retrait propre, et la surface retrouve son état initial. Idéal pour les locataires ou ceux qui aiment changer de style.",
   },
   {
     q: "Comment entretenir un plan de travail recouvert ?",
-    a: "L'entretien est tres simple : un chiffon doux humide avec un peu de produit vaisselle suffit. Evitez les eponges abrasives et les solvants agressifs. Nos films sont anti-traces et oleofuges, ce qui facilite le nettoyage quotidien. Aucun traitement particulier n'est necessaire.",
+    a: "L'entretien est très simple : un chiffon doux humide avec un peu de produit vaisselle suffit. Évitez les éponges abrasives et les solvants agressifs. Nos films sont anti-traces et oléofuges, ce qui facilite le nettoyage quotidien. Aucun traitement particulier n'est nécessaire.",
   },
 ];
 
@@ -52,37 +52,37 @@ const surfaces = [
     icon: "🍳",
     title: "Plans de travail",
     description:
-      "Stratifie, melamine ou carrelage : recouvrez votre plan de travail d'une finition marbre, bois ou beton sans depose.",
+      "Stratifié, mélaminé ou carrelage : recouvrez votre plan de travail d'une finition marbre, bois ou béton sans dépose.",
   },
   {
     icon: "🧱",
-    title: "Credences",
+    title: "Crédences",
     description:
-      "Remplacez le carrelage vieillissant par un film adhesif lisse, facile a nettoyer et resistant aux projections.",
+      "Remplacez le carrelage vieillissant par un film adhésif lisse, facile à nettoyer et résistant aux projections.",
   },
   {
     icon: "🚪",
-    title: "Facades de meubles",
+    title: "Façades de meubles",
     description:
-      "Donnez un second souffle a vos caissons hauts et bas avec des facades effet laque, bois naturel ou couleur unie.",
+      "Donnez un second souffle à vos caissons hauts et bas avec des façades effet laqué, bois naturel ou couleur unie.",
   },
   {
     icon: "🗄️",
-    title: "Tiroirs et poignees",
+    title: "Tiroirs et poignées",
     description:
-      "Chaque detail compte : harmonisez tiroirs, plinthes et poignees pour un rendu coherent et soigne.",
+      "Chaque détail compte : harmonisez tiroirs, plinthes et poignées pour un rendu cohérent et soigné.",
   },
   {
     icon: "🏝️",
-    title: "Ilots centraux",
+    title: "Îlots centraux",
     description:
-      "Transformez votre ilot en piece maitresse avec une finition premium : marbre Calacatta, chene clair ou beton cire.",
+      "Transformez votre îlot en pièce maîtresse avec une finition premium : marbre Calacatta, chêne clair ou béton ciré.",
   },
   {
     icon: "📦",
-    title: "Elements hauts et bas",
+    title: "Éléments hauts et bas",
     description:
-      "Colonnes, meubles d'angle, habillages de hotte : toutes les surfaces sont couvertes pour un resultat uniforme.",
+      "Colonnes, meubles d'angle, habillages de hotte : toutes les surfaces sont couvertes pour un résultat uniforme.",
   },
 ];
 
@@ -91,37 +91,37 @@ const finitions = [
     title: "Marbre",
     varieties: "Carrara, Calacatta, noir Marquina",
     description:
-      "Veinage naturel et profondeur de matiere pour un rendu luxueux. Toucher lisse et brillant, indiscernable du vrai marbre.",
+      "Veinage naturel et profondeur de matière pour un rendu luxueux. Toucher lisse et brillant, indiscernable du vrai marbre.",
   },
   {
     title: "Bois",
-    varieties: "Chene clair, noyer, teck",
+    varieties: "Chêne clair, noyer, teck",
     description:
-      "Grain et texture reproduits au millimetre. Chaleur du bois naturel sans les contraintes d'entretien ni la sensibilite a l'humidite.",
+      "Grain et texture reproduits au millimètre. Chaleur du bois naturel sans les contraintes d'entretien ni la sensibilité à l'humidité.",
   },
   {
-    title: "Beton",
-    varieties: "Gris anthracite, beton cire",
+    title: "Béton",
+    varieties: "Gris anthracite, béton ciré",
     description:
-      "L'esprit loft et industriel dans votre cuisine. Finition mate et minerale avec une resistance superieure au vrai beton cire.",
+      "L'esprit loft et industriel dans votre cuisine. Finition mate et minérale avec une résistance supérieure au vrai béton ciré.",
   },
   {
     title: "Couleurs unies",
-    varieties: "Mat, satine, brillant",
+    varieties: "Mat, satiné, brillant",
     description:
-      "Du blanc eclatant au noir profond en passant par toutes les teintes RAL. Finition uniforme et sans defaut pour un style epure.",
+      "Du blanc éclatant au noir profond en passant par toutes les teintes RAL. Finition uniforme et sans défaut pour un style épuré.",
   },
   {
-    title: "Metal",
-    varieties: "Inox brosse, laiton, cuivre",
+    title: "Métal",
+    varieties: "Inox brossé, laiton, cuivre",
     description:
-      "Reflets metalliques authentiques pour une touche contemporaine. Ideal pour les credences, ilots et elements de contrast.",
+      "Reflets métalliques authentiques pour une touche contemporaine. Idéal pour les crédences, îlots et éléments de contraste.",
   },
   {
     title: "Pierre naturelle",
     varieties: "Ardoise, granit, travertin",
     description:
-      "Texture et grain de la pierre veritable. Robustesse visuelle et elegance brute pour une cuisine de caractere.",
+      "Texture et grain de la pierre véritable. Robustesse visuelle et élégance brute pour une cuisine de caractère.",
   },
 ];
 
@@ -130,47 +130,47 @@ const steps = [
     num: "01",
     title: "Envoyez vos photos",
     description:
-      "Photographiez votre cuisine sous differents angles. Notre IA analyse les surfaces et genere un devis detaille en 48 heures.",
+      "Photographiez votre cuisine sous différents angles. Notre IA analyse les surfaces et génère un devis détaillé en 48 heures.",
   },
   {
     num: "02",
     title: "Choix des finitions",
     description:
-      "Selectionnez vos textures parmi 50+ references. Nous vous envoyons des echantillons physiques pour valider couleurs et toucher.",
+      "Sélectionnez vos textures parmi 50+ références. Nous vous envoyons des échantillons physiques pour valider couleurs et toucher.",
   },
   {
     num: "03",
-    title: "Preparation des surfaces",
+    title: "Préparation des surfaces",
     description:
-      "Nettoyage professionnel, degraissage, application d'un primaire d'accroche. Chaque surface est preparee pour une adhesion parfaite.",
+      "Nettoyage professionnel, dégraissage, application d'un primaire d'accroche. Chaque surface est préparée pour une adhésion parfaite.",
   },
   {
     num: "04",
     title: "Pose professionnelle",
     description:
-      "Nos poseurs certifies interviennent en 1 journee. Decoupe sur mesure, maroufflage sans bulles, finitions impeccables. Resultat immediat.",
+      "Nos poseurs certifiés interviennent en 1 journée. Découpe sur mesure, maroufflage sans bulles, finitions impeccables. Résultat immédiat.",
   },
 ];
 
 const avantages = [
-  { icon: "🔥", title: "Resistant chaleur", description: "Jusqu'a 75 °C en contact direct" },
-  { icon: "💧", title: "Resistant eau et humidite", description: "100 % impermeable, joints scelles" },
-  { icon: "🛡️", title: "Anti-rayures et anti-taches", description: "Surface oleofuge haute densite" },
-  { icon: "🧹", title: "Entretien simple", description: "Eau + chiffon doux, sans produit special" },
-  { icon: "✅", title: "Garanti 10 ans", description: "Anti-decollement, anti-jaunissement" },
-  { icon: "♻️", title: "Reversible sans traces", description: "Retrait propre, support preserve" },
-  { icon: "🍽️", title: "Conforme normes alimentaires", description: "Contact alimentaire indirect certifie" },
-  { icon: "🌱", title: "Ecologique (0 dechet)", description: "Pas de demolition, pas de gravats" },
+  { icon: "🔥", title: "Résistant chaleur", description: "Jusqu'à 75 °C en contact direct" },
+  { icon: "💧", title: "Résistant eau et humidité", description: "100 % imperméable, joints scellés" },
+  { icon: "🛡️", title: "Anti-rayures et anti-taches", description: "Surface oléofuge haute densité" },
+  { icon: "🧹", title: "Entretien simple", description: "Eau + chiffon doux, sans produit spécial" },
+  { icon: "✅", title: "Garanti 10 ans", description: "Anti-décollement, anti-jaunissement" },
+  { icon: "♻️", title: "Réversible sans traces", description: "Retrait propre, support préservé" },
+  { icon: "🍽️", title: "Conforme normes alimentaires", description: "Contact alimentaire indirect certifié" },
+  { icon: "🌱", title: "Écologique (0 déchet)", description: "Pas de démolition, pas de gravats" },
 ];
 
 const comparatif = [
   { critere: "Prix moyen", covering: "1 200 - 3 500 euros", classique: "5 000 - 15 000 euros" },
-  { critere: "Duree des travaux", covering: "1 journee", classique: "2 a 3 semaines" },
-  { critere: "Poussiere / Bruit", covering: "Aucun", classique: "Important" },
-  { critere: "Demenagement necessaire", covering: "Non", classique: "Souvent oui" },
-  { critere: "Durabilite", covering: "7 a 10 ans garanti", classique: "15 a 20 ans" },
-  { critere: "Personnalisation", covering: "50+ textures, changeable", classique: "Limitee au choix initial" },
-  { critere: "Impact ecologique", covering: "Minimal (0 dechet)", classique: "Eleve (demolition, transport)" },
+  { critere: "Durée des travaux", covering: "1 journée", classique: "2 à 3 semaines" },
+  { critere: "Poussière / Bruit", covering: "Aucun", classique: "Important" },
+  { critere: "Déménagement nécessaire", covering: "Non", classique: "Souvent oui" },
+  { critere: "Durabilité", covering: "7 à 10 ans garanti", classique: "15 à 20 ans" },
+  { critere: "Personnalisation", covering: "50+ textures, changeable", classique: "Limitée au choix initial" },
+  { critere: "Impact écologique", covering: "Minimal (0 déchet)", classique: "Élevé (démolition, transport)" },
 ];
 
 export default function CuisinePage() {
@@ -178,7 +178,7 @@ export default function CuisinePage() {
     <main className="bg-noir min-h-screen">
       <ServiceSchema
         name="Covering Cuisine"
-        description="Renovation de cuisine par revetement adhesif texture : plans de travail, credences, facades de meubles. Plus de 50 finitions disponibles, pose en 1 journee, garanti 10 ans."
+        description="Rénovation de cuisine par revêtement adhésif texturé : plans de travail, crédences, façades de meubles. Plus de 50 finitions disponibles, pose en 1 journée, garanti 10 ans."
         url="https://coverswap.fr/prestations/cuisine"
       />
       <FAQSchema faqs={faqs} />
@@ -211,12 +211,12 @@ export default function CuisinePage() {
               Covering Cuisine
             </span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold mb-6 tracking-tight max-w-3xl">
-              Relookez votre cuisine <span className="text-rouge">sans travaux</span>, en 1 journee
+              Relookez votre cuisine <span className="text-rouge">sans travaux</span>, en 1 journée
             </h1>
             <p className="text-gris-300 text-lg max-w-2xl leading-relaxed mb-10">
-              Plans de travail, credences, facades de meubles : transformez chaque surface avec un revetement adhesif
-              texture haut de gamme. Plus de 50 finitions marbre, bois et beton, posees en une seule journee, pour un
-              budget 10x inferieur a une renovation classique.
+              Plans de travail, crédences, façades de meubles : transformez chaque surface avec un revêtement adhésif
+              texturé haut de gamme. Plus de 50 finitions marbre, bois et béton, posées en une seule journée, pour un
+              budget 10x inférieur à une rénovation classique.
             </p>
           </ScrollReveal>
 
@@ -238,7 +238,7 @@ export default function CuisinePage() {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-16">
-              Pourquoi le covering est la <span className="text-rouge">revolution</span> de la renovation cuisine
+              Pourquoi le covering est la <span className="text-rouge">révolution</span> de la rénovation cuisine
             </h2>
           </ScrollReveal>
 
@@ -246,19 +246,19 @@ export default function CuisinePage() {
             <ScrollReveal direction="left">
               <div className="space-y-6">
                 <p className="text-gris-300 leading-relaxed">
-                  Renover une cuisine de maniere traditionnelle, c&apos;est un budget de 5 000 a 15 000 euros, 2 a 3
-                  semaines de travaux, des artisans qui se succedent, de la poussiere dans toute la maison et
-                  l&apos;impossibilite de cuisiner pendant des jours. Sans compter le stress de gerer un chantier au
-                  coeur de votre quotidien.
+                  Rénover une cuisine de manière traditionnelle, c&apos;est un budget de 5 000 à 15 000 euros, 2 à 3
+                  semaines de travaux, des artisans qui se succèdent, de la poussière dans toute la maison et
+                  l&apos;impossibilité de cuisiner pendant des jours. Sans compter le stress de gérer un chantier au
+                  cœur de votre quotidien.
                 </p>
                 <p className="text-gris-300 leading-relaxed">
-                  Le covering adhesif change completement la donne. En une seule journee, nos poseurs experts
-                  recouvrent l&apos;ensemble de vos surfaces &mdash; plans de travail, credences, facades &mdash;
-                  d&apos;un film adhesif texture haute performance. Pas de demolition, pas de poussiere, pas de bruit.
-                  Vous retrouvez une cuisine neuve le soir meme.
+                  Le covering adhésif change complètement la donne. En une seule journée, nos poseurs experts
+                  recouvrent l&apos;ensemble de vos surfaces &mdash; plans de travail, crédences, façades &mdash;
+                  d&apos;un film adhésif texturé haute performance. Pas de démolition, pas de poussière, pas de bruit.
+                  Vous retrouvez une cuisine neuve le soir même.
                 </p>
                 <p className="text-gris-300 leading-relaxed">
-                  Le resultat est bluffant : des finitions marbre, bois ou beton indiscernables des materiaux
+                  Le résultat est bluffant : des finitions marbre, bois ou béton indiscernables des matériaux
                   d&apos;origine, garanties 10 ans, pour une fraction du prix. C&apos;est la solution choisie par plus
                   de 500 particuliers et professionnels en France.
                 </p>
@@ -268,10 +268,10 @@ export default function CuisinePage() {
             <ScrollReveal direction="right">
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { value: "1 journee", label: "de pose" },
+                  { value: "1 journée", label: "de pose" },
                   { value: "10x", label: "moins cher" },
                   { value: "10 ans", label: "de garantie" },
-                  { value: "500+", label: "projets realises" },
+                  { value: "500+", label: "projets réalisés" },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -298,7 +298,7 @@ export default function CuisinePage() {
         <div className="container-custom relative z-20">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-16">
-              Toutes les surfaces de votre cuisine, <span className="text-rouge">transformees</span>
+              Toutes les surfaces de votre cuisine, <span className="text-rouge">transformées</span>
             </h2>
           </ScrollReveal>
 
@@ -324,8 +324,8 @@ export default function CuisinePage() {
               Plus de 50 textures pour <span className="text-rouge">votre style</span>
             </h2>
             <p className="text-gris-400 text-center max-w-2xl mx-auto mb-16">
-              Chaque finition est selectionnee pour son realisme, sa durabilite et sa resistance aux contraintes
-              specifiques de la cuisine.
+              Chaque finition est sélectionnée pour son réalisme, sa durabilité et sa résistance aux contraintes
+              spécifiques de la cuisine.
             </p>
           </ScrollReveal>
 
@@ -343,7 +343,7 @@ export default function CuisinePage() {
         </div>
       </section>
 
-      {/* ══════════════════ PROCESSUS EN 4 ETAPES ══════════════════ */}
+      {/* ══════════════════ PROCESSUS EN 4 ÉTAPES ══════════════════ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
           src="https://images.unsplash.com/photo-1722605090433-41d1183a792d?auto=format&fit=crop&w=1920&q=80"
@@ -354,7 +354,7 @@ export default function CuisinePage() {
         <div className="container-custom relative z-20">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-16">
-              Un relooking cuisine <span className="text-rouge">cle en main</span>
+              Un relooking cuisine <span className="text-rouge">clé en main</span>
             </h2>
           </ScrollReveal>
 
@@ -405,7 +405,7 @@ export default function CuisinePage() {
         <div className="container-custom max-w-4xl">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-16">
-              Covering vs renovation <span className="text-rouge">classique</span>
+              Covering vs rénovation <span className="text-rouge">classique</span>
             </h2>
           </ScrollReveal>
 
@@ -429,6 +429,39 @@ export default function CuisinePage() {
                 </div>
               ))}
             </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ══════════════════ CATALOGUE CTA ══════════════════ */}
+      <section className="section-padding bg-noir">
+        <div className="container-custom">
+          <ScrollReveal direction="scale">
+            <Link href="/revetements" className="block glass-card p-10 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group">
+              <div className="flex flex-col lg:flex-row items-center gap-8">
+                <div className="w-16 h-16 rounded-2xl bg-rouge/10 flex items-center justify-center shrink-0 group-hover:bg-rouge/20 transition-colors">
+                  <svg className="w-8 h-8 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
+                  </svg>
+                </div>
+                <div className="text-center lg:text-left flex-1">
+                  <h3 className="font-display text-2xl font-bold mb-2">
+                    Explorez nos 267 références bois et <span className="text-rouge">+50 finitions</span> pour votre cuisine
+                  </h3>
+                  <p className="text-gris-400 leading-relaxed">
+                    Parcourez notre catalogue complet de 497 références Cover Styl&apos; : marbre, bois, béton, métal et bien plus. Trouvez la finition parfaite pour chaque surface de votre cuisine.
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <span className="inline-flex items-center gap-2 text-rouge font-semibold group-hover:gap-3 transition-all">
+                    Voir le catalogue
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </Link>
           </ScrollReveal>
         </div>
       </section>
@@ -478,11 +511,11 @@ export default function CuisinePage() {
           <ScrollReveal direction="scale">
             <div className="bg-white/5 backdrop-blur border border-rouge/20 bg-rouge/5 rounded-2xl p-12">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
-                Pret a transformer votre <span className="text-rouge">cuisine</span> ?
+                Prêt à transformer votre <span className="text-rouge">cuisine</span> ?
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Envoyez-nous les photos de votre cuisine et recevez un apercu realiste ainsi qu&apos;un devis
-                personnalise sous 48 heures. Simulation gratuite, sans engagement.
+                Envoyez-nous les photos de votre cuisine et recevez un aperçu réaliste ainsi qu&apos;un devis
+                personnalisé sous 48 heures. Simulation gratuite, sans engagement.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/simulation" className="btn-primary text-lg px-10 py-5">

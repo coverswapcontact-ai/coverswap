@@ -44,7 +44,7 @@ export default function CookieBanner() {
           }
         }
       `}</style>
-      <div className="bg-noir-900/95 backdrop-blur-md border-t border-white/10 px-4 py-4">
+      <div className="bg-noir/95 backdrop-blur-md border-t border-white/10 px-4 py-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gris-300 text-center sm:text-left">
             Ce site utilise des cookies pour améliorer votre expérience.{" "}
