@@ -1,0 +1,5521 @@
+[
+  {
+    "id": "A4",
+    "nom": "Orangey Wenge",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/a4_ae69ca9971.jpg",
+    "tags": [
+      "wenge",
+      "foncé"
+    ]
+  },
+  {
+    "id": "AA01",
+    "nom": "Beige Oak",
+    "famille": "bois",
+    "categorie": "Medium",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa01_321a9b93e0.jpg",
+    "tags": [
+      "chêne",
+      "beige"
+    ]
+  },
+  {
+    "id": "AA02",
+    "nom": "Rustic Oak",
+    "famille": "bois",
+    "categorie": "Medium",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa02_4b34a45c7e.jpg",
+    "tags": [
+      "chêne",
+      "rustique"
+    ]
+  },
+  {
+    "id": "AA04",
+    "nom": "Rich Oak",
+    "famille": "bois",
+    "categorie": "Medium",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa04_d4dbfa3468.jpg",
+    "tags": [
+      "chêne"
+    ]
+  },
+  {
+    "id": "AA05",
+    "nom": "Honey Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa05_1a37cc9591.jpg",
+    "tags": [
+      "chêne",
+      "miel"
+    ]
+  },
+  {
+    "id": "AA06",
+    "nom": "Smoky Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa06_a52eddef32.jpg",
+    "tags": [
+      "chêne",
+      "fumé",
+      "foncé"
+    ]
+  },
+  {
+    "id": "AA08",
+    "nom": "Brown Orangey Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa08_ade14f9b9d.jpg",
+    "tags": [
+      "chêne",
+      "marron",
+      "orangé"
+    ]
+  },
+  {
+    "id": "AA09",
+    "nom": "Gravel Grey Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa09_1c3a012ccb.jpg",
+    "tags": [
+      "chêne",
+      "gris"
+    ]
+  },
+  {
+    "id": "AA12",
+    "nom": "Brown Line Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa12_47de9dd2d7.jpg",
+    "tags": [
+      "chêne",
+      "marron",
+      "ligné"
+    ]
+  },
+  {
+    "id": "AA14",
+    "nom": "Original Oak",
+    "famille": "bois",
+    "categorie": "Dark",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa14_658b90e0e4.jpg",
+    "tags": [
+      "chêne",
+      "original"
+    ]
+  },
+  {
+    "id": "AA15",
+    "nom": "Grey Line Oak",
+    "famille": "bois",
+    "categorie": "Medium",
+    "finition": "Rustic",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa15_1225760f54.jpg",
+    "tags": [
+      "chêne",
+      "gris",
+      "ligné"
+    ]
+  },
+  {
+    "id": "AA17",
+    "nom": "Beige Line Oak",
+    "famille": "bois",
+    "categorie": "Medium",
+    "finition": "Structured",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa17_0033983c62.jpg",
+    "tags": [
+      "chêne",
+      "beige",
+      "ligné"
+    ]
+  },
+  {
+    "id": "AB02",
+    "nom": "Creamy",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ab02_3d4c16df93.jpg",
+    "tags": [
+      "crème",
+      "peint"
+    ]
+  },
+  {
+    "id": "AB03",
+    "nom": "Khaki Oak",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ab03_1ced059bff.jpg",
+    "tags": [
+      "chêne",
+      "kaki",
+      "peint"
+    ]
+  },
+  {
+    "id": "AB05",
+    "nom": "Blue Ebony",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ab05_fda451393c.jpg",
+    "tags": [
+      "ébène",
+      "bleu",
+      "peint"
+    ]
+  },
+  {
+    "id": "AB06",
+    "nom": "Turquoise",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ab06_67832774f3.jpg",
+    "tags": [
+      "turquoise",
+      "peint"
+    ]
+  },
+  {
+    "id": "AB07",
+    "nom": "Dark Blue",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ab07_490a5ce0a6.jpg",
+    "tags": [
+      "bleu",
+      "foncé",
+      "peint"
+    ]
+  },
+  {
+    "id": "AC01",
+    "nom": "White Lined",
+    "famille": "bois",
+    "categorie": "Painted",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ac01_a17f2a1f00.jpg",
+    "tags": [
+      "blanc",
+      "ligné",
+      "peint"
+    ]
+  },
+  {
+    "id": "AC04",
+    "nom": "Plain White",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ac04_3e965d05da.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF02",
+    "nom": "Beige Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af02_b299ed5b51.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF03",
+    "nom": "Line Beige Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af03_dcbfa92c0b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF05",
+    "nom": "Orangey Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af05_9b8d6cdace.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF06",
+    "nom": "Brown Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af06_3183f83750.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF07",
+    "nom": "Pale Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af07_1d049cee94.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF08",
+    "nom": "Walnut Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af08_42f2e7bbce.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF09",
+    "nom": "Yellow Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af09_65aa55dced.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AF10",
+    "nom": "Hazelnut Cream",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af10_6c536d210d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG01",
+    "nom": "White Cream Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag01_50bb5cfcb0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG02",
+    "nom": "Yellow Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag02_8277e55310.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG07",
+    "nom": "White Line Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag07_88b40a24d3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG10",
+    "nom": "Honey Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag10_3bddd7a2a5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG11",
+    "nom": "Beige Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag11_9f1d686834.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG13",
+    "nom": "Pale Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag13_3dad64f1dd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG14",
+    "nom": "Cream Golden Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag14_16de4a1b1a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG15",
+    "nom": "Golden Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag15_bbd0387a10.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG16",
+    "nom": "Cream Golden Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag16_af7eb58fd3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG17",
+    "nom": "Golden Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag17_e7b8a3b5c5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG18",
+    "nom": "Line Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag18_8a8ee7ab72.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AG20",
+    "nom": "Cream Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag20_ee0fae5c42.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL08",
+    "nom": "Yellow Bao",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al08_88e9527f57.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL10",
+    "nom": "Beige Bao",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al10_8cd3cefaf4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL12",
+    "nom": "Walnut Bao",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al12_0c4cd4076d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL14",
+    "nom": "Traditional Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al14_f076ed8d05.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL23",
+    "nom": "Beige Cherry",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al23_35effb21e5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL24",
+    "nom": "Bleach Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al24_f7d93c2ea4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL25",
+    "nom": "Brown Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al25_c23a5624db.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL26",
+    "nom": "Beige Brown Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al26_b1098cc751.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL28",
+    "nom": "Bleach Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al28_7572873742.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL29",
+    "nom": "Pale White Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al29_9e531a4fbf.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AL30",
+    "nom": "Sand Cherry",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al30_f90be153ca.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AT02",
+    "nom": "Brown Cherry",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at02_f03a20ad4a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AT03",
+    "nom": "Beige Brown Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at03_e8326eaf13.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AT04",
+    "nom": "Orangey Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at04_bd93ab04da.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AT05",
+    "nom": "Honey Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at05_410e0ef87f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AT06",
+    "nom": "Black Sheen Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at06_6914a76ae7.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "AZ07",
+    "nom": "Walnut Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/az07_82d30fab94.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B1",
+    "nom": "Honey Maple",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b1_e1f94e1298.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B3",
+    "nom": "Natural Maple",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b3_6305dbf1ed.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B4",
+    "nom": "Weathered Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b4_ec0e92839a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B5",
+    "nom": "Golden Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b5_d5e3d18c69.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B50",
+    "nom": "Crème",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b50_0d209496cc.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B6",
+    "nom": "Cashew Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b6_ca0001ddcb.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B8",
+    "nom": "Heritage Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b8_4adf533ea5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "B9",
+    "nom": "Roast Coffee",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b9_e46158c3ae.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT01",
+    "nom": "Traditional Maple",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct01_9e2f4d2432.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT02",
+    "nom": "Aged Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct02_8b86bc2689.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT05",
+    "nom": "Nut Honey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct05_1b42a71b91.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT06",
+    "nom": "Nutmeg",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct06_da4b50e5ea.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT08",
+    "nom": "Andean Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct08_c10b8f3e3d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT09",
+    "nom": "Maple Syrup",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct09_bbae7ac19a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT10",
+    "nom": "Honey Limba",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct10_5dcabff7ec.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT100",
+    "nom": "White Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct100_d589ff55c4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT101",
+    "nom": "Waved Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct101_2fb0d65b9d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT102",
+    "nom": "Pale Sheen Cedar",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct102_fa3444d3da.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT11",
+    "nom": "Honey Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct11_c4f572a77c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT13",
+    "nom": "Pale Grey Maple",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct13_7e8f00a68c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT14",
+    "nom": "Aged Pale Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct14_82a214aab0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT15",
+    "nom": "Almond Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct15_7af5833dc2.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT16",
+    "nom": "Chess Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct16_0f635fce69.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT17",
+    "nom": "Cream Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct17_9aedbd8020.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT18",
+    "nom": "White Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct18_3e9c0542ab.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT19",
+    "nom": "Gold Pale Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct19_7f1240ff55.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT20",
+    "nom": "Gold Beige Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct20_8f5acaae07.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT21",
+    "nom": "Cream Orangey Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct21_eb7c82b56b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT22",
+    "nom": "Honey Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct22_826915729a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT24",
+    "nom": "Brown Orangey Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct24_a07f906ab4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT25",
+    "nom": "Aged Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct25_1f7cc7eeca.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT26",
+    "nom": "Bordeaux Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct26_a66325e72f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT28",
+    "nom": "Beige Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct28_12a3e92a45.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT29",
+    "nom": "Brown Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct29_9912fc14da.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT33",
+    "nom": "Basic Birch",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct33_0f005cf0dd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT35",
+    "nom": "Aged Golden Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct35_2628117014.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT36",
+    "nom": "Pecan Acacia",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct36_a7a1876c75.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT37",
+    "nom": "Cream Brown Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct37_c1c1b3f675.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT41",
+    "nom": "Yellow Noce",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct41_8275f9ac8f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT42",
+    "nom": "Sheen Noce",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct42_99126ae01c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT43",
+    "nom": "Orangey Noce",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct43_e3dd38d503.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT44",
+    "nom": "Rosewood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct44_f15853bf4a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT45",
+    "nom": "Beige Palm Tree",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct45_128dced6de.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT46",
+    "nom": "Beige Sycamore",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct46_ece4064458.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT48",
+    "nom": "Yellow Lined Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct48_74238d4c9b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT53",
+    "nom": "Deep Beige Cherry",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct53_33cc3d279a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT54",
+    "nom": "Honey Fir",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct54_ad05cae7b9.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT55",
+    "nom": "Deep Brown Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct55_c58c5e0a7f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT56",
+    "nom": "Brown Palm Tree",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct56_8466747052.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT58",
+    "nom": "Faded Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct58_64ae6f10c3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT59",
+    "nom": "Deep Classic Brown",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct59_8da3ba4ef3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT60",
+    "nom": "Brown Fir",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct60_05bd6a573f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT61",
+    "nom": "Deep Brown Ebony",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct61_740c03772e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT62",
+    "nom": "Deep Beige Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct62_045c0f08c8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT66",
+    "nom": "Rich Brown Ebony",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct66_34400a330c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT68",
+    "nom": "Brown Ebony",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct68_365410f248.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT69",
+    "nom": "Cream Brown",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct69_71f9c82a0f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT70",
+    "nom": "Yellow Sycamore",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct70_8261b433bd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT71",
+    "nom": "Classic Honey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct71_b2946917ea.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT74",
+    "nom": "Classic White Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct74_47386a223e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT75",
+    "nom": "Basic Honey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct75_fcc3cade1a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT76",
+    "nom": "Whitewashed Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct76_f2efa93761.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT77",
+    "nom": "Oak Barrel",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct77_2fc8f4cd36.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT78",
+    "nom": "Basic Yellow Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct78_d13062cadd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT79",
+    "nom": "Pale Grey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct79_6a479a1496.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT80",
+    "nom": "Antic Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct80_3067f1a91e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT82",
+    "nom": "Bumpy Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct82_4944847d48.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT84",
+    "nom": "Birch plywood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct84_55a4269b06.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT87",
+    "nom": "Honey Noce",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct87_8a35ed2e69.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT88",
+    "nom": "Brown Acacia",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct88_3f76a53dbf.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT89",
+    "nom": "Red Orangey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct89_03040a181c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT90",
+    "nom": "White Grey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct90_4fa93682e4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT91",
+    "nom": "Vanilla Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct91_12b5cbeeb7.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT92",
+    "nom": "Sand Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct92_219b9a6628.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT93",
+    "nom": "Beige Acacia",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct93_f2eef33bd2.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT94",
+    "nom": "Deep Beige Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct94_525ca4dac5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT95",
+    "nom": "Ivory Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct95_a5ebba321f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT96",
+    "nom": "Lined Almond Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct96_7bb2406022.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT97",
+    "nom": "Almond Palm Tree",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct97_ab1db9e8d8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT98",
+    "nom": "Honey Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct98_e2f09193ee.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "CT99",
+    "nom": "Sheen Honey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct99_a79c20ff2b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "D1",
+    "nom": "Classic Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/d1_085a670aef.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "D4",
+    "nom": "Zebrano",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/d4_b48a10449e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "E4",
+    "nom": "English Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/e4_d622bc50f0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "E50",
+    "nom": "Brownish Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/e50_317754e762.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "F4",
+    "nom": "Bucolic Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f4_64a61d43fd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "F5",
+    "nom": "Structured Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f5_8e274dd817.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "F6",
+    "nom": "Western Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f6_f3067d0df1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "F7",
+    "nom": "Castagno Caducci",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f7_01564898c9.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "G0",
+    "nom": "Line Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/g0_2e966a2d5e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "G6",
+    "nom": "Patina",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/g6_4caa2e3d38.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "H10",
+    "nom": "Slats Patina",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h10_b916d19fad.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "H4",
+    "nom": "Hardwood Panel",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h4_89975d3f0f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "H5",
+    "nom": "Silverblack",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h5_216872374f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "H50",
+    "nom": "Chevron Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h50_5ce929d727.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "I10",
+    "nom": "Mario Grey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i10_7fdc42c9e1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "I14",
+    "nom": "Legno",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i14_4ccd0d6a25.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "I9",
+    "nom": "Soft Pale Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i9_3bc08f0227.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "J14",
+    "nom": "Rich White",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j14_f5e7b664c5.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "J17",
+    "nom": "Off White",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j17_a911f4acc4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "J18",
+    "nom": "Anthracite Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j18_2cfbb6108e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "J2",
+    "nom": "Rich Black",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j2_d21400def8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "MA10",
+    "nom": "Pearl",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma10_e43ef2b52a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "MA14",
+    "nom": "Black Night",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma14_c3bc673cce.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE45",
+    "nom": "Cool Mint",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne45_79122bdd5d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE46",
+    "nom": "Tan Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne46_9b51b16151.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE57",
+    "nom": "Sandy",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne57_d10f568008.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE61",
+    "nom": "Cream Grey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne61_694b48c337.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE62",
+    "nom": "Brown Hazelwood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne62_c28a6f8fba.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE63",
+    "nom": "Pale Hazelwood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne63_49a718307a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE64",
+    "nom": "Beige Hazelwood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne64_a42a63cd9b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE65",
+    "nom": "Brown Lined Hazelwood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne65_6c2acc8375.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE66",
+    "nom": "Brown Lined Cream",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne66_fc40f346d4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NE68",
+    "nom": "Freijo Laurel",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne68_f4ad5fd3f3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF17",
+    "nom": "Crispy White",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf17_686186f59c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF18",
+    "nom": "Crispy Light Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf18_a2e253789e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF19",
+    "nom": "Crispy Beige",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf19_d32c62d993.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF20",
+    "nom": "Crispy Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf20_422c9c3135.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF21",
+    "nom": "Ecru",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf21_856501ecd3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF22",
+    "nom": "Sable Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf22_8ef0bfaf7e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF23",
+    "nom": "Dove Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf23_b6c9794e5b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF24",
+    "nom": "Winter Breeze",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf24_7581b3871c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF25",
+    "nom": "Twilight",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf25_18560fcbfa.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF26",
+    "nom": "Noir",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf26_fc25686292.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF27",
+    "nom": "American Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf27_85e983d38b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF28",
+    "nom": "Greyish Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf28_c79ba6a8e8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF29",
+    "nom": "Cream Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf29_b6b0a3ef3e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF30",
+    "nom": "Fawn Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf30_4cf29c991c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF31",
+    "nom": "Butter Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf31_5916c3b77a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF32",
+    "nom": "Almond Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf32_4bf32b9f8c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF33",
+    "nom": "Brownie Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf33_0fe221a9e1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF34",
+    "nom": "Tan Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf34_2b0c3d605c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF35",
+    "nom": "Praliné Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf35_276bb33763.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF36",
+    "nom": "Biscuit Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf36_5aa4664120.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF37",
+    "nom": "Gianduia Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf37_22a0ac1ec1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF38",
+    "nom": "Straw Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf38_3585b285a0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF39",
+    "nom": "Red Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf39_6471e66d9b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF40",
+    "nom": "Classic Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf40_3bb3212bd8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF41",
+    "nom": "Cinnamon Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf41_580ae4d8ec.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF42",
+    "nom": "Bleached Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf42_1b0f884519.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF43",
+    "nom": "Bleached Bronze Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf43_cfee99d963.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF44",
+    "nom": "Bleached Grey Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf44_bddf4a2f2a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF45",
+    "nom": "Bleached Golden Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf45_b8f86e5516.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF46",
+    "nom": "Rich Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf46_60abc316d0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF47",
+    "nom": "Caramel Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf47_480aef358f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF48",
+    "nom": "Yellow Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf48_a94d8ea186.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF49",
+    "nom": "Brown Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf49_4ef6ef8d5e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF50",
+    "nom": "Castagno Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf50_b7de3b35a6.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF51",
+    "nom": "Red Eiche",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf51_148f6b5063.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF53",
+    "nom": "Ivory Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf53_8d6839bdf6.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF54",
+    "nom": "Metropolis Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf54_fdb8876a16.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF55",
+    "nom": "Brown Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf55_27626db657.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF56",
+    "nom": "Black Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf56_fadf24b6a8.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF57",
+    "nom": "Beige Faded Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf57_183f4f0a9e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF58",
+    "nom": "Faded Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf58_1119cbc750.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF59",
+    "nom": "Brown Faded Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf59_0e75228aca.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF60",
+    "nom": "Black Faded Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf60_d78ec27bf7.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF61",
+    "nom": "Honey Comb",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf61_75661b0679.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF62",
+    "nom": "Hay Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf62_8c8dc6438d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF63",
+    "nom": "Nut Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf63_4192811253.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF64",
+    "nom": "White Sycamore",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf64_03c4ac015e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF65",
+    "nom": "Hard Gravel Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf65_8c2f652d12.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF66",
+    "nom": "Hard Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf66_0c1f5f19d2.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF70",
+    "nom": "Toasted Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf70_ea152e2958.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF71",
+    "nom": "Tulip Dark",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf71_1e2a19aa0b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF72",
+    "nom": "Beige Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf72_3a88451104.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF73",
+    "nom": "Desert Rose",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf73_c5b129e58f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF74",
+    "nom": "Grey Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf74_b3a8758116.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF76",
+    "nom": "Blond Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf76_ea6f2e158b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF77",
+    "nom": "Almond Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf77_1a8abfff08.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF78",
+    "nom": "Oaky",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf78_d720f85af3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF79",
+    "nom": "Honey Beech",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf79_3641d71c8e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF83",
+    "nom": "Driftwood Brown",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf83_504ce64100.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF85",
+    "nom": "Clean Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf85_3572c665e9.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF86",
+    "nom": "Pale Smooth Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf86_2844482954.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF87",
+    "nom": "Pampas Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf87_c6d2b74965.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF88",
+    "nom": "Smooth Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf88_d8fd844ba4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF89",
+    "nom": "Blond Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf89_ac6d4d8276.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF90",
+    "nom": "Sand Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf90_b46594cde9.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF91",
+    "nom": "Faded Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf91_b6ab9b0ee6.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NF95",
+    "nom": "Bronzed Ash",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf95_5f9ed0bac4.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH15",
+    "nom": "Smokey Green",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh15_a40f057527.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH16",
+    "nom": "Foggy Forest",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh16_0a68494b8e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH55",
+    "nom": "Mocha Mist",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh55_52df9c0cc1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH56",
+    "nom": "Vanilla Cream",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh56_404bfa9972.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH57",
+    "nom": "Charcoal Blue",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh57_d4a2018955.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH58",
+    "nom": "Midnight Grey",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh58_1dd560d697.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH64",
+    "nom": "Pale Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh64_357fd10b67.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH65",
+    "nom": "Ashen Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh65_a0ac93f736.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH66",
+    "nom": "Wheat Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh66_d908c2c6fb.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH67",
+    "nom": "Blond Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh67_4a2f01e02b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH68",
+    "nom": "Royal Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh68_0b5d28a6c0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH69",
+    "nom": "Chocolate Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh69_b0e967359c.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH70",
+    "nom": "Timber Split",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh70_a28f29272f.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH71",
+    "nom": "Split Wood",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh71_19ffc89603.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH72",
+    "nom": "Timeless Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh72_bf1bb2e757.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH73",
+    "nom": "Warm Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh73_7b8264f01e.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH74",
+    "nom": "Eucalyptus Grove",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh74_5fe53aba3d.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH75",
+    "nom": "Eucalyptus",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh75_cfe61a67d3.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH76",
+    "nom": "Rich Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh76_93721ca19b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH77",
+    "nom": "Honey Walnut",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh77_75d80806fb.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH78",
+    "nom": "Zambezi Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh78_e2b64f124b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH79",
+    "nom": "African Teak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh79_bf75646fcd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH80",
+    "nom": "Sand Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh80_c03811f427.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH81",
+    "nom": "Dyed Oak",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh81_160a7ee11b.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH83",
+    "nom": "Golden Elm",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh83_8ecb0597f0.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH84",
+    "nom": "Pale Elm",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh84_48479a03bd.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH85",
+    "nom": "Pecan Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh85_3f7c3d766a.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "NH86",
+    "nom": "Almond Pine",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh86_bc30eeb230.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "WI01",
+    "nom": "Small-grain cork",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/wi01_8a942ebaa1.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "WI02",
+    "nom": "Large-grain cork",
+    "famille": "bois",
+    "categorie": "Wood",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/wi02_534b8d4fc9.jpg",
+    "tags": [
+      "bois"
+    ]
+  },
+  {
+    "id": "J3",
+    "nom": "Ultra White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j3_8180ab9384.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "J4",
+    "nom": "Lacquered White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j4_c5ad05fbc9.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "J5",
+    "nom": "Lacquered Black",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j5_47a739f4e4.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "K1",
+    "nom": "Black Mat",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k1_6dc839de4a.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "K4",
+    "nom": "Khaki",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k4_b2f14e47b2.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "K5",
+    "nom": "Cement Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k5_c2a17ac1ab.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "K6",
+    "nom": "Light Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k6_27c5ced4e3.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "K7",
+    "nom": "Cream Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k7_6e108e84d4.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "L2",
+    "nom": "Chilli Red",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/l2_6deb551318.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "L3",
+    "nom": "Tangerine",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/l3_96e110813d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M0",
+    "nom": "Sun Flower Yellow",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m0_4a3de3ae12.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M10",
+    "nom": "Oat Milk",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m10_87014b1576.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M4",
+    "nom": "Pale Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m4_d8bc1a50ed.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M5",
+    "nom": "Vibrant Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m5_5955d206d1.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M6",
+    "nom": "Steel Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m6_68141ce0f8.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M7",
+    "nom": "Sand Beach",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m7_93c92902e8.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M8",
+    "nom": "Bright Yellow",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m8_689c4cd28d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "M9",
+    "nom": "Midnight Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m9_9ea095be14.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "N3",
+    "nom": "Porcelain",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/n3_f87d1c27ed.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE53",
+    "nom": "Peach",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne53_a9a9f70926.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE54",
+    "nom": "Clean Mint",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne54_7d995bca3c.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE55",
+    "nom": "Caffe Latte",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne55_cee1852845.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE56",
+    "nom": "Egg White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne56_165141c4b0.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE77",
+    "nom": "Eggshell",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne77_45919ac29f.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE78",
+    "nom": "Cord",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne78_99a72f7b11.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE79",
+    "nom": "Elephant Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne79_91f99b41f9.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE80",
+    "nom": "Graphite",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne80_8582f1b8c5.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE81",
+    "nom": "Charcoal Black",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne81_eddeea2bd7.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE82",
+    "nom": "Fossil Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne82_2a5abcfb1e.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NE83",
+    "nom": "Jade Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne83_73753f8933.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF01",
+    "nom": "Himalaya Salt",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf01_58c4bf5461.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF02",
+    "nom": "Antique Rose",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf02_768c5d1a87.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF03",
+    "nom": "Blush Rose",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf03_42222ce361.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF04",
+    "nom": "Bordeaux Red",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf04_5a62451de4.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF05",
+    "nom": "Green Lawn",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf05_cc2579e729.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF06",
+    "nom": "Blues",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf06_f1aaf40e1e.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF07",
+    "nom": "Pink Flamingo",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf07_02f505939d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF08",
+    "nom": "Dark Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf08_6013a96e99.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF09",
+    "nom": "Cacao",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf09_1953087408.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF10",
+    "nom": "Cloud Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf10_02c4089dfa.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF11",
+    "nom": "Light Cloud Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf11_5991f9cbc6.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF13",
+    "nom": "Deep Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf13_e9bc121a61.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF14",
+    "nom": "Deep Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf14_85c3545c85.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF15",
+    "nom": "Cream White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf15_ac78e03581.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NF16",
+    "nom": "Beige",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf16_6533169db0.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH02",
+    "nom": "White Flour",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh02_e8b2055032.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH05",
+    "nom": "Pistachio Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh05_d91b8ee8f7.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH06",
+    "nom": "Rose Sand",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh06_10afe95a61.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH08",
+    "nom": "Forest Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh08_b45d64c950.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH21",
+    "nom": "Soft Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh21_005df82500.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH22",
+    "nom": "Warm Gray",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh22_e5bfe48e6b.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH23",
+    "nom": "Pale Canary",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh23_f55d220cb9.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH24",
+    "nom": "Deep Ocean",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh24_56cc88d513.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH25",
+    "nom": "Ice White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh25_f3acca81b4.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH26",
+    "nom": "Grayed Beige",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh26_57c1ed5cae.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH27",
+    "nom": "White Fog",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh27_25bc0e335d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH28",
+    "nom": "Dry Branch",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh28_b7a81e3805.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH29",
+    "nom": "Bird Nest",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh29_37438bd91f.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH91",
+    "nom": "Dark Grey Stripes",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh91_bbb2681bb0.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH92",
+    "nom": "Light Grey Stripes",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh92_6981f05107.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "NH93",
+    "nom": "Off White Stripes",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh93_62f44e6a88.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "O4",
+    "nom": "Turquoise Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o4_d973f9961c.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "O6",
+    "nom": "Azure Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o6_4cfb26fcfd.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "O8",
+    "nom": "Indigo Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o8_b946393ee6.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM01",
+    "nom": "Linen White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm01_355cdc33c1.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM02",
+    "nom": "Pearl Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm02_dffa093e05.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM03",
+    "nom": "Lead Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm03_dda391e2c3.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM04",
+    "nom": "Brown Chocolate",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm04_0172f54979.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM06",
+    "nom": "Anthracite Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm06_04d007732c.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM07",
+    "nom": "Iced Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm07_89b08d98e7.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM08",
+    "nom": "Limoncello",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm08_f99e6c15c2.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM09",
+    "nom": "Ocean Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm09_9470804bcc.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM10",
+    "nom": "Delicate White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm10_6f33408de9.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM11",
+    "nom": "Silk White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm11_0938d8349d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM12",
+    "nom": "Marshmallow",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm12_dc3ea2b1e6.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM13",
+    "nom": "Alabaster",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm13_6a12177b80.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM14",
+    "nom": "Mushroom",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm14_34a3cccdfe.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM15",
+    "nom": "Lilac Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm15_c268a6046f.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM16",
+    "nom": "Honey Mustard",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm16_53479a6626.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM19",
+    "nom": "Olive Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm19_b01a39f079.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM20",
+    "nom": "Sage Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm20_59c34db7d2.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM21",
+    "nom": "Army Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm21_1bfbbfe6a9.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM23",
+    "nom": "Royal Blue",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm23_df249f82dd.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM25",
+    "nom": "Pink Sand",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm25_60d371574b.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM26",
+    "nom": "Creamy White",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm26_882a51d833.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM27",
+    "nom": "Lunar Surface",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm27_37bb065216.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM28",
+    "nom": "Asphalt Grey",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm28_943c0c4f4d.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM29",
+    "nom": "Onyx",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm29_6798340a81.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "RM30",
+    "nom": "Pastel Olive Green",
+    "famille": "couleur",
+    "categorie": "Color",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm30_b1724ef98b.jpg",
+    "tags": [
+      "couleur"
+    ]
+  },
+  {
+    "id": "KN04",
+    "nom": "Latte Marble",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/kn04_24d24271ba.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "MK13",
+    "nom": "Imperial White",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk13_2a79f1f1d1.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "MK14",
+    "nom": "Griogio Marquina",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk14_792e853256.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "MK15",
+    "nom": "Raw Travertine",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk15_8a065936ad.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE11",
+    "nom": "Grey Scoria",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne11_c1f26dad79.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE28",
+    "nom": "Andesite",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne28_aa0724117f.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE29",
+    "nom": "Multicolored",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne29_214e500b40.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE31",
+    "nom": "Statuary White",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne31_abda3aee83.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE32",
+    "nom": "Statuary Gold",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne32_00fb757005.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE70",
+    "nom": "Onyx Gold",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne70_19308d1354.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE71",
+    "nom": "Lombarda Nero",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne71_fd42ed7f2c.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE72",
+    "nom": "Arabesque",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne72_f43e65ea15.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NF97",
+    "nom": "Armani Gris",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf97_780a7ebffe.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NF98",
+    "nom": "Armani Nero",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf98_f247fa169f.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NF99",
+    "nom": "Lombarda Grigio",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf99_173cd3a686.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NG01",
+    "nom": "Lombarda Bianco",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng01_8663093bb1.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NG02",
+    "nom": "Spotted Grey",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng02_35ae70def1.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NG04",
+    "nom": "Crema",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng04_d8dfbb6cda.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NG05",
+    "nom": "Crema Scura",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng05_3b81df6d56.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NG31",
+    "nom": "Polished White",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng31_beae457e29.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH09",
+    "nom": "Twilight Basalt",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh09_0c5e29b5d6.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH10",
+    "nom": "Terrazzo Mixed Blue",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh10_2bf49d4c7f.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH11",
+    "nom": "Light Etruscan Grey",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh11_5afc830dcf.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH34",
+    "nom": "Grey Raw Granite",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh34_a81c345ecd.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH35",
+    "nom": "Beige Raw Granite",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh35_13cd57c3f4.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH38",
+    "nom": "Pietra di Cardoso Nero",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh38_9343910860.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH39",
+    "nom": "Pietra di Cardoso Grigio",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh39_50fd03efff.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH40",
+    "nom": "Terrazzo Grey",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh40_ebd8c9f78b.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH41",
+    "nom": "Terrazzo Beige",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh41_08c617c1d7.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH42",
+    "nom": "Lunar Basalt",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh42_9cd0587b14.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH43",
+    "nom": "Terrazzo Mixed Black",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh43_00046013dc.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH45",
+    "nom": "Tundra",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh45_28d1beef0d.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH46",
+    "nom": "Etruscan Grey",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh46_445b791c2d.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH47",
+    "nom": "Opal Beige",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/NH_47_final_1bb2de8e40.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NH48",
+    "nom": "Opal White",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/NH_48_final_503bd8eb8f.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "U50",
+    "nom": "Nero Marquina",
+    "famille": "pierre",
+    "categorie": "Stone",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u50_498d699e62.jpg",
+    "tags": [
+      "pierre"
+    ]
+  },
+  {
+    "id": "NE24",
+    "nom": "Raw Grey",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne24_50d2ddfad4.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NE25",
+    "nom": "Raw Taupe",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne25_0338c23623.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NE26",
+    "nom": "Raw Dark",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne26_b1d6e0c7e8.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH12",
+    "nom": "Terracotta Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh12_a67d2e63ac.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH13",
+    "nom": "Storm Cloud Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh13_569fcea126.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH14",
+    "nom": "Ivory Glow Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh14_6a3e9bc074.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH33",
+    "nom": "Off White Cement",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh33_4aee85fca9.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH49",
+    "nom": "Snowflake Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh49_a73e8d2067.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH50",
+    "nom": "Cashmere Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh50_10c518b015.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH51",
+    "nom": "White Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh51_49eb79e7cf.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH52",
+    "nom": "Silver Mist Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh52_1096887787.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH53",
+    "nom": "Cashmere Glow Stucco",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh53_06500ce2da.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "NH54",
+    "nom": "Grey Cement",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh54_b5ddbfa0cf.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "U19",
+    "nom": "Cement Grey",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u19_7c1fc04417.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "U20",
+    "nom": "Cement Dark",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u20_72b4c6e3d7.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "U21",
+    "nom": "Cement Taupe",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u21_e289c3c882.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "W7",
+    "nom": "Red Brick",
+    "famille": "beton",
+    "categorie": "Concrete",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/w7_f66646e16b.jpg",
+    "tags": [
+      "béton"
+    ]
+  },
+  {
+    "id": "AL07",
+    "nom": "Gold Black",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al07_1970f4c2dc.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "AL09",
+    "nom": "Gold Antique",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al09_9cc3cfd436.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "AU01",
+    "nom": "Aurora",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/au01_38ce172534.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "AU02",
+    "nom": "Aurora stripes",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/au02_665d95a130.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "KI01",
+    "nom": "Chromed Metal",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ki01_e5536ae2ce.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND01",
+    "nom": "Silver Blue",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd01_81386003d8.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND02",
+    "nom": "Stripes Gold",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd02_582369fdd5.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND03",
+    "nom": "Stripes Light Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd03_f7d46cfd95.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND04",
+    "nom": "Stripes Medium Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd04_60ddd2099d.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND05",
+    "nom": "Stripes Dark Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd05_0ad1066d45.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "ND07",
+    "nom": "Dots Anthracite",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd07_e28a5bd476.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NE47",
+    "nom": "Soft Gold",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne47_cdfb641094.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NE48",
+    "nom": "Dark Copper",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne48_b729f8da13.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NE49",
+    "nom": "Dark Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne49_154f6e0709.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NE51",
+    "nom": "Champagne Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne51_cd7c8b033d.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NG28",
+    "nom": "Golden Dark Brown",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng28_a844d1c9d8.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NG29",
+    "nom": "Golden Light Brown",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng29_63cb7b4ea0.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH20",
+    "nom": "Roseate",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh20_542e6ab9af.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH36",
+    "nom": "Bronze Patina",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh36_71fe3a0cf6.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH37",
+    "nom": "Anthracite Patina",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh37_a9cb8e5d20.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH60",
+    "nom": "Copper",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh60_e21e0fc26a.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH61",
+    "nom": "Silvered Glow",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh61_92a13d9efa.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH62",
+    "nom": "Bronze Mat",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh62_4c2bd8ed83.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "NH63",
+    "nom": "Striped Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh63_07e72c69b8.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "Q1",
+    "nom": "Mat Aluminium",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q1_e62a963e5f.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "Q2",
+    "nom": "Hard Silver",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q2_e76d3c364c.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "Q3",
+    "nom": "Hard Gold",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q3_ec902b751e.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "Q50",
+    "nom": "Hard Graphite",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q50_758837a23d.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "U10",
+    "nom": "Black Iron",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u10_6434fed280.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "W6",
+    "nom": "Corten",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/w6_dcdd73327a.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "Z2",
+    "nom": "Black Laser",
+    "famille": "metal",
+    "categorie": "Steel",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/z2_15c0e3c74a.jpg",
+    "tags": [
+      "métal"
+    ]
+  },
+  {
+    "id": "AL11",
+    "nom": "Silver Metal Weaving",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al11_1570eeff2d.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "AL13",
+    "nom": "Gold Metal Weaving",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al13_65c5e64db4.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "AL15",
+    "nom": "Yellow Gold",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al15_3bfd2a9d8e.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "AL17",
+    "nom": "Sand Gold",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al17_71e1037d08.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "MA12",
+    "nom": "White Warp",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma12_c8004eaa7a.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "MA16",
+    "nom": "White Waves",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma16_298957cf83.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "MK18",
+    "nom": "Beige Waves",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk18_a913f9bb23.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE13",
+    "nom": "Shimmery Gold",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne13_0dcc02877f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE37",
+    "nom": "Silver & Brown Lined",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne37_7e34bd101c.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE38",
+    "nom": "Silver And Grey Lined",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne38_2108481293.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE40",
+    "nom": "Truffle",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne40_5f181efbd0.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE41",
+    "nom": "Grigio",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne41_f4653aef30.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE42",
+    "nom": "Cashmere",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne42_11e782b2d0.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE43",
+    "nom": "Cream",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne43_4cd716ba77.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE73",
+    "nom": "Mika Dark",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne73_81ae0fc006.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NE74",
+    "nom": "Mika Light",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne74_3337a7319f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG07",
+    "nom": "Woven Beige",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng07_5ec8620411.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG09",
+    "nom": "Woven Brown",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng09_03cfe67cd5.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG10",
+    "nom": "Mini Chevron Grey",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng10_1c3826c9e0.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG11",
+    "nom": "Mini Chevron Beige",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng11_5c03f07076.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG20",
+    "nom": "Edgy Cream",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng20_e9d000f44f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NG23",
+    "nom": "Lozenge White",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng23_d69e41f677.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NH17",
+    "nom": "Ground Beige Linen",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh17_0003b7bbba.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NH18",
+    "nom": "Natural Linen",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh18_26ef45983f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NH19",
+    "nom": "Beige Linen",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh19_9d4bdaebc7.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "NH59",
+    "nom": "Light Brown Linen",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh59_c459272c2c.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "ST02",
+    "nom": "Might Beige Mesh",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/st02_4843758b3f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "T12",
+    "nom": "Mocha Mesh",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/t12_655b96d8cc.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "X51",
+    "nom": "Coal Black",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/x51_b2a405472f.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "X52",
+    "nom": "Togo white",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/x52_f53cb92b27.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "A1",
+    "nom": "Brown Wenge",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/a1_dab5cb368b.jpg",
+    "tags": [
+      "textile"
+    ]
+  },
+  {
+    "id": "LP01",
+    "nom": "Cognac",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_01_Cognac_d29b37d488.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP02",
+    "nom": "Ash",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_02_Ash_d5179abeab.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP03",
+    "nom": "Indigo",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_03_Indigo_d80ce44ca9.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP04",
+    "nom": "Graphite",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_04_Graphite_2802668bd8.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP05",
+    "nom": "Toffee",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_05_Toffee_2368268563.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP06",
+    "nom": "Pearl grey",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_06_Pearl_Grey_e3a661b25e.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP07",
+    "nom": "Ivory",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_07_Ivory_e898ba8965.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP08",
+    "nom": "Blush rose",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_08_Blush_Rose_5d964d277e.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP09",
+    "nom": "Eclipse",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_09_Eclipse_b4393e9569.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "LP10",
+    "nom": "Lagoon",
+    "famille": "textile",
+    "categorie": "Textile",
+    "finition": "Soft",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_10_Lagoon_902b6d5f7d.png",
+    "tags": [
+      "textile",
+      "cuir"
+    ]
+  },
+  {
+    "id": "J7",
+    "nom": "Sparkling White",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j7_9ddc4a7859.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R10",
+    "nom": "Copper Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r10_d53217b6bd.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R11",
+    "nom": "Midnight Blue Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r11_9f09c9b29b.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R12",
+    "nom": "Green Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r12_38fae4c62c.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R13",
+    "nom": "Pink Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r13_b5eaad163b.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R14",
+    "nom": "Green Mixed",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r14_83eda87b3b.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R15",
+    "nom": "Navy Blue",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r15_aafd8ec871.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R16",
+    "nom": "Mocha",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r16_3a3332957f.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R17",
+    "nom": "Butter",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r17_e25d2e44dd.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R18",
+    "nom": "Salmon",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r18_71ec7bface.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R19",
+    "nom": "Champagne",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r19_e5750b8229.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R5",
+    "nom": "Gold Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r5_4413446595.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R6",
+    "nom": "Yellow Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r6_029a82c07a.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R7",
+    "nom": "Silver Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r7_62b6bbe28a.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R8",
+    "nom": "Red Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r8_09c1b2417b.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  },
+  {
+    "id": "R9",
+    "nom": "Black Disco",
+    "famille": "paillettes",
+    "categorie": "Glitter",
+    "finition": "Glitter",
+    "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r9_1b304a92d8.jpg",
+    "tags": [
+      "paillettes",
+      "brillant"
+    ]
+  }
+]

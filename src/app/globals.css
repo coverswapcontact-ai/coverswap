@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Focus-visible for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #CC0000;
+  outline-offset: 2px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-noir text-white;
+  }
+
+  ::selection {
+    @apply bg-rouge text-white;
+  }
+}
+
+@layer components {
+  /* ── Bouton principal avec pulse subtil ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
+           px-8 py-4 rounded-lg text-lg transition-all duration-300
+           hover:bg-rouge-hover hover:scale-105
+           active:scale-95 uppercase tracking-wider;
+    animation: ctaPulse 2.5s ease-in-out infinite;
+  }
+
+  .btn-primary:hover {
+    animation: none;
+    box-shadow: 0 0 32px rgba(204, 0, 0, 0.55);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
+           px-8 py-4 rounded-lg text-lg transition-all duration-300
+           hover:bg-white hover:text-noir hover:scale-105
+           active:scale-95 uppercase tracking-wider;
+  }
+
+  .section-padding {
+    @apply py-24 px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto;
+  }
+
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar        { width: 8px; }
+::-webkit-scrollbar-track  { background: #1a1a1a; }
+::-webkit-scrollbar-thumb  { background: #404040; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #CC0000; }
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-up    { transform: translateY(48px); }
+.reveal-left  { transform: translateX(-48px); }
+.reveal-right { transform: translateX(48px); }
+.reveal-scale { transform: scale(0.92); }
+.reveal-fade  { transform: none; }
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CTA PULSE
+═══════════════════════════════════════════════════════════ */
+@keyframes ctaPulse {
+  0%   { box-shadow: 0 0 0 0   rgba(204, 0, 0, 0.55); }
+  55%  { box-shadow: 0 0 0 12px rgba(204, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(204, 0, 0, 0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO ENTRANCE ANIMATION
+═══════════════════════════════════════════════════════════ */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(36px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOW BORDER (formulaire)
+═══════════════════════════════════════════════════════════ */
+@keyframes borderGlow {
+  0%, 100% { border-color: rgba(204, 0, 0, 0.3); }
+  50%       { border-color: rgba(204, 0, 0, 0.8); }
+}
+
+.glow-border {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BEFORE/AFTER SLIDER
+═══════════════════════════════════════════════════════════ */
+.before-after-slider {
+  position: relative;
+  overflow: hidden;
+  cursor: ew-resize;
+  user-select: none;
+}
