@@ -27,17 +27,21 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://coverswap.fr";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "CoverSwap | Rénovation intérieure par revêtements adhésifs texturés",
+    default: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     template: "%s | CoverSwap",
   },
   description:
-    "Transformez votre intérieur en 1 journée avec nos revêtements adhésifs haut de gamme. Simulation IA gratuite en 60 secondes. Cuisine, salle de bain, meubles — à partir de 80 €/m².",
+    "Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis en 60s. À partir de 80 €/m² posé.",
   keywords:
-    "covering adhésif, rénovation intérieure, revêtement adhésif, covering cuisine, covering salle de bain, covering meubles, covering professionnel, simulation IA",
+    "covering adhésif, rénovation cuisine, covering salle de bain, covering meubles, revêtement adhésif, simulation IA, rénovation rapide",
+  applicationName: "CoverSwap",
+  authors: [{ name: "Lucas Villemin", url: SITE_URL }],
+  creator: "CoverSwap",
+  publisher: "CoverSwap",
   openGraph: {
-    title: "CoverSwap | Rénovation intérieure premium par covering adhésif",
+    title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     description:
-      "Transformez votre intérieur en 1 journée. Simulation IA gratuite en 60 secondes.",
+      "Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de 80 €/m² posé.",
     url: SITE_URL,
     siteName: "CoverSwap",
     locale: "fr_FR",
@@ -47,15 +51,18 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "CoverSwap — Rénovation intérieure par covering adhésif",
+        alt: "CoverSwap — Covering adhésif premium",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CoverSwap | Rénovation intérieure premium",
-    description: "Transformez votre intérieur en 1 journée. Simulation IA gratuite.",
+    title: "CoverSwap — Covering adhésif premium",
+    description: "Rénovez votre intérieur en 1 journée. Simulation IA gratuite.",
     images: [`${SITE_URL}/og-image.jpg`],
+  },
+  alternates: {
+    canonical: SITE_URL,
   },
   icons: {
     icon: "/logo.png",

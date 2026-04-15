@@ -11,13 +11,17 @@ import { SimulationSection, FAQSection } from "@/components/HomeClient";
    METADATA — SEO
 ────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "Rénovation intérieure par revêtements adhésifs texturés",
+  // Undefined pour que le title par défaut du layout s'applique
+  // (titre complet optimisé pour Google)
+  title: {
+    absolute: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
+  },
   description:
-    "Transformez votre intérieur en 1 journée avec nos revêtements adhésifs haut de gamme. Simulation IA gratuite. Cuisine, salle de bain, meubles — à partir de 80 €/m².",
+    "Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis en 60s. À partir de 80 €/m² posé.",
   openGraph: {
-    title: "CoverSwap — Rénovation intérieure premium par covering adhésif",
+    title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     description:
-      "Transformez votre intérieur en 1 journée. Simulation IA gratuite en 60 secondes. À partir de 80 €/m² fourni & posé.",
+      "Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de 80 €/m² posé.",
     type: "website",
   },
   alternates: {
