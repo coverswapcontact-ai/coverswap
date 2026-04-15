@@ -31,9 +31,16 @@ export default function TextureBackground({
   useEffect(() => {
     if (!parallax || !imgRef.current) return;
 
+    let ticking = false;
     const handleScroll = () => {
-      if (!imgRef.current) return;
-      imgRef.current.style.transform = `translateY(${window.scrollY * 0.32}px)`;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        if (imgRef.current) {
+          imgRef.current.style.transform = `translateY(${window.scrollY * 0.32}px)`;
+        }
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

@@ -98,8 +98,8 @@ const trustReasons = [
   },
   {
     icon: "\uD83D\uDE4C",
-    title: "Satisfaction client 4.9/5",
-    description: "Plus de 500 clients satisfaits nous font confiance. Avis vérifiés.",
+    title: "Artisan spécialisé Cover Styl'",
+    description: "Expert en revêtements adhésifs texturés haut de gamme. Finitions soignées, sans sous-traitance.",
   },
 ];
 
@@ -181,7 +181,7 @@ export default function PrestationsPage() {
                 href="/simulation"
                 className="btn-primary text-base px-8 py-4"
               >
-                Simuler mon projet gratuitement
+                Simuler ma cuisine (IA gratuite)
               </Link>
               <Link
                 href="/contact"
@@ -273,14 +273,14 @@ export default function PrestationsPage() {
                   Un projet sur-mesure&nbsp;?
                 </h2>
                 <p className="text-gris-400 mb-6">
-                  Obtenez votre simulation gratuite par IA en 60&nbsp;secondes,
-                  quel que soit votre projet.
+                  Décrivez votre projet et recevez un devis détaillé sous 48h.
+                  Sans engagement.
                 </p>
                 <Link
-                  href="/simulation"
+                  href="/contact"
                   className="btn-primary text-base px-6 py-3"
                 >
-                  Lancer ma simulation
+                  Demander un devis
                 </Link>
               </div>
             </ScrollReveal>
@@ -307,7 +307,7 @@ export default function PrestationsPage() {
               </span>
               <h2 className="font-display text-3xl sm:text-4xl font-bold">
                 Pourquoi{" "}
-                <span className="text-rouge">500+ clients</span> font confiance
+                <span className="text-rouge">nos clients</span> font confiance
                 &agrave; CoverSwap
               </h2>
             </div>
@@ -336,7 +336,7 @@ export default function PrestationsPage() {
               className="block mt-12 glass-card p-8 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group text-center"
             >
               <h3 className="font-display text-2xl font-bold mb-2">
-                Catalogue de <span className="text-rouge">+490 r&eacute;f&eacute;rences</span> Cover&nbsp;Styl&rsquo;
+                Catalogue de <span className="text-rouge">près de 500 références</span> Cover&nbsp;Styl&rsquo;
               </h3>
               <p className="text-gris-400 mb-4 max-w-xl mx-auto">
                 Bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies, cuir&hellip; Parcourez l&rsquo;int&eacute;gralit&eacute; de notre catalogue pour trouver la finition id&eacute;ale.
@@ -408,16 +408,15 @@ export default function PrestationsPage() {
               Quel projet souhaitez-vous r&eacute;aliser&nbsp;?
             </h2>
             <p className="text-gris-300 text-lg mb-10 max-w-xl mx-auto">
-              D&eacute;crivez votre projet et recevez une simulation
-              personnalis&eacute;e gratuite en moins de 60&nbsp;secondes
-              gr&acirc;ce &agrave; notre IA.
+              D&eacute;crivez votre projet et recevez un devis
+              personnalis&eacute; sous 48h. Simulation IA disponible pour les cuisines.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/simulation"
+                href="/contact"
                 className="btn-primary text-lg px-10 py-5"
               >
-                Recevoir ma simulation gratuite
+                Demander un devis gratuit
               </Link>
               <Link
                 href="/contact"

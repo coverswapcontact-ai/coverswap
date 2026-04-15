@@ -36,11 +36,17 @@ textarea:focus-visible {
            hover:bg-rouge-hover hover:scale-105
            active:scale-95 uppercase tracking-wider;
     animation: ctaPulse 2.5s ease-in-out infinite;
+    will-change: box-shadow;
   }
 
   .btn-primary:hover {
     animation: none;
     box-shadow: 0 0 32px rgba(204, 0, 0, 0.55);
+  }
+
+  /* Pause CTA pulse when reduced motion is preferred */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary { animation: none; }
   }
 
   .btn-secondary {
@@ -135,4 +141,24 @@ textarea:focus-visible {
   overflow: hidden;
   cursor: ew-resize;
   user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REDUCED MOTION — accessibility
+═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .glow-border {
+    animation: none;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 1; transform: none; }
+    to   { opacity: 1; transform: none; }
+  }
 }

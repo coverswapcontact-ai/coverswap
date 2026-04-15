@@ -173,12 +173,12 @@ export default function ProfessionnelPage() {
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/simulation" className="btn-primary">
+              <Link href="/contact" className="btn-primary">
                 Demander un audit gratuit
               </Link>
-              <Link href="/realisations" className="btn-secondary">
-                Voir les réalisations
-              </Link>
+              <a href="https://www.instagram.com/cover.swap/" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                Voir nos réalisations
+              </a>
             </div>
           </ScrollReveal>
         </div>
@@ -484,7 +484,7 @@ export default function ProfessionnelPage() {
                 jour de chiffre d&apos;affaires.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/simulation" className="btn-primary text-lg px-10 py-5">
+                <Link href="/contact" className="btn-primary text-lg px-10 py-5">
                   Demander un audit gratuit
                 </Link>
                 <Link href="/contact" className="btn-secondary text-lg px-10 py-5">

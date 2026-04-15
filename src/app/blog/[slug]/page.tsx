@@ -210,14 +210,14 @@ export default async function BlogPostPage({ params }: Props) {
                 Envie de tester ?
               </h3>
               <p className="text-sm text-gris-400 mb-5">
-                Simulez gratuitement le rendu sur votre propre surface en 60
+                Simulez gratuitement le rendu sur votre cuisine en 60
                 secondes.
               </p>
               <Link
                 href="/simulation"
                 className="btn-primary text-sm px-6 py-3 w-full"
               >
-                Lancer la simulation
+                Simuler ma cuisine
               </Link>
             </div>
 
@@ -239,7 +239,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </svg>
               </div>
               <h3 className="font-display font-bold text-lg mb-2">
-                +490 finitions
+                Près de 500 finitions
               </h3>
               <p className="text-sm text-gris-400 mb-5">
                 Explorez notre catalogue complet de revetements Cover Styl&apos; : bois, marbre, beton, metal et plus.

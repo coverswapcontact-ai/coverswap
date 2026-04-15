@@ -293,12 +293,12 @@ export default function MeublesPage() {
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/simulation" className="btn-primary">
-                Simuler mes meubles
+              <Link href="/contact" className="btn-primary">
+                Demander un devis gratuit
               </Link>
-              <Link href="/realisations" className="btn-secondary">
-                Voir les réalisations
-              </Link>
+              <a href="https://www.instagram.com/cover.swap/" target="_blank" rel="noopener noreferrer" className="btn-secondary">
+                Voir nos réalisations
+              </a>
             </div>
           </ScrollReveal>
         </div>
@@ -543,10 +543,10 @@ export default function MeublesPage() {
                 Vos meubles méritent un relooking
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Envoyez une photo de vos meubles et recevez votre simulation gratuite en 60 secondes. Sans engagement.
+                Décrivez votre projet meuble et recevez un devis détaillé sous 48h. Sans engagement.
               </p>
-              <Link href="/simulation" className="btn-primary text-lg px-10 py-5">
-                Recevoir ma simulation gratuite
+              <Link href="/contact" className="btn-primary text-lg px-10 py-5">
+                Demander un devis gratuit
               </Link>
             </div>
           </ScrollReveal>

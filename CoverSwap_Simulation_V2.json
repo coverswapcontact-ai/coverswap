@@ -1,0 +1,646 @@
+{
+  "name": "CoverSwap Simulation V2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "simulation-v2",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 460],
+      "webhookId": "simulation-v2-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\nreturn [{\n  json: {\n    photo_base64: body.photo_base64 || \"\",\n    name: body.name || \"\",\n    phone: body.phone || \"\",\n    email: body.email || \"\",\n    message: body.message || \"\",\n    credence_ref: body.credence_ref || \"\",\n    credence_name: body.credence_name || \"\",\n    credence_famille: body.credence_famille || \"\",\n    plan_ref: body.plan_ref || \"\",\n    plan_name: body.plan_name || \"\",\n    plan_famille: body.plan_famille || \"\",\n    facade_ref: body.facade_ref || \"\",\n    facade_name: body.facade_name || \"\",\n    facade_famille: body.facade_famille || \"\"\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000002",
+      "name": "Parse Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 460]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an expert in interior design prompt engineering specialized in photorealistic kitchen surface renovation using Cover Styl' adhesive films.\n\nYour role is to convert specific Cover Styl' product references into a precise image editing prompt.\n\nCORE RULES:\n- You must ONLY describe surface modifications\n- NEVER describe layout, structure, objects, lighting, or camera\n- ALL geometry, positions, and structure must remain strictly unchanged\n- Use the Cover Styl' reference information to describe EXACTLY what material/color/finish to apply\n\nFor each element, if the reference is empty or \"inchangé\", output \"inchangé\".\n\nOUTPUT FORMAT (STRICT - exactly 3 lines):\nfaçade: [description based on Cover Styl' reference or \"inchangé\"]\ncrédence: [description based on Cover Styl' reference or \"inchangé\"]\nplan de travail: [description based on Cover Styl' reference or \"inchangé\"]\n\nEach description must be max 25 words, physically accurate, specifying: material, color, finish, texture pattern.",
+              "role": "system"
+            },
+            {
+              "content": "=Crédence: Reference {{ $json.credence_ref }} - {{ $json.credence_name }} (Famille: {{ $json.credence_famille }})\nPlan de travail: Reference {{ $json.plan_ref }} - {{ $json.plan_name }} (Famille: {{ $json.plan_famille }})\nFaçade: Reference {{ $json.facade_ref }} - {{ $json.facade_name }} (Famille: {{ $json.facade_famille }})\nMessage client: {{ $json.message }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 300
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000003",
+      "name": "GPT-4.1-mini - Generate Structured Prompt",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [700, 460],
+      "credentials": {
+        "openAiApi": {
+          "id": "kuPsvuQRCRnBhXx5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.message?.content || $json.text || $json.choices?.[0]?.message?.content || \"\";\nreturn [{\n  json: {\n    style_rewritten: text.trim(),\n    photo_base64: $('Parse Input').first().json.photo_base64,\n    name: $('Parse Input').first().json.name,\n    phone: $('Parse Input').first().json.phone,\n    email: $('Parse Input').first().json.email,\n    message: $('Parse Input').first().json.message,\n    credence_ref: $('Parse Input').first().json.credence_ref,\n    credence_name: $('Parse Input').first().json.credence_name,\n    plan_ref: $('Parse Input').first().json.plan_ref,\n    plan_name: $('Parse Input').first().json.plan_name,\n    facade_ref: $('Parse Input').first().json.facade_ref,\n    facade_name: $('Parse Input').first().json.facade_name\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000004",
+      "name": "Extract Rewritten Style",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 460]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b64 = $json.photo_base64;\n// Strip data URI prefix if present\nconst raw = b64.replace(/^data:image\\/\\w+;base64,/, '');\nconst buffer = Buffer.from(raw, 'base64');\nreturn [{\n  json: { ...$json },\n  binary: {\n    data: {\n      data: raw,\n      mimeType: 'image/jpeg',\n      fileName: 'photo_source.jpg'\n    },\n    source_photo: {\n      data: raw,\n      mimeType: 'image/jpeg',\n      fileName: 'photo_source.jpg'\n    }\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000005",
+      "name": "Decode Base64 Photo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 460]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-image-1",
+          "mode": "id"
+        },
+        "prompt": "=You are an expert AI kitchen renovation simulator for CoverSwap using Cover Styl' adhesive films.\n\nPROJECT TYPE: Cuisine (Kitchen)\n\nSTYLE INSTRUCTIONS FROM COVER STYL' REFERENCES:\n{{ $json.style_rewritten }}\n\nCRITICAL RULES — STRUCTURE PRESERVATION:\n1. CAMERA LOCK: The viewpoint, angle, lens distortion, and perspective must remain EXACTLY identical to the source photo. No rotation, no zoom, no shift.\n2. GEOMETRY LOCK: Every edge, corner, surface boundary, handle position, appliance location, sink, faucet, outlet, and fixture must stay EXACTLY in place — pixel-perfect alignment.\n3. LIGHTING CONSISTENCY: Maintain the same light sources, shadow directions, ambient color temperature, and specular highlights. Only the surface reflectance changes — not the lighting setup.\n4. OBJECTS UNTOUCHED: All appliances, utensils, decorations, plants, towels, and personal items must remain perfectly intact — same position, same appearance.\n5. SURFACE-ONLY CHANGES: You may ONLY change the material, color, texture, and finish of the specified kitchen surfaces (façade, crédence, plan de travail). Nothing else.\n6. Apply Cover Styl' adhesive film textures faithfully — these are real premium vinyl wraps with specific material properties. The film should look naturally applied to the existing surface geometry, following all curves, edges, and relief.\n7. PHOTOREALISM: The result must be indistinguishable from a real photograph. Maintain grain, depth of field, lens artifacts, and environmental reflections consistent with the original image.\n8. If a surface is marked as \"inchangé\", keep it EXACTLY as in the original photo — do not modify it at all.\n\nApply ONLY the surface changes described above. Output a single photorealistic image.",
+        "inputType": "base64",
+        "binaryPropertyName": "data",
+        "options": {
+          "size": "1024x1024",
+          "quality": "high"
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000006",
+      "name": "OpenAI Image Edit",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1360, 460],
+      "credentials": {
+        "openAiApi": {
+          "id": "kuPsvuQRCRnBhXx5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const binary = $binary.data;\nconst base64 = binary.data;\nconst mimeType = binary.mimeType || 'image/png';\nreturn [{\n  json: {\n    image_base64: `data:${mimeType};base64,${base64}`,\n    success: true\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000007",
+      "name": "Convert to Base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1600, 260]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"image\": \"{{ $json.image_base64 }}\",\n  \"references\": {\n    \"credence\": \"{{ $('Parse Input').first().json.credence_ref }}\",\n    \"plan\": \"{{ $('Parse Input').first().json.plan_ref }}\",\n    \"facade\": \"{{ $('Parse Input').first().json.facade_ref }}\"\n  }\n}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000008",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1820, 260]
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "operation": "search",
+        "queryString": "={{ $('Parse Input').first().json.phone }}",
+        "filter": {
+          "folderId": "1rS6k8NgI275QhZlC_loJMSkZ_qJzWAvt"
+        },
+        "options": {
+          "fields": "id, name, mimeType"
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000009",
+      "name": "Search Client Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1600, 660],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-folder-exists",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000010",
+      "name": "Folder Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1820, 660]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "create",
+        "name": "={{ $('Parse Input').first().json.name }} - {{ $('Parse Input').first().json.phone }}",
+        "options": {
+          "parentFolderId": "1rS6k8NgI275QhZlC_loJMSkZ_qJzWAvt"
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000011",
+      "name": "Create Client Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2040, 760],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the client folder ID from either the search result or newly created folder\nlet clientFolderId;\ntry {\n  // If folder existed (true branch of IF)\n  clientFolderId = $('Folder Exists?').first().json.id;\n} catch (e) {\n  // If folder was just created (false branch)\n  clientFolderId = $('Create Client Folder').first().json.id;\n}\n\nreturn [{\n  json: {\n    clientFolderId: clientFolderId\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000012",
+      "name": "Merge Folder ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2260, 660]
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "create",
+        "name": "=Simulation {{ new Date().toISOString().slice(0,10) }}_{{ Date.now() }}",
+        "options": {
+          "parentFolderId": "={{ $json.clientFolderId }}"
+        }
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000013",
+      "name": "Create Simulation Subfolder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2480, 660],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "name": "simulation_result.png",
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000014",
+      "name": "Upload Generated Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2700, 560],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "name": "photo_source.jpg",
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Simulation Subfolder').first().json.id }}",
+          "mode": "id"
+        },
+        "inputDataFieldName": "source_photo",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000015",
+      "name": "Upload Source Photo",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2700, 700],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Parse Input').first().json;\nconst style = $('Extract Rewritten Style').first().json.style_rewritten;\n\nconst infoText = `CoverSwap Simulation Report\n============================\nDate: ${new Date().toISOString()}\n\nClient:\n  Nom: ${input.name}\n  Téléphone: ${input.phone}\n  Email: ${input.email}\n\nRéférences Cover Styl':\n  Crédence: ${input.credence_ref} - ${input.credence_name} (${input.credence_famille})\n  Plan de travail: ${input.plan_ref} - ${input.plan_name} (${input.plan_famille})\n  Façade: ${input.facade_ref} - ${input.facade_name} (${input.facade_famille})\n\nMessage client: ${input.message}\n\nStyle réécrit par IA:\n${style}\n`;\n\nreturn [{\n  json: { infoText },\n  binary: {\n    info: {\n      data: Buffer.from(infoText).toString('base64'),\n      mimeType: 'text/plain',\n      fileName: 'simulation_info.txt'\n    }\n  }\n}];"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000016",
+      "name": "Generate Info Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2700, 840]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "upload",
+        "name": "simulation_info.txt",
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Simulation Subfolder').first().json.id }}",
+          "mode": "id"
+        },
+        "inputDataFieldName": "info",
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000017",
+      "name": "Upload Info Text",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2920, 840],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "permission",
+        "operation": "create",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000018",
+      "name": "Share Generated Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [2920, 560],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nom": "={{ $('Parse Input').first().json.name }}",
+            "Telephone": "={{ $('Parse Input').first().json.phone }}",
+            "Email": "={{ $('Parse Input').first().json.email }}",
+            "Credence Ref": "={{ $('Parse Input').first().json.credence_ref }}",
+            "Plan Ref": "={{ $('Parse Input').first().json.plan_ref }}",
+            "Facade Ref": "={{ $('Parse Input').first().json.facade_ref }}",
+            "Message": "={{ $('Parse Input').first().json.message }}",
+            "Statut": "Nouveau lead",
+            "Date": "={{ new Date().toISOString() }}",
+            "Lien simulation": "={{ $('Upload Generated Image').first().json.webViewLink || '' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {"id": "Nom", "displayName": "Nom", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Telephone", "displayName": "Telephone", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Email", "displayName": "Email", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "Credence Ref", "displayName": "Credence Ref", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Plan Ref", "displayName": "Plan Ref", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Facade Ref", "displayName": "Facade Ref", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Message", "displayName": "Message", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Statut", "displayName": "Statut", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Date", "displayName": "Date", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false},
+            {"id": "Lien simulation", "displayName": "Lien simulation", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": false}
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000019",
+      "name": "CRM Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1600, 900],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "B6mLni8l7PoW7U85",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sms",
+        "operation": "send",
+        "from": "CoverSwap",
+        "to": "={{ $('Parse Input').first().json.phone }}",
+        "message": "=CoverSwap: Votre simulation cuisine est prête ! Consultez le résultat ici : {{ $('Upload Generated Image').first().json.webViewLink || 'Lien en cours de génération' }}"
+      },
+      "id": "a1b2c3d4-1111-4aaa-bbbb-000000000020",
+      "name": "Send SMS Twilio",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [3140, 560],
+      "credentials": {
+        "twilioApi": {
+          "id": "Fa3eOGQq6ojLcZ9n",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Input": {
+      "main": [
+        [
+          {
+            "node": "GPT-4.1-mini - Generate Structured Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4.1-mini - Generate Structured Prompt": {
+      "main": [
+        [
+          {
+            "node": "Extract Rewritten Style",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Rewritten Style": {
+      "main": [
+        [
+          {
+            "node": "Decode Base64 Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decode Base64 Photo": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Image Edit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Image Edit": {
+      "main": [
+        [
+          {
+            "node": "Convert to Base64",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search Client Folder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CRM Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Base64": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Client Folder": {
+      "main": [
+        [
+          {
+            "node": "Folder Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Folder Exists?": {
+      "main": [
+        [
+          {
+            "node": "Merge Folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Client Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client Folder": {
+      "main": [
+        [
+          {
+            "node": "Merge Folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Folder ID": {
+      "main": [
+        [
+          {
+            "node": "Create Simulation Subfolder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Simulation Subfolder": {
+      "main": [
+        [
+          {
+            "node": "Upload Generated Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload Source Photo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Info Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Generated Image": {
+      "main": [
+        [
+          {
+            "node": "Share Generated Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share Generated Image": {
+      "main": [
+        [
+          {
+            "node": "Send SMS Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Info Text": {
+      "main": [
+        [
+          {
+            "node": "Upload Info Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-04-03T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -49,13 +49,13 @@ export default function BlogPage() {
         <div className="text-center mt-20">
           <div className="glass-card inline-block px-10 py-8">
             <p className="font-display text-xl font-bold mb-2">
-              Envie de voir le resultat sur votre surface ?
+              Envie de voir le résultat sur votre cuisine ?
             </p>
             <p className="text-gris-400 mb-6 text-sm">
               Recevez une simulation gratuite en 60 secondes.
             </p>
             <Link href="/simulation" className="btn-primary">
-              Simuler mon projet
+              Simuler ma cuisine
             </Link>
           </div>
         </div>

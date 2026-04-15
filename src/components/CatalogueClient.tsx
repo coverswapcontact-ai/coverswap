@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
@@ -163,7 +163,7 @@ export default function CatalogueClient() {
             className="text-lg sm:text-xl text-gris-300 max-w-2xl mx-auto"
             style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.25s" }}
           >
-            <span className="text-white font-semibold">+490</span> références disponibles &mdash; bois, pierre, béton, métal, couleur, textile, paillettes
+            <span className="text-white font-semibold">Près de 500</span> références disponibles &mdash; bois, pierre, béton, métal, couleur, textile, paillettes
           </p>
         </div>
       </section>
@@ -372,7 +372,7 @@ export default function CatalogueClient() {
 /* ══════════════════════════════════════════════════════════════════
    PRODUCT CARD
 ══════════════════════════════════════════════════════════════════ */
-function ProductCard({ item, onClick }: { item: Reference; onClick: () => void }) {
+const ProductCard = React.memo(function ProductCard({ item, onClick }: { item: Reference; onClick: () => void }) {
   const familleColor = FAMILLE_COLORS[item.famille] || "bg-white/20";
   const familleLabel = FAMILLES.find((f) => f.id === item.famille)?.nomFr || item.famille;
 
@@ -414,7 +414,7 @@ function ProductCard({ item, onClick }: { item: Reference; onClick: () => void }
       </div>
     </button>
   );
-}
+});
 
 /* ══════════════════════════════════════════════════════════════════
    DETAIL MODAL
@@ -422,10 +422,14 @@ function ProductCard({ item, onClick }: { item: Reference; onClick: () => void }
 function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }) {
   const familleLabel = FAMILLES.find((f) => f.id === item.famille)?.nomFr || item.famille;
   const familleColor = FAMILLE_COLORS[item.famille] || "bg-white/20";
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Détail de ${item.nom}`}
       onClick={onClose}
     >
       {/* Backdrop */}
@@ -440,6 +444,7 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
         {/* Close button */}
         <button
           onClick={onClose}
+          aria-label="Fermer le détail"
           className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white rounded-full p-2 transition-colors"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -449,13 +454,17 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
 
         {/* Image */}
         <div className="relative aspect-square max-h-[600px] w-full bg-gris-900">
+          {!imgLoaded && (
+            <div className="absolute inset-0 bg-gris-800 animate-pulse" />
+          )}
           <Image
             src={item.image}
             alt={item.nom}
             fill
             sizes="600px"
-            quality={90}
-            className="object-cover"
+            quality={80}
+            className={`object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+            onLoad={() => setImgLoaded(true)}
           />
           {/* Family badge on image */}
           <div className="absolute top-4 left-4">

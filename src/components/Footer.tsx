@@ -15,17 +15,25 @@ export default function Footer() {
             Prêt à transformer votre intérieur ?
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            Recevez votre simulation IA gratuite en moins de 60 secondes. Sans engagement.
+            Simulation IA cuisine gratuite en 60 secondes ou devis classique sous 48h. Sans engagement.
           </p>
-          <Link
-            href="/simulation"
-            className="inline-flex items-center gap-2 bg-white text-noir font-bold px-10 py-4 rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl uppercase tracking-wider"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Recevoir ma simulation gratuite
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/simulation"
+              className="inline-flex items-center gap-2 bg-white text-noir font-bold px-10 py-4 rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl uppercase tracking-wider"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Simuler ma cuisine
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 bg-transparent text-white font-bold px-10 py-4 rounded-lg text-lg transition-all duration-300 hover:scale-105 border-2 border-white/30 hover:border-white uppercase tracking-wider"
+            >
+              Demander un devis
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -53,9 +61,9 @@ export default function Footer() {
                 <a
                   key={social}
                   href={
-                    social === "instagram" ? "https://www.instagram.com/coverswap"
+                    social === "instagram" ? "https://www.instagram.com/cover.swap/"
                     : social === "facebook" ? "https://www.facebook.com/coverswap"
-                    : social === "tiktok" ? "https://www.tiktok.com/@coverswap"
+                    : social === "tiktok" ? "https://www.tiktok.com/@cover.swap"
                     : "https://www.linkedin.com/company/coverswap"
                   }
                   target="_blank"
@@ -103,20 +111,32 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { href: "/simulation", label: "Simulation IA gratuite" },
-                { href: "/realisations", label: "Nos réalisations" },
+                { href: "https://www.instagram.com/cover.swap/", label: "Nos réalisations", external: true },
                 { href: "/blog", label: "Blog & conseils" },
                 { href: "/contact", label: "Demander un devis" },
                 { href: "/revetements", label: "Catalogue Cover Styl'" },
                 { href: "/#faq", label: "FAQ" },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gris-400 hover:text-rouge transition-colors text-sm flex items-center gap-2 group"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-rouge/50 group-hover:bg-rouge transition-colors" />
-                    {link.label}
-                  </Link>
+                  {"external" in link ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gris-400 hover:text-rouge transition-colors text-sm flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-rouge/50 group-hover:bg-rouge transition-colors" />
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className="text-gris-400 hover:text-rouge transition-colors text-sm flex items-center gap-2 group"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-rouge/50 group-hover:bg-rouge transition-colors" />
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

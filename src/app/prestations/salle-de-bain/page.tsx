@@ -107,7 +107,7 @@ export default function SalleDeBainPage() {
           </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/simulation" className="btn-primary">Simuler ma salle de bain</Link>
+              <Link href="/contact" className="btn-primary">Demander un devis gratuit</Link>
               <Link href="/contact" className="btn-secondary">Devis gratuit en 48h</Link>
             </div>
           </ScrollReveal>
@@ -346,11 +346,11 @@ export default function SalleDeBainPage() {
             <div className="glass-card p-12 border-rouge/20 bg-rouge/5">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">Transformez votre salle de bain dès maintenant</h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Recevez une simulation réaliste gratuite et un devis détaillé en 48&nbsp;heures. Zéro engagement, zéro surprise.
+                Recevez un devis détaillé en 48&nbsp;heures. Zéro engagement, zéro surprise.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/simulation" className="btn-primary text-lg px-10 py-5">Recevoir ma simulation gratuite</Link>
-                <Link href="/contact" className="btn-secondary text-lg px-10 py-5">Demander un devis</Link>
+                <Link href="/contact" className="btn-primary text-lg px-10 py-5">Demander un devis gratuit</Link>
+                <Link href="/simulation" className="btn-secondary text-lg px-10 py-5">Simuler une cuisine (IA)</Link>
               </div>
             </div>
           </ScrollReveal>

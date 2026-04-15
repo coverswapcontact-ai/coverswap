@@ -32,14 +32,9 @@ export function LocalBusinessSchema() {
       image={["https://coverswap.fr/og-image.jpg"]}
       openingHoursSpecification={[
         {
-          opens: "09:00",
-          closes: "18:00",
+          opens: "08:00",
+          closes: "17:00",
           dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        },
-        {
-          opens: "10:00",
-          closes: "16:00",
-          dayOfWeek: ["Saturday"],
         },
       ]}
       priceRange="€€"

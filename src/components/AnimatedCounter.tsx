@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface AnimatedCounterProps {
   end: number;
@@ -9,7 +9,7 @@ interface AnimatedCounterProps {
   duration?: number;
 }
 
-export default function AnimatedCounter({ end, suffix = "", prefix = "", duration = 2000 }: AnimatedCounterProps) {
+export default React.memo(function AnimatedCounter({ end, suffix = "", prefix = "", duration = 2000 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -52,4 +52,4 @@ export default function AnimatedCounter({ end, suffix = "", prefix = "", duratio
       {prefix}{count}{suffix}
     </span>
   );
-}
+});

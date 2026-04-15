@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: "Quel est le prix d'un covering cuisine complet ?",
-    a: "Le prix varie selon la surface à couvrir et les finitions choisies. En moyenne, un covering cuisine complet (plans de travail + façades + crédence) revient entre 1 200 et 3 500 euros, soit 5 à 10 fois moins qu'une rénovation classique. Chaque devis est personnalisé et gratuit.",
+    a: "Le prix varie selon la surface à couvrir et les finitions choisies. En moyenne, un covering cuisine complet (plans de travail + façades + crédence) revient entre 1 200 et 3 500 euros, soit jusqu'à 5 fois moins cher qu'une rénovation classique. Chaque devis est personnalisé et gratuit.",
   },
   {
     q: "Le covering est-il réversible ?",
@@ -216,7 +216,7 @@ export default function CuisinePage() {
             <p className="text-gris-300 text-lg max-w-2xl leading-relaxed mb-10">
               Plans de travail, crédences, façades de meubles : transformez chaque surface avec un revêtement adhésif
               texturé haut de gamme. Plus de 50 finitions marbre, bois et béton, posées en une seule journée, pour un
-              budget 10x inférieur à une rénovation classique.
+              budget jusqu&apos;à 5x inférieur à une rénovation classique.
             </p>
           </ScrollReveal>
 
@@ -259,8 +259,8 @@ export default function CuisinePage() {
                 </p>
                 <p className="text-gris-300 leading-relaxed">
                   Le résultat est bluffant : des finitions marbre, bois ou béton indiscernables des matériaux
-                  d&apos;origine, garanties 10 ans, pour une fraction du prix. C&apos;est la solution choisie par plus
-                  de 500 particuliers et professionnels en France.
+                  d&apos;origine, garanties 10 ans, pour une fraction du prix. Une solution adoptée par des particuliers
+                  et professionnels partout en France.
                 </p>
               </div>
             </ScrollReveal>
@@ -269,9 +269,9 @@ export default function CuisinePage() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { value: "1 journée", label: "de pose" },
-                  { value: "10x", label: "moins cher" },
+                  { value: "5x", label: "moins cher" },
                   { value: "10 ans", label: "de garantie" },
-                  { value: "500+", label: "projets réalisés" },
+                  { value: "100%", label: "satisfaction" },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -321,7 +321,7 @@ export default function CuisinePage() {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-4">
-              Plus de 50 textures pour <span className="text-rouge">votre style</span>
+              Près de 500 textures pour <span className="text-rouge">votre style</span>
             </h2>
             <p className="text-gris-400 text-center max-w-2xl mx-auto mb-16">
               Chaque finition est sélectionnée pour son réalisme, sa durabilité et sa résistance aux contraintes
@@ -446,7 +446,7 @@ export default function CuisinePage() {
                 </div>
                 <div className="text-center lg:text-left flex-1">
                   <h3 className="font-display text-2xl font-bold mb-2">
-                    Explorez nos 267 références bois et <span className="text-rouge">+50 finitions</span> pour votre cuisine
+                    Explorez notre catalogue de <span className="text-rouge">près de 500 finitions</span> pour votre cuisine
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
                     Parcourez notre catalogue complet de 497 références Cover Styl&apos; : marbre, bois, béton, métal et bien plus. Trouvez la finition parfaite pour chaque surface de votre cuisine.

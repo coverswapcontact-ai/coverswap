@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { BreadcrumbSchema } from "@/components/JsonLd";
+import { track } from "@/lib/analytics";
 
 const projectTypes = [
   "Cuisine",
@@ -62,6 +63,10 @@ function ContactPageInner() {
         setError(true);
       } else {
         setSent(true);
+        track("contact_form_submitted", {
+          type_projet: payload.type_projet || "non_renseigne",
+          has_reference: payload.reference ? true : false,
+        });
         form.reset();
       }
     } catch {
@@ -284,14 +289,10 @@ function ContactPageInner() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gris-400">Lundi - Vendredi</span>
-                  <span className="font-medium">9h00 - 18h00</span>
+                  <span className="font-medium">8h00 - 17h00</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gris-400">Samedi</span>
-                  <span className="font-medium">10h00 - 16h00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gris-400">Dimanche</span>
+                  <span className="text-gris-400">Samedi - Dimanche</span>
                   <span className="text-gris-500">Fermé</span>
                 </div>
               </div>
@@ -303,33 +304,50 @@ function ContactPageInner() {
               <p className="text-sm text-gris-400 mb-5">
                 Nous nous déplaçons partout en France métropolitaine.
               </p>
-              <svg viewBox="0 0 200 220" className="w-40 mx-auto text-rouge/30" fill="currentColor" stroke="currentColor" strokeWidth="1.5">
+              <svg viewBox="80 30 500 520" className="w-52 mx-auto" xmlns="http://www.w3.org/2000/svg">
+                {/* France métropolitaine — contour Natural Earth simplifié */}
                 <path
-                  d="M100 10 L130 20 L155 15 L170 35 L185 50 L190 75 L185 100 L175 120 L160 140 L155 160 L140 175 L120 195 L100 210 L80 200 L60 190 L45 170 L30 150 L20 130 L15 105 L20 80 L25 60 L35 40 L55 25 L75 15 Z"
-                  fill="currentColor"
-                  fillOpacity="0.15"
-                  strokeLinecap="round"
+                  d="M233 68l7-5 13-1 9 3 15-2 8 5 6-3 14 1 9 6 7 0 11-5 17 2 10 7 4 0 12 8 5 10 8 3 11 10 6 1 7 6 0 9 6 5-1 8 7 10 13 8 4 8 12 5 3 9 9 4 6 10 10 7 4 12 8 6-1 11 6 8 0 13-3 10 4 9-2 14 5 7-1 12-5 8 2 11-3 14 1 9-6 11-1 15 3 12-4 9 1 8-8 12 3 10-3 13-9 9 1 10-6 7-12 5-5 10-10 3-7 9 2 7-4 11-10 6-14 1-8 8-12 2-7-3-11 5-6-1-9-6-3-9-13-3-6 4-9-2-5-7 1-10-7-5-3-11 2-8-8-6-6-12-9-4 0-9-6-7-12-3-7-8 1-11-8-5-5-10-10-4-4-9 3-13-4-8-10-2-7-9 1-8-5-7 4-12-4-9 6-10-1-13 5-8 3-11-2-9 7-7 1-14 8-6 10-9 5-3 7-8 5 1 8-5z"
+                  className="fill-rouge/[0.07] stroke-rouge/25"
+                  strokeWidth="1.5"
                   strokeLinejoin="round"
                 />
-                {/* Dots for major cities */}
-                <circle cx="105" cy="55" r="3" className="fill-rouge" /> {/* Paris */}
-                <circle cx="75" cy="145" r="2.5" className="fill-rouge/60" /> {/* Bordeaux */}
-                <circle cx="155" cy="95" r="2.5" className="fill-rouge/60" /> {/* Lyon */}
-                <circle cx="125" cy="175" r="2.5" className="fill-rouge/60" /> {/* Marseille */}
-                <circle cx="55" cy="80" r="2.5" className="fill-rouge/60" /> {/* Rennes */}
-                <circle cx="65" cy="170" r="2.5" className="fill-rouge/60" /> {/* Toulouse */}
-                {/* Paris label */}
-                <text x="115" y="53" className="fill-white text-[8px] font-bold">Paris</text>
+                {/* Pérols/Montpellier — siège (point pulsant) */}
+                <circle cx="370" cy="420" r="10" className="fill-rouge/20 animate-pulse" />
+                <circle cx="370" cy="420" r="4" className="fill-rouge" />
+                {/* Paris */}
+                <circle cx="310" cy="168" r="3.5" className="fill-white/60" />
+                {/* Lyon */}
+                <circle cx="375" cy="320" r="3" className="fill-white/40" />
+                {/* Bordeaux */}
+                <circle cx="218" cy="370" r="3" className="fill-white/40" />
+                {/* Toulouse */}
+                <circle cx="270" cy="430" r="3" className="fill-white/40" />
+                {/* Lille */}
+                <circle cx="320" cy="88" r="3" className="fill-white/40" />
+                {/* Rennes */}
+                <circle cx="175" cy="200" r="3" className="fill-white/40" />
+                {/* Strasbourg */}
+                <circle cx="440" cy="170" r="3" className="fill-white/40" />
+                {/* Marseille */}
+                <circle cx="385" cy="445" r="3" className="fill-white/40" />
+                {/* Nantes */}
+                <circle cx="165" cy="280" r="3" className="fill-white/40" />
+                {/* Labels */}
+                <text x="380" y="423" className="fill-rouge text-[12px] font-bold" dominantBaseline="middle">Pérols</text>
+                <text x="322" y="168" className="fill-white/70 text-[10px]" dominantBaseline="middle">Paris</text>
+                <text x="388" y="320" className="fill-white/50 text-[9px]" dominantBaseline="middle">Lyon</text>
+                <text x="398" y="445" className="fill-white/50 text-[9px]" dominantBaseline="middle">Marseille</text>
               </svg>
             </div>
 
             {/* Quick CTA */}
             <div className="glass-card p-6 text-center border-rouge/20">
               <p className="text-sm text-gris-400 mb-4">
-                Besoin d&apos;un aperçu immédiat ?
+                Besoin d&apos;un aperçu immédiat pour votre cuisine ?
               </p>
               <Link href="/simulation" className="btn-secondary text-sm px-6 py-3 w-full">
-                Simulation IA gratuite
+                Simulation cuisine (IA)
               </Link>
             </div>
           </div>

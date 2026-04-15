@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 
 interface BeforeAfterSliderProps {
@@ -13,7 +13,7 @@ interface BeforeAfterSliderProps {
   height?: string;
 }
 
-export default function BeforeAfterSlider({
+export default React.memo(function BeforeAfterSlider({
   beforeLabel = "AVANT",
   afterLabel = "APRÈS",
   beforeColor,
@@ -41,13 +41,13 @@ export default function BeforeAfterSlider({
     isDragging.current = false;
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (isDragging.current) handleMove(e.clientX);
-  };
+  }, [handleMove]);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
     handleMove(e.touches[0].clientX);
-  };
+  }, [handleMove]);
 
   return (
     <div
@@ -104,7 +104,7 @@ export default function BeforeAfterSlider({
       {/* Slider handle */}
       <div
         className="absolute top-0 bottom-0 z-10"
-        style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
+        style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)", willChange: "left" }}
       >
         <div className="w-0.5 h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
         <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -127,4 +127,4 @@ export default function BeforeAfterSlider({
       </div>
     </div>
   );
-}
+});

@@ -27,6 +27,10 @@ yarn-error.log*
 # env files
 .env*.local
 
+# CRM queue (leads en attente si CRM down)
+.crm-queue.json
+.crm-failed-leads.json
+
 # vercel
 .vercel
 

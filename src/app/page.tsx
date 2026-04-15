@@ -1,30 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import ScrollReveal from "@/components/ScrollReveal";
 import TextureBackground from "@/components/TextureBackground";
-import { GallerySection, SimulationSection, FAQSection } from "@/components/HomeClient";
+import HeroVideo from "@/components/HeroVideo";
+import { SimulationSection, FAQSection } from "@/components/HomeClient";
 
 /* ──────────────────────────────────────────────────────────────────
    METADATA — SEO
 ────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "CoverSwap | Rénovation intérieure par revêtements adhésifs texturés",
+  title: "Rénovation intérieure par revêtements adhésifs texturés",
   description:
-    "Transformez votre intérieur en 1 journée avec nos revêtements adhésifs haut de gamme. Simulation IA gratuite en 60 secondes. Cuisine, salle de bain, meubles — 10x moins cher qu'une rénovation classique.",
-  keywords:
-    "covering adhésif, rénovation intérieure, revêtement adhésif, covering cuisine, covering salle de bain, covering meubles, covering professionnel, simulation IA, CoverSwap",
+    "Transformez votre intérieur en 1 journée avec nos revêtements adhésifs haut de gamme. Simulation IA gratuite. Cuisine, salle de bain, meubles — à partir de 80 €/m².",
   openGraph: {
-    title: "CoverSwap | Rénovation intérieure premium par covering adhésif",
+    title: "CoverSwap — Rénovation intérieure premium par covering adhésif",
     description:
-      "Transformez votre intérieur en 1 journée. Simulation IA gratuite en 60 secondes. Effet marbre, bois, béton, métal — 10x moins cher qu'une rénovation classique.",
-    url: "https://coverswap.fr",
-    siteName: "CoverSwap",
-    locale: "fr_FR",
+      "Transformez votre intérieur en 1 journée. Simulation IA gratuite en 60 secondes. À partir de 80 €/m² fourni & posé.",
     type: "website",
   },
   alternates: {
-    canonical: "https://coverswap.fr",
+    canonical: "/",
   },
 };
 
@@ -33,17 +30,9 @@ export const metadata: Metadata = {
    Paramètres : w=1920, q=80, fit=crop, format=auto
 ────────────────────────────────────────────────────────────────── */
 const TEXTURES = {
-  /** Cuisine moderne avec plan de travail en marbre */
-  kitchen:
-    "https://images.unsplash.com/photo-1639405069836-f82aa6dcb900?auto=format&fit=crop&w=1920&q=80",
-
   /** Salle de bain élégante avec murs en marbre et éléments naturels */
   bathroom:
     "https://images.unsplash.com/photo-1754522711595-84428937b07a?auto=format&fit=crop&w=1920&q=80",
-
-  /** Comptoir de bar moderne avec surface en marbre */
-  counter:
-    "https://images.unsplash.com/photo-1767022724924-993b00fc04b3?auto=format&fit=crop&w=1920&q=80",
 } as const;
 
 /* ══════════════════════════════════════════════════════════════════
@@ -53,14 +42,8 @@ const TEXTURES = {
 function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Texture marbre avec parallax */}
-      <TextureBackground
-        src={TEXTURES.kitchen}
-        overlay="linear-gradient(160deg, rgba(0,0,0,0.82) 0%, rgba(10,10,10,0.68) 50%, rgba(0,0,0,0.85) 100%)"
-        parallax
-        fadeTop={false}
-        fadeBottom
-      />
+      {/* Vidéo hero — desktop only, mobile = poster */}
+      <HeroVideo />
 
       {/* Halo rouge ambiant */}
       <div
@@ -105,7 +88,7 @@ function HeroSection() {
         >
           Revêtements adhésifs texturés haut de gamme. Effet marbre, bois, béton, métal.
           <br className="hidden sm:block" />
-          <strong className="text-white">10x moins cher</strong> qu&apos;une rénovation classique.
+          <strong className="text-white">Jusqu&apos;à 5x moins cher</strong> qu&apos;une rénovation classique.
         </p>
 
         {/* CTAs */}
@@ -117,38 +100,57 @@ function HeroSection() {
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Recevoir ma simulation gratuite
+            Simuler ma cuisine gratuitement
           </Link>
-          <Link href="/realisations" className="btn-secondary">
+          <a
+            href="https://www.instagram.com/cover.swap/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
             Voir nos réalisations
-          </Link>
+          </a>
         </div>
 
-        {/* Social proof */}
+        {/* Pricing hint */}
         <div
-          className="flex flex-wrap items-center justify-center gap-8 text-gris-500"
+          className="mb-10 -mt-4 flex items-center justify-center"
+          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.5s" }}
+        >
+          <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-rouge/30 rounded-full px-5 py-2.5">
+            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" />
+            </svg>
+            <span className="text-sm text-white font-medium">
+              À partir de <strong className="text-rouge">80&nbsp;€/m²</strong>
+              <span className="text-gris-400"> · surfaces lisses · à partir de 20&nbsp;m²</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Trust badges */}
+        <div
+          className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-gris-400"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.55s" }}
         >
           <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {["A", "B", "C", "D", "E"].map((l) => (
-                <div
-                  key={l}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-gris-600 to-gris-800 border-2 border-noir flex items-center justify-center text-[10px] font-bold text-white"
-                >
-                  {l}
-                </div>
-              ))}
-            </div>
-            <span className="text-sm">+500 clients satisfaits</span>
+            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="text-sm">Devis gratuit sans engagement</span>
           </div>
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-            <span className="text-sm ml-1">4.9/5 sur Google</span>
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm">Artisan spécialisé Cover Styl&apos;</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm">France entière</span>
           </div>
         </div>
       </div>
@@ -170,7 +172,7 @@ function HeroSection() {
 function KeyFigures() {
   const figures = [
     { value: 1,   suffix: " journée", label: "Pour transformer votre espace", icon: "clock" },
-    { value: 10,  suffix: "x",        label: "Moins cher qu'une rénovation",  icon: "euro"  },
+    { value: 5,   suffix: "x",        label: "Moins cher qu'une rénovation",  icon: "euro"  },
     { value: 60,  suffix: " sec",     label: "Pour votre simulation IA",      icon: "zap"   },
     { value: 100, suffix: "%",        label: "France entière couverte",       icon: "map"   },
   ];
@@ -282,8 +284,88 @@ function HowItWorks() {
         <ScrollReveal direction="up" delay={0.3}>
           <div className="text-center mt-12">
             <Link href="/simulation" className="btn-primary">
-              Commencer ma simulation
+              Simuler ma cuisine
             </Link>
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SECTION PRICING — Tarif transparent
+   Rassurer sur l'ordre de grandeur AVANT la demande de devis
+══════════════════════════════════════════════════════════════════ */
+function PricingSection() {
+  return (
+    <section id="tarifs" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
+      {/* Halo rouge */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full opacity-30"
+          style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.15) 0%, transparent 70%)" }}
+        />
+      </div>
+
+      <div className="container-custom relative z-10 max-w-5xl">
+        <div className="text-center mb-12">
+          <ScrollReveal direction="fade">
+            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Tarif transparent</span>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.1}>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
+              Un prix clair, <span className="text-rouge">sans surprise</span>
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal direction="up" delay={0.2}>
+            <p className="text-gris-300 max-w-2xl mx-auto">
+              Fini les devis opaques. CoverSwap affiche ses tarifs dès la page d&apos;accueil.
+            </p>
+          </ScrollReveal>
+        </div>
+
+        <ScrollReveal direction="up" delay={0.15}>
+          <div className="glass-card glow-border border-rouge/30 p-10 md:p-14 text-center relative overflow-hidden">
+            {/* Ribbon */}
+            <div className="absolute top-5 right-5 bg-rouge/15 border border-rouge/40 rounded-full px-3 py-1 text-[10px] font-bold text-rouge uppercase tracking-widest">
+              Fourni &amp; posé
+            </div>
+
+            <p className="text-gris-400 uppercase text-xs tracking-widest mb-3">À partir de</p>
+            <div className="flex items-baseline justify-center gap-2 mb-2">
+              <span className="font-display text-7xl md:text-8xl font-bold text-white">80</span>
+              <span className="font-display text-3xl md:text-4xl text-rouge font-bold">€ / m²</span>
+            </div>
+            <p className="text-gris-300 mb-8">Revêtement Cover Styl&apos; fourni et posé par nos soins</p>
+
+            <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
+              {[
+                { title: "Surfaces lisses", desc: "Crédence, plan, façades planes" },
+                { title: "À partir de 20 m²", desc: "Volume minimum d'intervention" },
+                { title: "Tout inclus", desc: "Matériau premium + pose + finitions" },
+              ].map((c) => (
+                <div key={c.title} className="bg-white/5 border border-white/10 rounded-xl p-4">
+                  <p className="font-bold text-white text-sm mb-1">{c.title}</p>
+                  <p className="text-xs text-gris-400">{c.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-gris-500 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Tarif indicatif de départ pour une surface plane à partir de 20&nbsp;m². Prix final ajusté selon la complexité
+              (angles, reliefs, démontages nécessaires), la référence Cover Styl&apos; choisie et la zone d&apos;intervention.
+              Devis détaillé gratuit sous 24&nbsp;h.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/simulation" className="btn-primary">
+                Simuler ma cuisine (IA)
+              </Link>
+              <Link href="/contact" className="btn-secondary">
+                Demander un devis précis
+              </Link>
+            </div>
           </div>
         </ScrollReveal>
       </div>
@@ -296,13 +378,60 @@ function HowItWorks() {
    Fond noir — bannière visuelle vers /revetements
 ══════════════════════════════════════════════════════════════════ */
 function CatalogueSection() {
+  /**
+   * Chaque famille est représentée par une référence clé du catalogue Cover Styl',
+   * pas par un icône générique. Visuel = preuve immédiate du produit.
+   */
   const families = [
-    { name: "Bois", count: "267", color: "from-amber-800 to-amber-600" },
-    { name: "Pierre & marbre", count: "58", color: "from-gray-400 to-gray-200" },
-    { name: "Béton & ciment", count: "24", color: "from-gray-600 to-gray-400" },
-    { name: "Couleurs unies", count: "89", color: "from-rouge to-red-400" },
-    { name: "Métal", count: "32", color: "from-zinc-500 to-zinc-300" },
-    { name: "Cuir & textile", count: "27", color: "from-amber-900 to-amber-700" },
+    {
+      name: "Bois",
+      count: "267",
+      refId: "AA04",
+      refName: "Rich Oak",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa04_d4dbfa3468.jpg",
+    },
+    {
+      name: "Pierre & marbre",
+      count: "36",
+      refId: "MK14",
+      refName: "Grigio Marquina",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk14_792e853256.jpg",
+    },
+    {
+      name: "Béton & ciment",
+      count: "17",
+      refId: "NE24",
+      refName: "Raw Grey",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne24_50d2ddfad4.jpg",
+    },
+    {
+      name: "Couleurs unies",
+      count: "89",
+      refId: "K1",
+      refName: "Black Mat",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k1_6dc839de4a.jpg",
+    },
+    {
+      name: "Métal",
+      count: "31",
+      refId: "KI01",
+      refName: "Chromed Metal",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ki01_e5536ae2ce.jpg",
+    },
+    {
+      name: "Cuir & textile",
+      count: "41",
+      refId: "LP04",
+      refName: "Graphite",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_04_Graphite_2802668bd8.png",
+    },
+    {
+      name: "Paillettes",
+      count: "16",
+      refId: "R11",
+      refName: "Midnight Blue Disco",
+      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r11_9f09c9b29b.jpg",
+    },
   ];
 
   return (
@@ -317,7 +446,7 @@ function CatalogueSection() {
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.1}>
             <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
-              +490 r&eacute;f&eacute;rences <span className="text-rouge">Cover Styl&rsquo;</span>
+              Près de 500 références <span className="text-rouge">Cover Styl&rsquo;</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>
@@ -328,13 +457,33 @@ function CatalogueSection() {
         </div>
 
         <ScrollReveal direction="up" delay={0.15}>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-10">
             {families.map((f) => (
-              <div key={f.name} className="glass-card p-5 text-center hover:border-rouge/30 transition-all duration-300">
-                <div className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${f.color} opacity-80`} />
-                <p className="font-display font-bold text-sm mb-0.5">{f.name}</p>
+              <Link
+                key={f.name}
+                href={`/revetements?famille=${encodeURIComponent(f.name.toLowerCase().split(" ")[0])}`}
+                className="group glass-card p-4 text-center hover:border-rouge/40 transition-all duration-300 hover:-translate-y-1"
+              >
+                {/* Vignette : référence clé de la famille */}
+                <div className="relative w-full aspect-square mx-auto mb-3 rounded-xl overflow-hidden border border-white/10 group-hover:border-rouge/40 transition-colors">
+                  <Image
+                    src={f.image}
+                    alt={`${f.refName} — exemple ${f.name}`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 140px"
+                    loading="lazy"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {/* Badge code ref en bas */}
+                  <div className="absolute bottom-1 right-1 bg-noir/85 backdrop-blur-sm text-[9px] font-mono text-white px-1.5 py-0.5 rounded">
+                    {f.refId}
+                  </div>
+                </div>
+                <p className="font-display font-bold text-sm mb-0.5 group-hover:text-rouge transition-colors">
+                  {f.name}
+                </p>
                 <p className="text-rouge text-xs font-semibold">{f.count} refs</p>
-              </div>
+              </Link>
             ))}
           </div>
         </ScrollReveal>
@@ -355,93 +504,6 @@ function CatalogueSection() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SECTION 6 — TÉMOIGNAGES
-   Métal brossé anthracite — overlay 0.82
-══════════════════════════════════════════════════════════════════ */
-function TestimonialsSection() {
-  const testimonials = [
-    {
-      name: "Sophie M.",
-      role: "Particulier — Paris",
-      text: "Incroyable ! Ma cuisine a été transformée en une demi-journée. Le rendu marbre est bluffant, mes amis pensent que j'ai fait de gros travaux.",
-      rating: 5,
-    },
-    {
-      name: "Thomas R.",
-      role: "Restaurateur — Lyon",
-      text: "J'ai fait recouvrir le comptoir et les murs de mon restaurant. Le résultat est impressionnant et mes clients adorent. Rapport qualité/prix imbattable.",
-      rating: 5,
-    },
-    {
-      name: "Marie L.",
-      role: "Particulier — Bordeaux",
-      text: "La simulation IA m'a convaincue instantanément. Le rendu était exactement ce que j'imaginais. Équipe professionnelle, travail impeccable.",
-      rating: 5,
-    },
-    {
-      name: "Pierre D.",
-      role: "Architecte d'intérieur — Nice",
-      text: "Je recommande CoverSwap à tous mes clients. La qualité des revêtements est exceptionnelle, la pose rapide et propre. Un vrai game-changer.",
-      rating: 5,
-    },
-  ];
-
-  return (
-    <section className="relative section-padding overflow-hidden">
-      {/* Texture métal brossé */}
-      <TextureBackground
-        src={TEXTURES.counter}
-        overlay="rgba(0,0,0,0.82)"
-        fadeTop
-        fadeBottom
-      />
-
-      <div className="container-custom relative z-20">
-        <div className="text-center mb-16">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Témoignages</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
-              Ils ont transformé leur intérieur
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 max-w-xl mx-auto">Plus de 500 clients satisfaits dans toute la France.</p>
-          </ScrollReveal>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {testimonials.map((t, i) => (
-            <ScrollReveal key={i} delay={i * 0.1} direction="up">
-              <div className="glass-card p-6 hover:border-rouge/20 transition-all duration-500 h-full flex flex-col">
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <svg key={j} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-gris-300 text-sm leading-relaxed mb-6 flex-1">&ldquo;{t.text}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rouge/60 to-rouge/30 flex items-center justify-center font-bold text-sm shrink-0">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">{t.name}</p>
-                    <p className="text-xs text-gris-500">{t.role}</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
    PAGE ROOT
 ══════════════════════════════════════════════════════════════════ */
 export default function HomePage() {
@@ -450,10 +512,9 @@ export default function HomePage() {
       <HeroSection />
       <KeyFigures />
       <HowItWorks />
-      <GallerySection />
+      <PricingSection />
       <CatalogueSection />
       <SimulationSection />
-      <TestimonialsSection />
       <FAQSection />
     </>
   );
