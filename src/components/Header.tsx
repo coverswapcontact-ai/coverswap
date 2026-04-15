@@ -168,7 +168,7 @@ export default function Header() {
         {/* Mobile burger */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden relative w-10 h-10 flex items-center justify-center"
+          className="lg:hidden relative z-50 w-10 h-10 flex items-center justify-center"
           aria-label="Menu"
         >
           <div className="space-y-1.5">
@@ -193,11 +193,11 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden fixed inset-0 top-0 bg-noir/98 backdrop-blur-xl z-40 transition-all duration-500 ${
+        className={`lg:hidden fixed inset-0 bg-noir z-40 transition-all duration-300 ${
           mobileOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
-        <div className="flex flex-col items-center justify-center h-full gap-6 pt-20">
+        <div className="flex flex-col items-center justify-center h-full gap-5 px-6 overflow-y-auto">
           {navLinks.map((link) =>
             link.submenu ? (
               <div key={link.href} className="text-center">
