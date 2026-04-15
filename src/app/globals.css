@@ -32,7 +32,7 @@ textarea:focus-visible {
   /* ── Bouton principal avec pulse subtil ── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
-           px-8 py-4 rounded-lg text-lg transition-all duration-300
+           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
            hover:bg-rouge-hover hover:scale-105
            active:scale-95 uppercase tracking-wider;
     animation: ctaPulse 2.5s ease-in-out infinite;
@@ -51,13 +51,13 @@ textarea:focus-visible {
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
-           px-8 py-4 rounded-lg text-lg transition-all duration-300
+           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
            hover:bg-white hover:text-noir hover:scale-105
            active:scale-95 uppercase tracking-wider;
   }
 
   .section-padding {
-    @apply py-24 px-4 sm:px-6 lg:px-8;
+    @apply py-14 md:py-24 px-4 sm:px-6 lg:px-8;
   }
 
   .container-custom {

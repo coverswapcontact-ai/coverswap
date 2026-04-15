@@ -79,7 +79,7 @@ export function SimulationSection() {
 
       <div className="container-custom relative z-10">
         {/* ── HEADER ── */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
           <ScrollReveal direction="fade">
             <div className="inline-flex items-center gap-2 bg-rouge/10 border border-rouge/30 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-rouge animate-pulse shadow-[0_0_8px_rgba(204,0,0,0.8)]" />
@@ -90,7 +90,7 @@ export function SimulationSection() {
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] mb-6 tracking-tight">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.02] mb-4 md:mb-6 tracking-tight">
               Votre cuisine.
               <br />
               <span className="relative inline-block">
@@ -154,14 +154,14 @@ export function SimulationSection() {
                 />
 
                 {/* Step badge */}
-                <div className="inline-flex items-center gap-2 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 mb-6">
+                <div className="inline-flex items-center gap-2 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 mb-4 md:mb-6">
                   <span className="text-rouge font-bold text-[10px] uppercase tracking-widest">
                     Étape 1 / 3 · Photo
                   </span>
                 </div>
 
                 {/* Big upload icon */}
-                <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 rounded-2xl bg-rouge/15 border border-rouge/30 flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 rounded-2xl bg-rouge/15 border border-rouge/30 flex items-center justify-center">
                   <svg
                     className="w-10 h-10 sm:w-12 sm:h-12 text-rouge"
                     fill="none"
@@ -177,7 +177,7 @@ export function SimulationSection() {
                   </svg>
                 </div>
 
-                <h3 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold mb-3 text-white">
+                <h3 className="font-display text-xl sm:text-2xl md:text-4xl font-bold mb-2 md:mb-3 text-white">
                   Glissez votre photo ici
                 </h3>
                 <p className="text-gris-300 mb-2">
@@ -268,7 +268,7 @@ export function SimulationSection() {
         </ScrollReveal>
 
         {/* ── PROCESS 3 ÉTAPES ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mt-16 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-4xl mx-auto mt-10 md:mt-16 mb-8 md:mb-14">
           {[
             {
               num: "01",
@@ -404,12 +404,12 @@ export function FAQSection() {
     <section id="faq" className="relative section-padding bg-noir overflow-hidden">
       <FAQSchema faqs={faqs} />
       <div className="container-custom relative z-10 max-w-3xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <ScrollReveal direction="fade">
             <span className="text-rouge font-bold text-sm uppercase tracking-widest">FAQ</span>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">Questions fréquentes</h2>
+            <h2 className="font-display text-3xl md:text-5xl font-bold mt-3 mb-4">Questions fréquentes</h2>
           </ScrollReveal>
         </div>
 

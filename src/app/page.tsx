@@ -41,17 +41,17 @@ const TEXTURES = {
 ══════════════════════════════════════════════════════════════════ */
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Vidéo hero — desktop only, mobile = poster */}
       <HeroVideo />
 
-      {/* Halo rouge ambiant */}
+      {/* Halo rouge ambiant — masqué mobile */}
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none hidden md:block"
         style={{ background: "radial-gradient(circle, rgba(204,0,0,0.07) 0%, transparent 70%)" }}
       />
 
-      <div className="container-custom relative z-20 text-center pt-32 pb-20">
+      <div className="container-custom relative z-20 text-center pt-24 pb-12 md:pt-32 md:pb-20">
         {/* Badge live */}
         <div
           className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-5 py-2 mb-8"
@@ -63,7 +63,7 @@ function HeroSection() {
 
         {/* Headline */}
         <h1
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[0.95] mb-6 tracking-tight"
+          className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] mb-4 md:mb-6 tracking-tight"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.1s" }}
         >
           Transformez votre
@@ -83,7 +83,7 @@ function HeroSection() {
         </h1>
 
         <p
-          className="text-lg sm:text-xl text-gris-300 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-base sm:text-lg md:text-xl text-gris-300 max-w-2xl mx-auto mb-6 md:mb-10 leading-relaxed"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.25s" }}
         >
           Revêtements adhésifs texturés haut de gamme. Effet marbre, bois, béton, métal.
@@ -93,7 +93,7 @@ function HeroSection() {
 
         {/* CTAs */}
         <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 mb-8 md:mb-16"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.4s" }}
         >
           <Link href="/simulation" className="btn-primary text-lg px-10 py-5">
@@ -115,7 +115,7 @@ function HeroSection() {
 
         {/* Pricing hint */}
         <div
-          className="mb-10 -mt-4 flex items-center justify-center"
+          className="mb-6 md:mb-10 -mt-2 md:-mt-4 flex items-center justify-center"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.5s" }}
         >
           <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-rouge/30 rounded-full px-5 py-2.5">
@@ -178,7 +178,7 @@ function KeyFigures() {
   ];
 
   return (
-    <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
+    <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
       {/* Halo rouge très subtil */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20"
@@ -189,14 +189,14 @@ function KeyFigures() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {figures.map((fig, i) => (
             <ScrollReveal key={i} delay={i * 0.1} direction="up">
-              <div className="glass-card p-8 text-center group hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 h-full">
-                <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-rouge/10 flex items-center justify-center group-hover:bg-rouge/20 transition-colors">
+              <div className="glass-card p-5 md:p-8 text-center group hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 h-full">
+                <div className="w-10 h-10 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 rounded-xl bg-rouge/10 flex items-center justify-center group-hover:bg-rouge/20 transition-colors">
                   {fig.icon === "clock" && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                   {fig.icon === "euro" && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" /></svg>}
                   {fig.icon === "zap"  && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
                   {fig.icon === "map"  && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                 </div>
-                <div className="font-display text-4xl md:text-5xl font-bold text-white mb-2">
+                <div className="font-display text-3xl md:text-5xl font-bold text-white mb-1 md:mb-2">
                   <AnimatedCounter end={fig.value} suffix={fig.suffix} />
                 </div>
                 <p className="text-sm text-gris-400">{fig.label}</p>
@@ -246,7 +246,7 @@ function HowItWorks() {
       />
 
       <div className="container-custom relative z-20">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 md:mb-16">
           <ScrollReveal direction="fade">
             <span className="text-rouge font-bold text-sm uppercase tracking-widest">Simple &amp; rapide</span>
           </ScrollReveal>
@@ -267,11 +267,11 @@ function HowItWorks() {
 
           {steps.map((step, i) => (
             <ScrollReveal key={i} delay={i * 0.15} direction="up">
-              <div className="glass-card p-8 h-full hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 hover:-translate-y-2 relative group">
-                <div className="font-display text-6xl font-bold text-rouge/10 absolute top-4 right-6 select-none">
+              <div className="glass-card p-5 md:p-8 h-full hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 hover:-translate-y-2 relative group">
+                <div className="font-display text-4xl md:text-6xl font-bold text-rouge/10 absolute top-3 right-4 md:top-4 md:right-6 select-none">
                   {step.num}
                 </div>
-                <div className="w-16 h-16 rounded-2xl bg-rouge/10 flex items-center justify-center text-rouge mb-6 group-hover:bg-rouge group-hover:text-white transition-all duration-500">
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-rouge/10 flex items-center justify-center text-rouge mb-4 md:mb-6 group-hover:bg-rouge group-hover:text-white transition-all duration-500">
                   {step.icon}
                 </div>
                 <h3 className="font-display text-xl font-bold mb-3">{step.title}</h3>
@@ -299,7 +299,7 @@ function HowItWorks() {
 ══════════════════════════════════════════════════════════════════ */
 function PricingSection() {
   return (
-    <section id="tarifs" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
+    <section id="tarifs" className="relative py-14 md:py-24 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
       {/* Halo rouge */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -326,7 +326,7 @@ function PricingSection() {
         </div>
 
         <ScrollReveal direction="up" delay={0.15}>
-          <div className="glass-card glow-border border-rouge/30 p-10 md:p-14 text-center relative overflow-hidden">
+          <div className="glass-card glow-border border-rouge/30 p-6 md:p-14 text-center relative overflow-hidden">
             {/* Ribbon */}
             <div className="absolute top-5 right-5 bg-rouge/15 border border-rouge/40 rounded-full px-3 py-1 text-[10px] font-bold text-rouge uppercase tracking-widest">
               Fourni &amp; posé
@@ -334,8 +334,8 @@ function PricingSection() {
 
             <p className="text-gris-400 uppercase text-xs tracking-widest mb-3">À partir de</p>
             <div className="flex items-baseline justify-center gap-2 mb-2">
-              <span className="font-display text-7xl md:text-8xl font-bold text-white">80</span>
-              <span className="font-display text-3xl md:text-4xl text-rouge font-bold">€ / m²</span>
+              <span className="font-display text-5xl md:text-8xl font-bold text-white">80</span>
+              <span className="font-display text-2xl md:text-4xl text-rouge font-bold">€ / m²</span>
             </div>
             <p className="text-gris-300 mb-8">Revêtement Cover Styl&apos; fourni et posé par nos soins</p>
 

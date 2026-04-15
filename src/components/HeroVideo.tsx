@@ -5,17 +5,16 @@ import { useEffect, useState, useRef, useCallback } from "react";
 /**
  * Fond vidéo pour le hero — autoplay, muted, plein écran.
  *
- * Stratégie mobile :
- * - < 768px → poster uniquement (économie data + batterie).
- * - ≥ 768px → vidéo MP4 + poster, démarrage à 1 s pour
- *   couper le début statique de la vidéo.
+ * Stratégie :
+ * - Mobile → vidéo MP4 en autoplay (muted + playsInline = autorisé iOS/Android)
+ *   avec object-position center pour cadrer le sujet sur écran vertical.
+ * - Desktop → même vidéo, object-cover classique.
+ * - Fallback poster si la vidéo ne charge pas.
  *
- * Hydration fix : on ne rend rien jusqu'au mount côté client
- * pour éviter un mismatch serveur/client sur isDesktop.
+ * Hydration fix : on ne rend rien jusqu'au mount côté client.
  */
 export default function HeroVideo() {
   const [mounted, setMounted] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -30,25 +29,21 @@ export default function HeroVideo() {
 
   useEffect(() => {
     setMounted(true);
-    const mq = window.matchMedia("(min-width: 768px)");
-    const update = () => setIsDesktop(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
   }, []);
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
-      {mounted && isDesktop && !videoError ? (
+      {mounted && !videoError ? (
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
           src="/videos/hero.mp4"
           poster="/videos/hero-poster.jpg"
           autoPlay
           muted
+          loop
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-hidden="true"
           onLoadedMetadata={handleLoadedMetadata}
           onError={() => setVideoError(true)}
@@ -61,8 +56,8 @@ export default function HeroVideo() {
         />
       )}
 
-      {/* Overlay noir global */}
-      <div className="absolute inset-0 bg-noir/50 pointer-events-none" />
+      {/* Overlay — plus sombre sur mobile pour lisibilité texte */}
+      <div className="absolute inset-0 bg-noir/60 md:bg-noir/50 pointer-events-none" />
     </div>
   );
 }
