@@ -61,16 +61,20 @@ export default function Header() {
     <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-rouge focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm">
       Aller au contenu principal
     </a>
+
+    {/* ═══ HEADER BAR ═══ */}
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
+        scrolled && !mobileOpen
           ? "bg-noir/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.5)] py-3"
+          : mobileOpen
+          ? "bg-noir py-3"
           : "bg-transparent py-5"
       }`}
     >
-      <div className="container-custom flex items-center justify-between">
+      <div className="container-custom flex items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group relative z-50">
           <div className="relative w-10 h-10">
             <div className="absolute inset-0 bg-rouge rounded-lg transform rotate-45 group-hover:rotate-[225deg] transition-transform duration-700" />
             <span className="absolute inset-0 flex items-center justify-center text-white font-display font-bold text-lg">
@@ -165,9 +169,9 @@ export default function Header() {
           Simuler ma cuisine
         </Link>
 
-        {/* Mobile burger */}
+        {/* Mobile burger — z-50 pour rester au-dessus du menu overlay */}
         <button
-          onClick={() => setMobileOpen(!mobileOpen)}
+          onClick={() => { setMobileOpen(!mobileOpen); setOpenSubmenu(null); }}
           className="lg:hidden relative z-50 w-10 h-10 flex items-center justify-center"
           aria-label="Menu"
         >
@@ -190,84 +194,84 @@ export default function Header() {
           </div>
         </button>
       </div>
+    </header>
 
-      {/* Mobile Menu */}
-      <div
-        className={`lg:hidden fixed inset-0 bg-noir z-40 transition-all duration-300 ${
-          mobileOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        }`}
-      >
-        <div className="flex flex-col items-center justify-center h-full gap-5 px-6 overflow-y-auto">
-          {navLinks.map((link) =>
-            link.submenu ? (
-              <div key={link.href} className="text-center">
-                <button
-                  onClick={() => setOpenSubmenu(openSubmenu === link.href ? null : link.href)}
-                  aria-haspopup="true"
-                  aria-expanded={openSubmenu === link.href}
-                  className="text-2xl font-display font-bold text-white flex items-center gap-2"
-                >
-                  {link.label}
-                  <svg
-                    className={`w-5 h-5 transition-transform ${openSubmenu === link.href ? "rotate-180" : ""}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {openSubmenu === link.href && (
-                  <div className="mt-3 space-y-2">
-                    {link.submenu.map((sub) => {
-                      const isExternal = sub.href.startsWith("http");
-                      return isExternal ? (
-                        <a
-                          key={sub.href}
-                          href={sub.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center justify-center gap-2 text-lg text-gris-400 hover:text-rouge transition-colors"
-                        >
-                          {sub.label}
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                        </a>
-                      ) : (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
-                          onClick={() => setMobileOpen(false)}
-                          className="block text-lg text-gris-400 hover:text-rouge transition-colors"
-                        >
-                          {sub.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="text-2xl font-display font-bold text-white hover:text-rouge transition-colors"
+    {/* ═══ MOBILE MENU — EN DEHORS DU HEADER pour éviter le bug backdrop-filter ═══ */}
+    <div
+      className={`lg:hidden fixed inset-0 bg-noir z-[45] transition-all duration-300 ${
+        mobileOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
+      }`}
+    >
+      <div className="flex flex-col items-center justify-center h-full gap-5 px-6 overflow-y-auto">
+        {navLinks.map((link) =>
+          link.submenu ? (
+            <div key={link.href} className="text-center">
+              <button
+                onClick={() => setOpenSubmenu(openSubmenu === link.href ? null : link.href)}
+                aria-haspopup="true"
+                aria-expanded={openSubmenu === link.href}
+                className="text-2xl font-display font-bold text-white flex items-center gap-2"
               >
                 {link.label}
-              </Link>
-            )
-          )}
-          <Link
-            href="/simulation"
-            onClick={() => setMobileOpen(false)}
-            className="btn-primary mt-4"
-          >
-            Simuler ma cuisine
-          </Link>
-        </div>
+                <svg
+                  className={`w-5 h-5 transition-transform ${openSubmenu === link.href ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openSubmenu === link.href && (
+                <div className="mt-3 space-y-2">
+                  {link.submenu.map((sub) => {
+                    const isExternal = sub.href.startsWith("http");
+                    return isExternal ? (
+                      <a
+                        key={sub.href}
+                        href={sub.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center justify-center gap-2 text-lg text-gris-400 hover:text-rouge transition-colors"
+                      >
+                        {sub.label}
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                      </a>
+                    ) : (
+                      <Link
+                        key={sub.href}
+                        href={sub.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block text-lg text-gris-400 hover:text-rouge transition-colors"
+                      >
+                        {sub.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              className="text-2xl font-display font-bold text-white hover:text-rouge transition-colors"
+            >
+              {link.label}
+            </Link>
+          )
+        )}
+        <Link
+          href="/simulation"
+          onClick={() => setMobileOpen(false)}
+          className="btn-primary mt-4"
+        >
+          Simuler ma cuisine
+        </Link>
       </div>
-    </header>
+    </div>
     </>
   );
 }

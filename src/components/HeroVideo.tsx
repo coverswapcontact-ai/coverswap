@@ -3,18 +3,12 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 /**
- * Fond vidéo pour le hero — autoplay, muted, plein écran.
- *
- * Stratégie :
- * - Mobile → vidéo MP4 en autoplay (muted + playsInline = autorisé iOS/Android)
- *   avec object-position center pour cadrer le sujet sur écran vertical.
- * - Desktop → même vidéo, object-cover classique.
- * - Fallback poster si la vidéo ne charge pas.
- *
- * Hydration fix : on ne rend rien jusqu'au mount côté client.
+ * Fond vidéo hero — autoplay muted, lecture unique (pas de loop).
+ * Le poster s'affiche immédiatement (pas de flash au mount).
+ * La vidéo se charge côté client et remplace le poster une fois prête.
  */
 export default function HeroVideo() {
-  const [mounted, setMounted] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -28,31 +22,31 @@ export default function HeroVideo() {
   }, []);
 
   useEffect(() => {
-    setMounted(true);
+    setShowVideo(true);
   }, []);
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
-      {mounted && !videoError ? (
+      {/* Poster toujours présent — visible tant que la vidéo n'a pas chargé */}
+      <div
+        className="absolute inset-0 w-full h-full bg-center bg-cover"
+        style={{ backgroundImage: "url(/videos/hero-poster.jpg)" }}
+        aria-hidden="true"
+      />
+
+      {/* Vidéo par-dessus le poster — lecture unique, pas de loop */}
+      {showVideo && !videoError && (
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover object-center"
           src="/videos/hero.mp4"
-          poster="/videos/hero-poster.jpg"
           autoPlay
           muted
-          loop
           playsInline
           preload="metadata"
           aria-hidden="true"
           onLoadedMetadata={handleLoadedMetadata}
           onError={() => setVideoError(true)}
-        />
-      ) : (
-        <div
-          className="absolute inset-0 w-full h-full bg-center bg-cover"
-          style={{ backgroundImage: "url(/videos/hero-poster.jpg)" }}
-          aria-hidden="true"
         />
       )}
 
