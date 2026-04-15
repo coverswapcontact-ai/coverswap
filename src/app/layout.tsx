@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
+import ScrollToTop from "@/components/ScrollToTop";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 const inter = Inter({
@@ -93,6 +95,9 @@ export default function RootLayout({
         )}
         <LocalBusinessSchema />
         <OrganizationSchema />
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         <Header />
         <main id="main-content">{children}</main>
         <Footer />
