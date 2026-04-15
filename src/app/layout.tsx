@@ -88,6 +88,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        {/* Preload haute priorité du poster hero — affichage instantané */}
+        <link
+          rel="preload"
+          as="image"
+          href="/videos/hero-poster.jpg"
+          fetchPriority="high"
+        />
+      </head>
       <body className="font-sans antialiased">
         {/* GTM noscript fallback */}
         {process.env.NEXT_PUBLIC_GTM_ID && (
