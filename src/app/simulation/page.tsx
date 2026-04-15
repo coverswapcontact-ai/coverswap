@@ -448,6 +448,13 @@ function ReferencePicker({
 export default function SimulationPage() {
   const [step, setStep] = useState(1);
 
+  // Scroll en haut à chaque changement d'étape
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [step]);
+
   // Step 1: Photo
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
