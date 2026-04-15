@@ -16,7 +16,6 @@ export default function HeroVideo() {
   const handleLoadedMetadata = useCallback(() => {
     const v = videoRef.current;
     if (v) {
-      v.currentTime = 1;
       v.play().catch(() => {});
     }
   }, []);
