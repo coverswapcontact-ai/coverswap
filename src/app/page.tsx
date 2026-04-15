@@ -346,7 +346,7 @@ function PricingSection() {
             <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
               {[
                 { title: "Surfaces lisses", desc: "Crédence, plan, façades planes" },
-                { title: "À partir de 20 m²", desc: "Volume minimum d'intervention" },
+                { title: "À partir de 20 m²", desc: "Surface minimale pour bénéficier de ce tarif" },
                 { title: "Tout inclus", desc: "Matériau premium + pose + finitions" },
               ].map((c) => (
                 <div key={c.title} className="bg-white/5 border border-white/10 rounded-xl p-4">

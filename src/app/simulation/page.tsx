@@ -474,6 +474,8 @@ export default function SimulationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [devisSent, setDevisSent] = useState(false);
+  const [devisSending, setDevisSending] = useState(false);
 
   // Quota journalier de simulations
   const [quota, setQuota] = useState<{ limit: number; remaining: number; resetAt: number } | null>(null);
@@ -507,23 +509,63 @@ export default function SimulationPage() {
     };
   }, []);
 
+  /* ── Downscale client-side : évite les payloads énormes (sécurise le pipe)
+     Cible: max 1600px côté long, JPEG q=0.85 → ~300–500 KB par photo,
+     bien en-dessous de toutes les limites de body size Next/Vercel/Railway. */
+  const downscaleImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("read-failed"));
+      reader.onload = (ev) => {
+        const dataUrl = ev.target?.result as string;
+        const img = new window.Image();
+        img.onerror = () => reject(new Error("decode-failed"));
+        img.onload = () => {
+          const MAX = 1600;
+          let { width, height } = img;
+          if (width > MAX || height > MAX) {
+            const ratio = Math.min(MAX / width, MAX / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return resolve(dataUrl); // fallback
+          ctx.drawImage(img, 0, 0, width, height);
+          try {
+            const jpg = canvas.toDataURL("image/jpeg", 0.85);
+            // Si le JPEG est plus gros que l'original (rare, petites images), garde l'original
+            resolve(jpg.length < dataUrl.length ? jpg : dataUrl);
+          } catch {
+            resolve(dataUrl);
+          }
+        };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   /* ── Handlers ── */
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
       setError("La photo ne doit pas dépasser 10 Mo.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPreview(ev.target?.result as string);
+    try {
+      const dataUrl = await downscaleImage(file);
+      setPreview(dataUrl);
       track("simulation_photo_uploaded", { source: "page", size_kb: Math.round(file.size / 1024) });
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setError("Impossible de lire cette image. Essayez une autre photo.");
+    }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
@@ -531,12 +573,13 @@ export default function SimulationPage() {
       setError("La photo ne doit pas dépasser 10 Mo.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPreview(ev.target?.result as string);
+    try {
+      const dataUrl = await downscaleImage(file);
+      setPreview(dataUrl);
       track("simulation_photo_uploaded", { source: "page_drop", size_kb: Math.round(file.size / 1024) });
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setError("Impossible de lire cette image. Essayez une autre photo.");
+    }
   };
 
   const toggleElement = (key: KitchenElement) => {
@@ -636,6 +679,39 @@ export default function SimulationPage() {
       track("simulation_failed", { reason: "network" });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const requestDevis = async () => {
+    if (devisSending || devisSent) return;
+    setDevisSending(true);
+    try {
+      const res = await fetch("/api/devis-direct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          credence_ref: elements.credence.enabled ? elements.credence.ref : "",
+          credence_name: elements.credence.enabled ? elements.credence.name : "",
+          plan_ref: elements.plan.enabled ? elements.plan.ref : "",
+          plan_name: elements.plan.enabled ? elements.plan.name : "",
+          facade_ref: elements.facade.enabled ? elements.facade.ref : "",
+          facade_name: elements.facade.enabled ? elements.facade.name : "",
+          website: honeypot,
+        }),
+      });
+      if (res.ok) {
+        setDevisSent(true);
+        track("devis_direct_sent", { from: "simulation_result" });
+      } else {
+        setError("Envoi du devis impossible. Réessayez dans un instant.");
+      }
+    } catch {
+      setError("Envoi du devis impossible. Réessayez dans un instant.");
+    } finally {
+      setDevisSending(false);
     }
   };
 
@@ -915,11 +991,12 @@ export default function SimulationPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gris-400 mb-1.5">Email</label>
+                <label className="block text-sm text-gris-400 mb-1.5">Email *</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge"
                   placeholder="jean@email.com"
                 />
@@ -1016,7 +1093,7 @@ export default function SimulationPage() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={!formData.name || !formData.phone || (quota?.remaining === 0)}
+                disabled={!formData.name || !formData.phone || !formData.email || (quota?.remaining === 0)}
                 className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -1161,19 +1238,30 @@ export default function SimulationPage() {
 
                 {/* CTAs */}
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                  <Link
-                    href={`/contact?ref=${encodeURIComponent(
-                      ELEMENTS.filter((el) => elements[el.key].enabled && elements[el.key].ref)
-                        .map((el) => elements[el.key].ref)
-                        .join(",")
-                    )}`}
-                    className="btn-primary flex-1 text-center"
+                  <button
+                    type="button"
+                    onClick={requestDevis}
+                    disabled={devisSending || devisSent}
+                    className="btn-primary flex-1 text-center disabled:opacity-90 disabled:cursor-default"
                   >
-                    Demander un devis
-                    <svg className="w-5 h-5 ml-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+                    {devisSent ? (
+                      <>
+                        <svg className="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Devis envoyé — on vous rappelle
+                      </>
+                    ) : devisSending ? (
+                      "Envoi..."
+                    ) : (
+                      <>
+                        Demander un devis
+                        <svg className="w-5 h-5 ml-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
                   {resultImage && preview && (
                     <button
                       type="button"

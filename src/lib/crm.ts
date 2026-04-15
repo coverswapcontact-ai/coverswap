@@ -45,6 +45,9 @@ export interface CrmLeadPayload {
   prixDevis?: number;
   lienSimulation?: string;
   notes?: string;
+  // Images base64 (data URL ou raw) à joindre à la simulation côté CRM
+  imageBefore?: string;
+  imageAfter?: string;
 }
 
 export interface CrmResult {
@@ -66,6 +69,7 @@ interface QueuedLead {
 ══════════════════════════════════════════════════════════════════ */
 const DEFAULT_URL = "http://localhost:3001/api/webhook";
 const TIMEOUT_MS = 5000;
+const TIMEOUT_WITH_IMAGES_MS = 20000; // upload photos = plus lent
 const QUEUE_FILE = path.join(process.cwd(), ".crm-queue.json");
 const RETRY_INTERVAL_MS = 30_000; // 30 secondes
 const MAX_RETRY_ATTEMPTS = 50; // ~25 min de tentatives max
@@ -122,8 +126,10 @@ async function sendPayload(
     return { ok: false, error: "missing-secret" };
   }
 
+  const hasImages = !!(cleaned.imageBefore || cleaned.imageAfter);
+  const timeout = hasImages ? TIMEOUT_WITH_IMAGES_MS : TIMEOUT_MS;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
     const res = await fetch(url, {
@@ -160,7 +166,7 @@ async function sendPayload(
     clearTimeout(timeoutId);
     const isAbort = err instanceof Error && err.name === "AbortError";
     const msg = isAbort
-      ? `timeout-${TIMEOUT_MS}ms`
+      ? `timeout-${timeout}ms`
       : (err as Error)?.message || "unknown";
     return { ok: false, error: msg };
   }
@@ -295,9 +301,15 @@ export async function sendLeadToCRM(
     return result;
   }
 
-  // Échec → sauvegarde en queue + lancement du retry
-  console.error(`[CRM] Envoi échoué (${result.error}) — mise en queue`);
-  await addToQueue(cleaned, result.error || "unknown");
+  // Échec → sauvegarde en queue + lancement du retry.
+  // On strip les images base64 avant la mise en queue pour éviter de gonfler
+  // le fichier disque. Les images sont best-effort : si le CRM est down au
+  // moment de la simulation, on préfère garder le lead et perdre les photos.
+  const lean = { ...cleaned };
+  delete lean.imageBefore;
+  delete lean.imageAfter;
+  console.error(`[CRM] Envoi échoué (${result.error}) — mise en queue (images écartées)`);
+  await addToQueue(lean, result.error || "unknown");
   startRetryLoop();
 
   return { ok: false, error: result.error, queued: true };

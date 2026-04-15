@@ -105,7 +105,7 @@ function describeElement(label: string, el: ElementInfo | null, imageIndex: numb
    SEND LEAD TO CRM — utilise le helper centralisé lib/crm.ts
    Enrichit avec: referenceChoisie, mlEstimes, prixDevis, lienSimulation
 ────────────────────────────────────────────────────────────────── */
-function pushLeadToCrm(body: Record<string, string>) {
+function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
   // Pas de nom/téléphone => simulation anonyme, on ne pousse rien au CRM
   if (!body.name || !body.phone) return;
 
@@ -147,6 +147,8 @@ function pushLeadToCrm(body: Record<string, string>) {
     prixDevis: Number.isFinite(prixDevis) ? prixDevis : undefined,
     lienSimulation: body.lien_simulation || undefined,
     notes: notesParts.join(" — "),
+    imageBefore: body.photo_base64 || undefined,
+    imageAfter: resultImage || undefined,
   }).catch((err) => {
     console.error("[/api/simulation] CRM helper threw (ne devrait pas):", err);
   });
@@ -180,8 +182,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, image: "" });
   }
 
-  if (!body.name || !body.phone) {
-    return NextResponse.json({ error: "Nom et téléphone requis." }, { status: 400 });
+  if (!body.name || !body.phone || !body.email) {
+    return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
   }
   if (!body.photo_base64) {
     return NextResponse.json({ error: "Photo requise." }, { status: 400 });
@@ -373,7 +375,7 @@ OUTPUT: One photorealistic image of this exact kitchen with only the specified s
     const resultImage = `data:image/png;base64,${generatedB64}`;
 
     /* ── Send lead to CRM (fire-and-forget) ── */
-    pushLeadToCrm(body);
+    pushLeadToCrm(body, resultImage);
 
     return NextResponse.json(
       {
