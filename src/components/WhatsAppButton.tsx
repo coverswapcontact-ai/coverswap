@@ -4,19 +4,20 @@ import { useEffect, useState } from "react";
 import { track } from "@/lib/analytics";
 
 /**
- * Bouton flottant WhatsApp — présent sur toutes les pages.
- * Se décale automatiquement quand le bandeau cookies est visible
- * pour ne pas masquer les boutons Accepter/Refuser.
+ * Bouton flottant WhatsApp — discret, apparaît après scroll.
+ * Se décale quand le bandeau cookies est visible.
  */
 export default function WhatsAppButton() {
-  const phone = "33670352869"; // format international sans +
+  const phone = "33670352869";
   const message = encodeURIComponent(
     "Bonjour Lucas, je viens du site CoverSwap et je souhaite plus d'informations sur mon projet."
   );
   const href = `https://wa.me/${phone}?text=${message}`;
 
   const [bannerVisible, setBannerVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
+  /* Visibilité cookies */
   useEffect(() => {
     const check = () => {
       setBannerVisible(!localStorage.getItem("cookie-consent"));
@@ -30,6 +31,16 @@ export default function WhatsAppButton() {
     };
   }, []);
 
+  /* Apparition après scroll au-delà du hero (≈ 600px) */
+  useEffect(() => {
+    const onScroll = () => {
+      setVisible(window.scrollY > 600);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <a
       href={href}
@@ -37,18 +48,15 @@ export default function WhatsAppButton() {
       rel="noopener noreferrer"
       aria-label="Contacter CoverSwap sur WhatsApp"
       onClick={() => track("whatsapp_clicked", { location: "floating_button" })}
-      className={`fixed right-6 z-40 group transition-[bottom] duration-300 ease-out ${
+      className={`fixed right-4 sm:right-6 z-40 group transition-all duration-500 ease-out ${
         bannerVisible ? "bottom-28 sm:bottom-24" : "bottom-6"
-      }`}
+      } ${visible ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"}`}
     >
-      {/* Pulse ring */}
-      <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-60 animate-ping pointer-events-none" />
-
-      {/* Main button */}
-      <span className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)] hover:scale-110 transition-transform duration-300">
+      {/* Bouton principal — plus petit, sans pulse, shadow douce */}
+      <span className="relative flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#25D366]/90 hover:bg-[#25D366] backdrop-blur-sm shadow-[0_4px_16px_rgba(37,211,102,0.25)] hover:shadow-[0_6px_20px_rgba(37,211,102,0.4)] hover:scale-105 transition-all duration-300">
         <svg
           viewBox="0 0 32 32"
-          className="w-7 h-7 text-white"
+          className="w-5 h-5 sm:w-6 sm:h-6 text-white"
           fill="currentColor"
           aria-hidden="true"
         >
@@ -56,8 +64,8 @@ export default function WhatsAppButton() {
         </svg>
       </span>
 
-      {/* Tooltip */}
-      <span className="absolute right-full top-1/2 -translate-y-1/2 mr-3 whitespace-nowrap bg-noir/90 backdrop-blur-sm border border-white/10 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
+      {/* Tooltip desktop uniquement */}
+      <span className="hidden sm:block absolute right-full top-1/2 -translate-y-1/2 mr-3 whitespace-nowrap bg-noir/90 backdrop-blur-sm border border-white/10 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
         Discuter sur WhatsApp
       </span>
     </a>
