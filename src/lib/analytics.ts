@@ -19,6 +19,7 @@ export type TrackEvent =
   | "simulation_generated"          // génération IA réussie
   | "simulation_failed"             // génération IA échouée
   | "devis_form_submitted"          // formulaire devis envoyé
+  | "devis_direct_sent"             // devis demandé en 1-clic après simulation
   | "contact_form_submitted"        // formulaire contact envoyé
   | "whatsapp_clicked"              // clic sur le bouton WhatsApp flottant
   | "phone_clicked"                 // clic sur un lien tel:
@@ -49,6 +50,7 @@ const META_EVENT_MAP: Partial<Record<TrackEvent, string>> = {
   simulation_photo_uploaded: "InitiateCheckout",
   simulation_generated: "Lead",
   devis_form_submitted: "Lead",
+  devis_direct_sent: "Lead",
   contact_form_submitted: "Contact",
   whatsapp_clicked: "Contact",
   phone_clicked: "Contact",
