@@ -32,9 +32,6 @@ const FAMILLES = [
   { id: "paillettes", nom: "Glitter", nomFr: "Paillettes", description: "Finitions scintillantes", count: 16 },
 ] as const;
 
-const FINITIONS = ["Tous", "Mat", "Brillant", "Texturé", "Soft Touch", "Anti-fingerprint"] as const;
-const THEMES = ["Tous", "Clair", "Foncé", "Naturel", "Industriel"] as const;
-
 const ITEMS_PER_PAGE = 48;
 
 const FAMILLE_ICONS: Record<string, string> = {
@@ -66,8 +63,6 @@ const MARBLE_TEXTURE =
 export default function CatalogueClient() {
   const [activeFamille, setActiveFamille] = useState<string>("tout");
   const [search, setSearch] = useState("");
-  const [finition, setFinition] = useState("Tous");
-  const [theme, setTheme] = useState("Tous");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedRef, setSelectedRef] = useState<Reference | null>(null);
 
@@ -99,18 +94,13 @@ export default function CatalogueClient() {
     const q = search.toLowerCase().trim();
     return (revetements as Reference[]).filter((r) => {
       if (activeFamille !== "tout" && r.famille !== activeFamille) return false;
-      if (finition !== "Tous" && r.finition !== finition) return false;
-      if (theme !== "Tous") {
-        const hasThemeTag = r.tags.some((t) => t.toLowerCase() === theme.toLowerCase());
-        if (!hasThemeTag) return false;
-      }
       if (q) {
         const haystack = `${r.nom} ${r.id} ${r.famille} ${r.categorie} ${r.tags.join(" ")}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [activeFamille, search, finition, theme]);
+  }, [activeFamille, search]);
 
   const visibleItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
   const hasMore = visibleCount < filtered.length;
@@ -118,7 +108,7 @@ export default function CatalogueClient() {
   /* ── Reset visible count when filters change ── */
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
-  }, [activeFamille, search, finition, theme]);
+  }, [activeFamille, search]);
 
   const handleFamilleClick = useCallback((id: string) => {
     setActiveFamille(id);
@@ -253,41 +243,6 @@ export default function CatalogueClient() {
             )}
           </div>
 
-          {/* Finition filter */}
-          <div className="relative">
-            <select
-              value={finition}
-              onChange={(e) => setFinition(e.target.value)}
-              className="appearance-none bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-10 text-sm text-white focus:outline-none focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all cursor-pointer"
-            >
-              {FINITIONS.map((f) => (
-                <option key={f} value={f} className="bg-noir text-white">
-                  {f === "Tous" ? "Finition" : f}
-                </option>
-              ))}
-            </select>
-            <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gris-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </div>
-
-          {/* Theme filter */}
-          <div className="relative">
-            <select
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="appearance-none bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-10 text-sm text-white focus:outline-none focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all cursor-pointer"
-            >
-              {THEMES.map((t) => (
-                <option key={t} value={t} className="bg-noir text-white">
-                  {t === "Tous" ? "Thème" : t}
-                </option>
-              ))}
-            </select>
-            <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gris-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </div>
         </div>
 
         {/* Results count */}
@@ -299,12 +254,10 @@ export default function CatalogueClient() {
             )}
             {search && <span> pour &laquo;{search}&raquo;</span>}
           </p>
-          {(search || finition !== "Tous" || theme !== "Tous" || activeFamille !== "tout") && (
+          {(search || activeFamille !== "tout") && (
             <button
               onClick={() => {
                 setSearch("");
-                setFinition("Tous");
-                setTheme("Tous");
                 setActiveFamille("tout");
               }}
               className="text-rouge hover:text-rouge-light transition-colors"
