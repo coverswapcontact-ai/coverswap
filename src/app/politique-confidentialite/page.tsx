@@ -23,7 +23,7 @@ export default function PolitiqueConfidentialite() {
           </section>
           <section>
             <h2 className="font-display text-xl font-bold text-white mb-3">Vos droits</h2>
-            <p>Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos données. Contactez-nous à coverswap.contact@gmail.com.</p>
+            <p>Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, de suppression et de portabilité de vos données. Contactez-nous à contact@coverswap.fr.</p>
           </section>
         </div>
       </div>

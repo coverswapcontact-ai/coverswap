@@ -39,7 +39,7 @@ export function LocalBusinessSchema() {
       ]}
       priceRange="€€"
       areaServed={["France"]}
-      email="coverswap.contact@gmail.com"
+      email="contact@coverswap.fr"
       slogan="Rénovation adhésive premium"
     />
   );
@@ -61,7 +61,7 @@ export function OrganizationSchema() {
         {
           telephone: "+33670352869",
           contactType: "customer service",
-          email: "coverswap.contact@gmail.com",
+          email: "contact@coverswap.fr",
         },
       ]}
       legalName="CoverSwap - Lucas Villemin"

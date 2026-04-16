@@ -6,7 +6,7 @@ export default function MentionsLegales() {
         <div className="prose prose-invert prose-gray max-w-none space-y-6 text-gris-300">
           <section>
             <h2 className="font-display text-xl font-bold text-white mb-3">Éditeur du site</h2>
-            <p>CoverSwap<br />Auto-entrepreneur<br />SIRET : 94518036200010 | APE : 4334Z<br />73 rue Simone Veil, 34470 Pérols<br />coverswap.contact@gmail.com<br />06 70 35 28 69</p>
+            <p>CoverSwap<br />Auto-entrepreneur<br />SIRET : 94518036200010 | APE : 4334Z<br />73 rue Simone Veil, 34470 Pérols<br />contact@coverswap.fr<br />06 70 35 28 69</p>
           </section>
           <section>
             <h2 className="font-display text-xl font-bold text-white mb-3">Directeur de la publication</h2>

@@ -266,7 +266,7 @@ function ContactPageInner() {
                 </div>
                 <div>
                   <p className="text-sm text-gris-400">Email</p>
-                  <p className="font-medium">coverswap.contact@gmail.com</p>
+                  <p className="font-medium">contact@coverswap.fr</p>
                 </div>
               </div>
 

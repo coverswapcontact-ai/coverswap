@@ -210,7 +210,7 @@ async function downloadSimulation(
 
     ctx.fillStyle = "#888888";
     ctx.font = "13px system-ui, -apple-system, sans-serif";
-    ctx.fillText("coverswap.fr  ·  06 70 35 28 69  ·  coverswap.contact@gmail.com", 60, footerY + 58);
+    ctx.fillText("coverswap.fr  ·  06 70 35 28 69  ·  contact@coverswap.fr", 60, footerY + 58);
     ctx.fillText("73 rue Simone Veil, 34470 Pérols  ·  Lun-Ven 8h-17h", 60, footerY + 78);
 
     ctx.fillStyle = "#444444";
