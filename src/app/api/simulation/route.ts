@@ -189,6 +189,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Photo requise." }, { status: 400 });
   }
 
+  /* ── Créer le lead dans le CRM dès maintenant (avant génération image) ── */
+  pushLeadToCrm(body);
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey.includes("REPLACE")) {
     return NextResponse.json({ error: "Clé API OpenAI non configurée." }, { status: 500 });
