@@ -48,6 +48,7 @@ export interface CrmLeadPayload {
   // Images base64 (data URL ou raw) à joindre à la simulation côté CRM
   imageBefore?: string;
   imageAfter?: string;
+  imageOriginal?: string;
 }
 
 export interface CrmResult {

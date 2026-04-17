@@ -149,6 +149,7 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     notes: notesParts.join(" — "),
     imageBefore: body.photo_base64 || undefined,
     imageAfter: resultImage || undefined,
+    imageOriginal: body.photo_base64_original || undefined,
   }).catch((err) => {
     console.error("[/api/simulation] CRM helper threw (ne devrait pas):", err);
   });

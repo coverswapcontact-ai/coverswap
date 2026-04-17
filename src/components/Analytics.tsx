@@ -23,7 +23,17 @@ export default function Analytics() {
   useEffect(() => {
     const check = () => {
       try {
-        setConsented(localStorage.getItem("cookie-consent") === "accepted");
+        const ok = localStorage.getItem("cookie-consent") === "accepted";
+        setConsented(ok);
+        // Met à jour le Consent Mode v2 si GTM est déjà chargé
+        if (ok && typeof window !== "undefined" && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
+          (window as unknown as { gtag: (...args: unknown[]) => void }).gtag("consent", "update", {
+            ad_storage: "granted",
+            ad_user_data: "granted",
+            ad_personalization: "granted",
+            analytics_storage: "granted",
+          });
+        }
       } catch {
         setConsented(false);
       }
@@ -33,16 +43,34 @@ export default function Analytics() {
     return () => window.removeEventListener("cookie-consent-change", check);
   }, []);
 
-  if (!consented) return null;
-
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
 
+  // GTM se charge TOUJOURS (avec consent denied par défaut).
+  // Les autres trackers (Meta Pixel, Clarity) attendent le consentement.
   return (
     <>
-      {/* ── Google Tag Manager (prioritaire sur GA4 standalone) ── */}
+      {/* ── Google Consent Mode v2 — doit être défini AVANT GTM ── */}
+      {gtmId && (
+        <Script id="gtm-consent-default" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
+            gtag('consent', 'default', {
+              ad_storage: '${consented ? "granted" : "denied"}',
+              ad_user_data: '${consented ? "granted" : "denied"}',
+              ad_personalization: '${consented ? "granted" : "denied"}',
+              analytics_storage: '${consented ? "granted" : "denied"}',
+              wait_for_update: 500
+            });
+          `}
+        </Script>
+      )}
+
+      {/* ── Google Tag Manager — chargé inconditionnellement ── */}
       {gtmId && (
         <>
           <Script id="gtm-init" strategy="afterInteractive">
@@ -54,12 +82,11 @@ export default function Analytics() {
               })(window,document,'script','dataLayer','${gtmId}');
             `}
           </Script>
-          {/* noscript fallback via layout.tsx n'est pas nécessaire en SPA Next.js */}
         </>
       )}
 
       {/* ── Google Analytics 4 (fallback si pas de GTM) ── */}
-      {!gtmId && gaId && (
+      {!gtmId && gaId && consented && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
@@ -81,7 +108,7 @@ export default function Analytics() {
       )}
 
       {/* ── Meta Pixel ── */}
-      {metaPixelId && (
+      {metaPixelId && consented && (
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -99,7 +126,7 @@ export default function Analytics() {
       )}
 
       {/* ── Microsoft Clarity ── */}
-      {clarityId && (
+      {clarityId && consented && (
         <Script id="ms-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){

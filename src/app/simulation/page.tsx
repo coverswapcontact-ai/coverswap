@@ -457,6 +457,8 @@ export default function SimulationPage() {
 
   // Step 1: Photo
   const [preview, setPreview] = useState<string | null>(null);
+  // Photo originelle (full size, non downscale) — envoyée au CRM en plus
+  const [originalPhoto, setOriginalPhoto] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Step 2: Element selections
@@ -549,6 +551,15 @@ export default function SimulationPage() {
   };
 
   /* ── Handlers ── */
+  // Lit le fichier original en dataURL (sans downscale)
+  const readOriginal = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("read-failed"));
+      reader.onload = (ev) => resolve(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -557,8 +568,12 @@ export default function SimulationPage() {
       return;
     }
     try {
-      const dataUrl = await downscaleImage(file);
+      const [dataUrl, original] = await Promise.all([
+        downscaleImage(file),
+        readOriginal(file),
+      ]);
       setPreview(dataUrl);
+      setOriginalPhoto(original);
       track("simulation_photo_uploaded", { source: "page", size_kb: Math.round(file.size / 1024) });
     } catch {
       setError("Impossible de lire cette image. Essayez une autre photo.");
@@ -574,8 +589,12 @@ export default function SimulationPage() {
       return;
     }
     try {
-      const dataUrl = await downscaleImage(file);
+      const [dataUrl, original] = await Promise.all([
+        downscaleImage(file),
+        readOriginal(file),
+      ]);
       setPreview(dataUrl);
+      setOriginalPhoto(original);
       track("simulation_photo_uploaded", { source: "page_drop", size_kb: Math.round(file.size / 1024) });
     } catch {
       setError("Impossible de lire cette image. Essayez une autre photo.");
@@ -605,6 +624,7 @@ export default function SimulationPage() {
 
     const payload = {
       photo_base64: preview,
+      photo_base64_original: originalPhoto,
       name: formData.name,
       phone: formData.phone,
       email: formData.email,
@@ -1125,7 +1145,7 @@ export default function SimulationPage() {
                   Notre IA génère votre simulation...
                 </h2>
                 <p className="text-gris-400 text-lg mb-2">
-                  Cela peut prendre 30 à 60 secondes
+                  Cela peut prendre 1 à 2 minutes
                 </p>
                 <p className="text-gris-500 text-sm">
                   Ne fermez pas cette page
