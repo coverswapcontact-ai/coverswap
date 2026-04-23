@@ -6,6 +6,7 @@ import Link from "next/link";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import revetements from "@/data/revetements.json";
 import { track } from "@/lib/analytics";
+import { PROJECT_TYPES, getProject, createEmptyElements, type ProjectType } from "./projects";
 
 /* ══════════════════════════════════════════════════════════════════
    DOWNLOAD — Génère une image brandée CoverSwap (avant/après + refs)
@@ -13,8 +14,9 @@ import { track } from "@/lib/analytics";
 async function downloadSimulation(
   beforeSrc: string,
   afterSrc: string,
-  elements: Record<KitchenElement, ElementSelection>,
+  elements: Record<string, ElementSelection>,
   userName: string,
+  projectElements: { key: string; label: string; description: string }[] = [],
 ) {
   const W = 1200;
   const H = 1100;
@@ -93,7 +95,7 @@ async function downloadSimulation(
     /* ── titre ── */
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "bold 32px system-ui, -apple-system, sans-serif";
-    ctx.fillText("Votre simulation cuisine", 60, 150);
+    ctx.fillText("Votre simulation Cover Styl'", 60, 150);
 
     /* ── ligne séparatrice ── */
     ctx.fillStyle = "#CC0000";
@@ -144,7 +146,7 @@ async function downloadSimulation(
     ctx.fillStyle = "#CC0000";
     ctx.fillRect(60, refY + 12, 60, 3);
 
-    const selectedEls = ELEMENTS.filter((el) => elements[el.key].enabled && elements[el.key].ref);
+    const selectedEls = projectElements.filter((el) => elements[el.key]?.enabled && elements[el.key]?.ref);
     let cardX = 60;
     const cardY = refY + 40;
     const cardW = (W - 120 - (selectedEls.length - 1) * 16) / Math.max(selectedEls.length, 1);
@@ -256,7 +258,8 @@ interface ElementSelection {
   image: string;
 }
 
-type KitchenElement = "credence" | "plan" | "facade";
+// Clés génériques : zone1, zone2, zone3 — mappées dynamiquement par le projet choisi
+type ZoneKey = string;
 
 /* ══════════════════════════════════════════════════════════════════
    DATA
@@ -281,11 +284,7 @@ const FAMILLE_COLORS: Record<string, string> = {
   paillettes: "bg-yellow-500/80",
 };
 
-const ELEMENTS: { key: KitchenElement; label: string; description: string }[] = [
-  { key: "credence", label: "Crédence", description: "Le mur entre le plan de travail et les meubles hauts" },
-  { key: "plan", label: "Plan de travail", description: "La surface de travail de votre cuisine" },
-  { key: "facade", label: "Façades", description: "Les portes et tiroirs de vos meubles de cuisine" },
-];
+// ELEMENTS est maintenant dynamique : voir `currentProject.elements`
 
 const ITEMS_PER_PAGE = 6;
 
@@ -448,6 +447,10 @@ function ReferencePicker({
 export default function SimulationPage() {
   const [step, setStep] = useState(1);
 
+  // Step 1: choix du type de projet
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const currentProject: ProjectType = projectId ? getProject(projectId) : PROJECT_TYPES[0];
+
   // Scroll en haut à chaque changement d'étape
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -455,18 +458,22 @@ export default function SimulationPage() {
     }
   }, [step]);
 
-  // Step 1: Photo
+  // Step 2: Photo
   const [preview, setPreview] = useState<string | null>(null);
-  // Photo originelle (full size, non downscale) — envoyée au CRM en plus
   const [originalPhoto, setOriginalPhoto] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Step 2: Element selections
-  const [elements, setElements] = useState<Record<KitchenElement, ElementSelection>>({
-    credence: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-    plan: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-    facade: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-  });
+  // Step 3: Element selections (dynamique par projet)
+  const [elements, setElements] = useState<Record<string, ElementSelection>>(() =>
+    createEmptyElements(PROJECT_TYPES[0])
+  );
+
+  // Reset elements quand le projet change
+  useEffect(() => {
+    if (projectId) {
+      setElements(createEmptyElements(getProject(projectId)));
+    }
+  }, [projectId]);
 
   // Step 3: Contact
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
@@ -499,7 +506,8 @@ export default function SimulationPage() {
       const pending = sessionStorage.getItem("coverswap_pending_photo");
       if (pending) {
         setPreview(pending);
-        setStep(2);
+        setProjectId("cuisine");
+        setStep(3); // saute à l'étape revêtements directement
         sessionStorage.removeItem("coverswap_pending_photo");
       }
     } catch {
@@ -601,14 +609,14 @@ export default function SimulationPage() {
     }
   };
 
-  const toggleElement = (key: KitchenElement) => {
+  const toggleElement = (key: ZoneKey) => {
     setElements((prev) => ({
       ...prev,
       [key]: { ...prev[key], enabled: !prev[key].enabled },
     }));
   };
 
-  const selectReference = (key: KitchenElement, ref: Reference) => {
+  const selectReference = (key: ZoneKey, ref: Reference) => {
     setElements((prev) => ({
       ...prev,
       [key]: { ...prev[key], ref: ref.id, name: ref.nom, famille: ref.famille, finition: ref.finition, categorie: ref.categorie, tags: ref.tags, image: ref.image },
@@ -620,38 +628,32 @@ export default function SimulationPage() {
   const handleSubmit = async () => {
     setSubmitting(true);
     setError("");
-    setStep(4);
+    setStep(5);
 
-    const payload = {
+    // Construit le payload avec les zones génériques zone1/zone2/zone3
+    const payload: Record<string, unknown> = {
       photo_base64: preview,
       photo_base64_original: originalPhoto,
       name: formData.name,
       phone: formData.phone,
       email: formData.email,
       message: formData.message,
-      credence_ref: elements.credence.enabled ? elements.credence.ref : "",
-      credence_name: elements.credence.enabled ? elements.credence.name : "",
-      credence_famille: elements.credence.enabled ? elements.credence.famille : "",
-      credence_finition: elements.credence.enabled ? elements.credence.finition : "",
-      credence_categorie: elements.credence.enabled ? elements.credence.categorie : "",
-      credence_tags: elements.credence.enabled ? elements.credence.tags : [],
-      credence_image: elements.credence.enabled ? elements.credence.image : "",
-      plan_ref: elements.plan.enabled ? elements.plan.ref : "",
-      plan_name: elements.plan.enabled ? elements.plan.name : "",
-      plan_famille: elements.plan.enabled ? elements.plan.famille : "",
-      plan_finition: elements.plan.enabled ? elements.plan.finition : "",
-      plan_categorie: elements.plan.enabled ? elements.plan.categorie : "",
-      plan_tags: elements.plan.enabled ? elements.plan.tags : [],
-      plan_image: elements.plan.enabled ? elements.plan.image : "",
-      facade_ref: elements.facade.enabled ? elements.facade.ref : "",
-      facade_name: elements.facade.enabled ? elements.facade.name : "",
-      facade_famille: elements.facade.enabled ? elements.facade.famille : "",
-      facade_finition: elements.facade.enabled ? elements.facade.finition : "",
-      facade_categorie: elements.facade.enabled ? elements.facade.categorie : "",
-      facade_tags: elements.facade.enabled ? elements.facade.tags : [],
-      facade_image: elements.facade.enabled ? elements.facade.image : "",
+      project_type: currentProject.id,
       website: honeypot,
     };
+    // Ajoute dynamiquement zone1_*, zone2_*, zone3_*
+    for (const el of currentProject.elements) {
+      const sel = elements[el.key];
+      const enabled = sel?.enabled;
+      payload[`${el.key}_ref`] = enabled ? sel.ref : "";
+      payload[`${el.key}_name`] = enabled ? sel.name : "";
+      payload[`${el.key}_label`] = el.label;
+      payload[`${el.key}_famille`] = enabled ? sel.famille : "";
+      payload[`${el.key}_finition`] = enabled ? sel.finition : "";
+      payload[`${el.key}_categorie`] = enabled ? sel.categorie : "";
+      payload[`${el.key}_tags`] = enabled ? sel.tags : [];
+      payload[`${el.key}_image`] = enabled ? sel.image : "";
+    }
 
     try {
       const res = await fetch("/api/simulation", {
@@ -689,10 +691,8 @@ export default function SimulationPage() {
 
       setResultImage(data.image || data.result_url || data.photo_url || null);
       track("simulation_generated", {
+        project_type: currentProject.id,
         elements_count: Object.values(elements).filter((el) => el.enabled && el.ref).length,
-        has_credence: elements.credence.enabled,
-        has_plan: elements.plan.enabled,
-        has_facade: elements.facade.enabled,
       });
     } catch {
       setError("Service indisponible. Veuillez réessayer.");
@@ -706,21 +706,22 @@ export default function SimulationPage() {
     if (devisSending || devisSent) return;
     setDevisSending(true);
     try {
+      const devisPayload: Record<string, unknown> = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        project_type: currentProject.id,
+        website: honeypot,
+      };
+      for (const el of currentProject.elements) {
+        const sel = elements[el.key];
+        devisPayload[`${el.key}_ref`] = sel?.enabled ? sel.ref : "";
+        devisPayload[`${el.key}_name`] = sel?.enabled ? sel.name : "";
+      }
       const res = await fetch("/api/devis-direct", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-          email: formData.email,
-          credence_ref: elements.credence.enabled ? elements.credence.ref : "",
-          credence_name: elements.credence.enabled ? elements.credence.name : "",
-          plan_ref: elements.plan.enabled ? elements.plan.ref : "",
-          plan_name: elements.plan.enabled ? elements.plan.name : "",
-          facade_ref: elements.facade.enabled ? elements.facade.ref : "",
-          facade_name: elements.facade.enabled ? elements.facade.name : "",
-          website: honeypot,
-        }),
+        body: JSON.stringify(devisPayload),
       });
       if (res.ok) {
         setDevisSent(true);
@@ -738,11 +739,8 @@ export default function SimulationPage() {
   const resetForm = () => {
     setStep(1);
     setPreview(null);
-    setElements({
-      credence: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-      plan: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-      facade: { enabled: false, ref: "", name: "", famille: "", finition: "", categorie: "", tags: [], image: "" },
-    });
+    setProjectId(null);
+    setElements(createEmptyElements(PROJECT_TYPES[0]));
     setFormData({ name: "", phone: "", email: "", message: "" });
     setHoneypot("");
     setError("");
@@ -760,23 +758,26 @@ export default function SimulationPage() {
         <div className="text-center mb-12">
           <span className="text-rouge font-bold text-sm uppercase tracking-widest">Intelligence artificielle</span>
           <h1 className="font-display text-4xl md:text-6xl font-bold mt-3 mb-4">
-            Simulation <span className="text-rouge">Cuisine</span>
+            Simulation <span className="text-rouge">{projectId ? currentProject.label : "Cover Styl'"}</span>
           </h1>
           <p className="text-gris-400 max-w-2xl mx-auto text-lg">
-            Envoyez une photo de votre cuisine, choisissez vos revêtements Cover Styl&apos; pour chaque élément, et recevez un rendu réaliste en moins de 60 secondes.
+            {projectId
+              ? `Envoyez une photo, choisissez vos revêtements Cover Styl' et recevez un rendu réaliste en moins de 60 secondes.`
+              : `Choisissez votre type de projet, envoyez une photo et recevez un rendu IA réaliste en moins de 60 secondes.`
+            }
           </p>
         </div>
 
         {/* Progress bar */}
         <div className="max-w-3xl mx-auto mb-12">
           <div className="flex items-center gap-2">
-            {[1, 2, 3, 4].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <div key={s} className="flex-1 flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => { if (s < step && step !== 4) setStep(s); }}
-                  disabled={s >= step || step === 4}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                  onClick={() => { if (s < step && step !== 5) setStep(s); }}
+                  disabled={s >= step || step === 5}
+                  className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-xs md:text-sm font-bold transition-all ${
                     step > s
                       ? "bg-green-500/20 text-green-400 cursor-pointer hover:bg-green-500/30"
                       : step === s
@@ -792,26 +793,62 @@ export default function SimulationPage() {
                     s
                   )}
                 </button>
-                {s < 4 && (
+                {s < 5 && (
                   <div className={`flex-1 h-0.5 ${step > s ? "bg-green-500/40" : "bg-white/10"} transition-colors`} />
                 )}
               </div>
             ))}
           </div>
           <div className="flex justify-between mt-2 text-xs text-gris-500">
+            <span>Projet</span>
             <span>Photo</span>
             <span>Revêtements</span>
-            <span>Coordonnées</span>
+            <span>Infos</span>
             <span>Résultat</span>
           </div>
         </div>
 
-        {/* ═══════════════ STEP 1: UPLOAD PHOTO ═══════════════ */}
+        {/* ═══════════════ STEP 1: CHOIX DU PROJET ═══════════════ */}
         {step === 1 && (
+          <div className="max-w-3xl mx-auto animate-fade-in">
+            <h2 className="font-display text-2xl font-bold mb-2 flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">1</span>
+              Quel est votre projet ?
+            </h2>
+            <p className="text-gris-400 mb-8 ml-11">
+              Sélectionnez le type de surface à rénover. Le simulateur s&apos;adapte automatiquement.
+            </p>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {PROJECT_TYPES.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setProjectId(p.id);
+                    setStep(2);
+                  }}
+                  className={`group text-left p-5 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
+                    projectId === p.id
+                      ? "border-rouge bg-rouge/10"
+                      : "border-white/10 bg-white/5 hover:border-rouge/40 hover:bg-white/10"
+                  }`}
+                >
+                  <span className="text-3xl mb-3 block">{p.icon}</span>
+                  <h3 className="font-display text-lg font-bold text-white mb-1">{p.label}</h3>
+                  <p className="text-xs text-gris-400 leading-relaxed">{p.description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════ STEP 2: UPLOAD PHOTO ═══════════════ */}
+        {step === 2 && (
           <div className="max-w-2xl mx-auto animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-6 flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">1</span>
-              Votre photo de cuisine
+              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">2</span>
+              {currentProject.uploadHint}
             </h2>
 
             <div
@@ -846,7 +883,7 @@ export default function SimulationPage() {
                   </div>
                   <p className="text-gris-400 mb-2">Glissez votre photo ici ou cliquez</p>
                   <p className="text-gris-600 text-sm">JPG, PNG — Max 10 Mo</p>
-                  <p className="text-gris-600 text-xs mt-3">💡 Conseil : prenez la photo de face, bien éclairée, sans zoom</p>
+                  <p className="text-gris-600 text-xs mt-3">💡 {currentProject.uploadTip}</p>
                 </div>
               )}
               <input
@@ -866,7 +903,7 @@ export default function SimulationPage() {
 
             <button
               type="button"
-              onClick={() => { setError(""); setStep(2); }}
+              onClick={() => { setError(""); setStep(3); }}
               disabled={!preview}
               className="btn-primary w-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -878,11 +915,11 @@ export default function SimulationPage() {
           </div>
         )}
 
-        {/* ═══════════════ STEP 2: SELECT REFERENCES ═══════════════ */}
-        {step === 2 && (
+        {/* ═══════════════ STEP 3: SELECT REFERENCES ═══════════════ */}
+        {step === 3 && (
           <div className="max-w-4xl mx-auto animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-2 flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">2</span>
+              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">3</span>
               Choisissez vos revêtements
             </h2>
             <p className="text-gris-400 mb-8 ml-11">
@@ -890,8 +927,9 @@ export default function SimulationPage() {
             </p>
 
             <div className="space-y-6">
-              {ELEMENTS.map((el) => {
+              {currentProject.elements.map((el) => {
                 const selection = elements[el.key];
+                if (!selection) return null;
                 return (
                   <div key={el.key} className="glass-card p-5 sm:p-6">
                     {/* Header with toggle */}
@@ -950,7 +988,7 @@ export default function SimulationPage() {
             <div className="flex gap-4 mt-8">
               <button
                 type="button"
-                onClick={() => setStep(1)}
+                onClick={() => setStep(2)}
                 className="btn-secondary flex-1"
               >
                 <svg className="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -960,7 +998,7 @@ export default function SimulationPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setStep(3)}
+                onClick={() => setStep(4)}
                 disabled={!hasAnySelection}
                 className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -978,11 +1016,11 @@ export default function SimulationPage() {
           </div>
         )}
 
-        {/* ═══════════════ STEP 3: CONTACT INFO ═══════════════ */}
-        {step === 3 && (
+        {/* ═══════════════ STEP 4: CONTACT INFO ═══════════════ */}
+        {step === 4 && (
           <div className="max-w-xl mx-auto animate-fade-in">
             <h2 className="font-display text-2xl font-bold mb-6 flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">3</span>
+              <span className="w-8 h-8 rounded-full bg-rouge flex items-center justify-center text-sm font-bold">4</span>
               Vos coordonnées
             </h2>
 
@@ -1049,9 +1087,9 @@ export default function SimulationPage() {
               <div className="bg-white/5 rounded-xl p-4">
                 <h4 className="text-sm font-semibold text-white mb-3">Récapitulatif</h4>
                 <div className="space-y-2">
-                  {ELEMENTS.map((el) => {
+                  {currentProject.elements.map((el) => {
                     const s = elements[el.key];
-                    if (!s.enabled || !s.ref) return null;
+                    if (!s?.enabled || !s.ref) return null;
                     return (
                       <div key={el.key} className="flex items-center gap-3">
                         <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
@@ -1102,7 +1140,7 @@ export default function SimulationPage() {
             <div className="flex gap-4 mt-6">
               <button
                 type="button"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 className="btn-secondary flex-1"
               >
                 <svg className="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -1125,8 +1163,8 @@ export default function SimulationPage() {
           </div>
         )}
 
-        {/* ═══════════════ STEP 4: PROCESSING & RESULT ═══════════════ */}
-        {step === 4 && (
+        {/* ═══════════════ STEP 5: PROCESSING & RESULT ═══════════════ */}
+        {step === 5 && (
           <div className="max-w-4xl mx-auto animate-fade-in">
             {submitting ? (
               /* Loading state */
@@ -1176,7 +1214,7 @@ export default function SimulationPage() {
                 <h2 className="font-display text-2xl font-bold mb-3">Oups, une erreur est survenue</h2>
                 <p className="text-gris-400 mb-8">{error}</p>
                 <div className="flex gap-4 justify-center">
-                  <button type="button" onClick={() => { setError(""); setStep(3); }} className="btn-secondary">
+                  <button type="button" onClick={() => { setError(""); setStep(4); }} className="btn-secondary">
                     Retour
                   </button>
                   <button type="button" onClick={handleSubmit} className="btn-primary">
@@ -1237,9 +1275,9 @@ export default function SimulationPage() {
                 <div className="glass-card p-5 mt-6">
                   <h3 className="font-display text-lg font-bold mb-4">Références sélectionnées</h3>
                   <div className="grid sm:grid-cols-3 gap-4">
-                    {ELEMENTS.map((el) => {
+                    {currentProject.elements.map((el) => {
                       const s = elements[el.key];
-                      if (!s.enabled || !s.ref) return null;
+                      if (!s?.enabled || !s.ref) return null;
                       return (
                         <div key={el.key} className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
                           <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
@@ -1285,7 +1323,7 @@ export default function SimulationPage() {
                   {resultImage && preview && (
                     <button
                       type="button"
-                      onClick={() => downloadSimulation(preview, resultImage, elements, formData.name)}
+                      onClick={() => downloadSimulation(preview, resultImage, elements, formData.name, currentProject.elements)}
                       className="group flex-1 inline-flex items-center justify-center gap-2 bg-white/5 border-2 border-white/20 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300 hover:bg-white/10 hover:border-rouge/50 hover:scale-105 active:scale-95 uppercase tracking-wider"
                     >
                       <svg className="w-5 h-5 group-hover:text-rouge transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">

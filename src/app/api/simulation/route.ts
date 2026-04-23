@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendLeadToCRM, splitName } from "@/lib/crm";
+import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 
 function getClientIp(req: NextRequest): string {
@@ -105,30 +105,40 @@ function describeElement(label: string, el: ElementInfo | null, imageIndex: numb
    SEND LEAD TO CRM — utilise le helper centralisé lib/crm.ts
    Enrichit avec: referenceChoisie, mlEstimes, prixDevis, lienSimulation
 ────────────────────────────────────────────────────────────────── */
+/* ── Mapping project_type → CRM typeProjet ── */
+const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
+  cuisine: "CUISINE",
+  "salle-de-bain": "SDB",
+  meubles: "MEUBLES",
+  "mur-plafond": "AUTRE",
+  professionnel: "PRO",
+};
+
 function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
-  // Pas de nom/téléphone => simulation anonyme, on ne pousse rien au CRM
   if (!body.name || !body.phone) return;
 
   const { prenom, nom } = splitName(body.name);
+  const projectType = body.project_type || "cuisine";
 
-  const refs = [
-    body.credence_ref ? `Crédence ${body.credence_ref} (${body.credence_name || ""})` : null,
-    body.plan_ref ? `Plan ${body.plan_ref} (${body.plan_name || ""})` : null,
-    body.facade_ref ? `Façade ${body.facade_ref} (${body.facade_name || ""})` : null,
-  ]
+  // Collecte dynamique des refs zone1/zone2/zone3
+  const refs = ["zone1", "zone2", "zone3"]
+    .map((z) => {
+      const ref = body[`${z}_ref`];
+      const label = body[`${z}_label`] || z;
+      const name = body[`${z}_name`] || "";
+      return ref ? `${label} ${ref} (${name})` : null;
+    })
     .filter(Boolean)
     .join(" | ");
 
-  // La ref principale = première renseignée
   const referenceChoisie =
-    body.credence_ref || body.plan_ref || body.facade_ref || undefined;
+    body.zone1_ref || body.zone2_ref || body.zone3_ref || undefined;
 
-  // Estimation mètres linéaires / prix si fournis par le front
   const mlEstimes = body.ml ? Number(body.ml) : undefined;
   const prixDevis = body.prix_devis ? Number(body.prix_devis) : undefined;
 
   const notesParts = [
-    "Simulation IA cuisine en ligne",
+    `Simulation IA ${projectType} en ligne`,
     refs,
     mlEstimes ? `${mlEstimes}ml` : null,
     prixDevis ? `${prixDevis}€` : null,
@@ -141,7 +151,7 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     telephone: body.phone,
     email: body.email || undefined,
     source: "SITE_SIMULATEUR",
-    typeProjet: "CUISINE",
+    typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
     referenceChoisie,
     mlEstimes: Number.isFinite(mlEstimes) ? mlEstimes : undefined,
     prixDevis: Number.isFinite(prixDevis) ? prixDevis : undefined,
@@ -149,7 +159,6 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     notes: notesParts.join(" — "),
     imageBefore: body.photo_base64 || undefined,
     imageAfter: resultImage || undefined,
-    imageOriginal: body.photo_base64_original || undefined,
   }).catch((err) => {
     console.error("[/api/simulation] CRM helper threw (ne devrait pas):", err);
   });
@@ -198,24 +207,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Clé API OpenAI non configurée." }, { status: 500 });
   }
 
-  /* ── Parse elements ── */
-  const elements: Record<string, ElementInfo | null> = {
-    credence: body.credence_ref ? {
-      ref: body.credence_ref, name: body.credence_name, famille: body.credence_famille,
-      finition: body.credence_finition, categorie: body.credence_categorie,
-      tags: body.credence_tags, imageUrl: body.credence_image,
-    } : null,
-    plan: body.plan_ref ? {
-      ref: body.plan_ref, name: body.plan_name, famille: body.plan_famille,
-      finition: body.plan_finition, categorie: body.plan_categorie,
-      tags: body.plan_tags, imageUrl: body.plan_image,
-    } : null,
-    facade: body.facade_ref ? {
-      ref: body.facade_ref, name: body.facade_name, famille: body.facade_famille,
-      finition: body.facade_finition, categorie: body.facade_categorie,
-      tags: body.facade_tags, imageUrl: body.facade_image,
-    } : null,
-  };
+  /* ── Parse elements (generic: zone1, zone2, zone3) ── */
+  const elements: Record<string, ElementInfo | null> = {};
+  for (const zoneKey of ["zone1", "zone2", "zone3"]) {
+    const ref = body[`${zoneKey}_ref`];
+    if (ref) {
+      elements[zoneKey] = {
+        ref,
+        name: body[`${zoneKey}_name`] || "",
+        famille: body[`${zoneKey}_famille`] || "",
+        finition: body[`${zoneKey}_finition`],
+        categorie: body[`${zoneKey}_categorie`],
+        tags: body[`${zoneKey}_tags`],
+        imageUrl: body[`${zoneKey}_image`],
+      };
+    } else {
+      elements[zoneKey] = null;
+    }
+  }
 
   try {
     /* ══════════════════════════════════════════════════════════════
@@ -245,20 +254,41 @@ export async function POST(req: NextRequest) {
     ══════════════════════════════════════════════════════════════ */
 
     // Map each element to its texture image index (if available)
-    const imageIndexMap: Record<string, number | null> = { credence: null, plan: null, facade: null };
+    const imageIndexMap: Record<string, number | null> = {};
+    for (const zk of ["zone1", "zone2", "zone3"]) imageIndexMap[zk] = null;
     textureEntries.forEach((entry, idx) => {
       imageIndexMap[entry.key] = idx;
     });
 
-    const elementDescriptions = [
-      describeElement("CRÉDENCE (backsplash wall between countertop and upper cabinets)", elements.credence, imageIndexMap.credence),
-      describeElement("PLAN DE TRAVAIL (countertop/worktop surface)", elements.plan, imageIndexMap.plan),
-      describeElement("FAÇADES (cabinet doors and drawer fronts)", elements.facade, imageIndexMap.facade),
-    ].join("\n\n");
+    // Labels dynamiques par zone (envoyés par le front)
+    const zoneLabels: Record<string, string> = {
+      zone1: body.zone1_label || "Zone 1",
+      zone2: body.zone2_label || "Zone 2",
+      zone3: body.zone3_label || "Zone 3",
+    };
 
-    const imagePrompt = `You are a professional interior renovation visualizer for CoverSwap, a company that applies Cover Styl' adhesive vinyl films on kitchen surfaces.
+    const elementDescriptions = ["zone1", "zone2", "zone3"]
+      .map((zk) => describeElement(
+        `${zoneLabels[zk].toUpperCase()}`,
+        elements[zk],
+        imageIndexMap[zk]
+      ))
+      .join("\n\n");
 
-YOUR MISSION: Take IMAGE 1 (the client's real kitchen photo) and produce an output image where ONLY the specified surfaces have their material/texture replaced. Everything else stays PERFECTLY identical.
+    // Contexte du type de projet pour le prompt
+    const projectType = body.project_type || "cuisine";
+    const PROJECT_PROMPT_MAP: Record<string, { room: string; surfaces: string }> = {
+      cuisine: { room: "kitchen", surfaces: "kitchen surfaces — backsplash, countertops, and cabinet doors" },
+      "salle-de-bain": { room: "bathroom", surfaces: "bathroom surfaces — vanity cabinet, wall tiles, and shower/bathtub surround" },
+      meubles: { room: "furniture/closet", surfaces: "furniture surfaces — door fronts, shelves/top, and side panels" },
+      "mur-plafond": { room: "room (walls and ceiling)", surfaces: "wall and ceiling surfaces — main wall, accent wall, and ceiling" },
+      professionnel: { room: "professional workspace", surfaces: "workspace surfaces — desk/counter, storage fronts, and wall cladding" },
+    };
+    const ctx = PROJECT_PROMPT_MAP[projectType] || PROJECT_PROMPT_MAP.cuisine;
+
+    const imagePrompt = `You are a professional interior renovation visualizer for CoverSwap, a company that applies Cover Styl' adhesive vinyl films on ${ctx.surfaces}.
+
+YOUR MISSION: Take IMAGE 1 (the client's real ${ctx.room} photo) and produce an output image where ONLY the specified surfaces have their material/texture replaced. Everything else stays PERFECTLY identical.
 
 ${textureEntries.length > 0 ? `TEXTURE REFERENCES: Images ${textureEntries.map((_, i) => i + 2).join(", ")} are close-up swatches of Cover Styl' adhesive film materials. Each shows the exact color, grain, veining, and finish of the vinyl to apply.` : ""}
 
@@ -314,7 +344,7 @@ Any surface marked "DO NOT TOUCH" must be reproduced with zero visual difference
 - Maintain natural lens characteristics (slight vignetting, depth of field) if present in the original
 - No artificial HDR look, no over-saturation, no artificial sharpening
 
-OUTPUT: One photorealistic image of this exact kitchen with only the specified surfaces changed to Cover Styl' materials.`;
+OUTPUT: One photorealistic image of this exact ${ctx.room} with only the specified surfaces changed to Cover Styl' materials.`;
 
     /* ══════════════════════════════════════════════════════════════
        STEP 3: Call OpenAI Image Edit with all images
