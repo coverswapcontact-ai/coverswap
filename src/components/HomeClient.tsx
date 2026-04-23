@@ -84,17 +84,17 @@ export function SimulationSection() {
             <div className="inline-flex items-center gap-2 bg-rouge/10 border border-rouge/30 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-rouge animate-pulse shadow-[0_0_8px_rgba(204,0,0,0.8)]" />
               <span className="text-rouge font-bold text-xs uppercase tracking-[0.2em]">
-                Démo IA cuisine · Exclusivité CoverSwap
+                Simulation IA · Exclusivité Coverswap
               </span>
             </div>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.1}>
             <h2 className="font-display text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.02] mb-4 md:mb-6 tracking-tight">
-              Votre cuisine.
+              Votre intérieur.
               <br />
               <span className="relative inline-block">
-                <span className="text-rouge">Transformée en 60 s.</span>
+                <span className="text-rouge">Transformé en 60 s.</span>
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
                   viewBox="0 0 300 12"
@@ -114,7 +114,7 @@ export function SimulationSection() {
 
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-gris-300 text-lg md:text-xl leading-relaxed">
-              Uploadez une photo de votre cuisine. Choisissez parmi <strong className="text-white">près de 500 textures</strong>.
+              Uploadez une photo (cuisine, salle de bain, meubles, murs…). Choisissez parmi <strong className="text-white">près de 500 textures</strong>.
               Notre IA génère un rendu photoréaliste en moins d&apos;une minute.
               <br className="hidden sm:block" />
               <span className="text-white font-medium">Sans email. Sans téléphone. Gratuit.</span>

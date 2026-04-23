@@ -95,7 +95,7 @@ async function downloadSimulation(
     /* ── titre ── */
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "bold 32px system-ui, -apple-system, sans-serif";
-    ctx.fillText("Votre simulation Cover Styl'", 60, 150);
+    ctx.fillText("Votre simulation Coverswap", 60, 150);
 
     /* ── ligne séparatrice ── */
     ctx.fillStyle = "#CC0000";
@@ -756,9 +756,15 @@ export default function SimulationPage() {
       <div className="container-custom">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="text-rouge font-bold text-sm uppercase tracking-widest">Intelligence artificielle</span>
+          <div className="flex flex-col items-center gap-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rouge/10 border border-rouge/30 text-rouge text-xs font-bold uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-rouge animate-pulse" />
+              Exclusivité Coverswap
+            </span>
+            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Intelligence artificielle</span>
+          </div>
           <h1 className="font-display text-4xl md:text-6xl font-bold mt-3 mb-4">
-            Simulation <span className="text-rouge">{projectId ? currentProject.label : "Cover Styl'"}</span>
+            Simulation <span className="text-rouge">{projectId ? currentProject.label : "Coverswap"}</span>
           </h1>
           <p className="text-gris-400 max-w-2xl mx-auto text-lg">
             {projectId
