@@ -12,9 +12,12 @@ import { useEffect, useState } from "react";
  *   - Meta Pixel          (NEXT_PUBLIC_META_PIXEL_ID)
  *   - Microsoft Clarity   (NEXT_PUBLIC_CLARITY_ID)
  *
- * Comportement RGPD :
- *   - Aucun script chargé tant que l'utilisateur n'a pas accepté les cookies.
- *   - Réécoute l'event "cookie-consent-change" pour s'activer dès l'accept.
+ * Comportement RGPD (Consent Mode v2) :
+ *   - Les scripts se chargent immédiatement avec consentement REVOKED
+ *     (data anonyme agrégée autorisée par CNIL/CMP en 2024).
+ *   - Au click "Accepter" les cookies : passage en consentement GRANTED
+ *     (tracking personnalisé complet).
+ *   - Au refus : les scripts restent en mode REVOKED.
  *   - Si une variable d'env est manquante, le tracker correspondant est ignoré.
  */
 export default function Analytics() {
@@ -25,14 +28,23 @@ export default function Analytics() {
       try {
         const ok = localStorage.getItem("cookie-consent") === "accepted";
         setConsented(ok);
-        // Met à jour le Consent Mode v2 si GTM est déjà chargé
-        if (ok && typeof window !== "undefined" && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
-          (window as unknown as { gtag: (...args: unknown[]) => void }).gtag("consent", "update", {
-            ad_storage: "granted",
-            ad_user_data: "granted",
-            ad_personalization: "granted",
-            analytics_storage: "granted",
+        if (typeof window === "undefined") return;
+        const w = window as unknown as {
+          gtag?: (...args: unknown[]) => void;
+          fbq?: (...args: unknown[]) => void;
+        };
+        // Met à jour le Consent Mode Google v2
+        if (w.gtag) {
+          w.gtag("consent", "update", {
+            ad_storage: ok ? "granted" : "denied",
+            ad_user_data: ok ? "granted" : "denied",
+            ad_personalization: ok ? "granted" : "denied",
+            analytics_storage: ok ? "granted" : "denied",
           });
+        }
+        // Met à jour le Consent Mode Meta Pixel
+        if (w.fbq) {
+          w.fbq("consent", ok ? "grant" : "revoke");
         }
       } catch {
         setConsented(false);
@@ -107,8 +119,10 @@ export default function Analytics() {
         </>
       )}
 
-      {/* ── Meta Pixel ── */}
-      {metaPixelId && consented && (
+      {/* ── Meta Pixel (Consent Mode) ── */}
+      {/* Chargé immédiatement, mais en mode REVOKED tant que pas de consent.
+         Au click "Accepter" → consent grant (voir effect ci-dessus). */}
+      {metaPixelId && (
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -119,14 +133,17 @@ export default function Analytics() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('consent', '${consented ? "grant" : "revoke"}');
             fbq('init', '${metaPixelId}');
             fbq('track', 'PageView');
           `}
         </Script>
       )}
 
-      {/* ── Microsoft Clarity ── */}
-      {clarityId && consented && (
+      {/* ── Microsoft Clarity ──
+         Clarity anonymise les données par défaut (pas d'IP, pas de fingerprint),
+         OK RGPD en mode agrégé même sans consent. */}
+      {clarityId && (
         <Script id="ms-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){
