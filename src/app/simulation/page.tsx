@@ -500,15 +500,17 @@ export default function SimulationPage() {
       })
       .catch(() => {});
 
-    // Reprise depuis le dropzone home : si une photo a été uploadée
-    // sur la home page, on la pré-charge et on saute directement à l'étape 2.
+    // Reprise depuis le widget home : si projet + photo ont été choisis
+    // sur la home page, on les pré-charge et on saute directement à l'étape 3.
     try {
-      const pending = sessionStorage.getItem("coverswap_pending_photo");
-      if (pending) {
-        setPreview(pending);
-        setProjectId("cuisine");
+      const pendingPhoto = sessionStorage.getItem("coverswap_pending_photo");
+      const pendingProject = sessionStorage.getItem("coverswap_pending_project");
+      if (pendingPhoto) {
+        setPreview(pendingPhoto);
+        setProjectId(pendingProject || "cuisine");
         setStep(3); // saute à l'étape revêtements directement
         sessionStorage.removeItem("coverswap_pending_photo");
+        sessionStorage.removeItem("coverswap_pending_project");
       }
     } catch {
       /* sessionStorage indisponible — on reste à l'étape 1 */

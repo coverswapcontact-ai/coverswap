@@ -6,19 +6,26 @@ import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
 import { FAQSchema } from "@/components/JsonLd";
 import { track } from "@/lib/analytics";
+import { PROJECT_TYPES } from "@/app/simulation/projects";
 
-/** Clé sessionStorage pour transférer la photo du home → /simulation */
+/** Clés sessionStorage pour transférer l'état du home → /simulation */
 const PENDING_PHOTO_KEY = "coverswap_pending_photo";
+const PENDING_PROJECT_KEY = "coverswap_pending_project";
 
 /* ══════════════════════════════════════════════════════════════════
    SIMULATION — accès direct au simulateur depuis la home
-   (étape 1 inline : upload photo → redirect vers /simulation step 2)
+   (étape 1 : choix projet → étape 2 : upload photo → redirect vers /simulation)
 ══════════════════════════════════════════════════════════════════ */
 export function SimulationSection() {
   const router = useRouter();
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+
+  const currentProject = projectId
+    ? PROJECT_TYPES.find((p) => p.id === projectId) ?? null
+    : null;
 
   const handleFile = useCallback((file: File) => {
     setError("");
@@ -39,15 +46,21 @@ export function SimulationSection() {
   }, []);
 
   const handleContinue = useCallback(() => {
-    if (!preview) return;
+    if (!preview || !projectId) return;
     try {
       sessionStorage.setItem(PENDING_PHOTO_KEY, preview);
+      sessionStorage.setItem(PENDING_PROJECT_KEY, projectId);
     } catch {
       /* sessionStorage indisponible (mode privé) → on redirige quand même */
     }
     track("cta_clicked", { cta: "home_simulation_continue" });
     router.push("/simulation");
-  }, [preview, router]);
+  }, [preview, projectId, router]);
+
+  const handleSelectProject = (id: string) => {
+    setProjectId(id);
+    track("cta_clicked", { cta: "home_project_selected", project: id });
+  };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -122,14 +135,46 @@ export function SimulationSection() {
           </ScrollReveal>
         </div>
 
-        {/* ── UPLOAD WIDGET — étape 1 du simulateur en direct ── */}
+        {/* ── WIDGET — Projet → Photo → redirect /simulation ── */}
         <ScrollReveal direction="scale" delay={0.15}>
           <div className="relative max-w-3xl mx-auto">
             {/* Glow rouge diffus */}
             <div className="absolute -inset-6 bg-rouge/25 rounded-[2rem] blur-3xl opacity-60 pointer-events-none" />
 
-            {!preview ? (
-              /* ── Étape A : Dropzone vide ── */
+            {!projectId ? (
+              /* ── Étape 1 : Sélection du type de projet ── */
+              <div className="relative rounded-3xl border border-rouge/30 bg-white/[0.03] backdrop-blur-sm p-6 sm:p-10">
+                <div className="text-center mb-6 sm:mb-8">
+                  <div className="inline-flex items-center gap-2 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 mb-3">
+                    <span className="text-rouge font-bold text-[10px] uppercase tracking-widest">
+                      Étape 1 / 3 · Projet
+                    </span>
+                  </div>
+                  <h3 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                    Quel est votre projet&nbsp;?
+                  </h3>
+                  <p className="text-gris-400 text-sm mt-2">
+                    Chaque type de pièce a son générateur IA dédié.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
+                  {PROJECT_TYPES.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => handleSelectProject(p.id)}
+                      className="group text-left p-3 sm:p-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-rouge hover:bg-rouge/5 hover:scale-[1.02] transition-all duration-200"
+                    >
+                      <div className="text-2xl sm:text-3xl mb-1.5">{p.icon}</div>
+                      <div className="font-bold text-white text-sm sm:text-base leading-tight">{p.label}</div>
+                      <div className="text-[11px] sm:text-xs text-gris-400 mt-0.5 leading-snug line-clamp-2">{p.description}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : !preview ? (
+              /* ── Étape 2 : Dropzone photo ── */
               <label
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -153,10 +198,29 @@ export function SimulationSection() {
                   className="sr-only"
                 />
 
+                {/* Project pill + back */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1.5 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 text-rouge text-[11px] font-bold uppercase tracking-widest">
+                    <span>{currentProject?.icon}</span>
+                    {currentProject?.label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setProjectId(null);
+                    }}
+                    className="text-gris-400 hover:text-white text-[11px] underline underline-offset-2"
+                  >
+                    changer
+                  </button>
+                </div>
+
                 {/* Step badge */}
                 <div className="inline-flex items-center gap-2 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 mb-4 md:mb-6">
                   <span className="text-rouge font-bold text-[10px] uppercase tracking-widest">
-                    Étape 1 / 3 · Photo
+                    Étape 2 / 3 · Photo
                   </span>
                 </div>
 
@@ -178,7 +242,7 @@ export function SimulationSection() {
                 </div>
 
                 <h3 className="font-display text-xl sm:text-2xl md:text-4xl font-bold mb-2 md:mb-3 text-white">
-                  Glissez votre photo ici
+                  {currentProject?.uploadHint ?? "Glissez votre photo ici"}
                 </h3>
                 <p className="text-gris-300 mb-2">
                   ou{" "}
@@ -191,8 +255,19 @@ export function SimulationSection() {
                 </p>
               </label>
             ) : (
-              /* ── Étape B : Aperçu photo + bouton continuer ── */
+              /* ── Étape 3 : Aperçu photo + bouton continuer ── */
               <div className="space-y-5">
+                {/* Récap projet + step */}
+                <div className="flex items-center justify-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 text-rouge text-[11px] font-bold uppercase tracking-widest">
+                    <span>{currentProject?.icon}</span>
+                    {currentProject?.label}
+                  </span>
+                  <span className="text-gris-500 text-[11px] uppercase tracking-widest">
+                    Étape 3 / 3 · Textures
+                  </span>
+                </div>
+
                 <div className="relative rounded-3xl overflow-hidden border-2 border-rouge/40 shadow-[0_30px_80px_-15px_rgba(204,0,0,0.4)] bg-noir">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
