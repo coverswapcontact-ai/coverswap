@@ -104,7 +104,7 @@ function HeroSection() {
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Simuler ma cuisine
+            Simuler mon projet
           </Link>
           <a
             href="https://www.instagram.com/cover.swap/"
@@ -288,7 +288,7 @@ function HowItWorks() {
         <ScrollReveal direction="up" delay={0.3}>
           <div className="text-center mt-12">
             <Link href="/simulation" className="btn-primary">
-              Simuler ma cuisine
+              Simuler mon projet
             </Link>
           </div>
         </ScrollReveal>
@@ -364,7 +364,7 @@ function PricingSection() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/simulation" className="btn-primary">
-                Simuler ma cuisine (IA)
+                Simuler mon projet (IA)
               </Link>
               <Link href="/contact" className="btn-secondary">
                 Demander un devis précis

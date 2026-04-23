@@ -166,7 +166,7 @@ export default function Header() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          Simuler ma cuisine
+          Simuler mon projet
         </Link>
 
         {/* Mobile burger — z-50 pour rester au-dessus du menu overlay */}
@@ -268,7 +268,7 @@ export default function Header() {
           onClick={() => setMobileOpen(false)}
           className="btn-primary mt-4"
         >
-          Simuler ma cuisine
+          Simuler mon projet
         </Link>
       </div>
     </div>

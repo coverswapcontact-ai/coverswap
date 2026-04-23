@@ -344,10 +344,10 @@ function ContactPageInner() {
             {/* Quick CTA */}
             <div className="glass-card p-6 text-center border-rouge/20">
               <p className="text-sm text-gris-400 mb-4">
-                Besoin d&apos;un aperçu immédiat pour votre cuisine ?
+                Besoin d&apos;un aperçu immédiat de votre projet ?
               </p>
               <Link href="/simulation" className="btn-secondary text-sm px-6 py-3 w-full">
-                Simulation cuisine (IA)
+                Simuler mon projet (IA)
               </Link>
             </div>
           </div>

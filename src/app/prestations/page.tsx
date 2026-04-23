@@ -181,7 +181,7 @@ export default function PrestationsPage() {
                 href="/simulation"
                 className="btn-primary text-base px-8 py-4"
               >
-                Simuler ma cuisine (IA gratuite)
+                Simuler mon projet (IA gratuite)
               </Link>
               <Link
                 href="/contact"
@@ -409,7 +409,7 @@ export default function PrestationsPage() {
             </h2>
             <p className="text-gris-300 text-lg mb-10 max-w-xl mx-auto">
               D&eacute;crivez votre projet et recevez un devis
-              personnalis&eacute; sous 48h. Simulation IA disponible pour les cuisines.
+              personnalis&eacute; sous 48h. Simulation IA disponible pour tous vos projets.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

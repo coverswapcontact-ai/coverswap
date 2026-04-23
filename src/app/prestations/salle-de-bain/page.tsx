@@ -350,7 +350,7 @@ export default function SalleDeBainPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/contact" className="btn-primary text-lg px-10 py-5">Demander un devis gratuit</Link>
-                <Link href="/simulation" className="btn-secondary text-lg px-10 py-5">Simuler une cuisine (IA)</Link>
+                <Link href="/simulation" className="btn-secondary text-lg px-10 py-5">Simuler mon projet (IA)</Link>
               </div>
             </div>
           </ScrollReveal>

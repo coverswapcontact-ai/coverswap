@@ -15,7 +15,7 @@ export default function Footer() {
             Prêt à transformer votre intérieur ?
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            Simulation IA cuisine gratuite en 60 secondes ou devis classique sous 48h. Sans engagement.
+            Simulation IA gratuite en 60 secondes ou devis classique sous 48h. Sans engagement.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -25,7 +25,7 @@ export default function Footer() {
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Simuler ma cuisine
+              Simuler mon projet
             </Link>
             <Link
               href="/contact"
