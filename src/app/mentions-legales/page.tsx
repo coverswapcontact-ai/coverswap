@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Mentions légales | CoverSwap",
+  description: "Mentions légales du site CoverSwap : éditeur, hébergeur et informations légales.",
+  alternates: { canonical: "https://coverswap.fr/mentions-legales" },
+  robots: { index: true, follow: true },
+};
+
 export default function MentionsLegales() {
   return (
     <div className="min-h-screen pt-28 pb-20">

@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Donnez une seconde vie à vos meubles avec le covering adhésif. Commodes, buffets, bibliothèques, tables. Effets bois, marbre, couleurs unies. Résultat pro garanti 10 ans.",
   keywords:
     "covering meuble, relooking meuble adhésif, film adhésif meuble, rénovation meuble sans poncer, covering mobilier, habillage meuble adhésif",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations/meubles",
+  },
 };
 
 const meubleTypes = [

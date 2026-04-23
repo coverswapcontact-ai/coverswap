@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Films adhésifs pour vitrages : protection solaire, intimité, décoration, sécurité anti-effraction. Bureaux, commerces, habitations. Pose professionnelle. Devis gratuit.",
   keywords:
     "film vitrage, film solaire vitres, film intimité, film anti-chaleur, film décoratif vitrage, film sécurité vitres, covering vitrage",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations/vitrages",
+  },
 };
 
 const typesFilms = [

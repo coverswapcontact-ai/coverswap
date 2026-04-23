@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Découvrez toutes nos prestations de covering adhésif : cuisine, salle de bain, meubles, locaux professionnels et vitrages. Rénovation intérieure sans travaux, garantie 10 ans.",
   keywords:
     "prestations covering, rénovation adhésive, covering intérieur, services covering, rénovation sans travaux",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations",
+  },
 };
 
 const services = [

@@ -19,6 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} | Blog CoverSwap`,
     description: article.excerpt,
+    alternates: {
+      canonical: `https://coverswap.fr/blog/${article.slug}`,
+    },
   };
 }
 

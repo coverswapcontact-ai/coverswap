@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Rénovez votre cuisine en 1 journée avec le covering adhésif. Plans de travail, crédences, façades de meubles. 50+ textures marbre, bois, béton. Garanti 10 ans. Devis gratuit.",
   keywords:
     "covering cuisine, relooking cuisine sans travaux, film adhésif plan de travail, rénovation cuisine adhésif, covering plan de travail, covering meuble cuisine, revêtement adhésif cuisine",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations/cuisine",
+  },
 };
 
 const faqs = [

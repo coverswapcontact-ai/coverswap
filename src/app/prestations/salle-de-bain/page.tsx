@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Covering Salle de Bain | Film Adhésif Waterproof & Anti-Moisissures",
   description: "Rénovez votre salle de bain sans casser le carrelage. Film adhésif waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit en 48h.",
   keywords: "covering salle de bain, film adhésif salle de bain, rénovation carrelage adhésif, film waterproof salle de bain, covering carrelage, revêtement adhésif douche",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations/salle-de-bain",
+  },
 };
 
 const zones = [

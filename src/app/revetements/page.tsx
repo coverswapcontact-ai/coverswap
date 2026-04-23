@@ -7,6 +7,9 @@ export const metadata: Metadata = {
     "Explorez notre catalogue complet de revêtements adhésifs Cover Styl'. Bois, pierre, béton, métal, couleur, textile, paillettes. Plus de 470 références disponibles.",
   keywords:
     "catalogue cover styl, revêtement adhésif, covering mural, film adhésif décoratif, bois adhésif, marbre adhésif, béton adhésif",
+  alternates: {
+    canonical: "https://coverswap.fr/revetements",
+  },
 };
 
 export default function RevetementsPage() {

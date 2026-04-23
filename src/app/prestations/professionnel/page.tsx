@@ -10,6 +10,9 @@ export const metadata: Metadata = {
     "Rénovez vos locaux professionnels sans fermer. Comptoirs de bar, réceptions, bureaux, hôtels. Covering adhésif posé en 1 nuit. Personnalisation aux couleurs de votre marque.",
   keywords:
     "covering professionnel, habillage comptoir bar, covering restaurant, rénovation hôtel adhésif, covering bureau, film adhésif professionnel",
+  alternates: {
+    canonical: "https://coverswap.fr/prestations/professionnel",
+  },
 };
 
 const secteurs = [

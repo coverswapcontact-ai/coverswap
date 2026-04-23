@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Politique de confidentialité | CoverSwap",
+  description: "Politique de confidentialité CoverSwap : traitement des données personnelles et RGPD.",
+  alternates: { canonical: "https://coverswap.fr/politique-confidentialite" },
+  robots: { index: true, follow: true },
+};
+
 export default function PolitiqueConfidentialite() {
   return (
     <div className="min-h-screen pt-28 pb-20">
