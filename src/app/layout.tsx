@@ -9,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -119,6 +120,7 @@ export default function RootLayout({
         <CookieBanner />
         <WhatsAppButton />
         <Analytics />
+        <VercelAnalytics />
       </body>
     </html>
   );
