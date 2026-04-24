@@ -5,15 +5,20 @@
  * NE JAMAIS importer ce fichier depuis un client component : il expose
  * le secret webhook via process.env et fait un fetch sans CORS.
  *
- * ── QUEUE DE SECOURS ──
- * Si le CRM est injoignable, le lead est sauvé dans un fichier JSON
- * local (.crm-queue.json). Un job de retry tourne toutes les 30 s et
- * renvoie automatiquement les leads en attente dès que le CRM revient.
- * → 0 lead perdu, même si le CRM est éteint.
+ * ── STRATÉGIE ANTI-PERTE ──
+ * 1. Tentative d'envoi au webhook CRM (timeout court).
+ * 2. En cas d'échec (404 / 5xx / timeout / secret invalide) :
+ *    a. Tentative d'écriture en queue locale (.crm-queue.json) — best effort,
+ *       marche en dev mais pas sur Vercel serverless (FS read-only).
+ *    b. Envoi d'un email de secours via Resend au gérant avec tout le payload
+ *       → jamais de lead perdu silencieusement, même si la queue échoue.
+ * 3. Toujours fire-and-forget côté caller → la réponse HTTP au client
+ *    n'est jamais bloquée par un problème CRM.
  */
 
 import { promises as fs } from "fs";
 import path from "path";
+import { Resend } from "resend";
 
 /* ══════════════════════════════════════════════════════════════════
    TYPES
@@ -56,6 +61,7 @@ export interface CrmResult {
   leadId?: string;
   error?: string;
   queued?: boolean;
+  emailFallback?: boolean;
 }
 
 interface QueuedLead {
@@ -74,9 +80,11 @@ const TIMEOUT_WITH_IMAGES_MS = 20000; // upload photos = plus lent
 const QUEUE_FILE = path.join(process.cwd(), ".crm-queue.json");
 const RETRY_INTERVAL_MS = 30_000; // 30 secondes
 const MAX_RETRY_ATTEMPTS = 50; // ~25 min de tentatives max
+const FALLBACK_EMAIL = process.env.LEAD_FALLBACK_EMAIL || "contact@coverswap.fr";
+const EMAIL_FROM = process.env.LEAD_FALLBACK_FROM || "CoverSwap Alert <noreply@coverswap.fr>";
 
 /* ══════════════════════════════════════════════════════════════════
-   QUEUE — lecture / écriture fichier JSON
+   QUEUE — lecture / écriture fichier JSON (best effort en prod)
 ══════════════════════════════════════════════════════════════════ */
 async function readQueue(): Promise<QueuedLead[]> {
   try {
@@ -88,18 +96,20 @@ async function readQueue(): Promise<QueuedLead[]> {
   }
 }
 
-async function writeQueue(queue: QueuedLead[]): Promise<void> {
+async function writeQueue(queue: QueuedLead[]): Promise<boolean> {
   try {
     await fs.writeFile(QUEUE_FILE, JSON.stringify(queue, null, 2), "utf-8");
+    return true;
   } catch (err) {
-    console.error("[CRM Queue] Erreur écriture:", err);
+    console.error("[CRM Queue] Erreur écriture (FS read-only ? Vercel serverless):", err);
+    return false;
   }
 }
 
 async function addToQueue(
   cleaned: Record<string, unknown>,
   error: string
-): Promise<void> {
+): Promise<boolean> {
   const queue = await readQueue();
   queue.push({
     payload: cleaned,
@@ -107,10 +117,88 @@ async function addToQueue(
     attempts: 1,
     lastError: error,
   });
-  await writeQueue(queue);
-  console.warn(
-    `[CRM Queue] Lead sauvé en file d'attente (${queue.length} en attente)`
-  );
+  const ok = await writeQueue(queue);
+  if (ok) {
+    console.warn(
+      `[CRM Queue] Lead sauvé en file d'attente (${queue.length} en attente)`
+    );
+  }
+  return ok;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FALLBACK EMAIL — dernière ligne de défense anti-perte
+══════════════════════════════════════════════════════════════════ */
+function formatLeadHtml(
+  payload: Record<string, unknown>,
+  error: string
+): string {
+  const rows: [string, string | undefined][] = [
+    ["Prénom", payload.prenom as string],
+    ["Nom", payload.nom as string],
+    ["Téléphone", payload.telephone as string],
+    ["Email", payload.email as string | undefined],
+    ["Ville", payload.ville as string | undefined],
+    ["Code postal", payload.codePostal as string | undefined],
+    ["Source", payload.source as string | undefined],
+    ["Type projet", payload.typeProjet as string | undefined],
+    ["Référence", payload.referenceChoisie as string | undefined],
+    ["Notes", payload.notes as string | undefined],
+  ];
+  const tableRows = rows
+    .filter(([, v]) => v != null && v !== "")
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:4px 12px;font-weight:bold;background:#f8f8f8;">${k}</td><td style="padding:4px 12px;">${v}</td></tr>`
+    )
+    .join("");
+  return `
+    <div style="font-family:sans-serif;max-width:600px;">
+      <h2 style="color:#CC0000;">🚨 Lead non enregistré dans le CRM</h2>
+      <p><strong>Erreur technique :</strong> <code>${error}</code></p>
+      <p>Le lead n'a pas pu atteindre le CRM. Contacte la personne manuellement et ajoute-la au CRM une fois disponible.</p>
+      <table style="border-collapse:collapse;border:1px solid #ddd;">
+        ${tableRows}
+      </table>
+      <p style="margin-top:20px;font-size:12px;color:#888;">
+        Email généré automatiquement par le fallback site → CRM.
+        Si tu vois cet email, le webhook CRM est en panne.
+      </p>
+    </div>
+  `;
+}
+
+async function sendFallbackEmail(
+  payload: Record<string, unknown>,
+  error: string
+): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error(
+      "[CRM Fallback] RESEND_API_KEY non configuré — impossible d'envoyer l'email de secours"
+    );
+    return false;
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    const name = `${payload.prenom || "?"} ${payload.nom || "?"}`.trim();
+    const { error: sendErr } = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: FALLBACK_EMAIL,
+      subject: `🚨 LEAD NON CAPTURÉ CRM — ${name} (${payload.telephone || "?"})`,
+      html: formatLeadHtml(payload, error),
+    });
+    if (sendErr) {
+      console.error("[CRM Fallback] Resend error:", sendErr);
+      return false;
+    }
+    console.log(`[CRM Fallback] Email de secours envoyé à ${FALLBACK_EMAIL}`);
+    return true;
+  } catch (err) {
+    console.error("[CRM Fallback] Exception envoi email:", err);
+    return false;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -210,10 +298,10 @@ async function processQueue(): Promise<void> {
         );
       } else if (item.attempts >= MAX_RETRY_ATTEMPTS) {
         console.error(
-          `[CRM Queue] ✗ Lead abandonné après ${item.attempts} tentatives:`,
-          item.payload
+          `[CRM Queue] ✗ Lead abandonné après ${item.attempts} tentatives — envoi email secours`
         );
-        // On le garde quand même dans un fichier d'archive
+        // Dernier recours : email au gérant
+        await sendFallbackEmail(item.payload, result.error || "retries-exhausted");
         await archiveFailedLead(item);
       } else {
         remaining.push({
@@ -271,9 +359,8 @@ function startRetryLoop(): void {
 
 /**
  * Envoie un lead au CRM — fire-and-forget côté serveur.
- * Si le CRM est down, le lead est sauvé en queue locale et
- * retransmis automatiquement dès que le CRM revient.
- * Ne throw jamais.
+ * Si le CRM est down : tentative queue locale (best effort), puis email
+ * de secours au gérant via Resend. Ne throw jamais.
  */
 export async function sendLeadToCRM(
   payload: CrmLeadPayload
@@ -302,18 +389,29 @@ export async function sendLeadToCRM(
     return result;
   }
 
-  // Échec → sauvegarde en queue + lancement du retry.
-  // On strip les images base64 avant la mise en queue pour éviter de gonfler
-  // le fichier disque. Les images sont best-effort : si le CRM est down au
-  // moment de la simulation, on préfère garder le lead et perdre les photos.
+  // Échec webhook → 2 filets de sécurité en cascade :
+  //   1) queue locale (marche en dev, probablement pas sur Vercel)
+  //   2) email immédiat via Resend (marche toujours)
   const lean = { ...cleaned };
   delete lean.imageBefore;
   delete lean.imageAfter;
-  console.error(`[CRM] Envoi échoué (${result.error}) — mise en queue (images écartées)`);
-  await addToQueue(lean, result.error || "unknown");
-  startRetryLoop();
+  delete lean.imageOriginal;
+  console.error(
+    `[CRM] Envoi échoué (${result.error}) — queue + email secours`
+  );
 
-  return { ok: false, error: result.error, queued: true };
+  const queued = await addToQueue(lean, result.error || "unknown");
+  if (queued) startRetryLoop();
+
+  // Envoi immédiat de l'email de secours (ne pas attendre les retries)
+  const emailFallback = await sendFallbackEmail(lean, result.error || "unknown");
+
+  return {
+    ok: false,
+    error: result.error,
+    queued,
+    emailFallback,
+  };
 }
 
 /* ══════════════════════════════════════════════════════════════════

@@ -13,7 +13,8 @@
     "next-seo": "^7.2.0",
     "pdfkit": "^0.18.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "resend": "^6.12.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
