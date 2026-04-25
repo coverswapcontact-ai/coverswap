@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
+import { getProject, type ProjectType } from "@/app/simulation/projects";
 
 // Max duration côté Vercel (Hobby = 60s max, Pro = 300s).
 // gpt-image-1 quality "medium" 1024px → ~20-35s, large marge avant kill.
@@ -311,20 +312,18 @@ export async function POST(req: NextRequest) {
       ))
       .join("\n\n");
 
-    // Contexte du type de projet pour le prompt
+    // Contexte du type de projet pour le prompt — source unique : src/app/simulation/projects.ts
     const projectType = body.project_type || "cuisine";
-    const PROJECT_PROMPT_MAP: Record<string, { room: string; surfaces: string }> = {
-      cuisine: { room: "kitchen", surfaces: "kitchen surfaces — backsplash, countertops, and cabinet doors" },
-      "salle-de-bain": { room: "bathroom", surfaces: "bathroom surfaces — vanity cabinet, wall tiles, and shower/bathtub surround" },
-      meubles: { room: "furniture/closet", surfaces: "furniture surfaces — door fronts, shelves/top, and side panels" },
-      "mur-plafond": { room: "room (walls and ceiling)", surfaces: "wall and ceiling surfaces — main wall, accent wall, and ceiling" },
-      professionnel: { room: "professional workspace", surfaces: "workspace surfaces — desk/counter, storage fronts, and wall cladding" },
-    };
-    const ctx = PROJECT_PROMPT_MAP[projectType] || PROJECT_PROMPT_MAP.cuisine;
+    const project: ProjectType = getProject(projectType);
 
-    const imagePrompt = `You are a professional interior renovation visualizer for CoverSwap, a company that applies Cover Styl' adhesive vinyl films on ${ctx.surfaces}.
+    // Liste explicite des éléments à NE JAMAIS toucher (varie par projet : cuisine ≠ SDB ≠ dressing)
+    const keepUntouchedList = project.promptKeepUntouched
+      .map((item) => `- ${item}`)
+      .join("\n");
 
-YOUR MISSION: Take IMAGE 1 (the client's real ${ctx.room} photo) and produce an output image where ONLY the specified surfaces have their material/texture replaced. Everything else stays PERFECTLY identical.
+    const imagePrompt = `You are a professional interior renovation visualizer for CoverSwap, a company that applies Cover Styl' adhesive vinyl films on ${project.promptSurfaceContext}.
+
+YOUR MISSION: Take IMAGE 1 (the client's real ${project.promptRoomType} photo) and produce an output image where ONLY the specified surfaces have their material/texture replaced. Everything else stays PERFECTLY identical.
 
 ${textureEntries.length > 0 ? `TEXTURE REFERENCES: Images ${textureEntries.map((_, i) => i + 2).join(", ")} are close-up swatches of Cover Styl' adhesive film materials. Each shows the exact color, grain, veining, and finish of the vinyl to apply.` : ""}
 
@@ -345,17 +344,9 @@ The output MUST be the exact same photograph as IMAGE 1. Think of it as a "find 
 - The edges/borders of the output image must show the exact same content as the input
 - If the original photo shows a wall on the left edge, the output must show that same wall at the same position
 
-🔒 RULE 2 — ABSOLUTE STRUCTURAL PRESERVATION:
-Every non-targeted element must remain pixel-identical:
-- Cabinet doors: same number, same sizes, same positions, same gaps between them
-- Handles, knobs, hinges: same style, same metal finish, same exact placement
-- Appliances: oven, hood, fridge, microwave, dishwasher — completely untouched
-- Sink, faucet, taps — completely untouched
-- Electrical outlets, switches, lights — completely untouched
-- Objects on countertops: bottles, jars, utensils, plants, cutting boards — all stay exactly as they are
-- Floor, ceiling, walls (non-backsplash) — completely untouched
-- Windows, curtains, blinds — completely untouched
-- Furniture visible in the background — completely untouched
+🔒 RULE 2 — ABSOLUTE STRUCTURAL PRESERVATION (project: ${project.label}):
+Every non-targeted element must remain pixel-identical. For this ${project.promptRoomType}, the following MUST stay 100% identical to IMAGE 1:
+${keepUntouchedList}
 
 🔒 RULE 3 — TEXTURE APPLICATION QUALITY (READ CAREFULLY):
 For surfaces marked with ✅:
@@ -382,7 +373,10 @@ Any surface marked "DO NOT TOUCH" must be reproduced with zero visual difference
 - Maintain natural lens characteristics (slight vignetting, depth of field) if present in the original
 - No artificial HDR look, no over-saturation, no artificial sharpening
 
-OUTPUT: One photorealistic image of this exact ${ctx.room} with only the specified surfaces changed to Cover Styl' materials.`;
+🔒 RULE 7 — ${project.label.toUpperCase()}-SPECIFIC RULES:
+${project.promptSpecificRules}
+
+OUTPUT: One photorealistic image of this exact ${project.promptRoomType} with ONLY the specified surfaces changed to Cover Styl' materials. Every element listed in RULE 2 must remain pixel-identical.`;
 
     /* ══════════════════════════════════════════════════════════════
        STEP 3: Call OpenAI Image Edit with all images
