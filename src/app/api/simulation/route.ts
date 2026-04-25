@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 
+// Max duration côté Vercel (Hobby = 60s max, Pro = 300s).
+// gpt-image-1 quality "medium" 1024px → ~20-35s, large marge avant kill.
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
+// Timeout interne pour l'appel OpenAI : on échoue PROPREMENT avant que Vercel kill la fonction.
+const OPENAI_TIMEOUT_MS = 55_000;
+
 function getClientIp(req: NextRequest): string {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -81,21 +89,29 @@ async function downloadImage(url: string): Promise<Buffer | null> {
 
 /* ──────────────────────────────────────────────────────────────────
    BUILD ELEMENT DESCRIPTION FOR PROMPT
+   Renforcé : enforce strict pour la fidélité couleur (bug fréquent
+   gpt-image-1 qui "interprète" librement les swatches couleur unie).
 ────────────────────────────────────────────────────────────────── */
 function describeElement(label: string, el: ElementInfo | null, imageIndex: number | null): string {
   if (!el || !el.ref) {
     return `${label}: ⛔ DO NOT TOUCH. This surface MUST remain 100% pixel-identical to the original photo. No color shift, no texture change, no alteration whatsoever.`;
   }
 
+  // Pour les couleurs unies (famille=couleur), le nom est le signal le plus fort.
+  // Le swatch montre la teinte exacte mais le modèle a tendance à la "stylizer".
+  // On insiste donc explicitement sur le nom anglais (Lacquered Black, Sun Flower Yellow, etc).
+  const isSolidColor = el.famille === "couleur";
+  const colorEmphasis = isSolidColor
+    ? `🎯 EXACT SOLID COLOR REQUIRED — "${el.name}". This is a flat, uniform color (no texture, no pattern, no grain). The output color MUST exactly match "${el.name}" sampled from IMAGE ${imageIndex !== null ? imageIndex + 2 : "?"}. Do NOT lighten, darken, desaturate, or stylize. The color hex value visible on the swatch is the ONLY acceptable color.`
+    : `🎯 EXACT MATERIAL REQUIRED — "${el.name}" (${el.famille}${el.categorie ? ", " + el.categorie : ""}${el.finition ? ", " + el.finition + " finish" : ""}). The exact texture, color, and pattern MUST be sampled from the swatch image — do not interpret loosely.`;
+
   const lines = [
-    `${label}: ✅ APPLY new texture — Cover Styl' ref. ${el.ref} "${el.name}"`,
-    el.famille ? `  Material family: ${el.famille}` : null,
-    el.finition ? `  Surface finish: ${el.finition}` : null,
-    el.categorie ? `  Category: ${el.categorie}` : null,
+    `${label}: ✅ APPLY Cover Styl' ref. ${el.ref} — "${el.name}"`,
+    `  ${colorEmphasis}`,
     el.tags?.length ? `  Visual traits: ${el.tags.join(", ")}` : null,
     imageIndex !== null
-      ? `  🎨 TEXTURE REFERENCE: See IMAGE ${imageIndex + 2}. This is a close-up swatch of the exact adhesive film. You MUST replicate this precise color, grain pattern, veining, and surface finish on the specified surface. Scale the pattern realistically to the surface dimensions.`
-      : null,
+      ? `  🎨 SWATCH IMAGE ${imageIndex + 2}: This is the precise color/texture reference for ref. ${el.ref} "${el.name}". Sample colors PIXEL-DIRECTLY from this swatch — same hue, same saturation, same value, same brightness. ${isSolidColor ? "For solid colors: pick a single representative pixel from the center of the swatch and apply that exact RGB color uniformly across the surface." : "Replicate grain/veining/pattern at a realistic scale (wood ~15-20cm planks, marble veins large-scale)."}${el.finition ? ` Surface finish: ${el.finition} (${el.finition.toLowerCase().includes("gloss") ? "reflective with specular highlights" : el.finition.toLowerCase().includes("matt") ? "matte, no specular" : "natural light absorption matching the swatch"}).` : ""}`
+      : `  ⚠️ NO SWATCH PROVIDED — base the texture purely on the name "${el.name}" and visual traits.`,
   ].filter(Boolean);
 
   return lines.join("\n");
@@ -229,20 +245,40 @@ export async function POST(req: NextRequest) {
   try {
     /* ══════════════════════════════════════════════════════════════
        STEP 1: Download texture reference images in parallel
+       BUG FIX : si un swatch échoue à se télécharger, on échoue PROPREMENT
+       au lieu de laisser l'IA inventer une couleur (ancien comportement).
     ══════════════════════════════════════════════════════════════ */
     const textureEntries: { key: string; el: ElementInfo; buffer: Buffer }[] = [];
-    const downloadPromises: Promise<void>[] = [];
+    const downloadResults = await Promise.all(
+      Object.entries(elements).map(async ([key, el]) => {
+        if (!el?.imageUrl) return { key, el, buffer: null as Buffer | null };
+        const buffer = await downloadImage(el.imageUrl);
+        return { key, el, buffer };
+      })
+    );
 
-    for (const [key, el] of Object.entries(elements)) {
-      if (el?.imageUrl) {
-        downloadPromises.push(
-          downloadImage(el.imageUrl).then((buf) => {
-            if (buf) textureEntries.push({ key, el, buffer: buf });
-          })
-        );
+    const failedDownloads: { key: string; ref: string; name: string }[] = [];
+    for (const { key, el, buffer } of downloadResults) {
+      if (!el) continue;
+      if (el.imageUrl && !buffer) {
+        // Swatch attendu mais échec → on rejette (ne pas laisser l'IA inventer)
+        failedDownloads.push({ key, ref: el.ref, name: el.name });
+      } else if (buffer && el) {
+        textureEntries.push({ key, el, buffer });
       }
     }
-    await Promise.all(downloadPromises);
+
+    if (failedDownloads.length > 0) {
+      const refs = failedDownloads.map((f) => `${f.ref} (${f.name})`).join(", ");
+      console.error(`[simulation] Swatch download failed for: ${refs}`);
+      return NextResponse.json(
+        {
+          error: `Impossible de télécharger les images de référence (${refs}). Réessayez dans quelques secondes.`,
+          reason: "swatch-download-failed",
+        },
+        { status: 502, headers: rateLimitHeaders(rl) }
+      );
+    }
 
     if (process.env.NODE_ENV !== "production") {
       console.log(`[simulation] Downloaded ${textureEntries.length} texture reference images`);
@@ -321,10 +357,12 @@ Every non-targeted element must remain pixel-identical:
 - Windows, curtains, blinds — completely untouched
 - Furniture visible in the background — completely untouched
 
-🔒 RULE 3 — TEXTURE APPLICATION QUALITY:
+🔒 RULE 3 — TEXTURE APPLICATION QUALITY (READ CAREFULLY):
 For surfaces marked with ✅:
-- Color: match the EXACT hue, saturation, and value from the texture swatch
-- Pattern: replicate the grain/veining direction naturally. Wood grain should run horizontally on countertops and vertically on cabinet fronts (unless the swatch suggests otherwise)
+- 🎯 COLOR FIDELITY IS NON-NEGOTIABLE: sample the color DIRECTLY from the swatch image (same RGB pixel values). Do NOT shift hue, saturation, value, or brightness — even slightly. If the swatch shows pure black, the output must be pure black. If the swatch shows pale blue, the output must be that exact pale blue — not a "similar blue".
+- 🎯 SOLID COLORS are uniform — no wood grain, no marble veining, no patterns. They are flat, even tones across the entire surface (only natural light/shadow variations from the original photo's lighting).
+- 🎯 NAMED COLORS: when the surface name is "Lacquered Black", "Sun Flower Yellow", "Midnight Blue" etc., the output color MUST clearly read as that name to a human observer. Do not desaturate or mute named colors.
+- Pattern: for textured materials (wood, marble, stone), replicate the grain/veining direction naturally. Wood grain should run horizontally on countertops and vertically on cabinet fronts (unless the swatch suggests otherwise)
 - Scale: the pattern must be proportionally realistic — marble veining should be large-scale, wood grain should match real plank widths (~15-20cm)
 - 3D wrapping: the texture must follow the surface geometry — wrap around cabinet edges, follow countertop corners
 - Finish: if the swatch is matte, the surface should absorb light. If glossy, add subtle specular highlights consistent with the existing light sources
@@ -373,7 +411,9 @@ OUTPUT: One photorealistic image of this exact ${ctx.room} with only the specifi
     formData.append("model", "gpt-image-1");
     formData.append("prompt", imagePrompt);
     formData.append("size", outputSize);
-    formData.append("quality", "high");
+    // "medium" plutôt que "high" : ~25-35s au lieu de 60-90s. Tient confortablement
+    // dans le maxDuration=60s de Vercel Hobby. Qualité visuelle quasi identique.
+    formData.append("quality", "medium");
 
     // Image 1: Kitchen photo (the source)
     formData.append("image[]", new Blob([new Uint8Array(kitchenBuffer)], { type: "image/png" }), "kitchen.png");
@@ -387,23 +427,64 @@ OUTPUT: One photorealistic image of this exact ${ctx.room} with only the specifi
       console.log(`[simulation] Sending ${1 + textureEntries.length} images to gpt-image-1 (prompt ${imagePrompt.length} chars)`);
     }
 
-    const imageRes = await fetch("https://api.openai.com/v1/images/edits", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}` },
-      body: formData,
-    });
+    // AbortController pour timeout propre AVANT que Vercel kill la fonction.
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+    let imageRes: Response;
+    try {
+      imageRes = await fetch("https://api.openai.com/v1/images/edits", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: formData,
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeoutId);
+      const isAbort = fetchErr instanceof Error && (fetchErr.name === "AbortError" || /aborted/i.test(fetchErr.message));
+      if (isAbort) {
+        console.error("[simulation] OpenAI timeout après", OPENAI_TIMEOUT_MS, "ms");
+        return NextResponse.json(
+          {
+            error: "La génération a pris trop de temps. Réessayez avec une photo plus petite ou moins de zones à modifier.",
+            reason: "openai-timeout",
+          },
+          { status: 504, headers: rateLimitHeaders(rl) }
+        );
+      }
+      console.error("[simulation] OpenAI fetch error:", fetchErr);
+      return NextResponse.json(
+        { error: "Service de génération d'image indisponible. Réessayez dans un instant.", reason: "openai-network" },
+        { status: 502, headers: rateLimitHeaders(rl) }
+      );
+    }
+    clearTimeout(timeoutId);
 
     if (!imageRes.ok) {
-      const err = await imageRes.text();
-      console.error("Image edit error:", err);
-      return NextResponse.json({ error: "Erreur lors de la génération de l'image." }, { status: 502 });
+      const err = await imageRes.text().catch(() => "");
+      console.error(`[simulation] OpenAI HTTP ${imageRes.status}:`, err.slice(0, 500));
+      // Erreur OpenAI explicite (quota, content policy, etc.) → message utile
+      const userMessage =
+        imageRes.status === 429
+          ? "Trop de requêtes vers le service IA. Réessayez dans une minute."
+          : imageRes.status === 400
+          ? "L'IA a refusé cette photo (probablement trop sombre, floue ou non conforme). Essayez une autre photo bien éclairée."
+          : "Erreur lors de la génération de l'image. Réessayez ou contactez-nous.";
+      return NextResponse.json(
+        { error: userMessage, reason: "openai-error", status: imageRes.status },
+        { status: 502, headers: rateLimitHeaders(rl) }
+      );
     }
 
     const imageData = await imageRes.json();
     const generatedB64 = imageData.data?.[0]?.b64_json;
 
     if (!generatedB64) {
-      return NextResponse.json({ error: "Aucune image générée." }, { status: 502 });
+      console.error("[simulation] Réponse OpenAI sans b64_json:", JSON.stringify(imageData).slice(0, 500));
+      return NextResponse.json(
+        { error: "Aucune image générée. Réessayez.", reason: "no-image-data" },
+        { status: 502, headers: rateLimitHeaders(rl) }
+      );
     }
 
     const resultImage = `data:image/png;base64,${generatedB64}`;
