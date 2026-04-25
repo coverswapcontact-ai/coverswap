@@ -8,11 +8,11 @@ import { getProject, type ProjectType } from "@/app/simulation/projects";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-// Timeouts internes par tentative — on échoue PROPREMENT avant que Vercel kill la fonction.
-// Stratégie : 1ère tentative quality "medium" (35s) → si fail, retry quality "low" (20s).
-// Total max ≈ 55s, fits dans maxDuration=60s.
-const OPENAI_PRIMARY_TIMEOUT_MS = 35_000;
-const OPENAI_FALLBACK_TIMEOUT_MS = 20_000;
+// Timeout interne — on échoue PROPREMENT avant que Vercel kill la fonction (60s max).
+// Stratégie : single attempt quality "low" (~15-25s typique), pas de retry pour
+// rester en-dessous de 45s avec marge confortable. La qualité "low" reste
+// largement photoréaliste et la fidélité couleur est préservée par le prompt.
+const OPENAI_TIMEOUT_MS = 45_000;
 
 function getClientIp(req: NextRequest): string {
   return (
@@ -404,83 +404,60 @@ OUTPUT: One photorealistic image of this exact ${project.promptRoomType} with ON
       console.log(`[simulation] Input: ${dims?.width}x${dims?.height} (ratio ${dims ? (dims.width / dims.height).toFixed(2) : "?"}) → output: ${outputSize}`);
     }
 
-    /* Construit le FormData (rebuilt à chaque tentative car le body est consommé) */
-    const buildFormData = (quality: "medium" | "low"): FormData => {
-      const fd = new FormData();
-      fd.append("model", "gpt-image-1");
-      fd.append("prompt", imagePrompt);
-      fd.append("size", outputSize);
-      fd.append("quality", quality);
-      fd.append("image[]", new Blob([new Uint8Array(kitchenBuffer)], { type: "image/png" }), "kitchen.png");
-      for (const entry of textureEntries) {
-        fd.append("image[]", new Blob([new Uint8Array(entry.buffer)], { type: "image/jpeg" }), `texture_${entry.key}.jpg`);
-      }
-      return fd;
-    };
+    const formData = new FormData();
+    formData.append("model", "gpt-image-1");
+    formData.append("prompt", imagePrompt);
+    formData.append("size", outputSize);
+    // quality "low" : ~15-25s typique (vs ~30-40s en medium). Garantit qu'on
+    // tient confortablement dans Vercel maxDuration=60s même avec photos
+    // complexes. La fidélité couleur est préservée par le prompt strict.
+    formData.append("quality", "low");
 
-    /* Tentative unique avec son propre AbortController + timeout */
-    type AttemptResult = { res: Response | null; aborted: boolean; networkError: boolean };
-    const attemptOpenAI = async (quality: "medium" | "low", timeoutMs: number): Promise<AttemptResult> => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      try {
-        const res = await fetch("https://api.openai.com/v1/images/edits", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${apiKey}` },
-          body: buildFormData(quality),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-        return { res, aborted: false, networkError: false };
-      } catch (err) {
-        clearTimeout(timeoutId);
-        const isAbort = err instanceof Error && (err.name === "AbortError" || /aborted/i.test(err.message));
-        return { res: null, aborted: isAbort, networkError: !isAbort };
-      }
-    };
+    formData.append("image[]", new Blob([new Uint8Array(kitchenBuffer)], { type: "image/png" }), "kitchen.png");
+    for (const entry of textureEntries) {
+      formData.append("image[]", new Blob([new Uint8Array(entry.buffer)], { type: "image/jpeg" }), `texture_${entry.key}.jpg`);
+    }
 
     if (process.env.NODE_ENV !== "production") {
-      console.log(`[simulation] Sending ${1 + textureEntries.length} images to gpt-image-1 (prompt ${imagePrompt.length} chars)`);
+      console.log(`[simulation] Sending ${1 + textureEntries.length} images to gpt-image-1 quality=low (prompt ${imagePrompt.length} chars)`);
     }
 
-    /* ── Tentative 1 : quality "medium" — qualité optimale ── */
-    let attempt = await attemptOpenAI("medium", OPENAI_PRIMARY_TIMEOUT_MS);
-    let fallbackUsed = false;
+    /* AbortController pour timeout propre AVANT que Vercel kill la fonction. */
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
-    /* ── Retry quality "low" si timeout, erreur réseau, ou 5xx OpenAI ── */
-    const should5xxRetry = attempt.res !== null && attempt.res.status >= 500;
-    if (attempt.aborted || attempt.networkError || should5xxRetry) {
-      const reason = attempt.aborted ? "timeout" : attempt.networkError ? "network" : `${attempt.res?.status}`;
-      console.warn(`[simulation] Tentative 1 échouée (${reason}), retry avec quality=low`);
-      // On ne réutilise pas le body de la première réponse 5xx — on relance fresh
-      attempt = await attemptOpenAI("low", OPENAI_FALLBACK_TIMEOUT_MS);
-      fallbackUsed = true;
-    }
-
-    /* ── Bilan après éventuel retry ── */
-    if (attempt.aborted) {
-      console.error("[simulation] OpenAI timeout après les 2 tentatives");
-      return NextResponse.json(
-        {
-          error: "La génération a pris trop de temps. Réessayez avec une photo plus petite ou moins de zones à modifier.",
-          reason: "openai-timeout",
-        },
-        { status: 504, headers: rateLimitHeaders(rl) }
-      );
-    }
-    if (attempt.networkError) {
-      console.error("[simulation] OpenAI network error après les 2 tentatives");
+    let imageRes: Response;
+    try {
+      imageRes = await fetch("https://api.openai.com/v1/images/edits", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: formData,
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeoutId);
+      const isAbort = fetchErr instanceof Error && (fetchErr.name === "AbortError" || /aborted/i.test(fetchErr.message));
+      if (isAbort) {
+        console.error("[simulation] OpenAI timeout après", OPENAI_TIMEOUT_MS, "ms");
+        return NextResponse.json(
+          {
+            error: "La génération a pris trop de temps. Essayez avec une photo plus simple ou moins de zones à modifier.",
+            reason: "openai-timeout",
+          },
+          { status: 504, headers: rateLimitHeaders(rl) }
+        );
+      }
+      console.error("[simulation] OpenAI fetch error:", fetchErr);
       return NextResponse.json(
         { error: "Service de génération d'image indisponible. Réessayez dans un instant.", reason: "openai-network" },
         { status: 502, headers: rateLimitHeaders(rl) }
       );
     }
+    clearTimeout(timeoutId);
 
-    const imageRes = attempt.res!;
     if (!imageRes.ok) {
       const err = await imageRes.text().catch(() => "");
-      console.error(`[simulation] OpenAI HTTP ${imageRes.status} (fallback=${fallbackUsed}):`, err.slice(0, 500));
-      // Erreur OpenAI explicite (quota, content policy, etc.) → message utile
+      console.error(`[simulation] OpenAI HTTP ${imageRes.status}:`, err.slice(0, 500));
       const userMessage =
         imageRes.status === 429
           ? "Trop de requêtes vers le service IA. Réessayez dans une minute."
@@ -491,10 +468,6 @@ OUTPUT: One photorealistic image of this exact ${project.promptRoomType} with ON
         { error: userMessage, reason: "openai-error", status: imageRes.status },
         { status: 502, headers: rateLimitHeaders(rl) }
       );
-    }
-
-    if (fallbackUsed && process.env.NODE_ENV !== "production") {
-      console.log(`[simulation] Fallback quality=low utilisé avec succès`);
     }
 
     const imageData = await imageRes.json();
