@@ -16,8 +16,15 @@
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const PER_IP_LIMIT = Number(process.env.SIMULATION_DAILY_LIMIT_PER_IP || 5);
-const GLOBAL_LIMIT = Number(process.env.SIMULATION_DAILY_LIMIT_GLOBAL || 80);
+// 15 simulations/IP/jour : assez pour qu'un client teste plusieurs combinaisons
+// de textures sans se faire couper. Le compteur s'incrémente AUSSI sur les
+// échecs OpenAI (timeout, 5xx), donc rester généreux évite de pénaliser un
+// client honnête qui aurait un retry malheureux.
+//
+// Beaucoup de clients sont sur 4G ou réseaux mobiles (NAT partagé) : plusieurs
+// utilisateurs derrière la même IP publique. Limite à 5 était trop agressive.
+const PER_IP_LIMIT = Number(process.env.SIMULATION_DAILY_LIMIT_PER_IP || 15);
+const GLOBAL_LIMIT = Number(process.env.SIMULATION_DAILY_LIMIT_GLOBAL || 150);
 
 interface IpEntry {
   count: number;
