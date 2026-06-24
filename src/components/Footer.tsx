@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ZONES, getZoneSlug } from "@/data/zones";
 
 export default function Footer() {
   return (
@@ -39,7 +40,7 @@ export default function Footer() {
 
       {/* Footer content */}
       <div className="container-custom section-padding pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-3 mb-6">
@@ -139,6 +140,34 @@ export default function Footer() {
                   )}
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Zones d'intervention */}
+          <div>
+            <h3 className="font-display font-bold text-sm uppercase tracking-wider text-white mb-6">
+              Zones d&apos;intervention
+            </h3>
+            <ul className="space-y-3">
+              {ZONES.slice(0, 8).map((zone) => (
+                <li key={zone.slug}>
+                  <Link
+                    href={`/zones/${getZoneSlug(zone)}`}
+                    className="text-gris-400 hover:text-rouge transition-colors text-sm flex items-center gap-2 group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-rouge/50 group-hover:bg-rouge transition-colors" />
+                    Covering {zone.ville}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/zones"
+                  className="text-rouge hover:underline text-xs font-semibold flex items-center gap-1 mt-2"
+                >
+                  Toutes les zones →
+                </Link>
+              </li>
             </ul>
           </div>
 
