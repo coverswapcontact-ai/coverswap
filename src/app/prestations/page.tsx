@@ -6,7 +6,7 @@ import { ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Prestations Covering Montpellier & France — Cuisine, SDB, Meubles, Pro | CoverSwap",
+  title: { absolute: "Prestations Covering Montpellier & France — Cuisine, SDB, Meubles, Pro | CoverSwap" },
   description:
     "Toutes nos prestations de covering adhésif à Montpellier, Pérols, Hérault et France entière : cuisine, salle de bain, meubles, locaux pro, vitrages. Cover Styl', sans travaux, garanti 10 ans.",
   keywords:

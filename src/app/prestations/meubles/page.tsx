@@ -6,7 +6,7 @@ import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd"
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Meubles Montpellier & France | Relooking Mobilier Adhésif | CoverSwap",
+  title: { absolute: "Covering Meubles Montpellier & France | Relooking Mobilier Adhésif | CoverSwap" },
   description:
     "Donnez une seconde vie à vos meubles à Montpellier, Pérols ou partout en France avec le covering Cover Styl'. Commodes, buffets, bibliothèques, dressings. 497 références bois, marbre, couleurs. Garanti 10 ans.",
   keywords:

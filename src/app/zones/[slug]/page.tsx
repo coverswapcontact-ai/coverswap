@@ -30,7 +30,7 @@ export async function generateMetadata({
   const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: `covering ${zone.ville}, rénovation cuisine ${zone.ville}, covering adhésif ${zone.ville}, relooking meubles ${zone.ville}, film adhésif ${zone.ville}, Cover Styl ${zone.ville}, covering Hérault, covering Occitanie`,
     alternates: { canonical: url },

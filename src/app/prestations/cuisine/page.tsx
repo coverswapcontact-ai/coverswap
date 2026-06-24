@@ -6,7 +6,7 @@ import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd"
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Cuisine Montpellier & France | Relooking Plan de Travail Sans Travaux | CoverSwap",
+  title: { absolute: "Covering Cuisine Montpellier & France | Relooking Plan de Travail Sans Travaux | CoverSwap" },
   description:
     "Rénovez votre cuisine à Montpellier, Pérols ou partout en France en 1 journée avec le covering adhésif Cover Styl'. Plans de travail, crédences, façades de meubles. 497 références marbre, bois, béton. Garanti 10 ans. Devis gratuit sous 24h.",
   keywords:

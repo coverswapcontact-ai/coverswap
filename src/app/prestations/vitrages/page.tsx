@@ -6,7 +6,7 @@ import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd"
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Film pour Vitrage Montpellier & France | Solaire, Intimité, Sécurité | CoverSwap",
+  title: { absolute: "Film pour Vitrage Montpellier & France | Solaire, Intimité, Sécurité | CoverSwap" },
   description:
     "Films adhésifs vitrages à Montpellier, Pérols et partout en France : solaire, intimité, déco, sécurité anti-effraction. Bureaux, commerces, habitations. Pose pro Cover Styl'. Devis gratuit.",
   keywords:

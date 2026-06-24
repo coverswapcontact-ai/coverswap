@@ -6,7 +6,7 @@ import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd"
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Professionnel Montpellier & France | Comptoirs, Restaurants, Bureaux | CoverSwap",
+  title: { absolute: "Covering Professionnel Montpellier & France | Comptoirs, Restaurants, Bureaux | CoverSwap" },
   description:
     "Rénovez vos locaux pro à Montpellier, Pérols ou partout en France sans fermer. Comptoirs, réceptions, bureaux, hôtels, restaurants. Covering Cover Styl' posé en 1 nuit. Aux couleurs de votre marque.",
   keywords:

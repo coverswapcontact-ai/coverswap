@@ -6,7 +6,7 @@ import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd"
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Salle de Bain Montpellier & France | Film Adhésif Waterproof | CoverSwap",
+  title: { absolute: "Covering Salle de Bain Montpellier & France | Film Adhésif Waterproof | CoverSwap" },
   description: "Rénovez votre salle de bain à Montpellier, Pérols ou partout en France sans casser le carrelage. Film adhésif Cover Styl' waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit sous 48h.",
   keywords: "covering salle de bain Montpellier, film adhésif salle de bain Hérault, rénovation carrelage adhésif, film waterproof salle de bain Pérols, covering carrelage Occitanie, revêtement adhésif douche",
   alternates: { canonical: "https://coverswap.fr/prestations/salle-de-bain" },

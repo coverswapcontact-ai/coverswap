@@ -6,7 +6,7 @@ import { BreadcrumbSchema } from "@/components/JsonLd";
 import { ZONES, getZoneSlug } from "@/data/zones";
 
 export const metadata: Metadata = {
-  title: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie",
+  title: { absolute: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie" },
   description:
     "CoverSwap intervient à Montpellier, Pérols, Lattes, Mauguio, Castelnau-le-Lez, Béziers, Nîmes, Sète et dans toute la France. Découvrez nos prestations de covering adhésif Cover Styl' par ville.",
   keywords:
