@@ -337,7 +337,7 @@ const ProductCard = React.memo(function ProductCard({ item, onClick }: { item: R
       {/* Image */}
       <Image
         src={item.image}
-        alt={item.nom}
+        alt={`Revêtement adhésif Cover Styl' ${item.nom} (${familleLabel}, finition ${item.finition}) — référence ${item.id}`}
         fill
         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         loading="lazy"
@@ -412,7 +412,7 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
           )}
           <Image
             src={item.image}
-            alt={item.nom}
+            alt={`Revêtement adhésif Cover Styl' ${item.nom} en grand format — référence ${item.id}`}
             fill
             sizes="600px"
             quality={80}
