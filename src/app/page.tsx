@@ -11,17 +11,16 @@ import { SimulationSection, FAQSection } from "@/components/HomeClient";
    METADATA — SEO
 ────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  // Undefined pour que le title par défaut du layout s'applique
-  // (titre complet optimisé pour Google)
   title: {
-    absolute: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
+    absolute: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
   },
   description:
-    "Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis en 60s. À partir de 80 €/m² posé.",
+    "Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Covering adhésif premium Cover Styl' posé en 1 journée, garanti 10 ans. Simulation IA gratuite, devis sous 24h. À partir de 80 €/m².",
   openGraph: {
-    title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
+    title: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
     description:
-      "Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de 80 €/m² posé.",
+      "Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Pose Cover Styl' en 1 journée, garantie 10 ans. Simulation IA gratuite.",
+    url: "https://coverswap.fr",
     type: "website",
   },
   alternates: {

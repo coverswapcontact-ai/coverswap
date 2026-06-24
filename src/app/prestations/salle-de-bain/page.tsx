@@ -3,13 +3,27 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Salle de Bain | Film Adhésif Waterproof & Anti-Moisissures",
-  description: "Rénovez votre salle de bain sans casser le carrelage. Film adhésif waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit en 48h.",
-  keywords: "covering salle de bain, film adhésif salle de bain, rénovation carrelage adhésif, film waterproof salle de bain, covering carrelage, revêtement adhésif douche",
-  alternates: {
-    canonical: "https://coverswap.fr/prestations/salle-de-bain",
+  title: "Covering Salle de Bain Montpellier & France | Film Adhésif Waterproof | CoverSwap",
+  description: "Rénovez votre salle de bain à Montpellier, Pérols ou partout en France sans casser le carrelage. Film adhésif Cover Styl' waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit sous 48h.",
+  keywords: "covering salle de bain Montpellier, film adhésif salle de bain Hérault, rénovation carrelage adhésif, film waterproof salle de bain Pérols, covering carrelage Occitanie, revêtement adhésif douche",
+  alternates: { canonical: "https://coverswap.fr/prestations/salle-de-bain" },
+  openGraph: {
+    title: "Covering Salle de Bain Montpellier & France — Sans casser le carrelage | CoverSwap",
+    description: "Rénovation SDB à Montpellier, Pérols, Hérault. Film adhésif Cover Styl' waterproof, garanti 10 ans, pose en 1 journée.",
+    url: "https://coverswap.fr/prestations/salle-de-bain",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [{ url: "https://coverswap.fr/og-image.jpg", width: 1200, height: 630, alt: "Covering salle de bain Cover Styl' à Montpellier — rénovation sans casser le carrelage" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Covering SDB Montpellier — Sans casser le carrelage",
+    description: "Film adhésif Cover Styl' waterproof, garanti 10 ans, pose en 1 journée.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -95,10 +109,7 @@ export default function SalleDeBainPage() {
         />
         <div className="absolute top-1/3 left-0 w-[500px] h-[500px] rounded-full bg-rouge/5 blur-[100px]" />
         <div className="container-custom relative z-20">
-          <Link href="/prestations" className="inline-flex items-center gap-2 text-gris-400 hover:text-white transition-colors mb-8 text-sm">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
-            Toutes les prestations
-          </Link>
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations", href: "/prestations" }, { label: "Covering Salle de bain" }]} />
           <ScrollReveal>
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">Covering Salle de Bain</span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold mb-6 tracking-tight max-w-3xl">

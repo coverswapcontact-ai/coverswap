@@ -3,15 +3,29 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Meuble | Relooking Mobilier Adhésif Bois, Marbre & Couleurs",
+  title: "Covering Meubles Montpellier & France | Relooking Mobilier Adhésif | CoverSwap",
   description:
-    "Donnez une seconde vie à vos meubles avec le covering adhésif. Commodes, buffets, bibliothèques, tables. Effets bois, marbre, couleurs unies. Résultat pro garanti 10 ans.",
+    "Donnez une seconde vie à vos meubles à Montpellier, Pérols ou partout en France avec le covering Cover Styl'. Commodes, buffets, bibliothèques, dressings. 497 références bois, marbre, couleurs. Garanti 10 ans.",
   keywords:
-    "covering meuble, relooking meuble adhésif, film adhésif meuble, rénovation meuble sans poncer, covering mobilier, habillage meuble adhésif",
-  alternates: {
-    canonical: "https://coverswap.fr/prestations/meubles",
+    "covering meuble Montpellier, relooking meuble adhésif Hérault, film adhésif meuble Pérols, rénovation meuble sans poncer, covering mobilier Occitanie, habillage meuble adhésif",
+  alternates: { canonical: "https://coverswap.fr/prestations/meubles" },
+  openGraph: {
+    title: "Covering Meubles Montpellier & France — Relooking mobilier | CoverSwap",
+    description: "Seconde vie à vos meubles avec le covering Cover Styl'. 497 références, garanti 10 ans, pose pro.",
+    url: "https://coverswap.fr/prestations/meubles",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [{ url: "https://coverswap.fr/og-image.jpg", width: 1200, height: 630, alt: "Covering meubles Cover Styl' à Montpellier — relooking mobilier" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Covering Meubles Montpellier — Relooking mobilier",
+    description: "Seconde vie à vos meubles avec le covering Cover Styl'. Garanti 10 ans.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -248,7 +262,7 @@ const faqs = [
 const stats = [
   { value: "10 ans", label: "de durabilité garantie" },
   { value: "0", label: "ponçage nécessaire" },
-  { value: "50+", label: "textures disponibles" },
+  { value: "497", label: "références Cover Styl'" },
   { value: "100%", label: "réversible" },
 ];
 
@@ -273,15 +287,7 @@ export default function MeublesPage() {
         />
         <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full bg-rouge/5 blur-[100px]" />
         <div className="container-custom relative z-20">
-          <Link
-            href="/prestations"
-            className="inline-flex items-center gap-2 text-gris-400 hover:text-white transition-colors mb-8 text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Toutes les prestations
-          </Link>
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations", href: "/prestations" }, { label: "Covering Meubles" }]} />
           <ScrollReveal>
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">
               Covering Meubles

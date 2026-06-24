@@ -127,7 +127,7 @@ export function SimulationSection() {
 
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-gris-300 text-lg md:text-xl leading-relaxed">
-              Uploadez une photo (cuisine, salle de bain, meubles, murs…). Choisissez parmi <strong className="text-white">près de 500 textures</strong>.
+              Uploadez une photo (cuisine, salle de bain, meubles, murs…). Choisissez parmi <strong className="text-white">497 références Cover Styl&apos;</strong>.
               Notre IA génère un rendu photoréaliste en moins d&apos;une minute.
               <br className="hidden sm:block" />
               <span className="text-white font-medium">Sans email. Sans téléphone. Gratuit.</span>
@@ -360,7 +360,7 @@ export function SimulationSection() {
             {
               num: "02",
               title: "Texture",
-              desc: "Choisissez parmi près de 500 revêtements Cover Styl'",
+              desc: "Choisissez parmi 497 références Cover Styl'",
               icon: (
                 <path
                   strokeLinecap="round"

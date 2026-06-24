@@ -1,46 +1,77 @@
 import {
-  LocalBusinessJsonLd,
   FAQJsonLd,
-  ArticleJsonLd,
   OrganizationJsonLd,
   BreadcrumbJsonLd,
 } from "next-seo";
 
 /* ──────────────────────────────────────────────────────────────────
-   LOCAL BUSINESS — schema.org/LocalBusiness
-   Utilisé dans layout.tsx (site-wide)
+   LOCAL BUSINESS — schema.org/HomeAndConstructionBusiness
+   Utilisé dans layout.tsx (site-wide).
+   Custom JSON-LD car next-seo ne supporte pas areaServed avec
+   un mix City + AdministrativeArea + Country (objet structuré).
 ────────────────────────────────────────────────────────────────── */
+const LOCAL_BUSINESS_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  "@id": "https://coverswap.fr",
+  name: "CoverSwap",
+  description:
+    "Rénovation intérieure par revêtements adhésifs Cover Styl'. Covering cuisine, salle de bain, meubles, vitrages et surfaces professionnelles. Pose en 1 journée, garantie 10 ans, simulation IA gratuite. Intervention Montpellier, Pérols, Hérault, Occitanie et France entière.",
+  url: "https://coverswap.fr",
+  telephone: "+33670352869",
+  email: "contact@coverswap.fr",
+  priceRange: "€€",
+  slogan: "Rénovation adhésive premium",
+  image: ["https://coverswap.fr/og-image.jpg"],
+  logo: "https://coverswap.fr/logo.png",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "73 rue Simone Veil",
+    addressLocality: "Pérols",
+    postalCode: "34470",
+    addressRegion: "Occitanie",
+    addressCountry: "FR",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 43.5275,
+    longitude: 3.9528,
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      opens: "08:00",
+      closes: "17:00",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    },
+  ],
+  areaServed: [
+    { "@type": "City", name: "Montpellier" },
+    { "@type": "City", name: "Pérols" },
+    { "@type": "City", name: "Lattes" },
+    { "@type": "City", name: "Mauguio" },
+    { "@type": "City", name: "Castelnau-le-Lez" },
+    { "@type": "City", name: "Béziers" },
+    { "@type": "City", name: "Nîmes" },
+    { "@type": "City", name: "Sète" },
+    { "@type": "AdministrativeArea", name: "Hérault" },
+    { "@type": "AdministrativeArea", name: "Occitanie" },
+    { "@type": "Country", name: "France" },
+  ],
+  sameAs: [
+    "https://www.instagram.com/cover.swap/",
+    "https://www.facebook.com/coverswap",
+    "https://www.tiktok.com/@cover.swap",
+    "https://www.linkedin.com/company/coverswap",
+  ],
+};
+
 export function LocalBusinessSchema() {
   return (
-    <LocalBusinessJsonLd
-      scriptKey="coverswap-local-business"
-      type="HomeAndConstructionBusiness"
-      name="CoverSwap"
-      description="Rénovation intérieure par revêtements adhésifs texturés. Covering cuisine, salle de bain, meubles et surfaces professionnelles. Intervention France entière."
-      url="https://coverswap.fr"
-      telephone="+33670352869"
-      address={{
-        streetAddress: "73 rue Simone Veil",
-        addressLocality: "Pérols",
-        postalCode: "34470",
-        addressCountry: "FR",
-      }}
-      geo={{
-        latitude: 43.5275,
-        longitude: 3.9528,
-      }}
-      image={["https://coverswap.fr/og-image.jpg"]}
-      openingHoursSpecification={[
-        {
-          opens: "08:00",
-          closes: "17:00",
-          dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        },
-      ]}
-      priceRange="€€"
-      areaServed={["France"]}
-      email="contact@coverswap.fr"
-      slogan="Rénovation adhésive premium"
+    <script
+      type="application/ld+json"
+      id="coverswap-local-business"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(LOCAL_BUSINESS_SCHEMA) }}
     />
   );
 }

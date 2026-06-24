@@ -3,15 +3,29 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Professionnel | Comptoirs, Restaurants, Hôtels & Bureaux",
+  title: "Covering Professionnel Montpellier & France | Comptoirs, Restaurants, Bureaux | CoverSwap",
   description:
-    "Rénovez vos locaux professionnels sans fermer. Comptoirs de bar, réceptions, bureaux, hôtels. Covering adhésif posé en 1 nuit. Personnalisation aux couleurs de votre marque.",
+    "Rénovez vos locaux pro à Montpellier, Pérols ou partout en France sans fermer. Comptoirs, réceptions, bureaux, hôtels, restaurants. Covering Cover Styl' posé en 1 nuit. Aux couleurs de votre marque.",
   keywords:
-    "covering professionnel, habillage comptoir bar, covering restaurant, rénovation hôtel adhésif, covering bureau, film adhésif professionnel",
-  alternates: {
-    canonical: "https://coverswap.fr/prestations/professionnel",
+    "covering professionnel Montpellier, habillage comptoir bar Hérault, covering restaurant Pérols, rénovation hôtel adhésif Occitanie, covering bureau, film adhésif professionnel France",
+  alternates: { canonical: "https://coverswap.fr/prestations/professionnel" },
+  openGraph: {
+    title: "Covering Pro Montpellier & France — Sans fermer vos locaux | CoverSwap",
+    description: "Rénovation pro en 1 nuit à Montpellier, Pérols. Comptoirs, bureaux, hôtels, restaurants. Cover Styl' aux couleurs de votre marque.",
+    url: "https://coverswap.fr/prestations/professionnel",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [{ url: "https://coverswap.fr/og-image.jpg", width: 1200, height: 630, alt: "Covering professionnel Cover Styl' à Montpellier — comptoirs, bureaux, restaurants" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Covering Pro Montpellier — Sans fermer vos locaux",
+    description: "Comptoirs, bureaux, hôtels. Cover Styl' aux couleurs de votre marque.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -151,15 +165,7 @@ export default function ProfessionnelPage() {
         />
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] rounded-full bg-rouge/5 blur-[100px]" />
         <div className="container-custom relative z-20">
-          <Link
-            href="/prestations"
-            className="inline-flex items-center gap-2 text-gris-400 hover:text-white transition-colors mb-8 text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Toutes les prestations
-          </Link>
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations", href: "/prestations" }, { label: "Covering Professionnel" }]} />
           <ScrollReveal>
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">
               Covering Professionnel

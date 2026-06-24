@@ -3,15 +3,39 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Covering Cuisine | Relooking Plan de Travail & Meubles Sans Travaux",
+  title: "Covering Cuisine Montpellier & France | Relooking Plan de Travail Sans Travaux | CoverSwap",
   description:
-    "Rénovez votre cuisine en 1 journée avec le covering adhésif. Plans de travail, crédences, façades de meubles. 50+ textures marbre, bois, béton. Garanti 10 ans. Devis gratuit.",
+    "Rénovez votre cuisine à Montpellier, Pérols ou partout en France en 1 journée avec le covering adhésif Cover Styl'. Plans de travail, crédences, façades de meubles. 497 références marbre, bois, béton. Garanti 10 ans. Devis gratuit sous 24h.",
   keywords:
-    "covering cuisine, relooking cuisine sans travaux, film adhésif plan de travail, rénovation cuisine adhésif, covering plan de travail, covering meuble cuisine, revêtement adhésif cuisine",
+    "covering cuisine Montpellier, relooking cuisine sans travaux Hérault, film adhésif plan de travail, rénovation cuisine adhésif Pérols, covering plan de travail, covering meuble cuisine, revêtement adhésif cuisine Occitanie",
   alternates: {
     canonical: "https://coverswap.fr/prestations/cuisine",
+  },
+  openGraph: {
+    title: "Covering Cuisine Montpellier & France — Relooking sans travaux | CoverSwap",
+    description:
+      "Rénovation cuisine en 1 journée à Montpellier, Pérols et partout en France. 497 références Cover Styl', garanti 10 ans. Devis gratuit.",
+    url: "https://coverswap.fr/prestations/cuisine",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [
+      {
+        url: "https://coverswap.fr/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Covering cuisine Cover Styl' — rénovation sans travaux à Montpellier et en France",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Covering Cuisine Montpellier — Relooking sans travaux",
+    description: "Cuisine rénovée en 1 journée. 497 références Cover Styl'. Garantie 10 ans.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -139,7 +163,7 @@ const steps = [
     num: "02",
     title: "Choix des finitions",
     description:
-      "Sélectionnez vos textures parmi 50+ références. Nous vous envoyons des échantillons physiques pour valider couleurs et toucher.",
+      "Sélectionnez vos textures parmi 497 références Cover Styl'. Nous vous envoyons des échantillons physiques pour valider couleurs et toucher.",
   },
   {
     num: "03",
@@ -172,7 +196,7 @@ const comparatif = [
   { critere: "Poussière / Bruit", covering: "Aucun", classique: "Important" },
   { critere: "Déménagement nécessaire", covering: "Non", classique: "Souvent oui" },
   { critere: "Durabilité", covering: "7 à 10 ans garanti", classique: "15 à 20 ans" },
-  { critere: "Personnalisation", covering: "50+ textures, changeable", classique: "Limitée au choix initial" },
+  { critere: "Personnalisation", covering: "497 références Cover Styl', changeable", classique: "Limitée au choix initial" },
   { critere: "Impact écologique", covering: "Minimal (0 déchet)", classique: "Élevé (démolition, transport)" },
 ];
 
@@ -198,15 +222,13 @@ export default function CuisinePage() {
         <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full bg-rouge/5 blur-[100px]" />
         <div className="container-custom relative z-20">
           <ScrollReveal direction="fade">
-            <Link
-              href="/prestations"
-              className="inline-flex items-center gap-2 text-gris-400 hover:text-white transition-colors mb-8 text-sm"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-              </svg>
-              Toutes les prestations
-            </Link>
+            <Breadcrumb
+              items={[
+                { label: "Accueil", href: "/" },
+                { label: "Prestations", href: "/prestations" },
+                { label: "Covering Cuisine" },
+              ]}
+            />
           </ScrollReveal>
 
           <ScrollReveal direction="up">
@@ -324,7 +346,7 @@ export default function CuisinePage() {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-4">
-              Près de 500 textures pour <span className="text-rouge">votre style</span>
+              497 références Cover Styl&apos; pour <span className="text-rouge">votre style</span>
             </h2>
             <p className="text-gris-400 text-center max-w-2xl mx-auto mb-16">
               Chaque finition est sélectionnée pour son réalisme, sa durabilité et sa résistance aux contraintes
@@ -449,7 +471,7 @@ export default function CuisinePage() {
                 </div>
                 <div className="text-center lg:text-left flex-1">
                   <h3 className="font-display text-2xl font-bold mb-2">
-                    Explorez notre catalogue de <span className="text-rouge">près de 500 finitions</span> pour votre cuisine
+                    Explorez notre catalogue de <span className="text-rouge">497 références Cover Styl&apos;</span> pour votre cuisine
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
                     Parcourez notre catalogue complet de 497 références Cover Styl&apos; : marbre, bois, béton, métal et bien plus. Trouvez la finition parfaite pour chaque surface de votre cuisine.

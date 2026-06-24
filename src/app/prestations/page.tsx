@@ -3,15 +3,29 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Nos Prestations | Covering Cuisine, Salle de Bain, Meubles & Pro",
+  title: "Prestations Covering Montpellier & France — Cuisine, SDB, Meubles, Pro | CoverSwap",
   description:
-    "Découvrez toutes nos prestations de covering adhésif : cuisine, salle de bain, meubles, locaux professionnels et vitrages. Rénovation intérieure sans travaux, garantie 10 ans.",
+    "Toutes nos prestations de covering adhésif à Montpellier, Pérols, Hérault et France entière : cuisine, salle de bain, meubles, locaux pro, vitrages. Cover Styl', sans travaux, garanti 10 ans.",
   keywords:
-    "prestations covering, rénovation adhésive, covering intérieur, services covering, rénovation sans travaux",
-  alternates: {
-    canonical: "https://coverswap.fr/prestations",
+    "prestations covering Montpellier, rénovation adhésive Hérault, covering intérieur Pérols, services covering Occitanie, rénovation sans travaux France",
+  alternates: { canonical: "https://coverswap.fr/prestations" },
+  openGraph: {
+    title: "Prestations Covering Montpellier & France — Cuisine, SDB, Meubles, Pro | CoverSwap",
+    description: "Covering Cover Styl' à Montpellier, Pérols, Hérault et France entière. Cuisine, SDB, meubles, pro, vitrages.",
+    url: "https://coverswap.fr/prestations",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [{ url: "https://coverswap.fr/og-image.jpg", width: 1200, height: 630, alt: "Prestations covering Cover Styl' à Montpellier" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Prestations Covering Montpellier — Cuisine, SDB, Meubles, Pro",
+    description: "Covering Cover Styl' sans travaux, garanti 10 ans.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -87,7 +101,7 @@ const trustReasons = [
   {
     icon: "\u2B50",
     title: "Films Cover Styl' premium",
-    description: "Marque leader mondial du covering architectural, près de 500 références.",
+    description: "Marque leader mondial du covering architectural, 497 références au catalogue.",
   },
   {
     icon: "\uD83D\uDCE9",
@@ -154,6 +168,9 @@ export default function PrestationsPage() {
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-rouge/5 blur-[100px]" />
 
         <div className="container-custom relative z-20 text-center max-w-4xl mx-auto">
+          <div className="text-left">
+            <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations" }]} />
+          </div>
           <ScrollReveal direction="fade">
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">
               Nos prestations
@@ -339,7 +356,7 @@ export default function PrestationsPage() {
               className="block mt-12 glass-card p-8 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group text-center"
             >
               <h3 className="font-display text-2xl font-bold mb-2">
-                Catalogue de <span className="text-rouge">près de 500 références</span> Cover&nbsp;Styl&rsquo;
+                Catalogue de <span className="text-rouge">497 références</span> Cover&nbsp;Styl&rsquo;
               </h3>
               <p className="text-gris-400 mb-4 max-w-xl mx-auto">
                 Bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies, cuir&hellip; Parcourez l&rsquo;int&eacute;gralit&eacute; de notre catalogue pour trouver la finition id&eacute;ale.

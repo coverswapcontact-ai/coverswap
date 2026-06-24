@@ -3,15 +3,29 @@ import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import ScrollReveal from "@/components/ScrollReveal";
 import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "Film pour Vitrage | Film Solaire, Intimité & Sécurité",
+  title: "Film pour Vitrage Montpellier & France | Solaire, Intimité, Sécurité | CoverSwap",
   description:
-    "Films adhésifs pour vitrages : protection solaire, intimité, décoration, sécurité anti-effraction. Bureaux, commerces, habitations. Pose professionnelle. Devis gratuit.",
+    "Films adhésifs vitrages à Montpellier, Pérols et partout en France : solaire, intimité, déco, sécurité anti-effraction. Bureaux, commerces, habitations. Pose pro Cover Styl'. Devis gratuit.",
   keywords:
-    "film vitrage, film solaire vitres, film intimité, film anti-chaleur, film décoratif vitrage, film sécurité vitres, covering vitrage",
-  alternates: {
-    canonical: "https://coverswap.fr/prestations/vitrages",
+    "film vitrage Montpellier, film solaire vitres Hérault, film intimité Pérols, film anti-chaleur, film décoratif vitrage Occitanie, film sécurité vitres, covering vitrage France",
+  alternates: { canonical: "https://coverswap.fr/prestations/vitrages" },
+  openGraph: {
+    title: "Films Vitrages Montpellier & France — Solaire, Intimité, Sécurité | CoverSwap",
+    description: "Films adhésifs vitrages à Montpellier, Pérols. Solaire, intimité, sécurité. Pose pro Cover Styl'.",
+    url: "https://coverswap.fr/prestations/vitrages",
+    type: "website",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    images: [{ url: "https://coverswap.fr/og-image.jpg", width: 1200, height: 630, alt: "Films pour vitrage Cover Styl' à Montpellier — solaire, intimité, sécurité" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Films Vitrages Montpellier — Solaire, Intimité, Sécurité",
+    description: "Films adhésifs vitrages à Montpellier. Pose pro Cover Styl'.",
+    images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
@@ -197,15 +211,7 @@ export default function VitragesPage() {
         />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-rouge/5 blur-[100px]" />
         <div className="container-custom relative z-20">
-          <Link
-            href="/prestations"
-            className="inline-flex items-center gap-2 text-gris-400 hover:text-white transition-colors mb-8 text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-            </svg>
-            Toutes les prestations
-          </Link>
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations", href: "/prestations" }, { label: "Films Vitrages" }]} />
           <ScrollReveal>
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">
               Films pour Vitrages
