@@ -36,12 +36,14 @@ export function describeElement(
   }
 
   const isSolidColor = el.famille === "couleur";
+  const swatchRef = imageIndex !== null ? imageIndex + 2 : "?";
   const colorEmphasis = isSolidColor
-    ? `🎯 EXACT SOLID COLOR REQUIRED — "${el.name}". This is a flat, uniform color (no texture, no pattern, no grain). The output color MUST exactly match "${el.name}" sampled from IMAGE ${imageIndex !== null ? imageIndex + 2 : "?"}. Do NOT lighten, darken, desaturate, or stylize. The color hex value visible on the swatch is the ONLY acceptable color.`
-    : `🎯 EXACT MATERIAL REQUIRED — "${el.name}" (${el.famille}${el.categorie ? ", " + el.categorie : ""}${el.finition ? ", " + el.finition + " finish" : ""}). The exact texture, color, and pattern MUST be sampled from the swatch image — do not interpret loosely.`;
+    ? `🎯 EXACT SOLID COLOR — "${el.name}". Flat, uniform color: no texture, no grain, no pattern. Reproduce the EXACT color of swatch IMAGE ${swatchRef} — same hue, same saturation, same lightness. The surface will naturally carry the room's existing light and shadow, but its BASE color MUST equal the swatch. Do NOT bend it toward the room's white balance / color temperature, do NOT tint, lighten, darken, desaturate or stylize. Placed side by side, the swatch and the result must read as the IDENTICAL color.`
+    : `🎯 EXACT MATERIAL — "${el.name}" (${el.famille}${el.categorie ? ", " + el.categorie : ""}${el.finition ? ", " + el.finition + " finish" : ""}). Sample the texture, color, grain and veining DIRECTLY from swatch IMAGE ${swatchRef}. Match its exact color and pattern scale — do not interpret loosely, do not shift the hue toward the room's lighting.`;
 
   const lines = [
     `${label}: ✅ APPLY Cover Styl' ref. ${el.ref} — "${el.name}"`,
+    `  📐 COVERAGE — Apply to ALL surfaces of this type ("${label}") visible in the photo, WITHOUT EXCEPTION: every individual door, drawer front, panel and section — upper, lower, tall and partially-visible ones at the edges of the frame included. Do NOT leave a single matching surface in its original material; consistency across all of them is mandatory.`,
     `  ${colorEmphasis}`,
     el.tags?.length ? `  Visual traits: ${el.tags.join(", ")}` : null,
     imageIndex !== null
@@ -98,12 +100,14 @@ The output MUST be the exact same photograph as IMAGE 1. Think of it as a "find 
 - If the original photo shows a wall on the left edge, the output must show that same wall at the same position
 
 🔒 RULE 2 — ABSOLUTE STRUCTURAL PRESERVATION (project: ${project.label}):
-Every non-targeted element must remain pixel-identical. For this ${project.promptRoomType}, the following MUST stay 100% identical to IMAGE 1:
+Every non-targeted element must remain pixel-identical — reproduce it with the SAME pixels as IMAGE 1. This explicitly includes any people, faces, hands, clothing, objects, plants, decorations, appliances, flooring, ceiling, walls, windows and the view through them. For this ${project.promptRoomType}, the following MUST stay 100% identical to IMAGE 1:
 ${keepUntouchedList}
 
 🔒 RULE 3 — TEXTURE APPLICATION QUALITY (READ CAREFULLY):
 For surfaces marked with ✅:
 - 🎯 COLOR FIDELITY IS NON-NEGOTIABLE: sample the color DIRECTLY from the swatch image (same RGB pixel values). Do NOT shift hue, saturation, value, or brightness — even slightly. If the swatch shows pure black, the output must be pure black. If the swatch shows pale blue, the output must be that exact pale blue — not a "similar blue".
+- 🎯 NO COLOR-TEMPERATURE DRIFT: never bend the applied color toward the room's white balance or lighting tint. The surface receives the scene's light and shadow, but its underlying color stays exactly the swatch's color. A warm kitchen light must NOT turn a pure-white swatch into cream; a cool light must NOT turn it bluish.
+- 🎯 APPLY TO EVERY TARGETED SURFACE: when a surface type is marked ✅, treat ALL instances of it identically — do not cover only the most visible ones. Partial or inconsistent application is a failure.
 - 🎯 SOLID COLORS are uniform — no wood grain, no marble veining, no patterns. They are flat, even tones across the entire surface (only natural light/shadow variations from the original photo's lighting).
 - 🎯 NAMED COLORS: when the surface name is "Lacquered Black", "Sun Flower Yellow", "Midnight Blue" etc., the output color MUST clearly read as that name to a human observer. Do not desaturate or mute named colors.
 - Pattern: for textured materials (wood, marble, stone), replicate the grain/veining direction naturally. Wood grain should run horizontally on countertops and vertically on cabinet fronts (unless the swatch suggests otherwise)
