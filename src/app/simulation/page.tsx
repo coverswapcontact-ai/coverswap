@@ -657,45 +657,102 @@ export default function SimulationPage() {
       payload[`${el.key}_image`] = enabled ? sel.image : "";
     }
 
-    try {
+    const updateQuotaFrom = (data: Record<string, unknown>, res: Response) => {
+      const rl = data?.rateLimit as { limit: number; remaining: number; resetAt: number } | undefined;
+      if (rl) {
+        setQuota({ limit: rl.limit, remaining: rl.remaining, resetAt: rl.resetAt });
+        return;
+      }
+      const l = res.headers.get("X-RateLimit-Limit");
+      const r = res.headers.get("X-RateLimit-Remaining");
+      const t = res.headers.get("X-RateLimit-Reset");
+      if (l && r && t) setQuota({ limit: Number(l), remaining: Number(r), resetAt: Number(t) * 1000 });
+    };
+
+    const onSuccess = (image: string) => {
+      setResultImage(image);
+      track("simulation_generated", {
+        project_type: currentProject.id,
+        elements_count: Object.values(elements).filter((el) => el.enabled && el.ref).length,
+      });
+    };
+
+    // ── Chemin SYNCHRONE Vercel (/api/simulation) — défaut + fallback ──
+    const runSyncPath = async () => {
       const res = await fetch("/api/simulation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       const data = await res.json();
+      updateQuotaFrom(data, res);
+      if (!res.ok) {
+        setError(data.error || "Une erreur est survenue.");
+        track("simulation_failed", { status: res.status, reason: data?.reason || "unknown" });
+        return;
+      }
+      onSuccess(data.image || data.result_url || data.photo_url || null);
+    };
 
-      // Mise à jour du compteur de quota depuis la réponse
-      if (data?.rateLimit) {
-        setQuota({ limit: data.rateLimit.limit, remaining: data.rateLimit.remaining, resetAt: data.rateLimit.resetAt });
-      } else {
-        const limitHeader = res.headers.get("X-RateLimit-Limit");
-        const remainingHeader = res.headers.get("X-RateLimit-Remaining");
-        const resetHeader = res.headers.get("X-RateLimit-Reset");
-        if (limitHeader && remainingHeader && resetHeader) {
-          setQuota({
-            limit: Number(limitHeader),
-            remaining: Number(remainingHeader),
-            resetAt: Number(resetHeader) * 1000,
+    // ── Chemin RAILWAY (sans plafond 60s) : prepare (Vercel) → génération (Railway) ──
+    // Activé uniquement si NEXT_PUBLIC_SIMULATE_URL est défini. Sinon, on reste
+    // sur le chemin synchrone historique → aucune régression possible.
+    const SIMULATE_URL = process.env.NEXT_PUBLIC_SIMULATE_URL;
+
+    try {
+      if (SIMULATE_URL) {
+        try {
+          const prep = await fetch("/api/simulation/prepare", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
           });
+          const prepData = await prep.json();
+          updateQuotaFrom(prepData, prep);
+
+          // Quota atteint : message clair, pas de fallback (le sync échouerait aussi).
+          if (prep.status === 429) {
+            setError(prepData.error || "Quota de simulations atteint pour aujourd'hui.");
+            track("simulation_failed", { status: 429, reason: prepData?.reason || "quota" });
+            return;
+          }
+
+          if (prep.ok && prepData.prompt && prepData.sig) {
+            // Génération lourde sur Railway — le navigateur attend (pas de cap).
+            const gen = await fetch(SIMULATE_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                prompt: prepData.prompt,
+                swatchUrls: prepData.swatchUrls,
+                sig: prepData.sig,
+                exp: prepData.exp,
+                photo_base64: preview,
+              }),
+            });
+            const genData = await gen.json();
+            if (gen.ok && genData.image) {
+              onSuccess(genData.image);
+              return;
+            }
+            // Génération Railway échouée APRÈS un prepare réussi : le lead est
+            // déjà enregistré (prepare l'a créé). On ne refait PAS le chemin sync
+            // (éviterait un double lead + double conso quota). Message rassurant.
+            setError(
+              genData.error ||
+                "Nos serveurs de génération sont très sollicités. Votre demande est bien enregistrée — nous vous recontactons très vite avec votre simulation."
+            );
+            track("simulation_failed", { status: gen.status, reason: genData?.reason || "railway-gen-failed" });
+            return;
+          }
+          // prepare a renvoyé 503 (non configuré) ou une erreur → on bascule sync.
+        } catch {
+          // Erreur réseau sur le chemin Railway → on bascule sur le sync.
         }
       }
 
-      if (!res.ok) {
-        setError(data.error || "Une erreur est survenue.");
-        track("simulation_failed", {
-          status: res.status,
-          reason: data?.reason || "unknown",
-        });
-        return;
-      }
-
-      setResultImage(data.image || data.result_url || data.photo_url || null);
-      track("simulation_generated", {
-        project_type: currentProject.id,
-        elements_count: Object.values(elements).filter((el) => el.enabled && el.ref).length,
-      });
+      // Défaut (SIMULATE_URL absent) ou fallback (chemin Railway indisponible).
+      await runSyncPath();
     } catch {
       setError("Service indisponible. Veuillez réessayer.");
       track("simulation_failed", { reason: "network" });
