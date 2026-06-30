@@ -20,8 +20,14 @@ export const dynamic = "force-dynamic";
 // Pourquoi medium en premier : ~80% des requêtes passent en medium sans timeout,
 // avec meilleure qualité visuelle. Le fallback low ne se déclenche que pour les
 // rares photos complexes ou les pics de latence OpenAI.
-const ATTEMPT_1_TIMEOUT_MS = 35_000;
-const ATTEMPT_2_TIMEOUT_MS = 18_000;
+// Budget temps TOTAL alloué à OpenAI avant qu'on rende la main proprement
+// (Vercel Hobby kill à 60s). On garde 7s de marge pour le download des swatches
+// + la sérialisation de la réponse.
+const TOTAL_OPENAI_BUDGET_MS = 53_000;
+// On ne relance une 2e tentative QUE si l'échec est rapide (5xx/réseau, pas un
+// timeout) ET qu'il reste assez de budget. Sinon, sur OpenAI lent, on laisse le
+// 1er essai utiliser tout le budget.
+const MIN_RETRY_BUDGET_MS = 20_000;
 
 function getClientIp(req: NextRequest): string {
   return (
@@ -477,15 +483,29 @@ OUTPUT: One photorealistic image of this exact ${project.promptRoomType} with ON
     }
 
     /* ══════════════════════════════════════════════════════════════
-       STEP 4: Stratégie multi-tentatives.
-       Tentative 1 : medium (qualité optimale)
-       Tentative 2 (si timeout/5xx/429) : low (fallback rapide)
-       Si user error (4xx hors 429) : abandon immédiat.
-    ══════════════════════════════════════════════════════════════ */
-    let attempt = await attemptOpenAI("medium", ATTEMPT_1_TIMEOUT_MS);
+       STEP 4: Stratégie single-shot "low" + budget dynamique.
 
+       gpt-image-1 quality "low" est le plus rapide (~15-26s typique) tout en
+       restant photoréaliste (la fidélité couleur vient du prompt strict, pas
+       du niveau de qualité). On lui donne TOUT le budget restant (≈53s) en un
+       seul essai → maximise les chances de finir avant le kill Vercel 60s.
+
+       On ne relance une 2e fois QUE si le 1er essai échoue VITE et SANS être un
+       timeout (ex: 5xx ou blip réseau OpenAI) ET qu'il reste assez de budget.
+       Sur OpenAI lent (timeout), pas de retry : ça ne ferait que rebrûler du
+       temps qu'on n'a pas.
+
+       L'ancienne stratégie medium(35s)→low(18s) gaspillait 35s sur un medium
+       qui timeout quand OpenAI est congestionné, ne laissant que 18s au low →
+       double échec = 504. C'est exactement ce qui faisait perdre des clients.
+    ══════════════════════════════════════════════════════════════ */
+    const genStart = Date.now();
+    const remainingBudget = () => TOTAL_OPENAI_BUDGET_MS - (Date.now() - genStart);
+
+    let attempt = await attemptOpenAI("low", remainingBudget());
+
+    // Photo refusée par OpenAI (4xx hors 429) : retry inutile, abandon immédiat.
     if (!attempt.ok && attempt.isUserError) {
-      // Photo refusée par OpenAI : pas la peine de retry
       const userMessage =
         attempt.status === 400
           ? "L'IA a refusé cette photo (probablement trop sombre, floue ou non conforme). Essayez une autre photo bien éclairée."
@@ -496,19 +516,23 @@ OUTPUT: One photorealistic image of this exact ${project.promptRoomType} with ON
       );
     }
 
-    if (!attempt.ok) {
-      // Timeout ou 5xx / 429 → fallback low quality
-      console.log(`[simulation] Tentative 1 échouée (${attempt.isTimeout ? "timeout" : "status " + attempt.status}), retry quality=low`);
-      attempt = await attemptOpenAI("low", ATTEMPT_2_TIMEOUT_MS);
+    // Échec RAPIDE non-timeout (5xx/réseau/réponse vide) + budget suffisant → 1 retry.
+    if (!attempt.ok && !attempt.isTimeout && remainingBudget() > MIN_RETRY_BUDGET_MS) {
+      console.log(`[simulation] Échec rapide (status ${attempt.status ?? "?"}), retry low — budget restant ${Math.round(remainingBudget() / 1000)}s`);
+      attempt = await attemptOpenAI("low", remainingBudget());
     }
 
     if (!attempt.ok) {
-      console.error("[simulation] Les 2 tentatives ont échoué");
-      const userMessage = attempt.isTimeout
-        ? "La génération a pris trop de temps. Essayez avec une photo plus simple ou moins de zones à modifier."
-        : "Service de génération d'image indisponible. Réessayez dans un instant.";
+      console.error(`[simulation] Génération échouée (${attempt.isTimeout ? "timeout" : "status " + attempt.status})`);
+      // Le lead + la photo sont DÉJÀ enregistrés dans le CRM (pushLeadToCrm au
+      // début). On ne perd donc jamais le contact : message rassurant orienté
+      // conversion plutôt qu'un "Oups erreur" sec.
       return NextResponse.json(
-        { error: userMessage, reason: attempt.isTimeout ? "openai-timeout" : "openai-error" },
+        {
+          error:
+            "Nos serveurs de génération sont très sollicités à l'instant. Bonne nouvelle : votre demande est bien enregistrée — nous vous recontactons très vite avec votre simulation. Vous pouvez aussi réessayer dans un instant.",
+          reason: attempt.isTimeout ? "openai-timeout" : "openai-error",
+        },
         { status: attempt.isTimeout ? 504 : 502, headers: rateLimitHeaders(rl) }
       );
     }
