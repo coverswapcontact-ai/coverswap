@@ -5,6 +5,7 @@ import Link from "next/link";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
+  { href: "/devis", label: "Devis en ligne", highlight: true },
   { href: "/simulation", label: "Simulation IA" },
   {
     href: "#realisations",
@@ -149,7 +150,11 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-gris-300 hover:text-white transition-colors relative group"
+                className={`px-4 py-2 text-sm font-medium transition-colors relative group ${
+                  "highlight" in link && link.highlight
+                    ? "text-rouge hover:text-white font-semibold"
+                    : "text-gris-300 hover:text-white"
+                }`}
               >
                 {link.label}
                 <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-rouge scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
@@ -257,7 +262,9 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="text-2xl font-display font-bold text-white hover:text-rouge transition-colors"
+              className={`text-2xl font-display font-bold transition-colors ${
+                "highlight" in link && link.highlight ? "text-rouge" : "text-white hover:text-rouge"
+              }`}
             >
               {link.label}
             </Link>

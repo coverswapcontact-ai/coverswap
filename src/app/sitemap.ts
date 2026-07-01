@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/simulation`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/devis`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/zones`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/prestations`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/prestations/cuisine`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
