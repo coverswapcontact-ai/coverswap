@@ -69,7 +69,7 @@ export default function DevisForm({
 }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoBusy, setPhotoBusy] = useState(false);
 
@@ -104,7 +104,7 @@ export default function DevisForm({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSending(true);
-    setError(false);
+    setError("");
 
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -131,7 +131,8 @@ export default function DevisForm({
         }),
       });
       if (!res.ok) {
-        setError(true);
+        const d = await res.json().catch(() => ({}));
+        setError(d?.error || "Une erreur est survenue. Veuillez réessayer.");
       } else {
         setSent(true);
         track("devis_form_submitted", {
@@ -144,7 +145,7 @@ export default function DevisForm({
         setPhotos([]);
       }
     } catch {
-      setError(true);
+      setError("Service indisponible. Veuillez réessayer.");
     } finally {
       setSending(false);
     }
@@ -308,7 +309,7 @@ export default function DevisForm({
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
-            Une erreur est survenue. Veuillez réessayer.
+            {error}
           </div>
         )}
 

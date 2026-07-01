@@ -17,7 +17,13 @@ setInterval(() => {
   }
 }, 15 * 60 * 1000);
 
-const FRENCH_MOBILE_RE = /^(?:\+33|0033|0)\s*[67](?:[\s.\-]?\d{2}){4}$/;
+// Validation téléphone volontairement PERMISSIVE : on préfère capturer un lead
+// avec un numéro fixe / étranger / légèrement mal formaté que de le rejeter.
+// On exige juste un nombre plausible de chiffres (9 à 15) pour bloquer le junk.
+function isPlausiblePhone(phone: string): boolean {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 9 && digits.length <= 15;
+}
 
 function getClientIp(req: NextRequest): string {
   return (
@@ -97,9 +103,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Le champ téléphone est requis." }, { status: 400 });
   }
 
-  if (!FRENCH_MOBILE_RE.test(phone)) {
+  if (!isPlausiblePhone(phone)) {
     return NextResponse.json(
-      { error: "Numéro de téléphone invalide. Utilisez un numéro mobile français (06/07)." },
+      { error: "Numéro de téléphone invalide. Vérifiez votre saisie (au moins 9 chiffres)." },
       { status: 400 }
     );
   }
