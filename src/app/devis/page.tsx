@@ -7,7 +7,7 @@ import { BreadcrumbSchema } from "@/components/JsonLd";
 export const metadata: Metadata = {
   title: { absolute: "Devis Covering en Ligne Gratuit — Réponse sous 24h | CoverSwap" },
   description:
-    "Demandez votre devis covering en ligne gratuit et sans engagement. Cuisine, salle de bain, meubles, pro à Montpellier, Pérols et partout en France. Réponse personnalisée sous 24 à 48 h. À partir de 80 €/m² posé.",
+    "Demandez votre devis covering en ligne gratuit et sans engagement. Cuisine, salle de bain, meubles, pro à Montpellier, Pérols et partout en France. Joignez vos photos, réponse personnalisée sous 24 à 48 h.",
   keywords:
     "devis covering en ligne, devis covering gratuit, devis rénovation cuisine, devis covering Montpellier, estimation covering adhésif, prix covering Hérault",
   alternates: { canonical: "https://coverswap.fr/devis" },
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 const avantages = [
   { icon: "⚡", title: "Réponse sous 24-48 h", desc: "Devis détaillé et personnalisé par email." },
   { icon: "🎁", title: "100 % gratuit", desc: "Sans engagement, sans frais cachés." },
-  { icon: "📐", title: "Prix ferme", desc: "Fourniture + pose incluses, dès 80 €/m² posé." },
+  { icon: "📐", title: "Devis détaillé", desc: "Fourniture + pose incluses, un prix clair et sans surprise." },
   { icon: "🇫🇷", title: "France entière", desc: "Intervention partout en France métropolitaine." },
 ];
 
@@ -70,8 +70,8 @@ export default function DevisPage() {
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-gris-300 text-lg max-w-2xl mx-auto leading-relaxed">
-              Cuisine, salle de bain, meubles ou local pro : décrivez votre projet et recevez une
-              estimation personnalisée sous 24 à 48 h. Sans engagement, à partir de 80 €/m² posé.
+              Cuisine, salle de bain, meubles ou local pro : décrivez votre projet, joignez quelques
+              photos et recevez une estimation personnalisée sous 24 à 48 h. Sans engagement.
             </p>
           </ScrollReveal>
         </div>

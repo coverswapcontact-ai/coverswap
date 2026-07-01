@@ -109,11 +109,20 @@ export async function POST(req: NextRequest) {
   const source = resolveSource(typeof body.source === "string" ? body.source : undefined);
   const typeProjet = mapTypeProjet(typeof body.type_projet === "string" ? body.type_projet : undefined);
 
+  /* ── Photos du projet (base64 data URLs, downscalées côté client) ──
+     Le CRM dispose de 3 emplacements image sur un lead ; on y mappe jusqu'à
+     3 photos jointes pour que Lucas les voie directement sur la fiche. */
+  const photos = Array.isArray(body.photos)
+    ? (body.photos as unknown[])
+        .filter((p): p is string => typeof p === "string" && p.startsWith("data:image"))
+        .slice(0, 3)
+    : [];
+
   const notes = [
     body.message ? `${body.message}` : null,
-    body.surface ? `Surface: ${body.surface}` : null,
     body.style ? `Style: ${body.style}` : null,
     body.reference ? `Réf catalogue: ${body.reference}` : null,
+    photos.length ? `${photos.length} photo(s) jointe(s)` : null,
   ]
     .filter(Boolean)
     .join(" — ");
@@ -130,6 +139,9 @@ export async function POST(req: NextRequest) {
     typeProjet,
     referenceChoisie: (body.reference as string) || undefined,
     notes: notes || undefined,
+    imageBefore: photos[0],
+    imageOriginal: photos[1],
+    imageAfter: photos[2],
   }).catch((err) => {
     console.error("[/api/contact] CRM helper threw (ne devrait pas):", err);
   });
