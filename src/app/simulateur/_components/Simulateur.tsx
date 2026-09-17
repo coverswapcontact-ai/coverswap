@@ -283,10 +283,6 @@ export default function Simulateur() {
     setEtape(2);
   };
 
-  if (!charge) {
-    return <div className="min-h-[520px] flex items-center justify-center text-gris-500">Chargement du simulateur…</div>;
-  }
-
   return (
     <div>
       <Indicateur etape={etape} onRetour={(e) => setEtape(e)} />
