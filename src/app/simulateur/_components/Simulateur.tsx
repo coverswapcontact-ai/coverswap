@@ -85,7 +85,9 @@ export default function Simulateur() {
       if (annule) return;
       const base = memoire ?? ETAT_VIDE;
       const projetInitial = demande && PROJECT_TYPES.some((p) => p.id === demande) ? demande : base.projet;
-      const repris: EtatSimulateur = { ...base, projet: projetInitial, selections: projetInitial === base.projet ? base.selections : {} };
+      // Autre pièce demandée dans l'adresse : la photo reste, les choix et le rendu de l'ancienne pièce non.
+      const memeProjet = projetInitial === base.projet;
+      const repris: EtatSimulateur = { ...base, projet: projetInitial, selections: memeProjet ? base.selections : {}, resultat: memeProjet ? base.resultat : null };
       // Reprise d'un état externe (IndexedDB, URL) après le montage.
       setEtat(repris);
       setEtape(repris.resultat ? 3 : repris.photo ? 2 : 1);
