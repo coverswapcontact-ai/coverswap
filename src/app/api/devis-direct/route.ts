@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
 
 const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
   cuisine: "CUISINE",
@@ -62,5 +65,7 @@ export async function POST(req: NextRequest) {
     notes: notesParts.join(" — "),
   });
 
-  return NextResponse.json({ ok: result.ok, queued: result.queued ?? false });
+  if (result.ok) return NextResponse.json({ ok: true, leadId: result.leadId ?? null });
+  if (result.emailFallback) return NextResponse.json({ ok: true, leadId: null, viaMail: true });
+  return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: result.error }, { status: 502 });
 }

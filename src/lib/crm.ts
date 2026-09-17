@@ -1,40 +1,27 @@
 /**
- * Helper CRM — envoie un lead au webhook CRM CoverSwap.
+ * Envoi d'un contact du site vers le CRM CoverSwap (webhook Railway).
  *
- * Usage SERVEUR uniquement (route handler / server action).
- * NE JAMAIS importer ce fichier depuis un client component : il expose
- * le secret webhook via process.env et fait un fetch sans CORS.
+ * Usage SERVEUR uniquement (route handler). Ne jamais importer depuis un
+ * composant client : le secret webhook vient de process.env.
  *
- * ── STRATÉGIE ANTI-PERTE ──
- * 1. Tentative d'envoi au webhook CRM (timeout court).
- * 2. En cas d'échec (404 / 5xx / timeout / secret invalide) :
- *    a. Tentative d'écriture en queue locale (.crm-queue.json) — best effort,
- *       marche en dev mais pas sur Vercel serverless (FS read-only).
- *    b. Envoi d'un email de secours via Resend au gérant avec tout le payload
- *       → jamais de lead perdu silencieusement, même si la queue échoue.
- * 3. Toujours fire-and-forget côté caller → la réponse HTTP au client
- *    n'est jamais bloquée par un problème CRM.
+ * ── Règle : jamais d'échec silencieux ──
+ * L'envoi est TOUJOURS attendu par la route qui l'appelle (sur Vercel, une
+ * fonction qui a répondu est gelée : un fetch lancé « en arrière-plan » ne
+ * part jamais). Chaque issue laisse une trace lisible :
+ *   - succès : `[CRM] lead enregistré` avec l'identifiant renvoyé par le CRM ;
+ *   - échec  : `[CRM] ÉCHEC` avec la cause, puis mail de secours Resend au
+ *     gérant avec tout le contact (sans les photos) ; si ce mail échoue aussi,
+ *     la route répond une erreur au visiteur au lieu d'un faux « envoyé ».
  */
 
-import { promises as fs } from "fs";
-import path from "path";
 import { Resend } from "resend";
 
 /* ══════════════════════════════════════════════════════════════════
    TYPES
 ══════════════════════════════════════════════════════════════════ */
-export type CrmSource =
-  | "SITE_SIMULATEUR"
-  | "SITE_CONTACT"
-  | "SITE_DEVIS"
-  | "ORGANIQUE";
+export type CrmSource = "SITE_SIMULATEUR" | "SITE_CONTACT" | "SITE_DEVIS" | "ORGANIQUE";
 
-export type CrmTypeProjet =
-  | "CUISINE"
-  | "SDB"
-  | "MEUBLES"
-  | "PRO"
-  | "AUTRE";
+export type CrmTypeProjet = "CUISINE" | "SDB" | "MEUBLES" | "PRO" | "AUTRE";
 
 export interface CrmLeadPayload {
   prenom: string;
@@ -50,7 +37,7 @@ export interface CrmLeadPayload {
   prixDevis?: number;
   lienSimulation?: string;
   notes?: string;
-  // Images base64 (data URL ou raw) à joindre à la simulation côté CRM
+  // Images base64 (data URL ou brut) rattachées à la simulation côté CRM
   imageBefore?: string;
   imageAfter?: string;
   imageOriginal?: string;
@@ -58,179 +45,111 @@ export interface CrmLeadPayload {
 
 export interface CrmResult {
   ok: boolean;
+  /** Identifiant du lead côté CRM (création ou rattachement à un lead existant). */
   leadId?: string;
+  /** Vrai si le CRM a rattaché le contact à un lead déjà connu. */
+  deduped?: boolean;
   error?: string;
-  queued?: boolean;
+  /** Vrai si, faute de CRM, le contact est parti par mail de secours au gérant. */
   emailFallback?: boolean;
-}
-
-interface QueuedLead {
-  payload: Record<string, unknown>;
-  timestamp: string;
-  attempts: number;
-  lastError?: string;
 }
 
 /* ══════════════════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════════════════ */
-const DEFAULT_URL = "http://localhost:3001/api/webhook";
-const TIMEOUT_MS = 5000;
-const TIMEOUT_WITH_IMAGES_MS = 20000; // upload photos = plus lent
-const QUEUE_FILE = path.join(process.cwd(), ".crm-queue.json");
-const RETRY_INTERVAL_MS = 30_000; // 30 secondes
-const MAX_RETRY_ATTEMPTS = 50; // ~25 min de tentatives max
+const TIMEOUT_MS = 6000;
+const TIMEOUT_WITH_IMAGES_MS = 20000; // envoi de photos = plus lent
+const RETRY_DELAY_MS = 700;
 const FALLBACK_EMAIL = process.env.LEAD_FALLBACK_EMAIL || "contact@coverswap.fr";
 const EMAIL_FROM = process.env.LEAD_FALLBACK_FROM || "CoverSwap Alert <noreply@coverswap.fr>";
 
 /* ══════════════════════════════════════════════════════════════════
-   QUEUE — lecture / écriture fichier JSON (best effort en prod)
+   MAIL DE SECOURS — dernière ligne de défense anti-perte
 ══════════════════════════════════════════════════════════════════ */
-async function readQueue(): Promise<QueuedLead[]> {
-  try {
-    const raw = await fs.readFile(QUEUE_FILE, "utf-8");
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
+const ENTITES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+
+function echapper(valeur: unknown): string {
+  return String(valeur).replace(/[&<>"']/g, (c) => ENTITES[c]);
 }
 
-async function writeQueue(queue: QueuedLead[]): Promise<boolean> {
-  try {
-    await fs.writeFile(QUEUE_FILE, JSON.stringify(queue, null, 2), "utf-8");
-    return true;
-  } catch (err) {
-    console.error("[CRM Queue] Erreur écriture (FS read-only ? Vercel serverless):", err);
-    return false;
-  }
-}
-
-async function addToQueue(
-  cleaned: Record<string, unknown>,
-  error: string
-): Promise<boolean> {
-  const queue = await readQueue();
-  queue.push({
-    payload: cleaned,
-    timestamp: new Date().toISOString(),
-    attempts: 1,
-    lastError: error,
-  });
-  const ok = await writeQueue(queue);
-  if (ok) {
-    console.warn(
-      `[CRM Queue] Lead sauvé en file d'attente (${queue.length} en attente)`
-    );
-  }
-  return ok;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   FALLBACK EMAIL — dernière ligne de défense anti-perte
-══════════════════════════════════════════════════════════════════ */
-function formatLeadHtml(
-  payload: Record<string, unknown>,
-  error: string
-): string {
-  const rows: [string, string | undefined][] = [
-    ["Prénom", payload.prenom as string],
-    ["Nom", payload.nom as string],
-    ["Téléphone", payload.telephone as string],
-    ["Email", payload.email as string | undefined],
-    ["Ville", payload.ville as string | undefined],
-    ["Code postal", payload.codePostal as string | undefined],
-    ["Source", payload.source as string | undefined],
-    ["Type projet", payload.typeProjet as string | undefined],
-    ["Référence", payload.referenceChoisie as string | undefined],
-    ["Notes", payload.notes as string | undefined],
+function formatLeadHtml(payload: Record<string, unknown>, error: string): string {
+  const rows: [string, unknown][] = [
+    ["Prénom", payload.prenom],
+    ["Nom", payload.nom],
+    ["Téléphone", payload.telephone],
+    ["Email", payload.email],
+    ["Ville", payload.ville],
+    ["Code postal", payload.codePostal],
+    ["Source", payload.source],
+    ["Type projet", payload.typeProjet],
+    ["Référence", payload.referenceChoisie],
+    ["Notes", payload.notes],
   ];
   const tableRows = rows
     .filter(([, v]) => v != null && v !== "")
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:4px 12px;font-weight:bold;background:#f8f8f8;">${k}</td><td style="padding:4px 12px;">${v}</td></tr>`
-    )
+    .map(([k, v]) => `<tr><td style="padding:4px 12px;font-weight:bold;background:#f8f8f8;">${k}</td><td style="padding:4px 12px;">${echapper(v)}</td></tr>`)
     .join("");
   return `
     <div style="font-family:sans-serif;max-width:600px;">
-      <h2 style="color:#CC0000;">🚨 Lead non enregistré dans le CRM</h2>
-      <p><strong>Erreur technique :</strong> <code>${error}</code></p>
-      <p>Le lead n'a pas pu atteindre le CRM. Contacte la personne manuellement et ajoute-la au CRM une fois disponible.</p>
-      <table style="border-collapse:collapse;border:1px solid #ddd;">
-        ${tableRows}
-      </table>
-      <p style="margin-top:20px;font-size:12px;color:#888;">
-        Email généré automatiquement par le fallback site → CRM.
-        Si tu vois cet email, le webhook CRM est en panne.
-      </p>
+      <h2 style="color:#CC0000;">🚨 Contact du site non enregistré dans le CRM</h2>
+      <p><strong>Erreur technique :</strong> <code>${echapper(error)}</code></p>
+      <p>Le contact n'a pas pu atteindre le CRM. Rappelle la personne et ajoute-la au CRM à la main.</p>
+      <table style="border-collapse:collapse;border:1px solid #ddd;">${tableRows}</table>
+      <p style="margin-top:20px;font-size:12px;color:#888;">Mail automatique du site coverswap.fr (secours site → CRM). Si tu le reçois, le webhook CRM est en panne.</p>
     </div>
   `;
 }
 
-async function sendFallbackEmail(
-  payload: Record<string, unknown>,
-  error: string
-): Promise<boolean> {
+async function sendFallbackEmail(payload: Record<string, unknown>, error: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error(
-      "[CRM Fallback] RESEND_API_KEY non configuré — impossible d'envoyer l'email de secours"
-    );
+    console.error("[CRM] RESEND_API_KEY absente sur Vercel — impossible d'envoyer le mail de secours");
     return false;
   }
-
   try {
     const resend = new Resend(apiKey);
     const name = `${payload.prenom || "?"} ${payload.nom || "?"}`.trim();
     const { error: sendErr } = await resend.emails.send({
       from: EMAIL_FROM,
       to: FALLBACK_EMAIL,
-      subject: `🚨 LEAD NON CAPTURÉ CRM — ${name} (${payload.telephone || "?"})`,
+      subject: `🚨 CONTACT NON ENREGISTRÉ CRM — ${name} (${payload.telephone || "?"})`,
       html: formatLeadHtml(payload, error),
     });
     if (sendErr) {
-      console.error("[CRM Fallback] Resend error:", sendErr);
+      console.error("[CRM] mail de secours refusé par Resend :", sendErr);
       return false;
     }
-    console.log(`[CRM Fallback] Email de secours envoyé à ${FALLBACK_EMAIL}`);
+    console.log(`[CRM] mail de secours envoyé à ${FALLBACK_EMAIL}`);
     return true;
   } catch (err) {
-    console.error("[CRM Fallback] Exception envoi email:", err);
+    console.error("[CRM] mail de secours : exception", err);
     return false;
   }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   ENVOI — tente d'envoyer un payload au CRM
+   ENVOI — une tentative vers le webhook
 ══════════════════════════════════════════════════════════════════ */
-async function sendPayload(
-  cleaned: Record<string, unknown>
-): Promise<CrmResult> {
-  const url = process.env.CRM_WEBHOOK_URL || DEFAULT_URL;
+async function sendPayload(cleaned: Record<string, unknown>): Promise<CrmResult & { retryable?: boolean }> {
+  const url = process.env.CRM_WEBHOOK_URL;
   const secret = process.env.CRM_WEBHOOK_SECRET;
 
-  if (!secret) {
-    console.error("[CRM] CRM_WEBHOOK_SECRET non configuré — lead ignoré");
-    return { ok: false, error: "missing-secret" };
+  if (!url || !secret) {
+    return { ok: false, error: !url ? "CRM_WEBHOOK_URL absente" : "CRM_WEBHOOK_SECRET absente" };
   }
 
-  const hasImages = !!(cleaned.imageBefore || cleaned.imageAfter);
+  const hasImages = !!(cleaned.imageBefore || cleaned.imageAfter || cleaned.imageOriginal);
   const timeout = hasImages ? TIMEOUT_WITH_IMAGES_MS : TIMEOUT_MS;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(url.trim(), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Webhook-Secret": secret,
-      },
+      headers: { "Content-Type": "application/json", "X-Webhook-Secret": secret.trim() },
       body: JSON.stringify(cleaned),
       signal: controller.signal,
     });
-
     clearTimeout(timeoutId);
 
     if (!res.ok) {
@@ -241,191 +160,65 @@ async function sendPayload(
       } catch {
         details = await res.text().catch(() => undefined);
       }
-      return { ok: false, error: `http-${res.status}: ${details ?? ""}` };
+      return { ok: false, error: `http-${res.status}: ${details ?? ""}`.slice(0, 500), retryable: res.status >= 500 };
     }
 
     try {
       const body = await res.json();
-      const leadId: string | undefined = body?.id || body?.leadId;
-      return { ok: true, leadId };
+      return { ok: true, leadId: body?.leadId || body?.id, deduped: body?.deduped === true };
     } catch {
       return { ok: true };
     }
   } catch (err) {
     clearTimeout(timeoutId);
     const isAbort = err instanceof Error && err.name === "AbortError";
-    const msg = isAbort
-      ? `timeout-${timeout}ms`
-      : (err as Error)?.message || "unknown";
-    return { ok: false, error: msg };
+    return { ok: false, error: isAbort ? `timeout-${timeout}ms` : (err as Error)?.message || "unknown", retryable: true };
   }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   RETRY — vide la queue automatiquement
+   API PUBLIQUE — sendLeadToCRM (à AWAITER par la route appelante)
 ══════════════════════════════════════════════════════════════════ */
-let retryRunning = false;
-let retryTimer: ReturnType<typeof setInterval> | null = null;
-
-async function processQueue(): Promise<void> {
-  if (retryRunning) return;
-  retryRunning = true;
-
-  try {
-    const queue = await readQueue();
-    if (queue.length === 0) {
-      retryRunning = false;
-      // Arrête le timer si la queue est vide
-      if (retryTimer) {
-        clearInterval(retryTimer);
-        retryTimer = null;
-      }
-      return;
-    }
-
-    console.log(`[CRM Queue] Retry: ${queue.length} lead(s) en attente...`);
-
-    const remaining: QueuedLead[] = [];
-
-    for (const item of queue) {
-      const result = await sendPayload(item.payload);
-
-      if (result.ok) {
-        console.log(
-          `[CRM Queue] ✓ Lead renvoyé avec succès${
-            result.leadId ? ` (id=${result.leadId})` : ""
-          } — était en attente depuis ${item.timestamp}`
-        );
-      } else if (item.attempts >= MAX_RETRY_ATTEMPTS) {
-        console.error(
-          `[CRM Queue] ✗ Lead abandonné après ${item.attempts} tentatives — envoi email secours`
-        );
-        // Dernier recours : email au gérant
-        await sendFallbackEmail(item.payload, result.error || "retries-exhausted");
-        await archiveFailedLead(item);
-      } else {
-        remaining.push({
-          ...item,
-          attempts: item.attempts + 1,
-          lastError: result.error,
-        });
-      }
-    }
-
-    await writeQueue(remaining);
-
-    if (remaining.length === 0 && retryTimer) {
-      clearInterval(retryTimer);
-      retryTimer = null;
-      console.log("[CRM Queue] ✓ File d'attente vidée — retry stoppé");
-    }
-  } catch (err) {
-    console.error("[CRM Queue] Erreur retry:", err);
-  } finally {
-    retryRunning = false;
-  }
-}
-
-async function archiveFailedLead(item: QueuedLead): Promise<void> {
-  const archivePath = path.join(process.cwd(), ".crm-failed-leads.json");
-  try {
-    let archive: QueuedLead[] = [];
-    try {
-      const raw = await fs.readFile(archivePath, "utf-8");
-      archive = JSON.parse(raw);
-    } catch {
-      /* fichier n'existe pas encore */
-    }
-    archive.push(item);
-    await fs.writeFile(archivePath, JSON.stringify(archive, null, 2), "utf-8");
-    console.warn(
-      `[CRM Queue] Lead archivé dans .crm-failed-leads.json pour traitement manuel`
-    );
-  } catch (err) {
-    console.error("[CRM Queue] Erreur archivage:", err);
-  }
-}
-
-function startRetryLoop(): void {
-  if (retryTimer) return;
-  retryTimer = setInterval(processQueue, RETRY_INTERVAL_MS);
-  // Premier essai immédiat après 5s (laisse le serveur démarrer)
-  setTimeout(processQueue, 5000);
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   API PUBLIQUE — sendLeadToCRM
-══════════════════════════════════════════════════════════════════ */
-
-/**
- * Envoie un lead au CRM — fire-and-forget côté serveur.
- * Si le CRM est down : tentative queue locale (best effort), puis email
- * de secours au gérant via Resend. Ne throw jamais.
- */
-export async function sendLeadToCRM(
-  payload: CrmLeadPayload
-): Promise<CrmResult> {
-  // Nettoie les champs optionnels vides / undefined avant envoi
+export async function sendLeadToCRM(payload: CrmLeadPayload): Promise<CrmResult> {
   const cleaned: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(payload)) {
     if (v === undefined || v === null || v === "") continue;
     cleaned[k] = v;
   }
 
-  // Validation minimale
   if (!cleaned.prenom || !cleaned.nom || !cleaned.telephone) {
-    console.error("[CRM] Payload incomplet (prenom/nom/telephone requis)", {
-      has: Object.keys(cleaned),
-    });
+    console.error("[CRM] contact incomplet (prenom/nom/telephone requis)", { champs: Object.keys(cleaned) });
     return { ok: false, error: "incomplete-payload" };
   }
 
-  const result = await sendPayload(cleaned);
+  let result = await sendPayload(cleaned);
+  if (!result.ok && result.retryable) {
+    console.warn(`[CRM] premier envoi échoué (${result.error}) — nouvel essai`);
+    await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+    result = await sendPayload(cleaned);
+  }
 
   if (result.ok) {
     console.log(
-      `[CRM] Lead créé${result.leadId ? ` (id=${result.leadId})` : ""}`
+      `[CRM] lead enregistré id=${result.leadId ?? "?"} source=${cleaned.source} tel=${cleaned.telephone}${result.deduped ? " (rattaché à un lead existant)" : ""}`
     );
-    return result;
+    return { ok: true, leadId: result.leadId, deduped: result.deduped };
   }
 
-  // Échec webhook → 2 filets de sécurité en cascade :
-  //   1) queue locale (marche en dev, probablement pas sur Vercel)
-  //   2) email immédiat via Resend (marche toujours)
   const lean = { ...cleaned };
   delete lean.imageBefore;
   delete lean.imageAfter;
   delete lean.imageOriginal;
-  console.error(
-    `[CRM] Envoi échoué (${result.error}) — queue + email secours`
-  );
-
-  const queued = await addToQueue(lean, result.error || "unknown");
-  if (queued) startRetryLoop();
-
-  // Envoi immédiat de l'email de secours (ne pas attendre les retries)
+  console.error(`[CRM] ÉCHEC (${result.error}) source=${cleaned.source} tel=${cleaned.telephone} — mail de secours`);
   const emailFallback = await sendFallbackEmail(lean, result.error || "unknown");
+  if (!emailFallback) console.error("[CRM] ÉCHEC TOTAL : ni CRM ni mail de secours — le visiteur reçoit une erreur");
 
-  return {
-    ok: false,
-    error: result.error,
-    queued,
-    emailFallback,
-  };
+  return { ok: false, error: result.error, emailFallback };
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   AUTO-START — vide la queue au démarrage du serveur
-   (si des leads étaient en attente d'une session précédente)
-══════════════════════════════════════════════════════════════════ */
-readQueue().then((queue) => {
-  if (queue.length > 0) {
-    console.log(
-      `[CRM Queue] ${queue.length} lead(s) en attente du dernier démarrage — lancement retry`
-    );
-    startRetryLoop();
-  }
-});
+/** Message affiché au visiteur quand rien n'a pu enregistrer sa demande. */
+export const MESSAGE_ECHEC_TOTAL =
+  "Nous n'avons pas pu enregistrer votre demande. Appelez-nous au 06 70 35 28 69 ou réessayez dans quelques minutes.";
 
 /* ══════════════════════════════════════════════════════════════════
    HELPERS — splitName + mapTypeProjet
@@ -434,10 +227,7 @@ export function splitName(fullName: string): { prenom: string; nom: string } {
   const parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return { prenom: "Inconnu", nom: "Inconnu" };
   if (parts.length === 1) return { prenom: parts[0], nom: parts[0] };
-  return {
-    prenom: parts[0],
-    nom: parts.slice(1).join(" "),
-  };
+  return { prenom: parts[0], nom: parts.slice(1).join(" ") };
 }
 
 const TYPE_PROJET_MAP: Record<string, CrmTypeProjet> = {

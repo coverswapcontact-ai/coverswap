@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/app/simulation/projects";
 import { buildImagePrompt, type ElementInfo } from "@/lib/simulation-prompt";
@@ -24,6 +24,7 @@ import { buildImagePrompt, type ElementInfo } from "@/lib/simulation-prompt";
  */
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const TOKEN_TTL_MS = 90_000; // le navigateur a 90s pour transmettre à Railway
 
@@ -57,9 +58,8 @@ const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
   professionnel: "PRO",
 };
 
-/** Crée le lead (fire-and-forget) — équivalent au chemin sync, sans image. */
-function pushLeadToCrm(body: Record<string, string>) {
-  if (!body.name || !body.phone) return;
+/** Crée le lead dans le CRM (attendu) — équivalent au chemin sync, sans image. */
+async function pushLeadToCrm(body: Record<string, string>) {
   const { prenom, nom } = splitName(body.name);
   const projectType = body.project_type || "cuisine";
 
@@ -81,7 +81,7 @@ function pushLeadToCrm(body: Record<string, string>) {
     body.message ? `Message: ${body.message}` : null,
   ].filter(Boolean);
 
-  sendLeadToCRM({
+  return sendLeadToCRM({
     prenom,
     nom,
     telephone: body.phone,
@@ -91,8 +91,6 @@ function pushLeadToCrm(body: Record<string, string>) {
     referenceChoisie,
     lienSimulation: body.lien_simulation || undefined,
     notes: notesParts.join(" — "),
-  }).catch((err) => {
-    console.error("[/api/simulation/prepare] CRM helper threw:", err);
   });
 }
 
@@ -129,8 +127,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
   }
 
-  // Crée le lead immédiatement (avant génération) → jamais de contact perdu.
-  pushLeadToCrm(body);
+  // Crée le lead AVANT la génération, et l'attend : un contact enregistré même
+  // si l'image échoue ensuite. Si rien ne peut l'enregistrer, on ne génère pas.
+  const lead = await pushLeadToCrm(body);
+  if (!lead.ok && !lead.emailFallback) {
+    return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
+  }
 
   // Parse les zones + ordonne les swatches présents.
   const elements: Record<string, ElementInfo | null> = { zone1: null, zone2: null, zone3: null };

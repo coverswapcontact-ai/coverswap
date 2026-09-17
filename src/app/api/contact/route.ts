@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendLeadToCRM, splitName, mapTypeProjet, type CrmSource } from "@/lib/crm";
+import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, mapTypeProjet, type CrmSource } from "@/lib/crm";
+
+// L'envoi au CRM est attendu (photos comprises) : au-delà des 10 s par défaut de Vercel.
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
 
 /* ──────────────────────────────────────────────────────────────────
    RATE LIMITING
@@ -133,8 +137,8 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join(" — ");
 
-  /* ── Fire-and-forget CRM — on n'attend pas la réponse pour répondre à l'utilisateur ── */
-  sendLeadToCRM({
+  /* ── Envoi au CRM, ATTENDU : sur Vercel, répondre avant la fin du fetch le tue ── */
+  const resultat = await sendLeadToCRM({
     prenom,
     nom,
     telephone: phone,
@@ -148,10 +152,10 @@ export async function POST(req: NextRequest) {
     imageBefore: photos[0],
     imageOriginal: photos[1],
     imageAfter: photos[2],
-  }).catch((err) => {
-    console.error("[/api/contact] CRM helper threw (ne devrait pas):", err);
   });
 
-  // Réponse immédiate à l'utilisateur, indépendamment du CRM
-  return NextResponse.json({ success: true });
+  if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null });
+  // CRM en panne mais contact parti par mail au gérant : la demande est bien prise.
+  if (resultat.emailFallback) return NextResponse.json({ success: true, leadId: null, viaMail: true });
+  return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: resultat.error }, { status: 502 });
 }

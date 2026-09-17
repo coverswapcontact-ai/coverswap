@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/app/simulation/projects";
 import { buildImagePrompt } from "@/lib/simulation-prompt";
@@ -121,7 +121,6 @@ const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
 };
 
 function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
-  if (!body.name || !body.phone) return;
 
   const { prenom, nom } = splitName(body.name);
   const projectType = body.project_type || "cuisine";
@@ -151,7 +150,7 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     body.message ? `Message: ${body.message}` : null,
   ].filter(Boolean);
 
-  sendLeadToCRM({
+  return sendLeadToCRM({
     prenom,
     nom,
     telephone: body.phone,
@@ -165,8 +164,6 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     notes: notesParts.join(" — "),
     imageBefore: body.photo_base64 || undefined,
     imageAfter: resultImage || undefined,
-  }).catch((err) => {
-    console.error("[/api/simulation] CRM helper threw (ne devrait pas):", err);
   });
 }
 
@@ -205,8 +202,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Photo requise." }, { status: 400 });
   }
 
-  /* ── Créer le lead dans le CRM dès maintenant (avant génération image) ── */
-  pushLeadToCrm(body);
+  /* ── Créer le lead dans le CRM dès maintenant (avant génération), et l'attendre ── */
+  const lead = await pushLeadToCrm(body);
+  if (!lead.ok && !lead.emailFallback) {
+    return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
+  }
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey.includes("REPLACE")) {
@@ -449,8 +449,8 @@ export async function POST(req: NextRequest) {
 
     const resultImage = `data:image/png;base64,${attempt.b64}`;
 
-    /* ── Send lead to CRM (fire-and-forget) ── */
-    pushLeadToCrm(body, resultImage);
+    /* ── Rendu terminé : on renvoie la simulation (images) au CRM, en l'attendant ── */
+    await pushLeadToCrm(body, resultImage);
 
     return NextResponse.json(
       {
