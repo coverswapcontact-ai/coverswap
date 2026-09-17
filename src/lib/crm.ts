@@ -44,6 +44,12 @@ export interface CrmLeadPayload {
   parcoursId?: string;
   /** Photos jointes à la demande (data URL), 4 au plus. */
   photos?: string[];
+  /** Simulations faites sur le site avant les coordonnées (identifiants côté CRM). */
+  simulationIds?: string[];
+  /** Acquisition : utm_campaign, utm_content, page ou formulaire d'origine. */
+  campagne?: string;
+  publicite?: string;
+  formulaire?: string;
   // Consentement aux e-mails commerciaux : case distincte, texte figé horodaté (lib/consentement)
   consentementMail?: boolean;
   consentementTexte?: string;
@@ -63,6 +69,8 @@ export interface CrmResult {
   photos?: number;
   /** Consentement mail enregistré par le CRM : ACCORDE, REFUSE ou null. */
   consentement?: string | null;
+  /** Simulations du parcours rattachées à la fiche par le CRM. */
+  simulations?: number;
   error?: string;
   /** Vrai si, faute de CRM, le contact est parti par mail de secours au gérant. */
   emailFallback?: boolean;
@@ -192,6 +200,7 @@ async function sendPayload(cleaned: Record<string, unknown>, ipVisiteur?: string
         deduped: body?.deduped === true,
         photos: typeof body?.photos === "number" ? body.photos : undefined,
         consentement: typeof body?.consentement === "string" ? body.consentement : null,
+        simulations: typeof body?.simulations === "number" ? body.simulations : undefined,
       };
     } catch {
       return { ok: true };
@@ -221,6 +230,14 @@ export async function sendLeadToCRM(payload: CrmLeadPayload, options: { ipVisite
   }
 
   if (Array.isArray(payload.photos) && payload.photos.length === 0) delete cleaned.photos;
+  if (Array.isArray(payload.simulationIds) && payload.simulationIds.length === 0) delete cleaned.simulationIds;
+  // Le CRM range l'acquisition dans campagne / publicite / formulaire (clés du format Meta)
+  if (payload.campagne) cleaned.campaign_name = payload.campagne;
+  if (payload.publicite) cleaned.ad_name = payload.publicite;
+  if (payload.formulaire) cleaned.form_name = payload.formulaire;
+  delete cleaned.campagne;
+  delete cleaned.publicite;
+  delete cleaned.formulaire;
 
   let result = await sendPayload(cleaned, options.ipVisiteur);
   if (!result.ok && result.retryable) {
@@ -233,7 +250,7 @@ export async function sendLeadToCRM(payload: CrmLeadPayload, options: { ipVisite
     console.log(
       `[CRM] lead enregistré id=${result.leadId ?? "?"} source=${cleaned.source} tel=${cleaned.telephone}${result.deduped ? " (rattaché à un lead existant)" : ""} photos=${result.photos ?? 0} consentement=${result.consentement ?? "non demandé"}`
     );
-    return { ok: true, leadId: result.leadId, deduped: result.deduped, photos: result.photos, consentement: result.consentement };
+    return { ok: true, leadId: result.leadId, deduped: result.deduped, photos: result.photos, consentement: result.consentement, simulations: result.simulations };
   }
 
   const lean = { ...cleaned };

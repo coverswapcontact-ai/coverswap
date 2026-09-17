@@ -212,7 +212,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, image: "" });
   }
 
-  if (!body.name || !body.phone || !body.email) {
+  const sansCoordonnees = !body.name && !body.phone && !body.email;
+  if (sansCoordonnees && !parcoursIdValide(body.parcoursId)) {
     return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
   }
   if (!body.photo_base64) {
@@ -226,7 +227,7 @@ export async function POST(req: NextRequest) {
   }
 
   /* ── Créer le lead dans le CRM dès maintenant (avant génération), et l'attendre ── */
-  const lead = await pushLeadToCrm(body, ip);
+  const lead = sansCoordonnees ? { ok: true, leadId: undefined, emailFallback: false } : await pushLeadToCrm(body, ip);
   if (!lead.ok && !lead.emailFallback) {
     return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
   }
@@ -472,8 +473,10 @@ export async function POST(req: NextRequest) {
 
     const resultImage = `data:image/png;base64,${attempt.b64}`;
 
-    /* ── Rendu terminé : on renvoie la simulation (images) au CRM, en l'attendant ── */
-    await pushLeadToCrm(body, ip, resultImage);
+    /* ── Rendu terminé : on renvoie la simulation (images) au CRM, en l'attendant.
+       Sans coordonnées (simulateur v2 en secours), le navigateur garde le rendu
+       et l'enverra avec la demande de devis. ── */
+    if (!sansCoordonnees) await pushLeadToCrm(body, ip, resultImage);
 
     return NextResponse.json(
       {

@@ -140,7 +140,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "ok" }, { status: 400 });
   }
 
-  if (!body.name || !body.phone || !body.email) {
+  // Simulateur v2 : pas de coordonnées avant le résultat. Le parcours est signé
+  // dans le jeton ; le CRM garde la simulation et la rattache à la demande de devis.
+  const parcoursId = parcoursIdValide(body.parcoursId);
+  const sansCoordonnees = !body.name && !body.phone && !body.email;
+  if (sansCoordonnees && !parcoursId) {
+    return NextResponse.json({ error: "Identifiant de parcours manquant : rechargez la page." }, { status: 400 });
+  }
+  if (!sansCoordonnees && (!body.name || !body.phone || !body.email)) {
     return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
   }
 
@@ -152,11 +159,14 @@ export async function POST(req: NextRequest) {
 
   // Crée le lead AVANT la génération, et l'attend : un contact enregistré même
   // si l'image échoue ensuite. Si rien ne peut l'enregistrer, on ne génère pas.
-  const lead = await pushLeadToCrm(body, ip);
-  if (!lead.ok && !lead.emailFallback) {
-    return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
+  let leadId = "";
+  if (!sansCoordonnees) {
+    const lead = await pushLeadToCrm(body, ip);
+    if (!lead.ok && !lead.emailFallback) {
+      return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
+    }
+    leadId = lead.leadId ?? "";
   }
-  const leadId = lead.leadId ?? "";
 
   // Parse les zones + ordonne les swatches présents.
   const elements: Record<string, ElementInfo | null> = { zone1: null, zone2: null, zone3: null };
@@ -202,7 +212,8 @@ export async function POST(req: NextRequest) {
   // Signature : empêche la falsification du prompt, le détournement des swatchUrls
   // et le rattachement des images à la fiche d'un autre (leadId signé).
   const exp = Date.now() + TOKEN_TTL_MS;
-  const payloadToSign = leadId ? `${prompt}\n${swatchUrls.join(",")}\n${exp}\n${leadId}` : `${prompt}\n${swatchUrls.join(",")}\n${exp}`;
+  const cle = leadId ? leadId : parcoursId ? `p:${parcoursId}` : null;
+  const payloadToSign = cle ? `${prompt}\n${swatchUrls.join(",")}\n${exp}\n${cle}` : `${prompt}\n${swatchUrls.join(",")}\n${exp}`;
   const sig = crypto.createHmac("sha256", secret).update(payloadToSign).digest("hex");
 
   return NextResponse.json(
@@ -213,7 +224,8 @@ export async function POST(req: NextRequest) {
       sig,
       exp,
       leadId: leadId || null,
-      jetonDevis: signerJetonDevis(parcoursIdValide(body.parcoursId) ?? "", leadId) ?? null,
+      parcoursId: parcoursId ?? null,
+      jetonDevis: leadId ? (signerJetonDevis(parcoursId ?? "", leadId) ?? null) : null,
       rateLimit: { limit: rl.limit, remaining: rl.remaining, resetAt: rl.resetAt },
     },
     { headers: rateLimitHeaders(rl) }

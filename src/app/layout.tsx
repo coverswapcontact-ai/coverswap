@@ -8,6 +8,7 @@ import CookieBanner from "@/components/CookieBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
+import SuiviParcours from "@/components/SuiviParcours";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
@@ -116,6 +117,9 @@ export default function RootLayout({
         <OrganizationSchema />
         <Suspense fallback={null}>
           <ScrollToTop />
+        </Suspense>
+        <Suspense fallback={null}>
+          <SuiviParcours />
         </Suspense>
         <Header />
         <main id="main-content">{children}</main>
