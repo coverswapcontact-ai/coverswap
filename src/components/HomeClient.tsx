@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
-import { FAQSchema } from "@/components/JsonLd";
 import { track } from "@/lib/analytics";
 import { PROJECT_TYPES } from "@/app/simulation/projects";
 
@@ -446,73 +445,3 @@ export function SimulationSection() {
 /* ══════════════════════════════════════════════════════════════════
    FAQ — needs useState for accordion
 ══════════════════════════════════════════════════════════════════ */
-export function FAQSection() {
-  const faqs = [
-    {
-      q: "Combien de temps dure la pose ?",
-      a: "La majorité de nos interventions se font en une seule journée. Pour les projets plus importants (cuisine complète + salle de bain), comptez 1 à 2 jours maximum.",
-    },
-    {
-      q: "Les revêtements sont-ils résistants à l'eau ?",
-      a: "Oui ! Nos revêtements Cover Styl' sont 100% waterproof. Ils sont parfaitement adaptés aux cuisines et salles de bain, résistants à l'humidité, aux éclaboussures et à la chaleur modérée.",
-    },
-    {
-      q: "Peut-on retirer le revêtement sans abîmer le support ?",
-      a: "Absolument. Nos revêtements sont conçus pour être repositionnables et retirables sans laisser de traces. Idéal pour les locataires.",
-    },
-    {
-      q: "Quelle est la durée de vie du covering ?",
-      a: "Nos revêtements haut de gamme sont garantis 10 ans contre le décollement et la décoloration. Ils résistent aux UV, aux rayures légères et au nettoyage régulier.",
-    },
-    {
-      q: "Intervenez-vous dans toute la France ?",
-      a: "Oui, nous intervenons sur l'ensemble du territoire français. Lucas se déplace partout en France métropolitaine.",
-    },
-    {
-      q: "Comment fonctionne la simulation IA ?",
-      a: "Envoyez une photo de votre espace via notre formulaire. Notre IA génère en moins de 60 secondes un rendu photoréaliste avec le revêtement de votre choix. Vous recevez le résultat par SMS.",
-    },
-  ];
-
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <section id="faq" className="relative section-padding bg-noir overflow-hidden">
-      <FAQSchema faqs={faqs} />
-      <div className="container-custom relative z-10 max-w-3xl mx-auto">
-        <div className="text-center mb-8 md:mb-16">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">FAQ</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-3xl md:text-5xl font-bold mt-3 mb-4">Questions fréquentes</h2>
-          </ScrollReveal>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, i) => (
-            <ScrollReveal key={i} delay={i * 0.07} direction="up">
-              <div className="glass-card overflow-hidden">
-                <button
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full flex items-center justify-between p-6 text-left"
-                >
-                  <span className="font-display font-bold text-lg pr-4">{faq.q}</span>
-                  <svg
-                    className={`w-5 h-5 shrink-0 text-rouge transition-transform duration-300 ${openIndex === i ? "rotate-180" : ""}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className={`overflow-hidden transition-all duration-300 ${openIndex === i ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-                  <p className="px-6 pb-6 text-gris-400 leading-relaxed">{faq.a}</p>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}

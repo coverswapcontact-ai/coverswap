@@ -88,26 +88,16 @@
   /* ── Bouton principal avec pulse subtil ── */
   @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
            px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-rouge-hover hover:scale-105
-           active:scale-95 uppercase tracking-wider;
-  animation: ctaPulse 2.5s ease-in-out infinite;
-  will-change: box-shadow;
-
-  &:hover {
-    animation: none;
-    box-shadow: 0 0 32px rgba(204, 0, 0, 0.55);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
+           hover:bg-rouge-hover
+           active:scale-[0.98] uppercase tracking-wider;
 }
 
 @utility btn-secondary {
   /* Pause CTA pulse when reduced motion is preferred */
   @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
            px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-white hover:text-noir hover:scale-105
-           active:scale-95 uppercase tracking-wider;
+           hover:bg-white hover:text-noir
+           active:scale-[0.98] uppercase tracking-wider;
 }
 
 @utility section-padding {
@@ -165,23 +155,18 @@
 /* ═══════════════════════════════════════════════════════════
    SCROLL REVEAL
 ═══════════════════════════════════════════════════════════ */
-.reveal {
+/* Visible sans JavaScript : seul <html class="js"> masque, l'observateur révèle. */
+html.js .reveal:not(.revealed) {
   opacity: 0;
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
 }
-
-.reveal-up    { transform: translateY(48px); }
-.reveal-left  { transform: translateX(-48px); }
-.reveal-right { transform: translateX(48px); }
-.reveal-scale { transform: scale(0.92); }
-.reveal-fade  { transform: none; }
-
-.reveal.revealed {
-  opacity: 1;
-  transform: translate(0, 0) scale(1);
+html.js .reveal {
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
+html.js .reveal-up:not(.revealed)    { transform: translateY(24px); }
+html.js .reveal-left:not(.revealed)  { transform: translateX(-24px); }
+html.js .reveal-right:not(.revealed) { transform: translateX(24px); }
+html.js .reveal-scale:not(.revealed) { transform: scale(0.96); }
 
 /* ═══════════════════════════════════════════════════════════
    CTA PULSE
@@ -226,7 +211,8 @@
    REDUCED MOTION — accessibility
 ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
+  html.js .reveal,
+  html.js .reveal:not(.revealed) {
     opacity: 1;
     transform: none;
     transition: none;

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { articles } from '@/data/blog-articles';
 import { ZONES, getZoneSlug } from '@/data/zones';
+import { PRESTATIONS } from '@/data/prestations';
 
 /**
  * Sitemap dynamique CoverSwap.
@@ -11,7 +12,7 @@ import { ZONES, getZoneSlug } from '@/data/zones';
  *  - Priorités : 1.0 (home), 0.9 (zones — SEO local), 0.8 (prestations),
  *    0.7 (catalogue + contact + index zones), 0.6 (blog), 0.5 (articles), 0.3 (legal).
  */
-const LAST_BUILD = new Date('2026-05-25T00:00:00Z');
+const LAST_BUILD = new Date('2026-09-17T00:00:00Z');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://coverswap.fr';
@@ -22,11 +23,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/devis`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/zones`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/prestations`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/prestations/cuisine`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/prestations/salle-de-bain`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/prestations/meubles`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/prestations/professionnel`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/prestations/vitrages`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/revetements`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/contact`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/blog`, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 0.6 },
@@ -39,6 +35,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * Pages locales (zones) — priorité haute (0.9) car forte intention de
    * recherche locale. Google les remontera en SERP local.
    */
+  const prestationPages: MetadataRoute.Sitemap = PRESTATIONS.map((p) => ({
+    url: `${baseUrl}/prestations/${p.slug}`,
+    lastModified: LAST_BUILD,
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
   const zonePages: MetadataRoute.Sitemap = ZONES.map((zone) => ({
     url: `${baseUrl}/zones/${getZoneSlug(zone)}`,
     lastModified: LAST_BUILD,
@@ -53,5 +56,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...zonePages, ...blogPages];
+  return [...staticPages, ...prestationPages, ...zonePages, ...blogPages];
 }

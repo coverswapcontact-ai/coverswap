@@ -37,8 +37,6 @@ export default function Analytics() {
       }
       if (w.fbq) w.fbq("consent", okPublicite ? "grant" : "revoke");
     };
-    // Lecture d'un état externe (localStorage) après le montage, inconnu côté serveur.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     appliquer();
     window.addEventListener(EVENEMENT_CHANGEMENT, appliquer);
     return () => window.removeEventListener(EVENEMENT_CHANGEMENT, appliquer);

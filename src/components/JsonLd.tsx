@@ -1,227 +1,167 @@
-import {
-  FAQJsonLd,
-  OrganizationJsonLd,
-  BreadcrumbJsonLd,
-} from "next-seo";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { ZONES } from "@/data/zones";
+import { PRIX_ML_MIN, PRIX_ML_COURANT_MAX } from "@/lib/offre";
 
-/* ──────────────────────────────────────────────────────────────────
-   LOCAL BUSINESS — schema.org/HomeAndConstructionBusiness
-   Utilisé dans layout.tsx (site-wide).
-   Custom JSON-LD car next-seo ne supporte pas areaServed avec
-   un mix City + AdministrativeArea + Country (objet structuré).
-────────────────────────────────────────────────────────────────── */
-const LOCAL_BUSINESS_SCHEMA = {
+/**
+ * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
+ * lib/offre, data/zones) : LocalBusiness, Organization, Service, FAQPage,
+ * HowTo, Article, BreadcrumbList. Aucune valeur en dur ici.
+ */
+function Script({ data }: { data: Record<string, unknown> }) {
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
+}
+
+const ADRESSE = {
+  "@type": "PostalAddress",
+  streetAddress: ENTREPRISE.adresse.rue,
+  addressLocality: ENTREPRISE.adresse.ville,
+  postalCode: ENTREPRISE.adresse.codePostal,
+  addressRegion: ENTREPRISE.adresse.region,
+  addressCountry: "FR",
+};
+
+export const LOCAL_BUSINESS_ID = `${ENTREPRISE.site}/#entreprise`;
+
+export const LOCAL_BUSINESS = {
   "@context": "https://schema.org",
   "@type": "HomeAndConstructionBusiness",
-  "@id": "https://coverswap.fr",
-  name: "CoverSwap",
+  "@id": LOCAL_BUSINESS_ID,
+  name: ENTREPRISE.nom,
+  legalName: `${ENTREPRISE.dirigeant} — ${ENTREPRISE.nom}`,
+  founder: { "@type": "Person", name: ENTREPRISE.dirigeant },
   description:
-    "Rénovation intérieure par revêtements adhésifs Cover Styl'. Covering cuisine, salle de bain, meubles, vitrages et surfaces professionnelles. Pose en 1 journée, garantie 10 ans, simulation IA gratuite. Intervention Montpellier, Pérols, Hérault, Occitanie et France entière.",
-  url: "https://coverswap.fr",
-  telephone: "+33670352869",
-  email: "contact@coverswap.fr",
-  priceRange: "€€",
-  slogan: "Rénovation adhésive premium",
-  image: ["https://coverswap.fr/og-image.jpg"],
-  logo: "https://coverswap.fr/logo.png",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "73 rue Simone Veil",
-    addressLocality: "Pérols",
-    postalCode: "34470",
-    addressRegion: "Occitanie",
-    addressCountry: "FR",
-  },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 43.5275,
-    longitude: 3.9528,
-  },
+    "Rénovation intérieure par covering adhésif Cover Styl' : cuisines, salles de bain, meubles, locaux professionnels et vitrages. Pose en une journée, film réversible, garanti 10 ans, simulation sur photo. Montpellier, Hérault et France métropolitaine sur devis.",
+  url: ENTREPRISE.site,
+  telephone: ENTREPRISE.telephoneInternational,
+  email: ENTREPRISE.email,
+  priceRange: `${PRIX_ML_MIN}-${PRIX_ML_COURANT_MAX} €/ml`,
+  currenciesAccepted: "EUR",
+  paymentAccepted: "Virement, chèque, espèces",
+  slogan: "Rénover sans casser",
+  image: [`${ENTREPRISE.site}/og-image.jpg`],
+  logo: `${ENTREPRISE.site}/logo.png`,
+  address: ADRESSE,
+  geo: { "@type": "GeoCoordinates", latitude: ENTREPRISE.geo.lat, longitude: ENTREPRISE.geo.lng },
   openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      opens: "08:00",
-      closes: "17:00",
-      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-    },
+    { "@type": "OpeningHoursSpecification", opens: ENTREPRISE.horaires.ouverture, closes: ENTREPRISE.horaires.fermeture, dayOfWeek: ENTREPRISE.horaires.joursIso },
   ],
   areaServed: [
-    { "@type": "City", name: "Montpellier" },
-    { "@type": "City", name: "Pérols" },
-    { "@type": "City", name: "Lattes" },
-    { "@type": "City", name: "Mauguio" },
-    { "@type": "City", name: "Castelnau-le-Lez" },
-    { "@type": "City", name: "Béziers" },
-    { "@type": "City", name: "Nîmes" },
-    { "@type": "City", name: "Sète" },
-    { "@type": "AdministrativeArea", name: "Hérault" },
-    { "@type": "AdministrativeArea", name: "Occitanie" },
+    ...ZONES.map((zone) => ({ "@type": "City", name: zone.ville })),
+    { "@type": "AdministrativeArea", name: ENTREPRISE.zone.departement },
+    { "@type": "AdministrativeArea", name: ENTREPRISE.adresse.region },
     { "@type": "Country", name: "France" },
   ],
-  sameAs: [
-    "https://www.instagram.com/cover.swap/",
-    "https://www.facebook.com/coverswap",
-    "https://www.tiktok.com/@cover.swap",
-  ],
+  knowsAbout: ["Covering adhésif", "Films Cover Styl'", "Rénovation de cuisine sans travaux", "Rénovation de salle de bain sans casser le carrelage", "Relooking de meubles", "Films pour vitrages"],
+  sameAs: [ENTREPRISE.reseaux.instagram, ENTREPRISE.reseaux.facebook, ENTREPRISE.reseaux.tiktok],
 };
 
 export function LocalBusinessSchema() {
-  return (
-    <script
-      type="application/ld+json"
-      id="coverswap-local-business"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(LOCAL_BUSINESS_SCHEMA) }}
-    />
-  );
+  return <Script data={LOCAL_BUSINESS} />;
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   ORGANIZATION — schema.org/Organization
-   Complément à LocalBusiness
-────────────────────────────────────────────────────────────────── */
 export function OrganizationSchema() {
   return (
-    <OrganizationJsonLd
-      scriptKey="coverswap-org"
-      type="Organization"
-      name="CoverSwap"
-      url="https://coverswap.fr"
-      logo="https://coverswap.fr/logo.png"
-      contactPoint={[
-        {
-          telephone: "+33670352869",
-          contactType: "customer service",
-          email: "contact@coverswap.fr",
-        },
-      ]}
-      legalName="CoverSwap - Lucas Villemin"
-      address={{
-        streetAddress: "73 rue Simone Veil",
-        addressLocality: "Pérols",
-        postalCode: "34470",
-        addressCountry: "FR",
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": `${ENTREPRISE.site}/#organisation`,
+        name: ENTREPRISE.nom,
+        url: ENTREPRISE.site,
+        logo: { "@type": "ImageObject", url: `${ENTREPRISE.site}/logo.png` },
+        contactPoint: [{ "@type": "ContactPoint", telephone: ENTREPRISE.telephoneInternational, email: ENTREPRISE.email, contactType: "customer service", availableLanguage: "French", areaServed: "FR" }],
+        sameAs: LOCAL_BUSINESS.sameAs,
       }}
     />
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   SERVICE — schema.org/Service (custom car next-seo n'a pas de ServiceJsonLd)
-────────────────────────────────────────────────────────────────── */
-export function ServiceSchema({
-  name,
-  description,
-  url,
-}: {
-  name: string;
-  description: string;
-  url: string;
-}) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name,
-    description,
-    url,
-    provider: {
-      "@type": "LocalBusiness",
-      name: "CoverSwap",
-      url: "https://coverswap.fr",
-      telephone: "+33670352869",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "73 rue Simone Veil",
-        addressLocality: "Pérols",
-        postalCode: "34470",
-        addressCountry: "FR",
-      },
-    },
-    areaServed: {
-      "@type": "Country",
-      name: "France",
-    },
-    serviceType: "Rénovation par covering adhésif",
-  };
-
+export function ServiceSchema({ name, description, url, typeProjet }: { name: string; description: string; url: string; typeProjet?: string }) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name,
+        description,
+        url,
+        serviceType: typeProjet ? `Covering adhésif — ${typeProjet}` : "Rénovation par covering adhésif",
+        provider: { "@id": LOCAL_BUSINESS_ID },
+        areaServed: LOCAL_BUSINESS.areaServed,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "EUR",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            priceCurrency: "EUR",
+            minPrice: PRIX_ML_MIN,
+            maxPrice: PRIX_ML_COURANT_MAX,
+            unitText: "mètre linéaire de film posé, fourni et posé",
+          },
+          availability: "https://schema.org/InStock",
+          url: `${ENTREPRISE.site}/devis`,
+        },
+      }}
     />
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   FAQ — schema.org/FAQPage via next-seo
-────────────────────────────────────────────────────────────────── */
 export function FAQSchema({ faqs }: { faqs: { q: string; a: string }[] }) {
   return (
-    <FAQJsonLd
-      scriptKey="faq-schema"
-      questions={faqs.map((faq) => ({
-        question: faq.q,
-        answer: faq.a,
-      }))}
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+      }}
     />
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   ARTICLE — schema.org/Article via next-seo
-────────────────────────────────────────────────────────────────── */
-export function ArticleSchema({
-  title,
-  description,
-  datePublished,
-  url,
-  images,
-}: {
-  title: string;
-  description: string;
-  datePublished: string;
-  url: string;
-  images?: string[];
-}) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: title,
-    description,
-    url,
-    datePublished,
-    dateModified: datePublished,
-    author: [{ "@type": "Person", name: "Lucas Villemin", url: "https://coverswap.fr" }],
-    publisher: {
-      "@type": "Organization",
-      name: "CoverSwap",
-      logo: { "@type": "ImageObject", url: "https://coverswap.fr/logo.png" },
-    },
-    image: images || ["https://coverswap.fr/og-image.jpg"],
-  };
-
+export function HowToSchema({ name, description, etapes, dureeTotale }: { name: string; description: string; etapes: { titre: string; texte: string }[]; dureeTotale?: string }) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name,
+        description,
+        ...(dureeTotale ? { totalTime: dureeTotale } : {}),
+        step: etapes.map((e, i) => ({ "@type": "HowToStep", position: i + 1, name: e.titre, text: e.texte })),
+      }}
     />
   );
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   BREADCRUMB — schema.org/BreadcrumbList via next-seo
-────────────────────────────────────────────────────────────────── */
-export function BreadcrumbSchema({
-  items,
-}: {
-  items: { name: string; url: string }[];
-}) {
+export function ArticleSchema({ title, description, url, image, datePublished, dateModified }: { title: string; description: string; url: string; image?: string; datePublished: string; dateModified?: string }) {
   return (
-    <BreadcrumbJsonLd
-      scriptKey="breadcrumb-schema"
-      items={items.map((i) => ({
-        name: i.name,
-        item: i.url,
-      }))}
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: title,
+        description,
+        url,
+        mainEntityOfPage: url,
+        ...(image ? { image: [image] } : {}),
+        datePublished,
+        dateModified: dateModified ?? datePublished,
+        inLanguage: "fr-FR",
+        author: [{ "@type": "Person", name: ENTREPRISE.dirigeant, url: ENTREPRISE.site }],
+        publisher: { "@id": `${ENTREPRISE.site}/#organisation` },
+      }}
+    />
+  );
+}
+
+export function BreadcrumbSchema({ items }: { items: { name: string; url: string }[] }) {
+  return (
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: items.map((item, i) => ({ "@type": "ListItem", position: i + 1, name: item.name, item: item.url })),
+      }}
     />
   );
 }

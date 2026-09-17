@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | CoverSwap",
   },
   description:
-    `Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis gratuit ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS} posé.`,
+    `Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis gratuit ${DELAI_REPONSE}. Prix au mètre linéaire, dès ${PRIX_DEPUIS} fourni et posé.`,
   keywords:
     "covering adhésif, rénovation cuisine, covering salle de bain, covering meubles, revêtement adhésif, simulation IA, rénovation rapide",
   applicationName: "CoverSwap",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     description:
-      `Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de ${PRIX_DEPUIS} posé.`,
+      `Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. Prix au mètre linéaire, dès ${PRIX_DEPUIS} fourni et posé.`,
     url: SITE_URL,
     siteName: "CoverSwap",
     locale: "fr_FR",
@@ -90,6 +90,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
+        {/* Le contenu est visible sans JavaScript ; cette classe autorise les apparitions douces (ScrollReveal). */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
         {/* Preload haute priorité du poster hero — affichage instantané */}
         <link
           rel="preload"

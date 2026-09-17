@@ -1,525 +1,280 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import AnimatedCounter from "@/components/AnimatedCounter";
 import ScrollReveal from "@/components/ScrollReveal";
-import TextureBackground from "@/components/TextureBackground";
 import HeroVideo from "@/components/HeroVideo";
-import { SimulationSection, FAQSection } from "@/components/HomeClient";
+import { SimulationSection } from "@/components/HomeClient";
+import { FAQSchema } from "@/components/JsonLd";
+import { PRESTATIONS } from "@/data/prestations";
+import { FAQ_GENERALE } from "@/data/faq";
+import { ZONES, getZoneSlug } from "@/data/zones";
+import revetements from "@/data/revetements.json";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 
-import { DELAI_REPONSE, NB_REFERENCES, PRIX_DEPUIS, PRIX_M2_DEPUIS, SURFACE_MINIMUM_M2 } from "@/lib/offre";
-/* ──────────────────────────────────────────────────────────────────
-   METADATA — SEO
-────────────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: {
-    absolute: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
-  },
-  description:
-    `Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Covering adhésif premium Cover Styl' posé en 1 journée, garanti 10 ans. Simulation IA gratuite, devis ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS}.`,
-  openGraph: {
-    title: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
-    description:
-      "Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Pose Cover Styl' en 1 journée, garantie 10 ans. Simulation IA gratuite.",
-    url: "https://coverswap.fr",
-    type: "website",
-  },
-  alternates: {
-    canonical: "/",
-  },
+  title: { absolute: "CoverSwap — Rénover sans casser : covering adhésif à Montpellier" },
+  description: `Cuisines, salles de bain, meubles et locaux professionnels recouverts d'un film Cover Styl' en une journée, sans travaux. Simulation sur votre photo, devis ${DELAI_REPONSE}, ${PRIX_PLAGE} fourni et posé, garantie ${GARANTIE_ANS} ans. Montpellier, Hérault, France sur devis.`,
+  alternates: { canonical: ENTREPRISE.site },
 };
 
-/* ──────────────────────────────────────────────────────────────────
-   TEXTURES — URLs Unsplash directes, images libres de droits
-   Paramètres : w=1920, q=80, fit=crop, format=auto
-────────────────────────────────────────────────────────────────── */
-const TEXTURES = {
-  /** Salle de bain élégante avec murs en marbre et éléments naturels */
-  bathroom:
-    "/images/fonds/photo-1754522711595-84428937b07a",
-} as const;
+/* ── Familles du catalogue : comptées dans les données, une référence témoin par famille ── */
+const TEMOINS: Record<string, { nom: string; ref: string; image: string }> = {
+  bois: { nom: "Bois", ref: "Rich Oak", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa04_d4dbfa3468.jpg" },
+  pierre: { nom: "Pierre & marbre", ref: "Grigio Marquina", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk14_792e853256.jpg" },
+  beton: { nom: "Béton", ref: "Raw Grey", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne24_50d2ddfad4.jpg" },
+  couleur: { nom: "Couleurs unies", ref: "Black Mat", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k1_6dc839de4a.jpg" },
+  metal: { nom: "Métal", ref: "Chromed Metal", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ki01_e5536ae2ce.jpg" },
+  textile: { nom: "Cuir & textile", ref: "Graphite", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_04_Graphite_2802668bd8.png" },
+  paillettes: { nom: "Paillettes", ref: "Midnight Blue Disco", image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r11_9f09c9b29b.jpg" },
+};
+const COMPTES = (revetements as { famille: string }[]).reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.famille]: (acc[r.famille] ?? 0) + 1 }), {});
 
-/* ══════════════════════════════════════════════════════════════════
-   SECTION 1 — HERO
-   Marbre noir / parallax / overlay 0.72
-══════════════════════════════════════════════════════════════════ */
-function HeroSection() {
+function Hero() {
   return (
-    <section className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Vidéo hero — desktop only, mobile = poster */}
+    <section className="relative min-h-[88vh] md:min-h-screen flex items-center overflow-hidden">
       <HeroVideo />
-
-      {/* Halo rouge ambiant — masqué mobile */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none hidden md:block"
-        style={{ background: "radial-gradient(circle, rgba(204,0,0,0.07) 0%, transparent 70%)" }}
-      />
-
-      <div className="container-custom relative z-20 text-center pt-20 pb-8 md:pt-32 md:pb-20">
-        {/* Badge live */}
-        <div
-          className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xs border border-white/10 rounded-full px-4 py-1.5 md:px-5 md:py-2 mb-5 md:mb-8"
-          style={{ animation: "slideUpFade 0.6s ease both 0s" }}
-        >
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-sm text-gris-300">Simulation IA gratuite en 60 secondes</span>
-        </div>
-
-        {/* Headline */}
-        <h1
-          className="font-display text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] mb-4 md:mb-6 tracking-tight"
-          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.1s" }}
-        >
-          Transformez votre
-          <br />
-          intérieur en{" "}
-          <span className="relative inline-block">
-            <span className="text-rouge">1 journée</span>
-            <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
-              <path
-                d="M2 10C50 2 100 2 150 6C200 10 250 4 298 8"
-                stroke="#CC0000"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
+      <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 py-28 md:py-32">
+        <p className="text-rouge font-bold text-sm uppercase tracking-widest mb-4">Covering adhésif · Montpellier &amp; France</p>
+        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight mb-6 max-w-4xl text-balance">
+          Rénover sans casser.
         </h1>
-
-        <p
-          className="text-sm sm:text-base md:text-xl text-gris-300 max-w-2xl mx-auto mb-4 md:mb-10 leading-relaxed"
-          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.25s" }}
-        >
-          Revêtements adhésifs texturés haut de gamme. Effet marbre, bois, béton, métal.
-          <br className="hidden sm:block" />
-          <strong className="text-white">Jusqu&apos;à 5x moins cher</strong> qu&apos;une rénovation classique.
+        <p className="text-gris-200 text-lg md:text-2xl max-w-2xl leading-relaxed mb-8">
+          Cuisine, salle de bain, meubles, locaux professionnels : un film Cover Styl&apos; posé sur vos surfaces existantes. Une journée de pose, réversible, garanti {GARANTIE_ANS} ans.
         </p>
-
-        {/* CTAs */}
-        <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 mb-6 md:mb-16"
-          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.4s" }}
-        >
-          <Link href="/simulation" className="btn-primary text-sm md:text-lg px-6 py-3 md:px-10 md:py-5">
-            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Simuler mon projet
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <Link href="/simulation" className="btn-primary">
+            Simuler sur ma photo
           </Link>
-          <Link
-            href="/devis"
-            className="btn-secondary inline-flex items-center gap-2 text-sm md:text-base px-5 py-2.5 md:px-6 md:py-3"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Devis en ligne gratuit
+          <Link href="/devis" className="btn-secondary">
+            Demander un devis
           </Link>
         </div>
-
-        {/* Pricing hint */}
-        <div
-          className="mb-4 md:mb-10 -mt-1 md:-mt-4 flex items-center justify-center"
-          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.5s" }}
-        >
-          <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xs border border-rouge/30 rounded-full px-5 py-2.5">
-            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" />
-            </svg>
-            <span className="text-sm text-white font-medium">
-              À partir de <strong className="text-rouge">{PRIX_M2_DEPUIS}&nbsp;€/m²</strong>
-              <span className="text-gris-400"> · surfaces lisses · à partir de {SURFACE_MINIMUM_M2}&nbsp;m²</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Trust badges */}
-        <div
-          className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-gris-400"
-          style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.55s" }}
-        >
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span className="text-sm">Devis gratuit sans engagement</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm">Artisan spécialisé Cover Styl&apos;</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-sm">France entière</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-20">
-        <svg className="w-6 h-6 text-gris-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gris-300">
+          <li>Devis gratuit {DELAI_REPONSE}</li>
+          <li>Dès {PRIX_ML_MIN} €/ml fourni et posé</li>
+          <li>{NB_REFERENCES} finitions Cover Styl&apos;</li>
+        </ul>
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SECTION 2 — CHIFFRES CLÉS
-   Fond noir pur — laisser respirer entre les sections texturées
-══════════════════════════════════════════════════════════════════ */
-function KeyFigures() {
-  const figures = [
-    { value: 1,   suffix: " journée", label: "Pour transformer votre espace", icon: "clock" },
-    { value: 5,   suffix: "x",        label: "Moins cher qu'une rénovation",  icon: "euro"  },
-    { value: 60,  suffix: " sec",     label: "Pour votre simulation IA",      icon: "zap"   },
-    { value: 100, suffix: "%",        label: "France entière couverte",       icon: "map"   },
+function CeQueCaChange() {
+  const points = [
+    { titre: "Pas de travaux", texte: "Le film se pose sur l'existant : pas de démontage, pas de poussière, pas de séchage. La pièce est utilisable le soir même." },
+    { titre: "Un prix lisible", texte: `Au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE} selon la gamme et la taille du chantier. Le devis détaille chaque surface.` },
+    { titre: "Réversible et garanti", texte: `Le film se retire à chaud sans abîmer le support. Pose et films garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration.` },
   ];
-
   return (
-    <section className="relative py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
-      {/* Halo rouge très subtil */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.15) 0%, transparent 70%)" }} />
-      </div>
-
-      <div className="container-custom relative z-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {figures.map((fig, i) => (
-            <ScrollReveal key={i} delay={i * 0.1} direction="up">
-              <div className="glass-card p-5 md:p-8 text-center group hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 h-full">
-                <div className="w-10 h-10 md:w-14 md:h-14 mx-auto mb-3 md:mb-4 rounded-xl bg-rouge/10 flex items-center justify-center group-hover:bg-rouge/20 transition-colors">
-                  {fig.icon === "clock" && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-                  {fig.icon === "euro" && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" /></svg>}
-                  {fig.icon === "zap"  && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>}
-                  {fig.icon === "map"  && <svg className="w-7 h-7 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-                </div>
-                <div className="font-display text-3xl md:text-5xl font-bold text-white mb-1 md:mb-2">
-                  <AnimatedCounter end={fig.value} suffix={fig.suffix} />
-                </div>
-                <p className="text-sm text-gris-400">{fig.label}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+    <section className="section-padding bg-noir">
+      <div className="container-custom grid md:grid-cols-3 gap-6">
+        {points.map((p, i) => (
+          <ScrollReveal key={p.titre} delay={i * 0.06}>
+            <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-7">
+              <h2 className="font-display text-2xl font-bold mb-3">{p.titre}</h2>
+              <p className="text-gris-400 leading-relaxed">{p.texte}</p>
+            </div>
+          </ScrollReveal>
+        ))}
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SECTION 3 — COMMENT ÇA MARCHE
-   Béton lisse anthracite — overlay 0.80
-══════════════════════════════════════════════════════════════════ */
-function HowItWorks() {
-  const steps = [
-    {
-      num: "01",
-      title: "Envoyez votre photo",
-      desc: "Prenez une photo de votre espace et envoyez-la via notre formulaire. Notre IA l'analyse en quelques secondes.",
-      icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
-    },
-    {
-      num: "02",
-      title: "Recevez votre simulation",
-      desc: "En moins de 60 secondes, notre IA génère un rendu réaliste avec le revêtement choisi. Gratuit et sans engagement.",
-      icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
-    },
-    {
-      num: "03",
-      title: "On transforme tout",
-      desc: "Notre équipe intervient chez vous en 1 journée. Pose professionnelle, finition parfaite, résultat garanti.",
-      icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>,
-    },
-  ];
-
+function Prestations() {
   return (
-    <section className="relative section-padding overflow-hidden">
-      {/* Texture béton */}
-      <TextureBackground
-        src={TEXTURES.bathroom}
-        overlay="rgba(0,0,0,0.80)"
-        fadeTop
-        fadeBottom
-      />
-
-      <div className="container-custom relative z-20">
-        <div className="text-center mb-10 md:mb-16">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Simple &amp; rapide</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">Comment ça marche ?</h2>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 max-w-xl mx-auto">
-              3 étapes simples pour transformer votre intérieur. De la simulation IA à la pose finale.
-            </p>
-          </ScrollReveal>
+    <section className="section-padding pt-0 bg-noir">
+      <div className="container-custom">
+        <div className="flex items-end justify-between gap-4 mb-8">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold">Ce que nous recouvrons</h2>
+          <Link href="/prestations" className="text-sm text-gris-400 hover:text-white transition-colors shrink-0">
+            Toutes les prestations →
+          </Link>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-8 relative">
-          {/* Ligne de connexion */}
-          <div className="hidden md:block absolute top-18 left-[22%] right-[22%] h-px"
-            style={{ background: "linear-gradient(to right, transparent, rgba(204,0,0,0.35), transparent)" }} />
-
-          {steps.map((step, i) => (
-            <ScrollReveal key={i} delay={i * 0.15} direction="up">
-              <div className="glass-card p-5 md:p-8 h-full hover:border-rouge/30 transition-all duration-500 hover:bg-rouge/5 hover:-translate-y-2 relative group">
-                <div className="font-display text-4xl md:text-6xl font-bold text-rouge/10 absolute top-3 right-4 md:top-4 md:right-6 select-none">
-                  {step.num}
-                </div>
-                <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-rouge/10 flex items-center justify-center text-rouge mb-4 md:mb-6 group-hover:bg-rouge group-hover:text-white transition-all duration-500">
-                  {step.icon}
-                </div>
-                <h3 className="font-display text-xl font-bold mb-3">{step.title}</h3>
-                <p className="text-gris-400 text-sm leading-relaxed">{step.desc}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-
-        <ScrollReveal direction="up" delay={0.3}>
-          <div className="text-center mt-12">
-            <Link href="/simulation" className="btn-primary">
-              Simuler mon projet
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {PRESTATIONS.map((p) => (
+            <Link key={p.slug} href={`/prestations/${p.slug}`} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:border-rouge/50 transition-colors">
+              <p className="font-display text-xl font-bold mb-2">{p.court}</p>
+              <p className="text-sm text-gris-400 leading-relaxed">{p.accroche}</p>
+              <p className="text-xs text-gris-500 mt-3">{p.prix.fourchette === "sur devis" ? "Sur devis" : p.prix.fourchette}</p>
             </Link>
-          </div>
-        </ScrollReveal>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   SECTION PRICING — Tarif transparent
-   Rassurer sur l'ordre de grandeur AVANT la demande de devis
-══════════════════════════════════════════════════════════════════ */
-function PricingSection() {
-  return (
-    <section id="tarifs" className="relative py-14 md:py-24 px-4 sm:px-6 lg:px-8 bg-noir overflow-hidden">
-      {/* Halo rouge */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full opacity-30"
-          style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.15) 0%, transparent 70%)" }}
-        />
-      </div>
-
-      <div className="container-custom relative z-10 max-w-5xl">
-        <div className="text-center mb-12">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Tarif transparent</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
-              Un prix clair, <span className="text-rouge">sans surprise</span>
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 max-w-2xl mx-auto">
-              Fini les devis opaques. CoverSwap affiche ses tarifs dès la page d&apos;accueil.
-            </p>
-          </ScrollReveal>
+          ))}
         </div>
-
-        <ScrollReveal direction="up" delay={0.15}>
-          <div className="glass-card glow-border border-rouge/30 p-6 md:p-14 text-center relative overflow-hidden">
-            {/* Ribbon */}
-            <div className="absolute top-5 right-5 bg-rouge/15 border border-rouge/40 rounded-full px-3 py-1 text-[10px] font-bold text-rouge uppercase tracking-widest">
-              Fourni &amp; posé
-            </div>
-
-            <p className="text-gris-400 uppercase text-xs tracking-widest mb-3">À partir de</p>
-            <div className="flex items-baseline justify-center gap-2 mb-2">
-              <span className="font-display text-5xl md:text-8xl font-bold text-white">{PRIX_M2_DEPUIS}</span>
-              <span className="font-display text-2xl md:text-4xl text-rouge font-bold">€ / m²</span>
-            </div>
-            <p className="text-gris-300 mb-8">Revêtement Cover Styl&apos; fourni et posé par nos soins</p>
-
-            <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
-              {[
-                { title: "Surfaces lisses", desc: "Crédence, plan, façades planes" },
-                { title: `À partir de ${SURFACE_MINIMUM_M2} m²`, desc: "Surface minimale pour bénéficier de ce tarif" },
-                { title: "Tout inclus", desc: "Matériau premium + pose + finitions" },
-              ].map((c) => (
-                <div key={c.title} className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <p className="font-bold text-white text-sm mb-1">{c.title}</p>
-                  <p className="text-xs text-gris-400">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-xs text-gris-500 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Tarif indicatif de départ pour une surface plane à partir de {SURFACE_MINIMUM_M2}&nbsp;m². Prix final ajusté selon la complexité
-              (angles, reliefs, démontages nécessaires), la référence Cover Styl&apos; choisie et la zone d&apos;intervention.
-              Devis détaillé gratuit {DELAI_REPONSE}.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/simulation" className="btn-primary">
-                Simuler mon projet (IA)
-              </Link>
-              <Link href="/contact" className="btn-secondary">
-                Demander un devis précis
-              </Link>
-            </div>
-          </div>
-        </ScrollReveal>
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SECTION 4b — CATALOGUE CTA
-   Fond noir — bannière visuelle vers /revetements
-══════════════════════════════════════════════════════════════════ */
-function CatalogueSection() {
-  /**
-   * Chaque famille est représentée par une référence clé du catalogue Cover Styl',
-   * pas par un icône générique. Visuel = preuve immédiate du produit.
-   */
-  const families = [
-    {
-      name: "Bois",
-      count: "267",
-      refId: "AA04",
-      refName: "Rich Oak",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa04_d4dbfa3468.jpg",
-    },
-    {
-      name: "Pierre & marbre",
-      count: "36",
-      refId: "MK14",
-      refName: "Grigio Marquina",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk14_792e853256.jpg",
-    },
-    {
-      name: "Béton & ciment",
-      count: "17",
-      refId: "NE24",
-      refName: "Raw Grey",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne24_50d2ddfad4.jpg",
-    },
-    {
-      name: "Couleurs unies",
-      count: "89",
-      refId: "K1",
-      refName: "Black Mat",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k1_6dc839de4a.jpg",
-    },
-    {
-      name: "Métal",
-      count: "31",
-      refId: "KI01",
-      refName: "Chromed Metal",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ki01_e5536ae2ce.jpg",
-    },
-    {
-      name: "Cuir & textile",
-      count: "41",
-      refId: "LP04",
-      refName: "Graphite",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/LP_04_Graphite_2802668bd8.png",
-    },
-    {
-      name: "Paillettes",
-      count: "16",
-      refId: "R11",
-      refName: "Midnight Blue Disco",
-      image: "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/r11_9f09c9b29b.jpg",
-    },
+function CommentCaMarche() {
+  const etapes = [
+    { titre: "Une photo", texte: "Vous photographiez la pièce ou le meuble. La simulation montre l'effet d'une finition sur votre propre photo, en moins d'une minute." },
+    { titre: `Un devis ${DELAI_REPONSE}`, texte: "Chiffré au mètre linéaire, finition par finition, déplacement compris dans le devis. Teintes validées sur échantillons." },
+    { titre: "Une journée de pose", texte: "Nettoyage, pose à chaud, finitions vérifiées avec vous. Pas de gravats : vous retrouvez la pièce le soir même." },
   ];
-
   return (
-    <section className="relative section-padding bg-noir overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full opacity-20 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.15) 0%, transparent 70%)" }} />
+    <section className="section-padding bg-noir">
+      <div className="container-custom">
+        <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10">Comment ça se passe</h2>
+        <ol className="grid md:grid-cols-3 gap-6">
+          {etapes.map((e, i) => (
+            <li key={e.titre} className="rounded-2xl border border-white/10 bg-white/[0.03] p-7">
+              <span className="font-display text-4xl font-bold text-rouge/60">{i + 1}</span>
+              <h3 className="font-display text-xl font-bold mt-2 mb-2">{e.titre}</h3>
+              <p className="text-gris-400 leading-relaxed">{e.texte}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
 
-      <div className="container-custom relative z-10">
-        <div className="text-center mb-12">
-          <ScrollReveal direction="fade">
-            <span className="text-rouge font-bold text-sm uppercase tracking-widest">Catalogue</span>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
-              {NB_REFERENCES} références <span className="text-rouge">Cover Styl&rsquo;</span>
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 max-w-2xl mx-auto">
-              Explorez notre catalogue complet de rev&ecirc;tements adh&eacute;sifs : bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies et bien plus. Chaque finition est disponible &agrave; la commande.
-            </p>
-          </ScrollReveal>
+function Tarifs() {
+  const lignes = [
+    { projet: FOURCHETTES.cuisine.libelle, prix: fourchette("cuisine") },
+    { projet: FOURCHETTES.sdb.libelle, prix: fourchette("sdb") },
+    { projet: FOURCHETTES.meuble.libelle, prix: fourchette("meuble") },
+    { projet: FOURCHETTES.pro.libelle, prix: fourchette("pro") },
+  ];
+  return (
+    <section id="tarifs" className="section-padding pt-0 bg-noir">
+      <div className="container-custom grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
+        <div>
+          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">Des prix au mètre linéaire</h2>
+          <p className="text-gris-300 leading-relaxed mb-4">
+            Nous mesurons le film réellement posé et le facturons fourni et posé : <strong className="text-white">{PRIX_PLAGE}</strong> selon la gamme Cover Styl&apos; choisie, la taille du chantier et la complexité de la pose. Plus le métrage est grand, plus le prix au mètre baisse.
+          </p>
+          <p className="text-sm text-gris-500 mb-6">{ENTREPRISE.tvaMention}. Devis gratuit, valable 30 jours, acompte de 30 % à la commande.</p>
+          <Link href="/devis" className="btn-primary">
+            Devis gratuit {DELAI_REPONSE}
+          </Link>
         </div>
-
-        <ScrollReveal direction="up" delay={0.15}>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-10">
-            {families.map((f) => (
-              <Link
-                key={f.name}
-                href={`/revetements?famille=${encodeURIComponent(f.name.toLowerCase().split(" ")[0])}`}
-                className="group glass-card p-4 text-center hover:border-rouge/40 transition-all duration-300 hover:-translate-y-1"
-              >
-                {/* Vignette : référence clé de la famille */}
-                <div className="relative w-full aspect-square mx-auto mb-3 rounded-xl overflow-hidden border border-white/10 group-hover:border-rouge/40 transition-colors">
-                  <Image
-                    src={f.image}
-                    alt={`${f.refName} — exemple ${f.name}`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 140px"
-                    loading="lazy"
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  {/* Badge code ref en bas */}
-                  <div className="absolute bottom-1 right-1 bg-noir/85 backdrop-blur-xs text-[9px] font-mono text-white px-1.5 py-0.5 rounded-sm">
-                    {f.refId}
-                  </div>
-                </div>
-                <p className="font-display font-bold text-sm mb-0.5 group-hover:text-rouge transition-colors">
-                  {f.name}
-                </p>
-                <p className="text-rouge text-xs font-semibold">{f.count} refs</p>
-              </Link>
+        <table className="w-full text-left border-collapse">
+          <caption className="sr-only">Ordres de grandeur par type de projet, fourni et posé</caption>
+          <thead>
+            <tr className="text-xs uppercase tracking-widest text-gris-500 border-b border-white/10">
+              <th scope="col" className="py-3 pr-4 font-medium">Projet</th>
+              <th scope="col" className="py-3 font-medium text-right">Ordre de grandeur</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lignes.map((l) => (
+              <tr key={l.projet} className="border-b border-white/5">
+                <td className="py-4 pr-4 text-gris-300">{l.projet}</td>
+                <td className="py-4 text-right font-display font-bold text-white whitespace-nowrap">{l.prix}</td>
+              </tr>
             ))}
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal direction="up" delay={0.25}>
-          <div className="text-center">
-            <Link href="/revetements" className="btn-secondary inline-flex items-center gap-2">
-              Explorer tout le catalogue
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </Link>
-          </div>
-        </ScrollReveal>
+          </tbody>
+        </table>
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   PAGE ROOT
-══════════════════════════════════════════════════════════════════ */
+function Catalogue() {
+  return (
+    <section className="section-padding bg-noir">
+      <div className="container-custom">
+        <div className="flex items-end justify-between gap-4 mb-8">
+          <h2 className="font-display text-3xl sm:text-4xl font-bold">{NB_REFERENCES} finitions Cover Styl&apos;</h2>
+          <Link href="/revetements" className="text-sm text-gris-400 hover:text-white transition-colors shrink-0">
+            Voir le catalogue →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+          {Object.entries(TEMOINS).map(([famille, t]) => (
+            <Link key={famille} href={`/revetements?famille=${famille}`} className="group">
+              <div className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group-hover:border-rouge/50 transition-colors">
+                <Image src={t.image} alt={`${t.nom} — exemple ${t.ref}`} fill sizes="(max-width: 640px) 50vw, 160px" loading="lazy" className="object-cover" />
+              </div>
+              <p className="font-display font-bold mt-2">{t.nom}</p>
+              <p className="text-xs text-gris-500">{COMPTES[famille] ?? 0} références</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Zones() {
+  return (
+    <section className="section-padding pt-0 bg-noir">
+      <div className="container-custom rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-10">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Basés à {ENTREPRISE.adresse.ville}, sur la métropole de Montpellier</h2>
+        <p className="text-gris-400 leading-relaxed mb-5">
+          Interventions courantes dans l&apos;{ENTREPRISE.zone.departement} et les départements voisins ; partout en {ENTREPRISE.zone.etendue}, le déplacement étant écrit dans le devis.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {ZONES.map((z) => (
+            <Link key={z.slug} href={`/zones/${getZoneSlug(z)}`} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-rouge hover:text-white transition-colors">
+              {z.ville}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQ() {
+  return (
+    <section id="faq" className="section-padding pt-0 bg-noir">
+      <FAQSchema faqs={FAQ_GENERALE} />
+      <div className="container-custom max-w-3xl">
+        <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8">Questions fréquentes</h2>
+        <div className="space-y-3">
+          {FAQ_GENERALE.map((f) => (
+            <details key={f.q} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <summary className="flex items-center justify-between gap-4 cursor-pointer font-display font-bold text-lg list-none">
+                {f.q}
+                <span aria-hidden className="text-rouge transition-transform group-open:rotate-45 text-2xl leading-none">+</span>
+              </summary>
+              <p className="text-gris-400 mt-3 leading-relaxed">{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CTAFinal() {
+  return (
+    <section className="section-padding pt-0 bg-noir">
+      <div className="container-custom rounded-3xl bg-rouge/10 border border-rouge/30 p-8 md:p-14 text-center">
+        <h2 className="font-display text-3xl sm:text-5xl font-bold mb-4 text-balance">Voyez votre pièce transformée avant de décider</h2>
+        <p className="text-gris-300 max-w-xl mx-auto mb-8">Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis.</p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/simulation" className="btn-primary">
+            Simuler sur ma photo
+          </Link>
+          <a href={`tel:${ENTREPRISE.telephoneInternational}`} className="btn-secondary">
+            {ENTREPRISE.telephone}
+          </a>
+        </div>
+        <p className="text-sm text-gris-500 mt-6">
+          Une cuisine complète : {euros(FOURCHETTES.cuisine.min)} à {euros(FOURCHETTES.cuisine.max)} fourni et posé.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <KeyFigures />
-      <HowItWorks />
-      <PricingSection />
-      <CatalogueSection />
+      <Hero />
+      <CeQueCaChange />
+      <Prestations />
       <SimulationSection />
-      <FAQSection />
+      <CommentCaMarche />
+      <Tarifs />
+      <Catalogue />
+      <Zones />
+      <FAQ />
+      <CTAFinal />
     </>
   );
 }
