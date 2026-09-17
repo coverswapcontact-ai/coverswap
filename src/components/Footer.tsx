@@ -114,7 +114,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { href: "/simulateur", label: "Simulateur sur photo" },
-                { href: "https://www.instagram.com/cover.swap/", label: "Nos réalisations", external: true },
+                { href: "/realisations", label: "Nos réalisations" },
                 { href: "/blog", label: "Blog & conseils" },
                 { href: "/contact", label: "Demander un devis" },
                 { href: "/revetements", label: "Catalogue Cover Styl'" },

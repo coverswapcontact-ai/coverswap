@@ -7,6 +7,8 @@ import { consentementPourEnvoi } from "@/lib/consentement";
 import CaseConsentement from "./CaseConsentement";
 import Turnstile, { reinitialiserTurnstile } from "./Turnstile";
 import { obtenirParcoursId } from "@/lib/parcours";
+import { acquisitionPourEnvoi } from "@/lib/utm";
+import { envoyerEvenement } from "@/lib/evenements-site";
 
 import { DELAI_REPONSE } from "@/lib/offre";
 const projectTypes = [
@@ -139,13 +141,17 @@ export default function DevisForm({
           source,
           parcoursId: obtenirParcoursId(),
           turnstileToken: jetonCaptcha,
+          ...acquisitionPourEnvoi(),
+          formulaire: source,
           ...consentementPourEnvoi(consentement, source),
         }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        setError(d?.error || "Une erreur est survenue. Veuillez réessayer.");
+        setError(`${d?.error || "Une erreur est survenue."} Vos réponses et vos photos sont conservées : vous pouvez réessayer.`);
+        envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: source, statut: res.status, raison: d?.reason });
       } else {
+        envoyerEvenement(source.includes("devis") ? "DEVIS_DEMANDE" : "CONTACT_ENVOYE", { formulaire: source, photos: photos.length });
         setSent(true);
         track("devis_form_submitted", {
           type_projet: payload.type_projet || "non_renseigne",
@@ -158,7 +164,8 @@ export default function DevisForm({
         setConsentement(false);
       }
     } catch {
-      setError("Service indisponible. Veuillez réessayer.");
+      setError("Connexion interrompue. Vos réponses et vos photos sont conservées : réessayez.");
+      envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: source, raison: "reseau" });
     } finally {
       setSending(false);
       reinitialiserTurnstile();

@@ -4,6 +4,7 @@ import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection } from "@/components/HomeClient";
+import Realisations from "@/components/Realisations";
 import { FAQSchema } from "@/components/JsonLd";
 import { PRESTATIONS } from "@/data/prestations";
 import { FAQ_GENERALE } from "@/data/faq";
@@ -11,6 +12,8 @@ import { ZONES, getZoneSlug } from "@/data/zones";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "CoverSwap — Rénover sans casser : covering adhésif à Montpellier" },
@@ -268,6 +271,7 @@ export default function HomePage() {
       <Hero />
       <CeQueCaChange />
       <Prestations />
+      <Realisations apercu />
       <SimulationSection />
       <CommentCaMarche />
       <Tarifs />

@@ -8,9 +8,8 @@ const navLinks = [
   { href: "/devis", label: "Devis en ligne", highlight: true },
   { href: "/simulateur", label: "Simulateur" },
   {
-    href: "https://www.instagram.com/cover.swap/",
+    href: "/realisations",
     label: "Réalisations",
-    external: true,
     submenu: [
       { href: "https://www.instagram.com/cover.swap/", label: "Instagram", icon: "instagram" },
       { href: "https://www.tiktok.com/@cover.swap", label: "TikTok", icon: "tiktok" },

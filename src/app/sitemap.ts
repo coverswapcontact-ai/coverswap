@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/simulateur`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/devis`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/zones`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/realisations`, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/prestations`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/revetements`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/contact`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
