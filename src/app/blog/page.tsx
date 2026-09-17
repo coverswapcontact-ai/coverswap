@@ -54,7 +54,7 @@ export default function BlogPage() {
             <p className="text-gris-400 mb-6 text-sm">
               Recevez une simulation gratuite en 60 secondes.
             </p>
-            <Link href="/simulation" className="btn-primary">
+            <Link href="/simulateur" className="btn-primary">
               Simuler mon projet
             </Link>
           </div>

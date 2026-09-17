@@ -5,12 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ScrollReveal from "@/components/ScrollReveal";
 import { track } from "@/lib/analytics";
-import { PROJECT_TYPES } from "@/app/simulation/projects";
+import { PROJECT_TYPES } from "@/lib/simulateur/projets";
+import { preparerPhoto, messageErreurPhoto } from "@/lib/simulateur/photo";
+import { sauvegarderEtat } from "@/lib/simulateur/stockage";
 
 import { NB_REFERENCES } from "@/lib/offre";
-/** Clés sessionStorage pour transférer l'état du home → /simulation */
-const PENDING_PHOTO_KEY = "coverswap_pending_photo";
-const PENDING_PROJECT_KEY = "coverswap_pending_project";
 
 /* ══════════════════════════════════════════════════════════════════
    SIMULATION — accès direct au simulateur depuis la home
@@ -29,32 +28,18 @@ export function SimulationSection() {
 
   const handleFile = useCallback((file: File) => {
     setError("");
-    if (!file.type.startsWith("image/")) {
-      setError("Format invalide. Utilisez une photo (JPG, PNG).");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("La photo ne doit pas dépasser 10 Mo.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPreview(ev.target?.result as string);
-      track("simulation_photo_uploaded", { source: "home", size_kb: Math.round(file.size / 1024) });
-    };
-    reader.readAsDataURL(file);
+    preparerPhoto(file)
+      .then((prete) => {
+        setPreview(prete.dataUrl);
+        track("simulation_photo_uploaded", { source: "home", size_kb: prete.poidsKo });
+      })
+      .catch((e: unknown) => setError(messageErreurPhoto(e instanceof Error ? e.message : "illisible")));
   }, []);
 
   const handleContinue = useCallback(() => {
     if (!preview || !projectId) return;
-    try {
-      sessionStorage.setItem(PENDING_PHOTO_KEY, preview);
-      sessionStorage.setItem(PENDING_PROJECT_KEY, projectId);
-    } catch {
-      /* sessionStorage indisponible (mode privé) → on redirige quand même */
-    }
     track("cta_clicked", { cta: "home_simulation_continue" });
-    router.push("/simulation");
+    void sauvegarderEtat({ projet: projectId, photo: preview, selections: {}, resultat: null, simulationSiteIds: [], rendusLocaux: [], majLe: Date.now() }).finally(() => router.push("/simulateur"));
   }, [preview, projectId, router]);
 
   const handleSelectProject = (id: string) => {

@@ -207,7 +207,7 @@ export default async function ZonePage({
 
           <ScrollReveal direction="up" delay={0.2}>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/simulation" className="btn-primary">
+              <Link href="/simulateur" className="btn-primary">
                 Simuler mon projet ({zone.ville})
               </Link>
               <Link href="/contact" className="btn-secondary">
@@ -491,7 +491,7 @@ export default async function ZonePage({
                 Sans engagement, sans visite obligatoire.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/simulation" className="btn-primary text-lg px-10 py-5">
+                <Link href="/simulateur" className="btn-primary text-lg px-10 py-5">
                   Simuler mon projet
                 </Link>
                 <a

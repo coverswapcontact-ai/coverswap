@@ -43,7 +43,7 @@ function Hero() {
           Cuisine, salle de bain, meubles, locaux professionnels : un film Cover Styl&apos; posé sur vos surfaces existantes. Une journée de pose, réversible, garanti {GARANTIE_ANS} ans.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <Link href="/simulation" className="btn-primary">
+          <Link href="/simulateur" className="btn-primary">
             Simuler sur ma photo
           </Link>
           <Link href="/devis" className="btn-secondary">
@@ -247,7 +247,7 @@ function CTAFinal() {
         <h2 className="font-display text-3xl sm:text-5xl font-bold mb-4 text-balance">Voyez votre pièce transformée avant de décider</h2>
         <p className="text-gris-300 max-w-xl mx-auto mb-8">Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis.</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/simulation" className="btn-primary">
+          <Link href="/simulateur" className="btn-primary">
             Simuler sur ma photo
           </Link>
           <a href={`tel:${ENTREPRISE.telephoneInternational}`} className="btn-secondary">

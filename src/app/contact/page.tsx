@@ -122,7 +122,7 @@ export default function ContactPage() {
               <p className="text-sm text-gris-400 mb-4">
                 Besoin d&apos;un aperçu immédiat de votre projet ?
               </p>
-              <Link href="/simulation" className="btn-secondary text-sm px-6 py-3 w-full">
+              <Link href="/simulateur" className="btn-secondary text-sm px-6 py-3 w-full">
                 Simuler mon projet (IA)
               </Link>
             </div>

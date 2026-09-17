@@ -219,7 +219,7 @@ export default async function BlogPostPage({ params }: Props) {
                 secondes.
               </p>
               <Link
-                href="/simulation"
+                href="/simulateur"
                 className="btn-primary text-sm px-6 py-3 w-full"
               >
                 Simuler mon projet

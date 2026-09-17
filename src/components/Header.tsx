@@ -6,7 +6,7 @@ import Link from "next/link";
 const navLinks = [
   { href: "/", label: "Accueil" },
   { href: "/devis", label: "Devis en ligne", highlight: true },
-  { href: "/simulation", label: "Simulation IA" },
+  { href: "/simulateur", label: "Simulateur" },
   {
     href: "https://www.instagram.com/cover.swap/",
     label: "Réalisations",
@@ -165,7 +165,7 @@ export default function Header() {
 
         {/* CTA Desktop */}
         <Link
-          href="/simulation"
+          href="/simulateur"
           className="hidden lg:inline-flex items-center gap-2 bg-rouge text-white font-bold px-6 py-2.5 rounded-lg text-sm transition-all duration-300 hover:bg-rouge-hover hover:shadow-[0_0_20px_rgba(204,0,0,0.4)] hover:scale-105 uppercase tracking-wider"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,7 +271,7 @@ export default function Header() {
           )
         )}
         <Link
-          href="/simulation"
+          href="/simulateur"
           onClick={() => setMobileOpen(false)}
           className="btn-primary mt-4"
         >

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 import { parcoursIdValide } from "@/lib/parcours";
-import { getProject } from "@/app/simulation/projects";
+import { getProject } from "@/lib/simulateur/projets";
 
 /**
  * POST /api/simulation/contact — après le résultat du simulateur, la personne

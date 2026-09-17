@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 import { parcoursIdValide } from "@/lib/parcours";
-import { signerJetonDevis } from "@/lib/jeton-devis";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
-import { getProject, type ProjectType } from "@/app/simulation/projects";
+import { getProject, type ProjectType } from "@/lib/simulateur/projets";
 import { buildImagePrompt } from "@/lib/simulation-prompt";
 
 // Max duration côté Vercel (Hobby = 60s max, Pro = 300s).
@@ -110,80 +108,6 @@ async function downloadImage(url: string): Promise<Buffer | null> {
   }
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   SEND LEAD TO CRM — utilise le helper centralisé lib/crm.ts
-   Enrichit avec: referenceChoisie, mlEstimes, prixDevis, lienSimulation
-────────────────────────────────────────────────────────────────── */
-/* ── Mapping project_type → CRM typeProjet ── */
-const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
-  cuisine: "CUISINE",
-  "salle-de-bain": "SDB",
-  meubles: "MEUBLES",
-  "mur-plafond": "AUTRE",
-  professionnel: "PRO",
-};
-
-
-/** Consentement mail transmis par le formulaire : booléen + texte figé horodaté. */
-function consentementDepuis(body: Record<string, unknown>): { consentementMail?: boolean; consentementTexte?: string } {
-  if (typeof body.consentementMail !== "boolean") return {};
-  return {
-    consentementMail: body.consentementMail,
-    consentementTexte: typeof body.consentementTexte === "string" ? body.consentementTexte.slice(0, 1000) : undefined,
-  };
-}
-
-function pushLeadToCrm(body: Record<string, string>, ip: string, resultImage?: string) {
-
-  const { prenom, nom } = splitName(body.name);
-  const projectType = body.project_type || "cuisine";
-
-  // Collecte dynamique des refs zone1/zone2/zone3
-  const refs = ["zone1", "zone2", "zone3"]
-    .map((z) => {
-      const ref = body[`${z}_ref`];
-      const label = body[`${z}_label`] || z;
-      const name = body[`${z}_name`] || "";
-      return ref ? `${label} ${ref} (${name})` : null;
-    })
-    .filter(Boolean)
-    .join(" | ");
-
-  const referenceChoisie =
-    body.zone1_ref || body.zone2_ref || body.zone3_ref || undefined;
-
-  const mlEstimes = body.ml ? Number(body.ml) : undefined;
-  const prixDevis = body.prix_devis ? Number(body.prix_devis) : undefined;
-
-  const notesParts = [
-    `Simulation IA ${projectType} en ligne`,
-    refs,
-    mlEstimes ? `${mlEstimes}ml` : null,
-    prixDevis ? `${prixDevis}€` : null,
-    body.message ? `Message: ${body.message}` : null,
-  ].filter(Boolean);
-
-  return sendLeadToCRM({
-    prenom,
-    nom,
-    telephone: body.phone,
-    email: body.email || undefined,
-    source: "SITE_SIMULATEUR",
-    typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
-    referenceChoisie,
-    mlEstimes: Number.isFinite(mlEstimes) ? mlEstimes : undefined,
-    prixDevis: Number.isFinite(prixDevis) ? prixDevis : undefined,
-    lienSimulation: body.lien_simulation || undefined,
-    notes: notesParts.join(" — "),
-    imageBefore: body.photo_base64 || undefined,
-    imageAfter: resultImage || undefined,
-    ville: body.ville || undefined,
-    codePostal: body.codePostal || undefined,
-    parcoursId: parcoursIdValide(body.parcoursId),
-    ...consentementDepuis(body),
-  }, { ipVisiteur: ip });
-}
-
 /* ══════════════════════════════════════════════════════════════════
    POST /api/simulation
 ══════════════════════════════════════════════════════════════════ */
@@ -212,9 +136,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, image: "" });
   }
 
-  const sansCoordonnees = !body.name && !body.phone && !body.email;
-  if (sansCoordonnees && !parcoursIdValide(body.parcoursId)) {
-    return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
+  // Repli du simulateur v2 : le parcours identifie la simulation ; les coordonnées
+  // viennent après le résultat (/api/simulation/contact) avec le rendu.
+  if (!parcoursIdValide(body.parcoursId)) {
+    return NextResponse.json({ error: "Identifiant de parcours manquant : rechargez la page.", reason: "parcours" }, { status: 400 });
   }
   if (!body.photo_base64) {
     return NextResponse.json({ error: "Photo requise." }, { status: 400 });
@@ -224,12 +149,6 @@ export async function POST(req: NextRequest) {
   if (!captcha.ok) {
     console.warn(`[/api/simulation] captcha refusé (${captcha.raison}) ip=${ip}`);
     return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
-  }
-
-  /* ── Créer le lead dans le CRM dès maintenant (avant génération), et l'attendre ── */
-  const lead = sansCoordonnees ? { ok: true, leadId: undefined, emailFallback: false } : await pushLeadToCrm(body, ip);
-  if (!lead.ok && !lead.emailFallback) {
-    return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
@@ -473,17 +392,11 @@ export async function POST(req: NextRequest) {
 
     const resultImage = `data:image/png;base64,${attempt.b64}`;
 
-    /* ── Rendu terminé : on renvoie la simulation (images) au CRM, en l'attendant.
-       Sans coordonnées (simulateur v2 en secours), le navigateur garde le rendu
-       et l'enverra avec la demande de devis. ── */
-    if (!sansCoordonnees) await pushLeadToCrm(body, ip, resultImage);
-
+    /* ── Rendu terminé : le navigateur garde le rendu et l'enverra avec la demande de devis ── */
     return NextResponse.json(
       {
         success: true,
         image: resultImage,
-        leadId: lead.leadId ?? null,
-        jetonDevis: signerJetonDevis(parcoursIdValide(body.parcoursId) ?? "", lead.leadId ?? "") ?? null,
         references: {
           credence: body.credence_ref || "",
           plan: body.plan_ref || "",

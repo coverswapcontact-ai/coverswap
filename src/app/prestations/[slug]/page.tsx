@@ -52,7 +52,7 @@ export default async function PagePrestation({ params }: Props) {
           <p className="text-gris-300 text-lg md:text-xl max-w-2xl leading-relaxed mb-8">{p.accroche}</p>
           <div className="flex flex-col sm:flex-row gap-4">
             {p.simulateur ? (
-              <Link href={`/simulation?projet=${p.simulateur}`} className="btn-primary">
+              <Link href={`/simulateur?projet=${p.simulateur}`} className="btn-primary">
                 Simuler sur ma photo
               </Link>
             ) : null}
@@ -184,7 +184,7 @@ export default async function PagePrestation({ params }: Props) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {p.simulateur ? (
-                <Link href={`/simulation?projet=${p.simulateur}`} className="btn-primary">
+                <Link href={`/simulateur?projet=${p.simulateur}`} className="btn-primary">
                   Simuler sur ma photo
                 </Link>
               ) : null}

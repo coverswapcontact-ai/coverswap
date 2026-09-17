@@ -6,6 +6,9 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
  * Événements de parcours : envoyés au CRM (audience et entonnoir par source et
  * par page, sans donnée personnelle) et poussés dans le dataLayer pour Google
  * Tag Manager / Meta. Jamais bloquant : un échec d'envoi est ignoré.
+ *
+ * Envoi en `text/plain` : une requête « simple », sans pré-vol CORS — un
+ * sendBeacon en JSON serait silencieusement abandonné par le navigateur.
  */
 export type EvenementSite = "PAGE_VUE" | "SIMULATION_PHOTO" | "SIMULATION_LANCEE" | "SIMULATION_RESULTAT" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC";
 
@@ -37,10 +40,9 @@ export function envoyerEvenement(type: EvenementSite, meta: Record<string, strin
   try {
     if (navigator.sendBeacon && type !== "PAGE_VUE") {
       // Beacon : part même si la page se ferme (demande de devis, échec)
-      navigator.sendBeacon(URL_EVENEMENTS, new Blob([corps], { type: "application/json" }));
-      return;
+      if (navigator.sendBeacon(URL_EVENEMENTS, new Blob([corps], { type: "text/plain" }))) return;
     }
-    fetch(URL_EVENEMENTS, { method: "POST", headers: { "Content-Type": "application/json" }, body: corps, keepalive: true }).catch(() => undefined);
+    fetch(URL_EVENEMENTS, { method: "POST", headers: { "Content-Type": "text/plain" }, body: corps, keepalive: true }).catch(() => undefined);
   } catch {
     /* jamais bloquant */
   }

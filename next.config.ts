@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // L'ancien simulateur vivait sur /simulation ; l'adresse est indexée et partagée.
+    return [{ source: "/simulation", destination: "/simulateur", permanent: true }];
+  },
   async headers() {
     return [
       {

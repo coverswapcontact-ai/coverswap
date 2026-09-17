@@ -9,7 +9,7 @@
  * garantir une fidélité de rendu identique quel que soit le chemin d'exécution.
  */
 
-import type { ProjectType } from "@/app/simulation/projects";
+import type { ProjectType } from "@/lib/simulateur/projets";
 
 export interface ElementInfo {
   ref: string;

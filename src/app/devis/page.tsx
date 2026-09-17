@@ -157,7 +157,7 @@ export default function DevisPage() {
                 <p className="text-sm text-gris-300 mb-4">
                   Envie de <strong className="text-white">visualiser</strong> le rendu avant de vous décider ?
                 </p>
-                <Link href="/simulation" className="btn-secondary text-sm px-6 py-3 w-full">
+                <Link href="/simulateur" className="btn-secondary text-sm px-6 py-3 w-full">
                   Simuler mon projet en 60 s
                 </Link>
               </div>

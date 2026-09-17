@@ -22,7 +22,7 @@ export default function Footer() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/simulation"
+              href="/simulateur"
               className="inline-flex items-center gap-2 bg-white text-noir font-bold px-10 py-4 rounded-lg text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl uppercase tracking-wider"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,7 +113,7 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {[
-                { href: "/simulation", label: "Simulation IA gratuite" },
+                { href: "/simulateur", label: "Simulateur sur photo" },
                 { href: "https://www.instagram.com/cover.swap/", label: "Nos réalisations", external: true },
                 { href: "/blog", label: "Blog & conseils" },
                 { href: "/contact", label: "Demander un devis" },

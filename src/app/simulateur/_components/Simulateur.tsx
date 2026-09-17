@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import CaseConsentement from "@/components/CaseConsentement";
 import Turnstile, { reinitialiserTurnstile } from "@/components/Turnstile";
-import { PROJECT_TYPES, getProject } from "@/app/simulation/projects";
+import { PROJECT_TYPES, getProject } from "@/lib/simulateur/projets";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import { envoyerEvenement } from "@/lib/evenements-site";
 import { obtenirParcoursId } from "@/lib/parcours";
