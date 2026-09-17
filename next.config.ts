@@ -34,7 +34,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     // L'ancien simulateur vivait sur /simulation ; l'adresse est indexée et partagée.
-    return [{ source: "/simulation", destination: "/simulateur", permanent: true }];
+    return [
+      { source: "/simulation", destination: "/simulateur", permanent: true },
+      // Ancien article daté ; son sujet vit dans un guide sans date.
+      { source: "/blog/tendances-deco-2025-covering", destination: "/blog/quelle-finition-choisir", permanent: true },
+    ];
   },
   async headers() {
     return [

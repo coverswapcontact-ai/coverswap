@@ -43,7 +43,9 @@ export default async function BlogPostPage({ params }: Props) {
       <ArticleSchema
         title={article.title}
         description={article.excerpt}
-        datePublished={article.date}
+        datePublished={article.dateIso}
+        dateModified={article.dateModifiedIso}
+        image={`https://coverswap.fr${article.image}-1600.jpg`}
         url={`https://coverswap.fr/blog/${article.slug}`}
       />
       <BreadcrumbSchema

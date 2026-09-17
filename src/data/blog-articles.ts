@@ -1,10 +1,22 @@
+import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_COURANT_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+
+/**
+ * Guides : les vraies questions que les gens posent avant un covering, avec
+ * des réponses vérifiables. Les chiffres viennent de lib/offre (grille réelle
+ * au mètre linéaire) ; ce qui n'est pas sûr n'est pas écrit.
+ */
 export interface BlogArticle {
   slug: string;
   title: string;
   excerpt: string;
   category: string;
+  /** Affichage. */
   date: string;
+  /** Pour le balisage et le sitemap. */
+  dateIso: string;
+  dateModifiedIso: string;
   readTime: string;
+  /** Photo de fond locale : `/images/fonds/<id>` (paire 800/1600). */
   image: string;
   content: {
     intro: string;
@@ -15,246 +27,370 @@ export interface BlogArticle {
   relatedSlugs: string[];
 }
 
+const MAJ = "2026-09-17";
+const MAJ_TEXTE = "17 septembre 2026";
+const cuisineMin = euros(FOURCHETTES.cuisine.min);
+const cuisineMax = euros(FOURCHETTES.cuisine.max);
+const sdbMin = euros(FOURCHETTES.sdb.min);
+const sdbMax = euros(FOURCHETTES.sdb.max);
+
 export const articles: BlogArticle[] = [
   {
+    slug: "prix-renovation-cuisine-covering",
+    title: "Combien coûte une rénovation de cuisine par covering ?",
+    excerpt: `Prix au mètre linéaire, fourchettes réelles (${cuisineMin} à ${cuisineMax} pour une cuisine complète), ce qui fait varier le devis et ce qu'il contient.`,
+    category: "Prix",
+    date: MAJ_TEXTE,
+    dateIso: MAJ,
+    dateModifiedIso: MAJ,
+    readTime: "5 min",
+    image: "/images/fonds/photo-1758315417321-83eb30a39710",
+    content: {
+      intro: `Le covering se facture au mètre linéaire de film posé, fourni et posé. Chez CoverSwap, le prix au mètre va de ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € dans la plupart des cas ; une cuisine complète — façades, plan de travail, crédence — se situe entre ${cuisineMin} et ${cuisineMax}. Voici comment ce chiffre se construit, pour lire un devis sans surprise.`,
+      sections: [
+        {
+          title: "Pourquoi au mètre linéaire, et pas au mètre carré",
+          text: "Le film Cover Styl' est vendu en rouleaux d'une largeur fixe (1,22 m). Ce qui compte pour la pose, c'est la longueur de film déroulée sur chaque surface, chants et retours compris. Le mètre linéaire reflète donc le vrai coût de matière et de main-d'œuvre, là où un prix au mètre carré ferait payer de la surface qui n'existe pas ou oublierait les chants.",
+        },
+        {
+          title: "Ce qui fait varier le prix au mètre",
+          text: `Trois choses. La gamme du film : une couleur unie mate coûte moins qu'un bois texturé, une pierre ou un textile (jusqu'à environ 30 % d'écart). La taille du chantier : plus le métrage est grand, plus le prix au mètre baisse, par paliers (jusqu'à 10 m, 10 à 15 m, au-delà). La complexité : des façades planes se posent vite ; des tiroirs nombreux, des moulures, un îlot avec retours prennent plus de temps. C'est pour cela que le devis détaille chaque surface avec son métrage et sa finition.`,
+        },
+        {
+          title: "Les fourchettes constatées",
+          text: `Cuisine complète (façades + plan de travail + crédence) : ${cuisineMin} à ${cuisineMax}. Façades seules d'une cuisine courante : souvent ${euros(900)} à ${euros(1800)}. Plan de travail et crédence seuls : ${euros(600)} à ${euros(1200)}. Ces montants sont fournis et posés, TVA non applicable (article 293 B du CGI). Un devis précis demande vos photos ou une visite ; il est gratuit et vous répond ${DELAI_REPONSE}.`,
+        },
+        {
+          title: "Ce que comprend le devis",
+          text: "Le film Cover Styl' de la référence choisie, la préparation des surfaces (nettoyage, dégraissage, lissage léger si nécessaire), la pose à chaud, les finitions des chants et arêtes, la vérification avec vous, et le déplacement s'il y en a un — écrit sur une ligne à part. L'acompte est de 30 % à la commande, le solde à la fin de l'intervention.",
+        },
+        {
+          title: "Comparer avec un remplacement",
+          text: "Remplacer une cuisine, c'est le mobilier, l'électroménager parfois, la plomberie et l'électricité à reprendre, plusieurs jours sans cuisine, et des gravats. Le covering garde tout ce qui fonctionne et ne change que l'apparence : c'est pour cela qu'il coûte plusieurs fois moins cher. Il ne remplace pas une cuisine dont la structure est abîmée : dans ce cas, nous le disons au devis.",
+        },
+      ],
+      tip: "Envoyez des photos de face avec un objet de taille connue (une feuille A4 posée sur le plan de travail) : le métrage se lit mieux et le devis est plus juste dès le premier envoi.",
+      conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € le mètre linéaire posé, ${cuisineMin} à ${cuisineMax} pour une cuisine complète. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
+    },
+    relatedSlugs: ["covering-adhesif-vs-peinture-cuisine", "comment-se-passe-une-pose-de-covering", "covering-adhesif-durabilite"],
+  },
+  {
+    slug: "comment-se-passe-une-pose-de-covering",
+    title: "Comment se passe une pose de covering, concrètement",
+    excerpt: "De la première photo à la vérification finale : les étapes réelles d'un chantier de covering, ce que vous préparez, ce que nous faisons, combien de temps ça prend.",
+    category: "Déroulement",
+    date: MAJ_TEXTE,
+    dateIso: MAJ,
+    dateModifiedIso: MAJ,
+    readTime: "5 min",
+    image: "/images/fonds/photo-1639405069836-f82aa6dcb900",
+    content: {
+      intro: "Une pose de covering ne ressemble pas à un chantier classique : pas de démontage, pas de poussière, pas de séchage. Voici le déroulé exact, du premier contact à la fin de l'intervention.",
+      sections: [
+        {
+          title: "1. Vos photos, ou une simulation",
+          text: "Tout commence par des photos de la pièce ou du meuble, prises de face, bien éclairées. Le simulateur du site applique la finition de votre choix sur votre propre photo en moins d'une minute ; c'est un aperçu, pas un engagement sur la teinte exacte.",
+        },
+        {
+          title: `2. Le devis, ${DELAI_REPONSE}`,
+          text: "Nous relevons les surfaces sur vos photos (ou sur place quand les mesures l'exigent) et chiffrons au mètre linéaire, finition par finition. Le devis liste chaque surface, sa référence Cover Styl', le déplacement éventuel, et il est valable 30 jours.",
+        },
+        {
+          title: "3. Les échantillons et la commande",
+          text: "Les teintes se valident sur de vrais échantillons, chez vous, dans votre lumière : un chêne clair n'a pas le même rendu sous une fenêtre plein sud ou dans une pièce sombre. Une fois la référence arrêtée et le devis signé avec l'acompte de 30 %, le film est commandé au fabricant.",
+        },
+        {
+          title: "4. Le jour de la pose",
+          text: "Nous protégeons la pièce, puis nettoyons et dégraissons chaque surface : c'est l'étape qui garantit l'adhérence. Le film se pose à chaud, panneau par panneau, avec les chants et les arêtes finis un à un ; les poignées et charnières restent en place. Une cuisine courante prend une journée, un meuble quelques heures, une salle de bain une journée.",
+        },
+        {
+          title: "5. La vérification avec vous",
+          text: "À la fin, nous passons chaque surface en revue avec vous. Les éventuelles réserves sont notées par écrit et reprises. La pièce est utilisable le soir même : rien ne sèche, rien ne dégage d'odeur.",
+        },
+        {
+          title: "Ce que vous préparez",
+          text: "Vider les tiroirs et dégager les plans de travail, libérer l'accès aux surfaces, signaler tout défaut connu du support (un panneau qui gonfle, une peinture qui s'écaille). Le reste, nous le faisons.",
+        },
+      ],
+      conclusion: "Photos, devis, échantillons, une journée de pose, vérification : cinq étapes, aucune surprise. Le simulateur vous donne le point de départ.",
+    },
+    relatedSlugs: ["prix-renovation-cuisine-covering", "entretenir-revetement-adhesif", "covering-adhesif-durabilite"],
+  },
+  {
     slug: "covering-adhesif-vs-peinture-cuisine",
-    title: "Covering adhésif vs peinture : quel choix pour votre cuisine ?",
-    excerpt:
-      "Découvrez les avantages et inconvénients de chaque solution pour transformer votre cuisine sans gros travaux. Coût, durée, rendu : on compare tout.",
+    title: "Covering adhésif ou peinture : quel choix pour votre cuisine ?",
+    excerpt: "Deux façons de changer une cuisine sans la remplacer. Durée du chantier, tenue dans le temps, rendu, prix, réversibilité : la comparaison honnête.",
     category: "Comparatif",
-    date: "18 mars 2025",
-    readTime: "6 min",
+    date: MAJ_TEXTE,
+    dateIso: "2025-03-18",
+    dateModifiedIso: MAJ,
+    readTime: "5 min",
     image: "/images/fonds/photo-1722605090433-41d1183a792d",
     content: {
-      intro:
-        "Rénover sa cuisine est souvent le premier projet que l'on envisage quand on souhaite rafraîchir son intérieur. Deux options reviennent systématiquement : la peinture classique et le covering adhésif. Si la peinture reste un réflexe bien ancré, le revêtement adhésif s'impose de plus en plus comme une alternative performante, rapide et économique. Comparons ces deux solutions point par point pour vous aider à faire le bon choix.",
+      intro: "Repeindre ou recouvrir ? Les deux évitent le remplacement de la cuisine. Ils ne donnent pas le même résultat ni la même tenue, et ne se prêtent pas aux mêmes surfaces.",
       sections: [
         {
-          title: "Le coût : un avantage net pour le covering",
-          text: "Repeindre une cuisine complète — façades de meubles, crédence, plan de travail — nécessite un ponçage minutieux, une sous-couche d'accrochage, deux à trois couches de peinture spéciale meubles et souvent l'intervention d'un professionnel. Le budget se situe généralement entre 1 500 et 3 000 euros selon la surface. Le covering adhésif, lui, revient en moyenne 2 à 3 fois moins cher, matériaux et pose comprise. Chez CoverSwap, une cuisine standard de 10 à 15 façades se rénove à partir de 890 euros, avec un résultat qui rivalise visuellement avec du neuf.",
+          title: "Le chantier",
+          text: "La peinture demande un dégraissage, un ponçage, une sous-couche d'accroche, deux couches et des temps de séchage entre chaque : plusieurs jours, avec les façades démontées ou la cuisine immobilisée, et des odeurs. Le covering se pose en une journée, à chaud, sur des surfaces nettoyées ; la cuisine sert le soir même.",
         },
         {
-          title: "La durée des travaux : 1 jour contre 3 à 5 jours",
-          text: "La peinture impose des temps de séchage incompressibles entre chaque couche, sans compter la préparation des surfaces et la protection de la pièce. Comptez 3 à 5 jours ouvrés pour une cuisine complète, pendant lesquels la pièce reste difficilement utilisable. Le covering adhésif se pose en une seule journée dans la majorité des cas. Pas de temps de séchage, pas d'odeur de solvant : vous retrouvez votre cuisine opérationnelle le soir même. Un gain de temps considérable, surtout quand la cuisine est le cœur de la maison.",
+          title: "Le rendu",
+          text: "La peinture donne une couleur unie, mate ou satinée, avec le risque de traces de pinceau ou de rouleau sur un mélaminé. Le covering propose aussi des couleurs unies, mais surtout des textures — bois, pierre, béton, métal, textile — avec un relief au toucher qu'une peinture ne peut pas imiter.",
         },
         {
-          title: "La qualité de finition : des textures impossibles en peinture",
-          text: "C'est peut-être l'argument le plus décisif. Le covering adhésif reproduit fidèlement des textures de marbre veiné, de chêne naturel, de béton ciré ou de pierre ardoise — des rendus tout simplement impossibles à obtenir avec un pot de peinture. Les films adhésifs haut de gamme offrent un grain, un relief et une profondeur de couleur qui trompent le regard et le toucher. La peinture, même appliquée par un professionnel, reste limitée aux aplats de couleur et aux effets de patine.",
+          title: "La tenue",
+          text: `Une peinture sur façades de cuisine s'use aux points de contact (poignées, arêtes) et s'écaille si l'accroche n'était pas parfaite. Le film Cover Styl' est prévu pour les cuisines : projections, nettoyage courant, chaleur d'usage. Films et pose sont garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration.`,
         },
         {
-          title: "Durabilité et résistance au quotidien",
-          text: "Une peinture de cuisine bien appliquée tient 3 à 5 ans avant de montrer des signes d'usure : écaillage autour des points d'eau, jaunissement près des plaques de cuisson, traces de doigts sur les façades mates. Le covering adhésif professionnel, quant à lui, est conçu pour résister à l'humidité, aux éclaboussures de graisse et aux nettoyages fréquents pendant 7 à 10 ans. Sa surface non poreuse empêche les taches de s'incruster, ce qui simplifie considérablement l'entretien.",
+          title: "La réversibilité",
+          text: "Une façade peinte reste peinte : pour revenir en arrière, il faut décaper. Le film se retire à chaud, sans abîmer le support d'origine : un point décisif pour un locataire ou pour une cuisine que l'on veut pouvoir changer encore.",
         },
         {
-          title: "Réversibilité : un atout majeur du covering",
-          text: "Lorsque vous repeignez vos meubles de cuisine, le changement est permanent. Revenir en arrière implique un décapage complet, souvent coûteux et fastidieux. Le covering adhésif est entièrement amovible : il se retire proprement sans laisser de résidu ni abîmer le support d'origine. C'est un avantage capital pour les locataires, mais aussi pour tous ceux qui aiment changer de décor régulièrement. Vous pouvez passer d'un marbre blanc à un chêne naturel en une journée, sans aucune trace du revêtement précédent.",
+          title: "Le prix",
+          text: `Repeindre soi-même coûte peu en matériel, beaucoup en temps et en risque de résultat inégal ; faire repeindre par un peintre revient souvent au niveau du covering. Le covering se chiffre au mètre linéaire, ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € posé, soit ${cuisineMin} à ${cuisineMax} pour une cuisine complète.`,
+        },
+        {
+          title: "Quand la peinture reste le bon choix",
+          text: "Sur du bois massif brut que l'on veut garder visible, sur des surfaces très irrégulières, ou pour un mur : là, la peinture est plus adaptée. Le covering excelle sur les surfaces lisses et planes — mélaminé, stratifié, laqué, métal, carrelage sain.",
         },
       ],
-      tip: "Avant de choisir, demandez un échantillon gratuit de covering pour le comparer visuellement à un nuancier de peinture directement dans votre cuisine. La lumière naturelle de la pièce peut complètement changer la perception d'une teinte.",
-      conclusion:
-        "Pour la grande majorité des rénovations de cuisine, le covering adhésif l'emporte sur la peinture. Il est moins cher, plus rapide à poser, plus durable dans le temps et offre une palette de textures incomparablement plus riche. Surtout, sa réversibilité en fait une solution sans risque. La peinture garde un intérêt pour des retouches ponctuelles ou des murs lisses, mais dès qu'il s'agit de transformer des façades de meubles ou un plan de travail, le covering s'impose comme le choix le plus pertinent.",
+      conclusion: "Peinture : bon marché en matériel, long, résultat uni, définitif. Covering : une journée, textures réalistes, garanti, réversible. Pour des façades de cuisine en mélaminé, le covering est presque toujours le choix le plus durable.",
     },
-    relatedSlugs: ["entretenir-revetement-adhesif", "marbre-bois-beton-quel-covering"],
-  },
-  {
-    slug: "entretenir-revetement-adhesif",
-    title: "Comment entretenir votre revêtement adhésif ?",
-    excerpt:
-      "Les bons gestes au quotidien pour garder un covering impeccable pendant des années. Produits recommandés, erreurs à éviter et astuces de pros.",
-    category: "Conseils",
-    date: "10 mars 2025",
-    readTime: "4 min",
-    image: "/images/fonds/photo-1642505172378-a6f5e5b15580",
-    content: {
-      intro:
-        "Le covering adhésif est une solution durable et élégante, mais un entretien adapté permet de prolonger sa durée de vie et de conserver un rendu impeccable au fil des années. Bonne nouvelle : les gestes à adopter sont simples, rapides et ne nécessitent aucun produit spécialisé coûteux. Voici le guide complet pour prendre soin de votre revêtement adhésif au quotidien.",
-      sections: [
-        {
-          title: "Le nettoyage au quotidien",
-          text: "Utilisez un chiffon microfibre légèrement humide avec quelques gouttes de produit vaisselle doux. Ce duo suffit à éliminer les traces de doigts, les éclaboussures de cuisine et la poussière du quotidien. Essuyez toujours dans le sens de la texture du film pour un résultat optimal. Après le nettoyage, passez un chiffon sec pour éviter les traces d'eau, surtout sur les finitions foncées ou brillantes. Un entretien quotidien de deux minutes suffit à garder des surfaces impeccables.",
-        },
-        {
-          title: "Protéger les zones à fort passage",
-          text: "Les zones les plus sollicitées — plan de travail, crédences, poignées de meubles — méritent une attention particulière. Pour les crédences de cuisine exposées aux projections de graisse, un nettoyage après chaque session de cuisson prolonge significativement la durée de vie du film. Autour des poignées, où les contacts sont fréquents, un coup de chiffon humide quotidien empêche l'accumulation de sébum qui peut, à terme, altérer l'adhérence en périphérie. Un entretien régulier de ces points critiques évite les interventions correctives.",
-        },
-        {
-          title: "Ce qu'il faut absolument éviter",
-          text: "Ne posez jamais de casserole brûlante directement sur un covering, même si nos films supportent jusqu'à 75 °C. Une chaleur prolongée et intense peut provoquer une déformation locale du revêtement. Utilisez toujours un dessous de plat ou un repose-casserole. Évitez également les éponges abrasives, les crèmes à récurer, l'eau de Javel concentrée et tout solvant agressif (acétone, white-spirit). Ces produits attaquent la couche protectrice du film et peuvent provoquer une décoloration irréversible. En cas de tache résistante, préférez un nettoyant pour vitres sans ammoniaque.",
-        },
-        {
-          title: "Réparer une micro-bulle ou un léger décollement",
-          text: "Il arrive parfois qu'une petite bulle d'air apparaisse après quelques semaines, notamment si la pose a été réalisée par temps froid. Pas de panique : un simple sèche-cheveux réglé sur chaleur tiède suffit à ramollir l'adhésif et à lisser la bulle en pressant délicatement avec un chiffon doux. Pour un léger décollement en bordure, chauffez la zone concernée et pressez fermement pendant une dizaine de secondes. Si le problème persiste ou s'étend, contactez votre poseur professionnel pour une reprise sous garantie.",
-        },
-        {
-          title: "Quand faire appel à un professionnel",
-          text: "Certaines situations dépassent le cadre de l'entretien courant. Si vous constatez un décollement supérieur à 2 centimètres, une rayure profonde qui traverse le film ou un gonflement persistant malgré la technique du sèche-cheveux, il est préférable de contacter un professionnel. Chez CoverSwap, nous assurons un suivi après pose et pouvons intervenir pour remplacer un lé isolé sans avoir à refaire la totalité de la surface. La plupart de nos interventions de maintenance se font en moins d'une heure.",
-        },
-      ],
-      tip: "Le nettoyant pour vitres sans ammoniaque est votre meilleur allié pour un covering impeccable. Vaporisez, essuyez avec un chiffon microfibre, et le tour est joué. Il dégraisse en douceur sans attaquer le film protecteur.",
-      conclusion:
-        "Avec ces gestes simples, votre covering conservera son éclat pendant au moins les 10 ans de sa garantie. Un entretien minimal pour un résultat maximal — c'est tout l'avantage de la rénovation adhésive. En adoptant les bons réflexes dès la pose, vous protégez votre investissement et profitez d'un intérieur toujours aussi beau qu'au premier jour.",
-    },
-    relatedSlugs: ["covering-adhesif-durabilite", "covering-adhesif-vs-peinture-cuisine"],
-  },
-  {
-    slug: "tendances-deco-2025-covering",
-    title: "Les tendances déco 2025 en covering adhésif",
-    excerpt:
-      "Marbre veiné, bois clair scandinave, béton ciré anthracite... Tour d'horizon des finitions qui vont marquer cette année dans la rénovation adhésive.",
-    category: "Tendances",
-    date: "2 mars 2025",
-    readTime: "5 min",
-    image: "/images/fonds/photo-1704383014623-a6630096ff8c",
-    content: {
-      intro:
-        "Chaque année apporte son lot de nouvelles inspirations en décoration intérieure, et le covering adhésif n'échappe pas à la règle. En 2025, les tendances oscillent entre retour au naturel, audaces industrielles et couleurs apaisantes. Tour d'horizon des finitions qui transforment les intérieurs cette année — et comment les intégrer chez vous grâce au revêtement adhésif.",
-      sections: [
-        {
-          title: "Le marbre blanc veiné : le retour du Calacatta",
-          text: "Le marbre Calacatta, avec ses veines grises et dorées sur fond blanc lumineux, fait un retour en force dans les cuisines et salles de bain haut de gamme. Grâce aux progrès d'impression sur film adhésif, il est désormais possible de reproduire cette pierre noble avec un réalisme saisissant, veines aléatoires et reflets subtils inclus. Le covering marbre apporte une touche d'élégance intemporelle à un plan de travail ou une crédence, sans le prix prohibitif ni la fragilité du marbre naturel. Il s'accorde parfaitement avec des façades de meubles noires ou grises pour un contraste raffiné.",
-        },
-        {
-          title: "Le bois clair scandinave : chêne et bouleau à l'honneur",
-          text: "L'esthétique nordique continue de séduire avec des bois clairs aux tons miel et blonds. Le chêne blanchi et le bouleau naturel dominent les catalogues de covering en 2025. Ces textures apportent une chaleur immédiate à n'importe quel espace, du salon à la chambre en passant par les meubles d'entrée. Le bois clair agrandit visuellement les pièces et diffuse une atmosphère sereine et accueillante. Associé à des murs blancs et des touches de vert sauge, il crée un cocon scandinave parfaitement dans l'air du temps.",
-        },
-        {
-          title: "Le béton ciré anthracite : l'esprit loft industriel",
-          text: "Le béton brut et le béton ciré dans des teintes anthracite et gris foncé s'imposent dans les intérieurs contemporains. Ce type de covering convient particulièrement aux cuisines ouvertes, aux lofts et aux espaces de travail modernes. Il apporte une dimension brute et authentique sans la froideur ni les contraintes d'un vrai béton (poids, porosité, entretien). Le film adhésif béton reproduit fidèlement les nuances, les micro-imperfections et la patine caractéristiques de ce matériau. Il se marie idéalement avec des éléments en métal noir et du bois naturel pour un style industriel maîtrisé.",
-        },
-        {
-          title: "Les couleurs mates : vert sauge, terracotta et bleu nuit",
-          text: "Les aplats de couleur unis en finition mate sont la grande tendance colorielle de 2025. Le vert sauge apporte une douceur végétale aux cuisines et salles de bain. Le terracotta réchauffe les espaces et rappelle les intérieurs méditerranéens. Le bleu nuit, profond et sophistiqué, crée une atmosphère cosy dans les chambres et les espaces lecture. Le covering mat a l'avantage de masquer les petites imperfections du support et de ne pas refléter la lumière, ce qui donne un rendu très contemporain et épuré. Ces teintes se combinent facilement entre elles ou avec des textures bois et marbre.",
-        },
-        {
-          title: "Les finitions métal brossé : laiton et cuivre",
-          text: "Le métal fait son entrée remarquée dans le monde du covering. Les finitions laiton brossé et cuivre vieilli permettent de relooker des éléments ponctuels — cadres de porte, niches décoratives, intérieurs de placards — avec une touche de luxe industriel. Ces films reproduisent l'aspect brossé et les reflets chauds du métal sans les inconvénients d'oxydation ou de ternissement dans le temps. Utilisés avec parcimonie, ils créent des points focaux élégants qui rehaussent l'ensemble de la décoration. La tendance est au mix and match : un plan de travail marbre, des façades vert sauge et des détails cuivre pour un intérieur unique.",
-        },
-      ],
-      tip: "N'hésitez pas à combiner deux textures différentes dans une même pièce : par exemple, des façades basses en chêne blanchi et des façades hautes en vert sauge mat. Ce jeu de contrastes est l'une des signatures déco les plus en vogue en 2025.",
-      conclusion:
-        "Les tendances 2025 en covering adhésif offrent un éventail de possibilités plus large que jamais. Du marbre Calacatta au béton anthracite, en passant par les teintes mates et les accents métalliques, chaque style trouve sa finition idéale. Le grand avantage du covering, c'est la possibilité de suivre ces tendances sans engagement définitif : quand votre goût évolue, votre intérieur peut évoluer avec lui en une seule journée de pose.",
-    },
-    relatedSlugs: ["marbre-bois-beton-quel-covering", "covering-adhesif-vs-peinture-cuisine"],
-  },
-  {
-    slug: "marbre-bois-beton-quel-covering",
-    title: "Marbre, bois ou béton : quel covering choisir ?",
-    excerpt:
-      "Chaque texture a ses atouts. On vous aide à choisir le covering idéal selon votre espace, votre style et votre budget.",
-    category: "Comparatif",
-    date: "22 février 2025",
-    readTime: "7 min",
-    image: "/images/fonds/photo-1566041510394-cf7c8fe21800",
-    content: {
-      intro:
-        "Le choix de la texture est l'étape la plus importante quand on envisage une rénovation par covering adhésif. Marbre, bois ou béton : chacune de ces finitions possède une personnalité propre et s'adapte à des contextes différents. Plutôt que de choisir au hasard ou de suivre uniquement la tendance du moment, voici un guide complet pour sélectionner la texture qui sublimera réellement votre espace.",
-      sections: [
-        {
-          title: "Le marbre : luxe intemporel et luminosité",
-          text: "Le covering marbre est le choix idéal pour apporter une touche de luxe à un espace sans le budget astronomique de la pierre naturelle. Ses veines délicates et son fond lumineux agrandissent visuellement la pièce et reflètent la lumière de manière flatteuse. Il excelle en cuisine (plan de travail, crédence) et en salle de bain (meuble vasque, contour de baignoire). Attention cependant : dans un espace déjà très clair et froid, le marbre blanc peut accentuer cette impression. Contrebalancez avec des éléments en bois chaud ou des textiles doux pour un équilibre parfait. Le marbre noir ou vert est une alternative audacieuse pour les intérieurs plus sombres.",
-        },
-        {
-          title: "Le bois : chaleur naturelle et polyvalence",
-          text: "Le covering bois est sans doute le plus polyvalent de tous. Il apporte instantanément une sensation de chaleur et de confort, quel que soit l'espace. Chêne, noyer, teck, pin : chaque essence véhicule une ambiance différente. Les tons clairs (chêne blanchi, bouleau) conviennent aux petits espaces et aux ambiances scandinaves. Les tons foncés (noyer, wengé) imposent une élégance plus classique dans les grands volumes. Le piège à éviter : choisir un bois trop orangé ou trop verni, qui peut rapidement paraître daté. Privilégiez les finitions mates et les tons naturels pour un résultat intemporel. Le bois s'adapte aussi bien aux meubles de salon qu'aux portes, têtes de lit et étagères.",
-        },
-        {
-          title: "Le béton : modernité brute et caractère",
-          text: "Le covering béton ciré est le choix de prédilection des amateurs de design contemporain et d'ambiances industrielles. Il apporte un caractère brut et assumé qui transforme radicalement un intérieur. Il fonctionne particulièrement bien dans les cuisines ouvertes, les lofts et les espaces de travail. Le béton anthracite crée une atmosphère sophistiquée et masculine, tandis que le béton gris clair reste plus doux et s'intègre facilement dans un intérieur familial. Le point de vigilance : utilisé en excès, le béton peut rendre un espace austère et froid. L'astuce est de le combiner avec des éléments chaleureux — bois, plantes vertes, textiles — pour humaniser le rendu.",
-        },
-        {
-          title: "Critères de choix : luminosité, déco existante et taille de la pièce",
-          text: "La bonne texture dépend avant tout du contexte de votre pièce. Dans un espace peu lumineux, privilégiez le marbre clair ou le bois blond qui réfléchissent la lumière naturelle. Dans une grande pièce lumineuse, vous pouvez oser le béton foncé ou le noyer sans risque d'assombrir l'espace. Prenez également en compte votre décoration existante : le marbre s'accorde avec les intérieurs épurés et classiques, le bois avec les ambiances chaleureuses et naturelles, le béton avec les styles contemporains et industriels. Enfin, la taille de la pièce joue un rôle : les textures claires agrandissent visuellement, tandis que les textures foncées créent une impression de cocon plus intime.",
-        },
-        {
-          title: "Le style personnel comme dernier arbitre",
-          text: "Au-delà des règles de décoration, votre ressenti personnel doit guider votre choix final. Vivez-vous votre intérieur comme un refuge chaleureux ? Le bois est fait pour vous. Rêvez-vous d'un espace épuré et lumineux ? Le marbre est votre allié. Vous vibrez pour le design contemporain et les lignes nettes ? Le béton s'impose. N'hésitez pas à commander des échantillons gratuits pour les tester in situ, à différentes heures de la journée. La lumière du matin et celle du soir modifient radicalement la perception d'une texture. Chez CoverSwap, nous proposons un service de simulation photo pour visualiser le rendu avant de vous engager.",
-        },
-      ],
-      tip: "Demandez trois échantillons différents et scotchez-les sur la surface à rénover pendant 48 heures. Observez-les à la lumière naturelle du matin et à la lumière artificielle du soir : votre préférence se dessinera naturellement.",
-      conclusion:
-        "Marbre, bois et béton sont trois univers esthétiques complémentaires, chacun avec ses forces et ses précautions d'emploi. Le marbre illumine et ennoblit, le bois réchauffe et rassure, le béton affirme et modernise. Le covering adhésif vous offre la liberté de changer d'avis sans contrainte : si une texture ne vous convient plus, elle se remplace en une journée. C'est cette flexibilité qui fait toute la valeur de la rénovation adhésive.",
-    },
-    relatedSlugs: ["tendances-deco-2025-covering", "covering-adhesif-durabilite"],
+    relatedSlugs: ["prix-renovation-cuisine-covering", "covering-adhesif-durabilite", "quelle-finition-choisir"],
   },
   {
     slug: "covering-adhesif-durabilite",
-    title: "Covering adhésif : est-ce vraiment durable ?",
-    excerpt:
-      "Résistance à l'eau, à la chaleur, aux UV... On répond à toutes vos questions sur la durée de vie réelle d'un revêtement adhésif professionnel.",
-    category: "Conseils",
-    date: "14 février 2025",
-    readTime: "5 min",
+    title: "Covering adhésif : combien de temps ça tient, et à quoi ça résiste ?",
+    excerpt: `Eau, chaleur, rayures, soleil : ce que supporte un film Cover Styl' posé dans les règles, ce qui l'abîme, et ce que couvre la garantie de ${GARANTIE_ANS} ans.`,
+    category: "Durabilité",
+    date: MAJ_TEXTE,
+    dateIso: "2025-02-14",
+    dateModifiedIso: MAJ,
+    readTime: "4 min",
     image: "/images/fonds/photo-1759238136854-913e5e383308",
     content: {
-      intro:
-        "C'est la question numéro un que se posent nos clients : « Est-ce que ça va tenir ? » Légitime, quand on investit dans la rénovation de sa cuisine ou de sa salle de bain. La réponse courte : oui, un covering adhésif professionnel est remarquablement durable. La réponse longue mérite qu'on détaille chaque aspect de cette résistance pour dissiper tous les doutes.",
+      intro: "La question revient toujours : est-ce que ça tient ? Oui, à condition de poser le bon film sur un support sain, à chaud, avec des chants finis. Voici ce qu'un covering supporte, et ce qu'il ne supporte pas.",
       sections: [
         {
-          title: "Résistance à l'eau : 100 % étanche",
-          text: "Les films adhésifs professionnels utilisés par CoverSwap sont totalement imperméables. Ils ont été testés en immersion prolongée et résistent sans broncher aux éclaboussures quotidiennes, à la vapeur de douche et même au contact direct avec l'eau stagnante. Cette étanchéité en fait une solution parfaitement adaptée aux salles de bain, aux crédences de cuisine et aux plans de travail situés près de l'évier. Contrairement au bois naturel qui gonfle et au stratifié bas de gamme qui cloque, le covering adhésif maintient son intégrité structurelle en milieu humide. La jointure entre les lés est elle aussi imperméable lorsque la pose est réalisée par un professionnel.",
+          title: "L'eau et l'humidité",
+          text: "Les films Cover Styl' sont conçus pour les cuisines et les salles de bain : projections, éclaboussures, humidité ambiante et nettoyage à l'éponge ne les affectent pas. La seule limite est l'immersion permanente : nous ne recouvrons pas l'intérieur d'un bac de douche ni le fond d'une baignoire.",
         },
         {
-          title: "Résistance à la chaleur : jusqu'à 75 °C",
-          text: "Nos films adhésifs supportent des températures allant jusqu'à 75 °C en contact direct, ce qui couvre l'immense majorité des situations domestiques : tasses de café, plats sortant du four posés brièvement, vapeur de cuisson. Cette résistance thermique dépasse largement celle de nombreuses peintures de rénovation qui commencent à se dégrader dès 50 °C. En revanche, nous recommandons toujours l'usage d'un dessous de plat pour les casseroles directement retirées du feu, par mesure de précaution. Les zones proches des plaques de cuisson bénéficient d'un film spécial haute température pour une sécurité maximale.",
+          title: "La chaleur",
+          text: "Un film supporte la chaleur d'un usage courant de cuisine. Au contact direct des plaques de cuisson ou d'un plat sortant du four posé sans dessous-de-plat, il peut marquer : nous étudions cette bande au cas par cas et utilisons les références prévues pour les hautes températures. Un dessous-de-plat reste la bonne habitude, comme sur un stratifié.",
         },
         {
-          title: "Résistance aux UV : aucun jaunissement pendant 10 ans",
-          text: "L'un des défauts majeurs des anciennes générations de films adhésifs était le jaunissement au soleil. Ce problème appartient au passé. Les covering professionnels actuels intègrent un traitement anti-UV qui garantit la stabilité des couleurs pendant au minimum 10 ans, même sur des surfaces exposées à la lumière directe du soleil. Que votre plan de travail soit situé sous une fenêtre ou que votre meuble de salon reçoive le soleil d'après-midi, la teinte restera identique au fil des années. Cette garantie anti-jaunissement est certifiée par des tests en laboratoire selon les normes européennes en vigueur.",
+          title: "Les rayures et les chocs",
+          text: "Le film résiste à l'usage quotidien : frottements, ongles, objets déplacés. Il n'est pas incassable : une coupure au couteau directement sur le plan de travail ou un choc violent sur une arête peuvent l'entailler. On découpe sur une planche, comme sur n'importe quel plan de travail.",
         },
         {
-          title: "Résistance aux rayures : conçu pour le quotidien",
-          text: "Le film adhésif professionnel possède une couche de protection en surface qui résiste aux micro-rayures du quotidien : déplacement d'ustensiles, frottements de vaisselle, contact avec des objets courants. Cette résistance est comparable à celle d'un stratifié de qualité moyenne, et nettement supérieure à celle d'une surface peinte. Pour les plans de travail de cuisine, nous recommandons tout de même l'usage d'une planche à découper, comme pour toute surface d'ailleurs. Les rayures intentionnelles avec un objet pointu endommageront le film, mais l'utilisation normale ne pose aucun problème. En cas de rayure accidentelle, un lé isolé peut être remplacé sans refaire l'ensemble.",
+          title: "Le soleil",
+          text: "Les films sont traités contre la décoloration ; une façade exposée plein sud garde sa teinte. Cette tenue fait partie de la garantie.",
         },
         {
-          title: "Durée de vie réelle et conditions de garantie",
-          text: "En conditions normales d'utilisation, un covering adhésif professionnel dure entre 7 et 10 ans. Cette fourchette dépend de l'emplacement (une crédence de cuisine sollicitée quotidiennement s'usera plus vite qu'un meuble de salon) et de l'entretien appliqué. À titre de comparaison, une peinture de rénovation tient 3 à 5 ans, un papier peint vinyle 5 à 7 ans et un stratifié entrée de gamme 8 à 10 ans. Chez CoverSwap, nous offrons une garantie de 10 ans couvrant tout défaut d'adhérence, de décoloration et de déformation dans des conditions normales d'usage. Cette garantie est transférable en cas de revente du logement.",
+          title: "Ce qui l'abîme vraiment",
+          text: "Les éponges abrasives, les solvants (acétone, dissolvant), le nettoyeur vapeur sur les joints et un support qui bougeait déjà avant la pose (panneau gonflé par l'eau, peinture qui s'écaille). C'est pour cela que la préparation et le diagnostic du support comptent autant que le film.",
+        },
+        {
+          title: "La garantie",
+          text: `Films et pose sont garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration en usage normal ; certaines références haute température ont une garantie fabricant étendue. Les exclusions (chocs, coupures, produits abrasifs, défaut du support signalé) sont écrites dans nos conditions générales.`,
         },
       ],
-      tip: "Pour maximiser la durée de vie de votre covering, évitez simplement trois choses : la chaleur directe intense, les produits abrasifs et les outils coupants en contact avec la surface. Avec ces précautions élémentaires, votre revêtement passera la barre des 10 ans sans difficulté.",
-      conclusion:
-        "Le covering adhésif professionnel est une solution authentiquement durable. Étanche, résistant à la chaleur et aux UV, protégé contre les rayures du quotidien, il offre une longévité de 7 à 10 ans qui surpasse celle de la plupart des alternatives de rénovation. Associé à un entretien adapté — simple et rapide — il constitue un investissement rentable et pérenne pour la transformation de votre intérieur.",
+      conclusion: `Posé correctement sur une surface saine, un covering tient au moins la durée de sa garantie de ${GARANTIE_ANS} ans, et peut être retiré ou recouvert à nouveau le jour où l'on veut changer.`,
     },
-    relatedSlugs: ["entretenir-revetement-adhesif", "marbre-bois-beton-quel-covering"],
+    relatedSlugs: ["entretenir-revetement-adhesif", "covering-salle-de-bain-carrelage", "covering-adhesif-vs-peinture-cuisine"],
+  },
+  {
+    slug: "covering-salle-de-bain-carrelage",
+    title: "Recouvrir un carrelage de salle de bain sans le casser",
+    excerpt: "Ce qui se recouvre dans une salle de bain (murs carrelés, meuble vasque, tablier de baignoire), ce qui ne se recouvre pas, et comment le film résiste à l'humidité.",
+    category: "Salle de bain",
+    date: MAJ_TEXTE,
+    dateIso: MAJ,
+    dateModifiedIso: MAJ,
+    readTime: "4 min",
+    image: "/images/fonds/photo-1754788358645-d6e6cca12e25",
+    content: {
+      intro: "Un carrelage de salle de bain démodé mais sain n'a pas besoin d'être cassé. Le covering le recouvre d'un film prévu pour les pièces humides, en une journée, sans gravats.",
+      sections: [
+        {
+          title: "Ce qui se recouvre",
+          text: "Les murs carrelés hors zone d'immersion, le meuble sous la vasque, le tablier et les coffrages de baignoire, les portes et placards, une colonne de rangement. Une salle de bain courante se traite en une journée.",
+        },
+        {
+          title: "Ce qui ne se recouvre pas",
+          text: "L'intérieur d'une douche à l'italienne (bac et parois immergées), le fond d'une baignoire, le sol. Ces zones restent d'origine ou relèvent d'une autre solution ; nous le disons dès le devis.",
+        },
+        {
+          title: "Les joints du carrelage",
+          text: "Des joints creux marqueraient le film. Ils sont lissés au préalable pour que la surface soit plane ; un carrelage très en relief est étudié au cas par cas. Les bords du film sont traités pour que l'eau ne s'infiltre pas derrière.",
+        },
+        {
+          title: "Combien de temps, combien ça coûte",
+          text: `Une journée de pose pour une salle de bain courante ; nous conseillons d'attendre 24 h avant une douche très chaude côté murs traités. Au mètre linéaire, une salle de bain (meuble vasque, murs carrelés, contour de baignoire) se situe généralement entre ${sdbMin} et ${sdbMax}, fournie et posée.`,
+        },
+        {
+          title: "L'entretien",
+          text: "Éponge douce et produit ménager courant. Pas d'abrasif, pas de solvant, pas de nettoyeur vapeur sur les joints.",
+        },
+      ],
+      conclusion: "Murs carrelés, meuble vasque, tablier de baignoire : tout ce qui est hors immersion se recouvre, en une journée, sans casser. Une photo suffit pour savoir ce qui est possible chez vous.",
+    },
+    relatedSlugs: ["covering-adhesif-durabilite", "entretenir-revetement-adhesif", "comment-se-passe-une-pose-de-covering"],
+  },
+  {
+    slug: "quelle-finition-choisir",
+    title: "Quelle finition choisir : bois, pierre, béton, couleur unie ?",
+    excerpt: `Comment choisir parmi les familles du catalogue Cover Styl' selon la pièce, la lumière et l'usage — et pourquoi la teinte se valide toujours sur échantillon.`,
+    category: "Finitions",
+    date: MAJ_TEXTE,
+    dateIso: "2025-03-02",
+    dateModifiedIso: MAJ,
+    readTime: "5 min",
+    image: "/images/fonds/photo-1704383014623-a6630096ff8c",
+    content: {
+      intro: "Le catalogue compte près de cinq cents références. Le bon choix dépend de trois choses : la pièce, la lumière et ce que la surface va vivre. Voici comment trancher.",
+      sections: [
+        {
+          title: "Bois",
+          text: "La famille la plus large : chênes clairs, noyers, teck, wengé, bois blanchis. Un bois clair agrandit une petite cuisine ; un bois foncé réchauffe une pièce très lumineuse. Sur des façades de cuisine, c'est le choix le plus courant ; sur un meuble, il redonne l'aspect d'un meuble massif.",
+        },
+        {
+          title: "Pierre et marbre",
+          text: "Carrare, Calacatta, Marquina, travertin, ardoise : pour un plan de travail, une crédence ou un meuble vasque. Le veinage se dessine à la pose ; sur une grande surface, nous orientons les lés pour qu'il reste cohérent.",
+        },
+        {
+          title: "Béton et ciment",
+          text: "Gris clair à anthracite, aspect ciré ou brut. Très bien sur une crédence, un îlot ou un comptoir professionnel ; à doser dans une pièce déjà sombre.",
+        },
+        {
+          title: "Couleurs unies",
+          text: "Mat, satiné ou brillant, du blanc cassé au noir profond en passant par le vert sauge ou le terracotta. C'est la famille la plus économique et la plus facile à marier ; un mat foncé montre davantage les traces de doigts qu'un satiné.",
+        },
+        {
+          title: "Métal, textile, paillettes",
+          text: "Inox brossé, laiton, cuivre pour un comptoir ou une crédence ; cuir et textile pour une tête de lit ou une porte ; paillettes pour un accent. Ce sont les gammes les plus hautes : le prix au mètre monte d'environ 20 à 30 % par rapport à une couleur unie.",
+        },
+        {
+          title: "Pourquoi on valide sur échantillon",
+          text: "Un écran n'affiche pas une teinte, il l'approche. Le simulateur donne un aperçu réaliste de l'effet d'ensemble ; la référence exacte se choisit sur un échantillon posé sur la surface, dans la lumière de la pièce, le matin et le soir.",
+        },
+      ],
+      tip: "Deux finitions au plus dans une même pièce : une pour les façades, une pour le plan de travail ou la crédence. Au-delà, l'œil ne sait plus où se poser.",
+      conclusion: "Bois pour la chaleur, pierre pour la matière, béton pour le caractère, couleur unie pour la simplicité et le budget. Le simulateur pour se décider, l'échantillon pour être sûr.",
+    },
+    relatedSlugs: ["marbre-bois-beton-quel-covering", "prix-renovation-cuisine-covering", "covering-adhesif-vs-peinture-cuisine"],
+  },
+  {
+    slug: "marbre-bois-beton-quel-covering",
+    title: "Quel revêtement pour quelle pièce ?",
+    excerpt: "Cuisine, salle de bain, chambre, bureau, local professionnel : les finitions qui conviennent à chaque usage, et celles à éviter.",
+    category: "Finitions",
+    date: MAJ_TEXTE,
+    dateIso: "2025-02-22",
+    dateModifiedIso: MAJ,
+    readTime: "4 min",
+    image: "/images/fonds/photo-1566041510394-cf7c8fe21800",
+    content: {
+      intro: "Toutes les finitions ne conviennent pas à toutes les surfaces. L'usage décide avant le goût : un plan de travail ne vit pas comme une tête de lit.",
+      sections: [
+        {
+          title: "Cuisine",
+          text: "Façades : bois, couleur unie mate ou satinée. Plan de travail et crédence : pierre, béton, ou couleur unie foncée, dans une gamme résistante au nettoyage fréquent. Autour des plaques : références hautes températures, validées au devis.",
+        },
+        {
+          title: "Salle de bain",
+          text: "Murs carrelés : pierre claire, béton, couleur unie. Meuble vasque : bois ou couleur unie. On évite les textures très profondes près des points d'eau, plus longues à sécher et à nettoyer.",
+        },
+        {
+          title: "Chambre et séjour",
+          text: "Dressing, commode, tête de lit, meuble TV : bois, textile, cuir, couleur unie. Ces surfaces sont peu sollicitées : toutes les familles conviennent, y compris les plus décoratives.",
+        },
+        {
+          title: "Bureau et local professionnel",
+          text: "Comptoirs et plans de travail : gammes résistantes, béton, métal brossé, couleurs unies. Portes et cloisons : couleur unie ou bois. Les fiches techniques de chaque référence, avec leur classement au feu, sont disponibles pour un dossier d'établissement recevant du public.",
+        },
+        {
+          title: "Portes et placards",
+          text: "Une porte pleine se recouvre comme un meuble : bois pour l'assortir au parquet, couleur unie pour la faire disparaître dans le mur.",
+        },
+      ],
+      conclusion: "Une règle simple : plus la surface est sollicitée (plan de travail, comptoir), plus la gamme doit être résistante ; plus elle est décorative (tête de lit, dressing), plus on peut oser.",
+    },
+    relatedSlugs: ["quelle-finition-choisir", "covering-salle-de-bain-carrelage", "renovation-locataire-covering"],
+  },
+  {
+    slug: "entretenir-revetement-adhesif",
+    title: "Entretenir un revêtement adhésif : les bons gestes",
+    excerpt: "Ce qu'il faut faire, et surtout ne pas faire, pour qu'un covering garde son aspect : produits, éponges, chaleur, chocs.",
+    category: "Entretien",
+    date: MAJ_TEXTE,
+    dateIso: "2025-03-10",
+    dateModifiedIso: MAJ,
+    readTime: "3 min",
+    image: "/images/fonds/photo-1642505172378-a6f5e5b15580",
+    content: {
+      intro: "Un covering s'entretient comme un stratifié de bonne qualité : simplement, avec les bons produits. Trois règles suffisent.",
+      sections: [
+        {
+          title: "Le nettoyage courant",
+          text: "Un chiffon ou une éponge douce, de l'eau tiède et un produit ménager courant (liquide vaisselle, nettoyant multi-surfaces sans solvant). Rincer à l'eau claire sur un plan de travail, essuyer.",
+        },
+        {
+          title: "Ce qu'il faut éviter",
+          text: "Les éponges abrasives et la laine d'acier, l'acétone, le dissolvant, l'alcool à brûler et les dégraissants très agressifs, le nettoyeur vapeur sur les joints et les chants. Ils attaquent la surface ou décollent les bords.",
+        },
+        {
+          title: "Chaleur et coupures",
+          text: "Un dessous-de-plat pour les casseroles et plats sortant du four ; une planche pour découper. Ce sont les deux seules habitudes à garder, les mêmes que sur n'importe quel plan de travail stratifié.",
+        },
+        {
+          title: "Les premières 24 heures",
+          text: "Le film adhère complètement en quelques heures. Le jour de la pose, on évite de mouiller abondamment les chants et de tirer sur les arêtes ; dès le lendemain, usage normal.",
+        },
+        {
+          title: "Une rayure ou un choc",
+          text: "Une petite marque ne se répare pas comme une peinture. Selon l'endroit, la façade ou la bande concernée peut être recouverte à nouveau sans refaire l'ensemble ; nous le regardons sur photo.",
+        },
+      ],
+      tip: "Un chiffon microfibre légèrement humide chaque semaine évite l'accumulation de graisse en cuisine, la seule chose qui ternit vraiment un film mat.",
+      conclusion: "Doux, sans solvant, sans abrasif : avec ces gestes, le covering garde son aspect pendant toute la durée de sa garantie et au-delà.",
+    },
+    relatedSlugs: ["covering-adhesif-durabilite", "covering-salle-de-bain-carrelage", "quelle-finition-choisir"],
   },
   {
     slug: "renovation-locataire-covering",
-    title: "Rénovation locataire : le covering adhésif, la solution idéale",
-    excerpt:
-      "Transformez votre logement sans percer, sans colle permanente et sans perdre votre caution. Le guide complet pour locataires malins.",
-    category: "Locataire",
-    date: "5 février 2025",
-    readTime: "6 min",
+    title: "Rénover en location : le covering, réversible et sans autorisation lourde",
+    excerpt: "Pourquoi le film adhésif convient aux locataires et aux propriétaires bailleurs : retrait sans trace, pose en une journée, logement remis en l'état.",
+    category: "Location",
+    date: MAJ_TEXTE,
+    dateIso: "2025-02-05",
+    dateModifiedIso: MAJ,
+    readTime: "4 min",
     image: "/images/fonds/photo-1742490382029-98357c08f3cd",
     content: {
-      intro:
-        "Quand on est locataire, la frustration de vivre dans un intérieur qui ne nous ressemble pas est réelle. Cuisine défraîchie, meubles de salle de bain datés, portes abîmées : autant d'éléments qu'on rêve de transformer sans pouvoir toucher à rien de permanent. Le covering adhésif est la réponse parfaite à cette contrainte. Entièrement réversible, il permet de métamorphoser un logement loué sans risquer sa caution.",
+      intro: "Un locataire ne peut pas casser une cuisine ; un bailleur ne veut pas immobiliser un logement plusieurs semaines entre deux locataires. Le covering répond aux deux : il change l'apparence sans toucher à la structure, et il se retire.",
       sections: [
         {
-          title: "100 % réversible, zéro dégât",
-          text: "La caractéristique fondamentale du covering adhésif pour un locataire, c'est sa réversibilité totale. Le film se retire proprement sans laisser de résidu de colle, sans arracher la peinture et sans endommager la surface d'origine. Que vous ayez couvert des façades de meubles, un plan de travail ou une porte, le support retrouve son état initial après retrait. Cette propriété est garantie par la technologie d'adhésif repositionnable utilisée dans les films professionnels. Vous pouvez donc transformer votre logement l'esprit tranquille, en sachant que le retour à l'état d'origine prend quelques heures seulement.",
+          title: "Pour le locataire",
+          text: "Le film se pose sur les façades, le plan de travail ou le carrelage existants, sans démontage. Au départ, il se retire à chaud sans abîmer le support : le logement retrouve son état d'origine. Prévenez votre propriétaire par écrit avant de recouvrir des éléments qui lui appartiennent : c'est une question de bonne foi plus que d'autorisation formelle, et le caractère réversible rassure.",
         },
         {
-          title: "Aucune modification permanente requise",
-          text: "Contrairement à la peinture, au carrelage ou à l'installation de nouveaux meubles, le covering adhésif ne nécessite aucun perçage, aucune colle permanente et aucune modification structurelle. Pas besoin de demander l'autorisation du propriétaire pour des changements réversibles en France : l'article 7 de la loi du 6 juillet 1989 autorise le locataire à réaliser des aménagements qui n'affectent pas le gros œuvre ni la structure du logement, à condition de remettre les lieux en état au départ. Le covering entre parfaitement dans ce cadre juridique. Vous êtes libre de transformer votre intérieur sans courrier recommandé ni avenant au bail.",
+          title: "Pour le bailleur",
+          text: "Entre deux locataires, une cuisine ou une salle de bain vieillissantes se remettent au goût du jour en une journée, sans travaux lourds ni délai de séchage. Le logement se reloue plus vite, sans investissement de remplacement complet.",
         },
         {
-          title: "Les meilleures surfaces à couvrir en location",
-          text: "En tant que locataire, certaines surfaces offrent un rapport transformation/effort exceptionnel. Les façades de cuisine sont le premier réflexe : elles changent radicalement l'ambiance de la pièce en quelques heures. Le meuble vasque de la salle de bain, souvent le point faible esthétique des locations, se métamorphose avec un covering bois ou marbre. Les portes intérieures abîmées retrouvent une seconde jeunesse en blanc mat ou chêne clair. Et la crédence de cuisine, souvent un carrelage démodé des années 90, se recouvre élégamment sans avoir à décoller le moindre carreau. Chacune de ces transformations se réalise en moins d'une demi-journée.",
+          title: "Ce qui se recouvre dans un logement loué",
+          text: "Façades et plan de travail de la cuisine, crédence, carrelage mural de salle de bain hors immersion, meuble vasque, portes intérieures, placards. Le sol et les zones immergées restent en dehors.",
         },
         {
-          title: "Un budget maîtrisé pour un résultat spectaculaire",
-          text: "Acheter des meubles neufs pour un logement qu'on ne possède pas est rarement judicieux. Le covering adhésif permet de transformer l'existant pour une fraction du prix du neuf. Relooker une cuisine complète en location coûte en moyenne 500 à 800 euros en covering, contre 3 000 à 8 000 euros pour des façades neuves que vous ne pourrez pas emporter en déménageant. L'avantage supplémentaire : le covering se retire et peut techniquement être réutilisé sur un autre support si le prochain logement a des dimensions similaires. C'est un investissement dans votre confort quotidien, pas dans le patrimoine de votre propriétaire.",
-        },
-        {
-          title: "Le départ : retrait facile et récupération de caution",
-          text: "Quand vient le moment de quitter le logement, le retrait du covering se fait simplement à la main, en tirant le film depuis un angle. Pour faciliter l'opération, chauffez légèrement la surface avec un sèche-cheveux : l'adhésif se ramollit et le film se décolle sans effort ni résidu. Comptez environ une heure pour une cuisine complète et 30 minutes pour une salle de bain. Un coup de chiffon humide sur les surfaces découvertes suffit à éliminer les éventuelles traces résiduelles. Votre propriétaire retrouve ses meubles dans leur état d'origine et votre caution vous est restituée intégralement. Plusieurs de nos clients locataires nous confirment que l'état des lieux de sortie s'est déroulé sans aucune remarque.",
+          title: "Budget",
+          text: `Au mètre linéaire, fourni et posé : ${cuisineMin} à ${cuisineMax} pour une cuisine complète, ${sdbMin} à ${sdbMax} pour une salle de bain, un meuble seul dès ${euros(FOURCHETTES.meuble.min)}. Devis gratuit ${DELAI_REPONSE} sur photos.`,
         },
       ],
-      tip: "Avant de poser le covering, prenez des photos datées de l'état initial des surfaces. En cas de litige lors de l'état des lieux de sortie, ces photos prouvent que le support n'a subi aucune dégradation.",
-      conclusion:
-        "Le covering adhésif est véritablement la solution idéale pour les locataires qui refusent de vivre dans un intérieur qui ne leur plaît pas. Réversible, abordable, rapide à poser et à retirer, il offre une liberté de décoration totale sans aucun risque pour votre caution. C'est la façon la plus intelligente de se sentir chez soi, même dans un logement que l'on ne possède pas.",
+      conclusion: "Réversible, rapide, sans gravats : le covering est la rénovation qui ne pose pas de problème à l'état des lieux de sortie.",
     },
-    relatedSlugs: ["covering-adhesif-vs-peinture-cuisine", "covering-adhesif-durabilite"],
+    relatedSlugs: ["prix-renovation-cuisine-covering", "covering-adhesif-durabilite", "comment-se-passe-une-pose-de-covering"],
   },
 ];
 
@@ -263,5 +399,5 @@ export function getArticleBySlug(slug: string): BlogArticle | undefined {
 }
 
 export function getRelatedArticles(slugs: string[]): BlogArticle[] {
-  return articles.filter((a) => slugs.includes(a.slug));
+  return slugs.map((s) => getArticleBySlug(s)).filter((a): a is BlogArticle => !!a);
 }

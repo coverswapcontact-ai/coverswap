@@ -52,7 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogPages: MetadataRoute.Sitemap = articles.map((article) => ({
     url: `${baseUrl}/blog/${article.slug}`,
-    lastModified: LAST_BUILD,
+    lastModified: new Date(article.dateModifiedIso),
     changeFrequency: 'monthly' as const,
     priority: 0.5,
   }));

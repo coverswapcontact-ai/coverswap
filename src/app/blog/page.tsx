@@ -4,15 +4,15 @@ import { BreadcrumbSchema } from "@/components/JsonLd";
 import BlogClient from "@/components/BlogClient";
 
 export const metadata: Metadata = {
-  title: "Blog — Conseils et tendances covering adhésif",
+  title: "Guides — prix, durée, entretien, finitions du covering adhésif",
   description:
-    "Conseils, tendances et guides pratiques autour du covering adhésif et de la rénovation intérieure. Découvrez nos articles experts.",
+    "Ce que coûte un covering, combien de temps il tient, comment se passe la pose, quelle finition choisir, comment l'entretenir : des réponses vérifiables, sans jargon.",
   keywords:
     "blog covering adhésif, conseils rénovation, tendances décoration, covering cuisine, covering salle de bain",
   openGraph: {
-    title: "Blog CoverSwap — Conseils et tendances covering adhésif",
+    title: "Guides CoverSwap — prix, durée, pose, finitions du covering adhésif",
     description:
-      "Conseils, tendances et guides pratiques autour du covering adhésif et de la rénovation intérieure.",
+      "Ce que coûte un covering, combien de temps il tient, comment se passe la pose, quelle finition choisir.",
     url: "https://coverswap.fr/blog",
     siteName: "CoverSwap",
     locale: "fr_FR",
@@ -31,14 +31,13 @@ export default function BlogPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <span className="text-rouge font-bold text-sm uppercase tracking-widest">
-            Blog
+            Guides
           </span>
           <h1 className="font-display text-4xl md:text-6xl font-bold mt-3 mb-4">
-            Nos <span className="text-rouge">articles</span>
+            Les vraies questions, <span className="text-rouge">les vraies réponses</span>
           </h1>
           <p className="text-gris-400 max-w-2xl mx-auto text-lg">
-            Conseils, tendances et guides pratiques autour du covering adhesif et
-            de la renovation interieure.
+            Ce que coûte un covering, combien de temps il tient, comment se passe la pose, quelle finition choisir, comment l&apos;entretenir.
           </p>
         </div>
 
