@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
@@ -30,9 +29,7 @@ export default function PageSimulateur() {
         <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-3 text-balance">Votre pièce, avec le revêtement de votre choix</h1>
         <p className="text-gris-300 text-lg max-w-2xl mb-8">Une photo, une finition, un résultat en moins d&apos;une minute. Gratuit, sans inscription : vos coordonnées ne servent qu&apos;à recevoir le rendu et un devis.</p>
         <div className="glass-card p-5 sm:p-8">
-          <Suspense fallback={<p className="text-gris-500">Chargement…</p>}>
-            <Simulateur />
-          </Suspense>
+          <Simulateur />
         </div>
         <section className="mt-16 max-w-3xl">
           <h2 className="font-display text-2xl font-bold mb-6">Comment ça marche</h2>

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import CaseConsentement from "@/components/CaseConsentement";
 import Turnstile, { reinitialiserTurnstile } from "@/components/Turnstile";
@@ -63,7 +62,6 @@ function Indicateur({ etape, onRetour }: { etape: Etape; onRetour: (e: Etape) =>
 }
 
 export default function Simulateur() {
-  const params = useSearchParams();
   const [charge, setCharge] = useState(false);
   const [etape, setEtape] = useState<Etape>(1);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
@@ -82,7 +80,8 @@ export default function Simulateur() {
     let annule = false;
     (async () => {
       const memoire = await lireEtat();
-      const demande = params.get("projet");
+      // Lu à la main (pas useSearchParams) : le composant reste rendu côté serveur, sans bloc d'attente ni décalage.
+      const demande = new URLSearchParams(window.location.search).get("projet");
       if (annule) return;
       const base = memoire ?? ETAT_VIDE;
       const projetInitial = demande && PROJECT_TYPES.some((p) => p.id === demande) ? demande : base.projet;
@@ -96,7 +95,7 @@ export default function Simulateur() {
     return () => {
       annule = true;
     };
-  }, [params]);
+  }, []);
 
   /* ── Sauvegarde locale à chaque changement ── */
   useEffect(() => {
