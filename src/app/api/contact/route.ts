@@ -168,7 +168,9 @@ export async function POST(req: NextRequest) {
     { ipVisiteur: ip }
   );
 
-  if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null });
+  if (resultat.ok) {
+    return NextResponse.json({ success: true, leadId: resultat.leadId ?? null, photos: resultat.photos ?? 0, consentement: resultat.consentement ?? null });
+  }
   // CRM en panne mais contact parti par mail au gérant : la demande est bien prise.
   if (resultat.emailFallback) return NextResponse.json({ success: true, leadId: null, viaMail: true });
   return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: resultat.error }, { status: 502 });

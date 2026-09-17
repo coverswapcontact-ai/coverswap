@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import BoutonCookies from "./BoutonCookies";
 import { ZONES, getZoneSlug } from "@/data/zones";
 
 import { DELAI_REPONSE } from "@/lib/offre";
@@ -216,6 +217,7 @@ export default function Footer() {
             <Link href="/cgv" className="hover:text-white transition-colors">
               CGV
             </Link>
+            <BoutonCookies className="hover:text-white transition-colors" />
           </div>
         </div>
       </div>

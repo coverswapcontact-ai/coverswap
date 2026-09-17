@@ -59,6 +59,10 @@ export interface CrmResult {
   leadId?: string;
   /** Vrai si le CRM a rattaché le contact à un lead déjà connu. */
   deduped?: boolean;
+  /** Photos jointes effectivement enregistrées par le CRM. */
+  photos?: number;
+  /** Consentement mail enregistré par le CRM : ACCORDE, REFUSE ou null. */
+  consentement?: string | null;
   error?: string;
   /** Vrai si, faute de CRM, le contact est parti par mail de secours au gérant. */
   emailFallback?: boolean;
@@ -182,7 +186,13 @@ async function sendPayload(cleaned: Record<string, unknown>, ipVisiteur?: string
 
     try {
       const body = await res.json();
-      return { ok: true, leadId: body?.leadId || body?.id, deduped: body?.deduped === true };
+      return {
+        ok: true,
+        leadId: body?.leadId || body?.id,
+        deduped: body?.deduped === true,
+        photos: typeof body?.photos === "number" ? body.photos : undefined,
+        consentement: typeof body?.consentement === "string" ? body.consentement : null,
+      };
     } catch {
       return { ok: true };
     }
@@ -221,9 +231,9 @@ export async function sendLeadToCRM(payload: CrmLeadPayload, options: { ipVisite
 
   if (result.ok) {
     console.log(
-      `[CRM] lead enregistré id=${result.leadId ?? "?"} source=${cleaned.source} tel=${cleaned.telephone}${result.deduped ? " (rattaché à un lead existant)" : ""}`
+      `[CRM] lead enregistré id=${result.leadId ?? "?"} source=${cleaned.source} tel=${cleaned.telephone}${result.deduped ? " (rattaché à un lead existant)" : ""} photos=${result.photos ?? 0} consentement=${result.consentement ?? "non demandé"}`
     );
-    return { ok: true, leadId: result.leadId, deduped: result.deduped };
+    return { ok: true, leadId: result.leadId, deduped: result.deduped, photos: result.photos, consentement: result.consentement };
   }
 
   const lean = { ...cleaned };
