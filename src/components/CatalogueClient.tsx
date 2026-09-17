@@ -105,10 +105,12 @@ export default function CatalogueClient() {
   const visibleItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
   const hasMore = visibleCount < filtered.length;
 
-  /* ── Reset visible count when filters change ── */
-  useEffect(() => {
+  /* ── Retour au premier lot quand le filtre change (état ajusté pendant le rendu) ── */
+  const [filtrePrecedent, setFiltrePrecedent] = useState({ activeFamille, search });
+  if (filtrePrecedent.activeFamille !== activeFamille || filtrePrecedent.search !== search) {
+    setFiltrePrecedent({ activeFamille, search });
     setVisibleCount(ITEMS_PER_PAGE);
-  }, [activeFamille, search]);
+  }
 
   const handleFamilleClick = useCallback((id: string) => {
     setActiveFamille(id);
@@ -169,7 +171,7 @@ export default function CatalogueClient() {
             {/* "Tout" button */}
             <button
               onClick={() => handleFamilleClick("tout")}
-              className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                 activeFamille === "tout"
                   ? "bg-rouge text-white shadow-lg shadow-rouge/25"
                   : "bg-white/5 text-gris-300 hover:bg-white/10 hover:text-white"
@@ -194,7 +196,7 @@ export default function CatalogueClient() {
               <button
                 key={f.id}
                 onClick={() => handleFamilleClick(f.id)}
-                className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                   activeFamille === f.id
                     ? "bg-rouge text-white shadow-lg shadow-rouge/25"
                     : "bg-white/5 text-gris-300 hover:bg-white/10 hover:text-white"
@@ -229,7 +231,7 @@ export default function CatalogueClient() {
               placeholder="Rechercher par nom, référence, famille..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all"
             />
             {search && (
               <button
@@ -346,16 +348,16 @@ const ProductCard = React.memo(function ProductCard({ item, onClick }: { item: R
 
       {/* Badges top */}
       <div className="absolute top-2 left-2 right-2 flex items-start justify-between z-10">
-        <span className={`${familleColor} backdrop-blur-sm text-white text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full`}>
+        <span className={`${familleColor} backdrop-blur-xs text-white text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full`}>
           {familleLabel}
         </span>
-        <span className="bg-black/50 backdrop-blur-sm text-gris-300 text-[10px] sm:text-xs px-2 py-0.5 rounded-full">
+        <span className="bg-black/50 backdrop-blur-xs text-gris-300 text-[10px] sm:text-xs px-2 py-0.5 rounded-full">
           {item.finition}
         </span>
       </div>
 
       {/* Hover overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-4">
+      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 sm:p-4">
         <p className="text-white font-semibold text-sm sm:text-base leading-tight mb-1">{item.nom}</p>
         <p className="text-gris-400 text-xs mb-3">{item.id}</p>
         <span className="inline-flex items-center gap-1.5 text-rouge text-xs sm:text-sm font-medium">
@@ -386,7 +388,7 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xs" />
 
       {/* Modal content */}
       <div
@@ -398,7 +400,7 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
         <button
           onClick={onClose}
           aria-label="Fermer le détail"
-          className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-sm hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+          className="absolute top-4 right-4 z-20 bg-black/50 backdrop-blur-xs hover:bg-black/70 text-white rounded-full p-2 transition-colors"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -421,7 +423,7 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
           />
           {/* Family badge on image */}
           <div className="absolute top-4 left-4">
-            <span className={`${familleColor} backdrop-blur-sm text-white text-sm font-medium px-3 py-1 rounded-full`}>
+            <span className={`${familleColor} backdrop-blur-xs text-white text-sm font-medium px-3 py-1 rounded-full`}>
               {familleLabel}
             </span>
           </div>

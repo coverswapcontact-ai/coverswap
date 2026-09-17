@@ -9,7 +9,7 @@ export default function Footer() {
       {/* CTA Band */}
       <div className="bg-rouge py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/30 via-transparent to-black/30" />
         </div>
         <div className="container-custom text-center relative z-10">
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">

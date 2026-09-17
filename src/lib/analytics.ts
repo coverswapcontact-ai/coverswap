@@ -110,7 +110,6 @@ export function track(event: TrackEvent, params: TrackParams = {}): void {
 
   // Dev log
   if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
     console.log(`[track] ${event}`, params);
   }
 }

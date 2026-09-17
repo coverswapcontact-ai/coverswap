@@ -260,7 +260,7 @@ export default async function ZonePage({
 
           {/* Liste quartiers */}
           <ScrollReveal direction="up" delay={0.2}>
-            <div className="mt-12 bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8">
+            <div className="mt-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
               <h3 className="font-display text-xl font-bold mb-4">
                 Quartiers et secteurs couverts à {zone.ville}
               </h3>
@@ -346,7 +346,7 @@ export default async function ZonePage({
               <ScrollReveal key={p.href} direction="up">
                 <Link
                   href={p.href}
-                  className="block bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:border-rouge/40 hover:bg-rouge/5 transition-all duration-300 h-full"
+                  className="block bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-rouge/40 hover:bg-rouge/5 transition-all duration-300 h-full"
                 >
                   <span className="text-3xl mb-3 block">{p.icon}</span>
                   <h3 className="font-display text-lg font-bold mb-2 text-white">{p.title}</h3>
@@ -397,7 +397,7 @@ export default async function ZonePage({
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 text-center"
+                    className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
                   >
                     <span className="block font-display text-2xl font-bold text-rouge mb-1">
                       {stat.value}
@@ -429,7 +429,7 @@ export default async function ZonePage({
           <div className="space-y-4">
             {zone.faqLocale.map((faq) => (
               <ScrollReveal key={faq.q} direction="up">
-                <details className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 group cursor-pointer">
+                <details className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 group cursor-pointer">
                   <summary className="flex items-center justify-between font-display font-bold text-lg list-none">
                     {faq.q}
                     <svg
@@ -467,7 +467,7 @@ export default async function ZonePage({
               <Link
                 key={z.slug}
                 href={`/zones/${getZoneSlug(z)}`}
-                className="block bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 hover:border-rouge/40 hover:bg-rouge/5 transition-all text-center"
+                className="block bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:border-rouge/40 hover:bg-rouge/5 transition-all text-center"
               >
                 <span className="block text-white font-medium text-sm">Covering {z.ville}</span>
                 <span className="text-gris-500 text-xs">{z.codePostal.split(" / ")[0]}</span>
@@ -481,7 +481,7 @@ export default async function ZonePage({
       <section className="section-padding bg-noir">
         <div className="container-custom text-center">
           <ScrollReveal direction="scale">
-            <div className="bg-white/5 backdrop-blur border border-rouge/20 bg-rouge/5 rounded-2xl p-12 max-w-3xl mx-auto">
+            <div className="bg-white/5 backdrop-blur-sm border border-rouge/20 bg-rouge/5 rounded-2xl p-12 max-w-3xl mx-auto">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
                 Votre projet covering à <span className="text-rouge">{zone.ville}</span> commence ici
               </h2>

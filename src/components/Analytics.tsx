@@ -66,7 +66,7 @@ export default function Analytics() {
     <>
       {/* ── Google Consent Mode v2 — doit être défini AVANT GTM ── */}
       {gtmId && (
-        <Script id="gtm-consent-default" strategy="beforeInteractive">
+        <Script id="gtm-consent-default" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

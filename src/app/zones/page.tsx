@@ -76,7 +76,7 @@ export default function ZonesIndexPage() {
               <ScrollReveal key={zone.slug} direction="up">
                 <Link
                   href={`/zones/${getZoneSlug(zone)}`}
-                  className="block bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:border-rouge/40 hover:bg-rouge/5 transition-all duration-300 h-full"
+                  className="block bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-rouge/40 hover:bg-rouge/5 transition-all duration-300 h-full"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -128,7 +128,7 @@ export default function ZonesIndexPage() {
       <section className="section-padding bg-noir">
         <div className="container-custom max-w-4xl">
           <ScrollReveal direction="up">
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-10 text-center">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-10 text-center">
               <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
                 Votre ville n&apos;est pas dans la liste&nbsp;?
               </h2>

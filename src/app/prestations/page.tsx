@@ -418,7 +418,7 @@ export default function PrestationsPage() {
       {/* ══════════════════════════════════════════════
           CTA BAND
       ══════════════════════════════════════════════ */}
-      <section className="section-padding bg-gradient-to-b from-noir to-noir-800">
+      <section className="section-padding bg-linear-to-b from-noir to-noir-800">
         <div className="container-custom text-center">
           <ScrollReveal>
             <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">

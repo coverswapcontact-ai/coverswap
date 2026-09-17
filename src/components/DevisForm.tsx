@@ -182,7 +182,7 @@ export default function DevisForm({
               name="nom"
               required
               placeholder="Jean Dupont"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
             />
           </div>
           <div>
@@ -192,7 +192,7 @@ export default function DevisForm({
               type="email"
               required
               placeholder="jean@exemple.fr"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
             />
           </div>
         </div>
@@ -205,7 +205,7 @@ export default function DevisForm({
               type="tel"
               required
               placeholder="06 12 34 56 78"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
             />
           </div>
           <div>
@@ -213,7 +213,7 @@ export default function DevisForm({
             <select
               name="type_projet"
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-rouge/50 transition-colors appearance-none"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50 transition-colors appearance-none"
             >
               <option value="" className="bg-noir">Sélectionnez...</option>
               {projectTypes.map((t) => (
@@ -229,7 +229,7 @@ export default function DevisForm({
           <input
             name="style"
             placeholder="ex : Marbre blanc, Bois chêne, Noir mat..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 transition-colors"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function DevisForm({
             required
             rows={4}
             placeholder="Décrivez votre projet, vos contraintes, vos envies..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 transition-colors resize-none"
+            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors resize-none"
           />
         </div>
 
@@ -282,7 +282,7 @@ export default function DevisForm({
           )}
 
           {photos.length < MAX_PHOTOS && (
-            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-rouge/30 transition-colors bg-white/[0.02]">
+            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-rouge/30 transition-colors bg-white/2">
               <svg className="w-8 h-8 text-gris-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>

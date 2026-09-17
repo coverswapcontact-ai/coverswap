@@ -94,7 +94,7 @@ export function SimulationSection() {
         {/* ── HEADER ── */}
         <div className="text-center max-w-3xl mx-auto mb-8 md:mb-14">
           <ScrollReveal direction="fade">
-            <div className="inline-flex items-center gap-2 bg-rouge/10 border border-rouge/30 rounded-full px-5 py-2 mb-6 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 bg-rouge/10 border border-rouge/30 rounded-full px-5 py-2 mb-6 backdrop-blur-xs">
               <span className="w-2 h-2 rounded-full bg-rouge animate-pulse shadow-[0_0_8px_rgba(204,0,0,0.8)]" />
               <span className="text-rouge font-bold text-xs uppercase tracking-[0.2em]">
                 Simulation IA · Exclusivité Coverswap
@@ -139,11 +139,11 @@ export function SimulationSection() {
         <ScrollReveal direction="scale" delay={0.15}>
           <div className="relative max-w-3xl mx-auto">
             {/* Glow rouge diffus */}
-            <div className="absolute -inset-6 bg-rouge/25 rounded-[2rem] blur-3xl opacity-60 pointer-events-none" />
+            <div className="absolute -inset-6 bg-rouge/25 rounded-4xl blur-3xl opacity-60 pointer-events-none" />
 
             {!projectId ? (
               /* ── Étape 1 : Sélection du type de projet ── */
-              <div className="relative rounded-3xl border border-rouge/30 bg-white/[0.03] backdrop-blur-sm p-6 sm:p-10">
+              <div className="relative rounded-3xl border border-rouge/30 bg-white/3 backdrop-blur-xs p-6 sm:p-10">
                 <div className="text-center mb-6 sm:mb-8">
                   <div className="inline-flex items-center gap-2 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 mb-3">
                     <span className="text-rouge font-bold text-[10px] uppercase tracking-widest">
@@ -164,7 +164,7 @@ export function SimulationSection() {
                       key={p.id}
                       type="button"
                       onClick={() => handleSelectProject(p.id)}
-                      className="group text-left p-3 sm:p-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-rouge hover:bg-rouge/5 hover:scale-[1.02] transition-all duration-200"
+                      className="group text-left p-3 sm:p-4 rounded-2xl border border-white/10 bg-white/3 hover:border-rouge hover:bg-rouge/5 hover:scale-[1.02] transition-all duration-200"
                     >
                       <div className="text-2xl sm:text-3xl mb-1.5">{p.icon}</div>
                       <div className="font-bold text-white text-sm sm:text-base leading-tight">{p.label}</div>
@@ -182,10 +182,10 @@ export function SimulationSection() {
                 }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
-                className={`relative block cursor-pointer rounded-3xl border-2 border-dashed transition-all duration-300 backdrop-blur-sm p-10 sm:p-16 text-center ${
+                className={`relative block cursor-pointer rounded-3xl border-2 border-dashed transition-all duration-300 backdrop-blur-xs p-10 sm:p-16 text-center ${
                   dragOver
                     ? "border-rouge bg-rouge/10 scale-[1.01]"
-                    : "border-rouge/40 bg-white/[0.03] hover:border-rouge hover:bg-white/[0.06] hover:scale-[1.005]"
+                    : "border-rouge/40 bg-white/3 hover:border-rouge hover:bg-white/6 hover:scale-[1.005]"
                 }`}
               >
                 <input
@@ -317,7 +317,7 @@ export function SimulationSection() {
                   <button
                     onClick={handleContinue}
                     type="button"
-                    className="sm:flex-[2] group inline-flex items-center justify-center gap-3 bg-rouge text-white font-bold text-base sm:text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_40px_rgba(204,0,0,0.45)] hover:shadow-[0_0_60px_rgba(204,0,0,0.75)] hover:scale-[1.02] hover:bg-[#e60000]"
+                    className="sm:flex-2 group inline-flex items-center justify-center gap-3 bg-rouge text-white font-bold text-base sm:text-lg px-8 py-4 rounded-full transition-all duration-300 shadow-[0_0_40px_rgba(204,0,0,0.45)] hover:shadow-[0_0_60px_rgba(204,0,0,0.75)] hover:scale-[1.02] hover:bg-[#e60000]"
                   >
                     Choisir mes textures
                     <svg

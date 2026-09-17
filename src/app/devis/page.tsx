@@ -58,7 +58,7 @@ export default function DevisPage() {
           style={{ background: "radial-gradient(ellipse, rgba(204,0,0,0.10) 0%, transparent 70%)" }} />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
           <ScrollReveal direction="fade">
-            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-rouge/30 rounded-full px-4 py-1.5 mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xs border border-rouge/30 rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-sm text-gris-300">Devis gratuit · réponse sous 24-48 h</span>
             </div>

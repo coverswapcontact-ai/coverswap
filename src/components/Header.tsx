@@ -59,7 +59,7 @@ export default function Header() {
 
   return (
     <>
-    <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-rouge focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm">
+    <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-100 focus:bg-rouge focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm">
       Aller au contenu principal
     </a>
 
@@ -77,7 +77,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group relative z-50">
           <div className="relative w-10 h-10">
-            <div className="absolute inset-0 bg-rouge rounded-lg transform rotate-45 group-hover:rotate-[225deg] transition-transform duration-700" />
+            <div className="absolute inset-0 bg-rouge rounded-lg transform rotate-45 group-hover:rotate-225 transition-transform duration-700" />
             <span className="absolute inset-0 flex items-center justify-center text-white font-display font-bold text-lg">
               C
             </span>
@@ -203,7 +203,7 @@ export default function Header() {
 
     {/* ═══ MOBILE MENU — EN DEHORS DU HEADER pour éviter le bug backdrop-filter ═══ */}
     <div
-      className={`lg:hidden fixed inset-0 bg-noir z-[45] transition-all duration-300 ${
+      className={`lg:hidden fixed inset-0 bg-noir z-45 transition-all duration-300 ${
         mobileOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
       }`}
     >

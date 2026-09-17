@@ -57,7 +57,7 @@ function HeroSection() {
       <div className="container-custom relative z-20 text-center pt-20 pb-8 md:pt-32 md:pb-20">
         {/* Badge live */}
         <div
-          className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-1.5 md:px-5 md:py-2 mb-5 md:mb-8"
+          className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xs border border-white/10 rounded-full px-4 py-1.5 md:px-5 md:py-2 mb-5 md:mb-8"
           style={{ animation: "slideUpFade 0.6s ease both 0s" }}
         >
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -121,7 +121,7 @@ function HeroSection() {
           className="mb-4 md:mb-10 -mt-1 md:-mt-4 flex items-center justify-center"
           style={{ animation: "slideUpFade 0.8s cubic-bezier(0.16,1,0.3,1) both 0.5s" }}
         >
-          <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-rouge/30 rounded-full px-5 py-2.5">
+          <div className="inline-flex items-center gap-3 bg-white/5 backdrop-blur-xs border border-rouge/30 rounded-full px-5 py-2.5">
             <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" />
             </svg>
@@ -265,7 +265,7 @@ function HowItWorks() {
 
         <div className="grid md:grid-cols-3 gap-8 relative">
           {/* Ligne de connexion */}
-          <div className="hidden md:block absolute top-[4.5rem] left-[22%] right-[22%] h-px"
+          <div className="hidden md:block absolute top-18 left-[22%] right-[22%] h-px"
             style={{ background: "linear-gradient(to right, transparent, rgba(204,0,0,0.35), transparent)" }} />
 
           {steps.map((step, i) => (
@@ -478,7 +478,7 @@ function CatalogueSection() {
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   {/* Badge code ref en bas */}
-                  <div className="absolute bottom-1 right-1 bg-noir/85 backdrop-blur-sm text-[9px] font-mono text-white px-1.5 py-0.5 rounded">
+                  <div className="absolute bottom-1 right-1 bg-noir/85 backdrop-blur-xs text-[9px] font-mono text-white px-1.5 py-0.5 rounded-sm">
                     {f.refId}
                   </div>
                 </div>

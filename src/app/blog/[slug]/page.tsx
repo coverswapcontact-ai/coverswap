@@ -294,7 +294,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <input
                   type="email"
                   placeholder="Votre email"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50"
                 />
                 <button className="bg-rouge hover:bg-rouge-hover text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
                   OK

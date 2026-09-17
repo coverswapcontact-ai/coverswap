@@ -300,7 +300,7 @@ export default function CuisinePage() {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 text-center"
+                    className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
                   >
                     <span className="block font-display text-3xl font-bold text-rouge mb-1">{stat.value}</span>
                     <span className="text-gris-400 text-sm">{stat.label}</span>
@@ -330,7 +330,7 @@ export default function CuisinePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {surfaces.map((s, i) => (
               <ScrollReveal key={s.title} direction="up" delay={i * 0.1}>
-                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:border-rouge/30 transition-all duration-300 h-full">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-rouge/30 transition-all duration-300 h-full">
                   <span className="text-3xl mb-4 block">{s.icon}</span>
                   <h3 className="font-display text-lg font-bold mb-2">{s.title}</h3>
                   <p className="text-gris-400 text-sm leading-relaxed">{s.description}</p>
@@ -357,7 +357,7 @@ export default function CuisinePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {finitions.map((f, i) => (
               <ScrollReveal key={f.title} direction="up" delay={i * 0.08}>
-                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:border-rouge/30 transition-all duration-300 h-full">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-rouge/30 transition-all duration-300 h-full">
                   <h3 className="font-display text-xl font-bold mb-1">{f.title}</h3>
                   <span className="text-rouge text-sm font-medium block mb-3">{f.varieties}</span>
                   <p className="text-gris-400 text-sm leading-relaxed">{f.description}</p>
@@ -385,11 +385,11 @@ export default function CuisinePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative">
             {/* Connecting line (desktop) */}
-            <div className="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-rouge/0 via-rouge/40 to-rouge/0" />
+            <div className="hidden lg:block absolute top-16 left-[12.5%] right-[12.5%] h-px bg-linear-to-r from-rouge/0 via-rouge/40 to-rouge/0" />
 
             {steps.map((s, i) => (
               <ScrollReveal key={s.num} direction="up" delay={i * 0.15}>
-                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8 relative h-full">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 relative h-full">
                   <div className="w-12 h-12 rounded-full bg-rouge/20 border border-rouge/40 flex items-center justify-center mb-6 relative z-10">
                     <span className="text-rouge font-display font-bold text-lg">{s.num}</span>
                   </div>
@@ -414,7 +414,7 @@ export default function CuisinePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {avantages.map((a, i) => (
               <ScrollReveal key={a.title} direction="up" delay={i * 0.06}>
-                <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 text-center hover:border-rouge/30 transition-all duration-300 h-full">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center hover:border-rouge/30 transition-all duration-300 h-full">
                   <span className="text-3xl mb-3 block">{a.icon}</span>
                   <h3 className="font-display font-bold mb-1">{a.title}</h3>
                   <p className="text-gris-400 text-sm">{a.description}</p>
@@ -435,7 +435,7 @@ export default function CuisinePage() {
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.1}>
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
               <div className="grid grid-cols-3 text-center font-display font-bold text-sm sm:text-base">
                 <div className="p-4 border-b border-white/10" />
                 <div className="p-4 border-b border-l border-white/10 text-rouge">Covering CoverSwap</div>
@@ -509,7 +509,7 @@ export default function CuisinePage() {
           <div className="space-y-4">
             {faqs.map((faq, i) => (
               <ScrollReveal key={faq.q} direction="up" delay={i * 0.05}>
-                <details className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 group cursor-pointer">
+                <details className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 group cursor-pointer">
                   <summary className="flex items-center justify-between font-display font-bold text-lg list-none">
                     {faq.q}
                     <svg
@@ -534,7 +534,7 @@ export default function CuisinePage() {
       <section className="section-padding bg-noir">
         <div className="container-custom text-center">
           <ScrollReveal direction="scale">
-            <div className="bg-white/5 backdrop-blur border border-rouge/20 bg-rouge/5 rounded-2xl p-12">
+            <div className="bg-white/5 backdrop-blur-sm border border-rouge/20 bg-rouge/5 rounded-2xl p-12">
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
                 Prêt à transformer votre <span className="text-rouge">cuisine</span> ?
               </h2>

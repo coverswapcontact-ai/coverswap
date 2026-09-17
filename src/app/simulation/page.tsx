@@ -2,7 +2,6 @@
 
 import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import revetements from "@/data/revetements.json";
 import { track } from "@/lib/analytics";
@@ -147,7 +146,7 @@ async function downloadSimulation(
     ctx.fillRect(60, refY + 12, 60, 3);
 
     const selectedEls = projectElements.filter((el) => elements[el.key]?.enabled && elements[el.key]?.ref);
-    let cardX = 60;
+    const cardX = 60;
     const cardY = refY + 40;
     const cardW = (W - 120 - (selectedEls.length - 1) * 16) / Math.max(selectedEls.length, 1);
     const cardH = 200;
@@ -274,16 +273,6 @@ const FAMILLES = [
   { id: "paillettes", label: "Paillettes" },
 ];
 
-const FAMILLE_COLORS: Record<string, string> = {
-  bois: "bg-amber-700/80",
-  couleur: "bg-rose-600/80",
-  pierre: "bg-stone-500/80",
-  beton: "bg-zinc-500/80",
-  metal: "bg-slate-500/80",
-  textile: "bg-purple-600/80",
-  paillettes: "bg-yellow-500/80",
-};
-
 // ELEMENTS est maintenant dynamique : voir `currentProject.elements`
 
 const ITEMS_PER_PAGE = 6;
@@ -321,8 +310,12 @@ function ReferencePicker({
     return filtered.slice(start, start + ITEMS_PER_PAGE);
   }, [filtered, page]);
 
-  // Reset page when filters change
-  useEffect(() => { setPage(0); }, [search, familleFilter]);
+  // Retour à la première page quand le filtre change (état ajusté pendant le rendu).
+  const [filtrePrecedent, setFiltrePrecedent] = useState({ search, familleFilter });
+  if (filtrePrecedent.search !== search || filtrePrecedent.familleFilter !== familleFilter) {
+    setFiltrePrecedent({ search, familleFilter });
+    setPage(0);
+  }
 
   const handleFamilleClick = useCallback((id: string) => {
     setFamilleFilter((prev) => (prev === id ? null : id));
@@ -342,7 +335,7 @@ function ReferencePicker({
             placeholder="Rechercher..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder:text-gris-500 focus:outline-none focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all"
+            className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 focus:ring-1 focus:ring-rouge/30 transition-all"
           />
         </div>
         <div className="flex flex-wrap gap-1">
@@ -468,12 +461,12 @@ export default function SimulationPage() {
     createEmptyElements(PROJECT_TYPES[0])
   );
 
-  // Reset elements quand le projet change
-  useEffect(() => {
-    if (projectId) {
-      setElements(createEmptyElements(getProject(projectId)));
-    }
-  }, [projectId]);
+  // Sélections remises à zéro quand le projet change (état ajusté pendant le rendu).
+  const [projetDesElements, setProjetDesElements] = useState(projectId);
+  if (projectId && projectId !== projetDesElements) {
+    setProjetDesElements(projectId);
+    setElements(createEmptyElements(getProject(projectId)));
+  }
 
   // Step 3: Contact
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
@@ -506,6 +499,9 @@ export default function SimulationPage() {
       const pendingPhoto = sessionStorage.getItem("coverswap_pending_photo");
       const pendingProject = sessionStorage.getItem("coverswap_pending_project");
       if (pendingPhoto) {
+        // Reprise d'un état externe (sessionStorage) après le montage : lecture
+        // volontairement au montage, pas d'autre source possible côté serveur.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPreview(pendingPhoto);
         setProjectId(pendingProject || "cuisine");
         setStep(3); // saute à l'étape revêtements directement
@@ -1028,7 +1024,7 @@ export default function SimulationPage() {
                     {/* Selected reference summary */}
                     {selection.enabled && selection.ref && (
                       <div className="flex items-center gap-3 mt-3 mb-1 bg-rouge/10 border border-rouge/20 rounded-lg px-3 py-2">
-                        <div className="relative w-10 h-10 rounded overflow-hidden flex-shrink-0">
+                        <div className="relative w-10 h-10 rounded-sm overflow-hidden shrink-0">
                           <Image src={selection.image} alt={selection.name} fill className="object-cover" sizes="40px" />
                         </div>
                         <div className="min-w-0">
@@ -1097,7 +1093,7 @@ export default function SimulationPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge"
                   placeholder="Jean Dupont"
                 />
               </div>
@@ -1109,7 +1105,7 @@ export default function SimulationPage() {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge"
                   placeholder="06 12 34 56 78"
                 />
               </div>
@@ -1120,7 +1116,7 @@ export default function SimulationPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge"
                   placeholder="jean@email.com"
                 />
               </div>
@@ -1130,7 +1126,7 @@ export default function SimulationPage() {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-none focus:ring-1 focus:ring-rouge resize-none"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge resize-none"
                   placeholder="Décrivez votre projet, dimensions, rendu souhaité..."
                 />
               </div>
@@ -1157,7 +1153,7 @@ export default function SimulationPage() {
                     if (!s?.enabled || !s.ref) return null;
                     return (
                       <div key={el.key} className="flex items-center gap-3">
-                        <div className="relative w-8 h-8 rounded overflow-hidden flex-shrink-0">
+                        <div className="relative w-8 h-8 rounded-sm overflow-hidden shrink-0">
                           <Image src={s.image} alt={s.name} fill className="object-cover" sizes="32px" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -1345,7 +1341,7 @@ export default function SimulationPage() {
                       if (!s?.enabled || !s.ref) return null;
                       return (
                         <div key={el.key} className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
-                          <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0">
+                          <div className="relative w-12 h-12 rounded-sm overflow-hidden shrink-0">
                             <Image src={s.image} alt={s.name} fill className="object-cover" sizes="48px" />
                           </div>
                           <div className="min-w-0">

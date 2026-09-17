@@ -1,15 +1,141 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-/* Focus-visible for accessibility */
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid #CC0000;
-  outline-offset: 2px;
+@theme {
+  --color-noir: #1a1a1a;
+  --color-rouge: #cc0000;
+  --color-rouge-hover: #aa0000;
+  --color-rouge-light: #ff1a1a;
+
+  --color-gris-100: #f5f5f5;
+  --color-gris-200: #e5e5e5;
+  --color-gris-300: #d4d4d4;
+  --color-gris-400: #a3a3a3;
+  --color-gris-500: #737373;
+  --color-gris-600: #525252;
+  --color-gris-700: #404040;
+  --color-gris-800: #262626;
+  --color-gris-900: #171717;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+
+  --animate-fade-in: fadeIn 0.6s ease-out forwards;
+  --animate-slide-up: slideUp 0.6s ease-out forwards;
+  --animate-slide-in-left: slideInLeft 0.6s ease-out forwards;
+  --animate-slide-in-right: slideInRight 0.6s ease-out forwards;
+  --animate-count-up: countUp 2s ease-out forwards;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideInLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility btn-primary {
+  /* ── Bouton principal avec pulse subtil ── */
+  @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
+           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
+           hover:bg-rouge-hover hover:scale-105
+           active:scale-95 uppercase tracking-wider;
+  animation: ctaPulse 2.5s ease-in-out infinite;
+  will-change: box-shadow;
+
+  &:hover {
+    animation: none;
+    box-shadow: 0 0 32px rgba(204, 0, 0, 0.55);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility btn-secondary {
+  /* Pause CTA pulse when reduced motion is preferred */
+  @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
+           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
+           hover:bg-white hover:text-noir hover:scale-105
+           active:scale-95 uppercase tracking-wider;
+}
+
+@utility section-padding {
+  @apply py-14 md:py-24 px-4 sm:px-6 lg:px-8;
+}
+
+@utility container-custom {
+  @apply max-w-7xl mx-auto;
+}
+
+@utility glass-card {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+}
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@layer utilities {
+  /* Focus-visible for accessibility */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #cc0000;
+    outline-offset: 2px;
+  }
 }
 
 @layer base {
@@ -25,53 +151,6 @@ textarea:focus-visible {
 
   ::selection {
     @apply bg-rouge text-white;
-  }
-}
-
-@layer components {
-  /* ── Bouton principal avec pulse subtil ── */
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
-           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-rouge-hover hover:scale-105
-           active:scale-95 uppercase tracking-wider;
-    animation: ctaPulse 2.5s ease-in-out infinite;
-    will-change: box-shadow;
-  }
-
-  .btn-primary:hover {
-    animation: none;
-    box-shadow: 0 0 32px rgba(204, 0, 0, 0.55);
-  }
-
-  /* Pause CTA pulse when reduced motion is preferred */
-  @media (prefers-reduced-motion: reduce) {
-    .btn-primary { animation: none; }
-  }
-
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
-           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-white hover:text-noir hover:scale-105
-           active:scale-95 uppercase tracking-wider;
-  }
-
-  .section-padding {
-    @apply py-14 md:py-24 px-4 sm:px-6 lg:px-8;
-  }
-
-  .container-custom {
-    @apply max-w-7xl mx-auto;
-  }
-
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
   }
 }
 

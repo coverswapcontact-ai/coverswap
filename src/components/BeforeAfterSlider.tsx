@@ -74,7 +74,7 @@ export default React.memo(function BeforeAfterSlider({
           />
         )}
         <div className="absolute inset-0 flex items-end justify-center pb-6 pointer-events-none">
-          <span className="text-white/70 font-display text-sm uppercase tracking-widest bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">Rendu CoverSwap</span>
+          <span className="text-white/70 font-display text-sm uppercase tracking-widest bg-black/40 backdrop-blur-xs px-3 py-1.5 rounded-full">Rendu CoverSwap</span>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export default React.memo(function BeforeAfterSlider({
           />
         )}
         <div className="absolute inset-0 flex items-end justify-center pb-6 pointer-events-none">
-          <span className="text-white/50 font-display text-sm uppercase tracking-widest bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">Existant</span>
+          <span className="text-white/50 font-display text-sm uppercase tracking-widest bg-black/40 backdrop-blur-xs px-3 py-1.5 rounded-full">Existant</span>
         </div>
       </div>
 
@@ -116,12 +116,12 @@ export default React.memo(function BeforeAfterSlider({
 
       {/* Labels */}
       <div className="absolute top-4 left-4 z-10">
-        <span className="bg-black/60 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+        <span className="bg-black/60 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
           {beforeLabel}
         </span>
       </div>
       <div className="absolute top-4 right-4 z-10">
-        <span className="bg-rouge/80 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+        <span className="bg-rouge/80 backdrop-blur-xs text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
           {afterLabel}
         </span>
       </div>
