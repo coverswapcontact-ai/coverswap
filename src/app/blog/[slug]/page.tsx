@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { fondSrc } from "@/lib/images";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import TextureBackground from "@/components/TextureBackground";
@@ -120,7 +121,7 @@ export default async function BlogPostPage({ params }: Props) {
               {/* Featured image */}
               <div className="w-full h-64 md:h-80 rounded-xl overflow-hidden relative mb-8">
                 <Image
-                  src={article.image}
+                  src={fondSrc(article.image, 1600)}
                   alt={article.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 700px"

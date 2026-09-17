@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { fondSrc } from "@/lib/images";
 import { articles } from "@/data/blog-articles";
 
 const categories = ["Tout", "Conseils", "Tendances", "Comparatif", "Locataire"];
@@ -44,7 +45,7 @@ export default function BlogClient() {
             {/* Thumbnail */}
             <div className="relative h-48 overflow-hidden">
               <Image
-                src={article.image}
+                src={fondSrc(article.image, 800)}
                 alt={article.title}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

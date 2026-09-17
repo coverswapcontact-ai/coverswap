@@ -102,7 +102,7 @@ export default function SalleDeBainPage() {
       {/* Hero */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1754788358645-d6e6cca12e25?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1754788358645-d6e6cca12e25"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -155,7 +155,7 @@ export default function SalleDeBainPage() {
       {/* Zones couvertes */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1754522711595-84428937b07a?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1754522711595-84428937b07a"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom
@@ -208,7 +208,7 @@ export default function SalleDeBainPage() {
       {/* Finitions */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1750036015902-c6f5ebca924e?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1750036015902-c6f5ebca924e"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom
@@ -260,7 +260,7 @@ export default function SalleDeBainPage() {
       {/* Comparatif */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1617325697689-196257ac1829?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1617325697689-196257ac1829"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom

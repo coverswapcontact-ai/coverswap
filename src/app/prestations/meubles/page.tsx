@@ -280,7 +280,7 @@ export default function MeublesPage() {
       {/* Hero */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1764526624453-db32c24eca55?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1764526624453-db32c24eca55"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -344,7 +344,7 @@ export default function MeublesPage() {
       {/* Types de meubles */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1601224503166-47e6afa2fc92?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1601224503166-47e6afa2fc92"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom
@@ -417,7 +417,7 @@ export default function MeublesPage() {
       {/* Processus 4 étapes */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1687942918532-69295473701d?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1687942918532-69295473701d"
           overlay="rgba(0,0,0,0.80)"
           fadeTop
           fadeBottom
@@ -508,7 +508,7 @@ export default function MeublesPage() {
       {/* FAQ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1684846416931-dddf8cbfc2ad?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1684846416931-dddf8cbfc2ad"
           overlay="rgba(0,0,0,0.80)"
           fadeTop
           fadeBottom

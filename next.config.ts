@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   images: {
+    // Aucune optimisation à la volée : le quota d'images du plan Vercel Hobby
+    // était épuisé (HTTP 402, catalogue vide). Les échantillons Cover Styl' (S3)
+    // sont déjà petits ; les photos de fond sont produites en local aux bonnes
+    // tailles par scripts/importer-fonds.mjs et servies par srcset.
+    unoptimized: true,
     // Qualités autorisées (requis à partir de Next 16)
     qualities: [60, 75, 80, 85, 90],
     formats: ["image/avif", "image/webp"],
@@ -15,11 +20,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 40, 48, 64, 80, 96, 128, 140, 256, 384],
     deviceSizes: [600, 640, 700, 750, 828, 960, 1080, 1200, 1920, 2048, 3840],
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        pathname: "/**",
-      },
       {
         protocol: "https",
         hostname: "ssi.s3.fr-par.scw.cloud",

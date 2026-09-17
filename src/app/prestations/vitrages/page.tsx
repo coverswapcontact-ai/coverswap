@@ -204,7 +204,7 @@ export default function VitragesPage() {
       {/* Hero */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1737930172367-30621b8d5d75?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1737930172367-30621b8d5d75"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -271,7 +271,7 @@ export default function VitragesPage() {
       {/* Applications */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1745015446589-7ee6f702d8c1?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1745015446589-7ee6f702d8c1"
           overlay="rgba(0,0,0,0.88)"
           fadeTop
           fadeBottom
@@ -337,7 +337,7 @@ export default function VitragesPage() {
       {/* Processus */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1704383014623-a6630096ff8c?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1704383014623-a6630096ff8c"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom

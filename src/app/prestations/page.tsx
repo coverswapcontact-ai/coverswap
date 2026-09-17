@@ -160,7 +160,7 @@ export default function PrestationsPage() {
       ══════════════════════════════════════════════ */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1639405069836-f82aa6dcb900?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1639405069836-f82aa6dcb900"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -313,7 +313,7 @@ export default function PrestationsPage() {
       ══════════════════════════════════════════════ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1754522711595-84428937b07a?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1754522711595-84428937b07a"
           overlay="rgba(0,0,0,0.82)"
           fadeTop
           fadeBottom

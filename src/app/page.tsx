@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 const TEXTURES = {
   /** Salle de bain élégante avec murs en marbre et éléments naturels */
   bathroom:
-    "https://images.unsplash.com/photo-1754522711595-84428937b07a?auto=format&fit=crop&w=1920&q=80",
+    "/images/fonds/photo-1754522711595-84428937b07a",
 } as const;
 
 /* ══════════════════════════════════════════════════════════════════

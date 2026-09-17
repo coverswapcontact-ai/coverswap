@@ -24,7 +24,7 @@ export const articles: BlogArticle[] = [
     category: "Comparatif",
     date: "18 mars 2025",
     readTime: "6 min",
-    image: "https://images.unsplash.com/photo-1722605090433-41d1183a792d?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1722605090433-41d1183a792d",
     content: {
       intro:
         "Rénover sa cuisine est souvent le premier projet que l'on envisage quand on souhaite rafraîchir son intérieur. Deux options reviennent systématiquement : la peinture classique et le covering adhésif. Si la peinture reste un réflexe bien ancré, le revêtement adhésif s'impose de plus en plus comme une alternative performante, rapide et économique. Comparons ces deux solutions point par point pour vous aider à faire le bon choix.",
@@ -64,7 +64,7 @@ export const articles: BlogArticle[] = [
     category: "Conseils",
     date: "10 mars 2025",
     readTime: "4 min",
-    image: "https://images.unsplash.com/photo-1642505172378-a6f5e5b15580?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1642505172378-a6f5e5b15580",
     content: {
       intro:
         "Le covering adhésif est une solution durable et élégante, mais un entretien adapté permet de prolonger sa durée de vie et de conserver un rendu impeccable au fil des années. Bonne nouvelle : les gestes à adopter sont simples, rapides et ne nécessitent aucun produit spécialisé coûteux. Voici le guide complet pour prendre soin de votre revêtement adhésif au quotidien.",
@@ -104,7 +104,7 @@ export const articles: BlogArticle[] = [
     category: "Tendances",
     date: "2 mars 2025",
     readTime: "5 min",
-    image: "https://images.unsplash.com/photo-1704383014623-a6630096ff8c?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1704383014623-a6630096ff8c",
     content: {
       intro:
         "Chaque année apporte son lot de nouvelles inspirations en décoration intérieure, et le covering adhésif n'échappe pas à la règle. En 2025, les tendances oscillent entre retour au naturel, audaces industrielles et couleurs apaisantes. Tour d'horizon des finitions qui transforment les intérieurs cette année — et comment les intégrer chez vous grâce au revêtement adhésif.",
@@ -144,7 +144,7 @@ export const articles: BlogArticle[] = [
     category: "Comparatif",
     date: "22 février 2025",
     readTime: "7 min",
-    image: "https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1566041510394-cf7c8fe21800",
     content: {
       intro:
         "Le choix de la texture est l'étape la plus importante quand on envisage une rénovation par covering adhésif. Marbre, bois ou béton : chacune de ces finitions possède une personnalité propre et s'adapte à des contextes différents. Plutôt que de choisir au hasard ou de suivre uniquement la tendance du moment, voici un guide complet pour sélectionner la texture qui sublimera réellement votre espace.",
@@ -184,7 +184,7 @@ export const articles: BlogArticle[] = [
     category: "Conseils",
     date: "14 février 2025",
     readTime: "5 min",
-    image: "https://images.unsplash.com/photo-1759238136854-913e5e383308?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1759238136854-913e5e383308",
     content: {
       intro:
         "C'est la question numéro un que se posent nos clients : « Est-ce que ça va tenir ? » Légitime, quand on investit dans la rénovation de sa cuisine ou de sa salle de bain. La réponse courte : oui, un covering adhésif professionnel est remarquablement durable. La réponse longue mérite qu'on détaille chaque aspect de cette résistance pour dissiper tous les doutes.",
@@ -224,7 +224,7 @@ export const articles: BlogArticle[] = [
     category: "Locataire",
     date: "5 février 2025",
     readTime: "6 min",
-    image: "https://images.unsplash.com/photo-1742490382029-98357c08f3cd?auto=format&fit=crop&w=1920&q=80",
+    image: "/images/fonds/photo-1742490382029-98357c08f3cd",
     content: {
       intro:
         "Quand on est locataire, la frustration de vivre dans un intérieur qui ne nous ressemble pas est réelle. Cuisine défraîchie, meubles de salle de bain datés, portes abîmées : autant d'éléments qu'on rêve de transformer sans pouvoir toucher à rien de permanent. Le covering adhésif est la réponse parfaite à cette contrainte. Entièrement réversible, il permet de métamorphoser un logement loué sans risquer sa caution.",

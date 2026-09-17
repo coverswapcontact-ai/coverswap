@@ -158,7 +158,7 @@ export default function ProfessionnelPage() {
       {/* Hero */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1767022724924-993b00fc04b3?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1767022724924-993b00fc04b3"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -225,7 +225,7 @@ export default function ProfessionnelPage() {
       {/* Avantages pro */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1682888813913-e13f18692019?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1682888813913-e13f18692019"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom
@@ -320,7 +320,7 @@ export default function ProfessionnelPage() {
       {/* Processus 4 étapes */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1758448721205-8465cebc26af?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1758448721205-8465cebc26af"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom
@@ -440,7 +440,7 @@ export default function ProfessionnelPage() {
       {/* FAQ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1742490382029-98357c08f3cd?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1742490382029-98357c08f3cd"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom

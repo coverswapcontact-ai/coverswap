@@ -55,7 +55,7 @@ const FAMILLE_COLORS: Record<string, string> = {
 };
 
 const MARBLE_TEXTURE =
-  "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=1920&q=80";
+  "/images/fonds/photo-1618220179428-22790b461013";
 
 /* ══════════════════════════════════════════════════════════════════
    COMPONENT

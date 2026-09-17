@@ -214,7 +214,7 @@ export default function CuisinePage() {
       {/* ══════════════════ HERO ══════════════════ */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1758315417321-83eb30a39710?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1758315417321-83eb30a39710"
           overlay="rgba(0,0,0,0.80)"
           fadeTop={false}
           fadeBottom
@@ -315,7 +315,7 @@ export default function CuisinePage() {
       {/* ══════════════════ SURFACES COUVERTES ══════════════════ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1639405069836-f82aa6dcb900?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1639405069836-f82aa6dcb900"
           overlay="rgba(0,0,0,0.82)"
           fadeTop
           fadeBottom
@@ -371,7 +371,7 @@ export default function CuisinePage() {
       {/* ══════════════════ PROCESSUS EN 4 ÉTAPES ══════════════════ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1722605090433-41d1183a792d?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1722605090433-41d1183a792d"
           overlay="rgba(0,0,0,0.82)"
           fadeTop
           fadeBottom
@@ -494,7 +494,7 @@ export default function CuisinePage() {
       {/* ══════════════════ FAQ ══════════════════ */}
       <section className="relative section-padding overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1759238136854-913e5e383308?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1759238136854-913e5e383308"
           overlay="rgba(0,0,0,0.85)"
           fadeTop
           fadeBottom

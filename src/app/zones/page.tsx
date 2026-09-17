@@ -38,7 +38,7 @@ export default function ZonesIndexPage() {
       {/* HERO */}
       <section className="relative section-padding pt-40 overflow-hidden">
         <TextureBackground
-          src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1920&q=80"
+          src="/images/fonds/photo-1556909114-f6e7ad7d3136"
           overlay="rgba(0,0,0,0.82)"
           fadeTop={false}
           fadeBottom

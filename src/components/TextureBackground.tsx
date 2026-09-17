@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { fondSrc, fondSrcSet } from "@/lib/images";
 
 interface TextureBackgroundProps {
-  /** URL directe Unsplash (images.unsplash.com) */
+  /** Photo de fond locale : `/images/fonds/<id>` (paire 800/1600, voir lib/images) */
   src: string;
   /** Couleur de l'overlay CSS (rgba). Défaut : rgba(0,0,0,0.78) */
   overlay?: string;
@@ -49,20 +49,22 @@ export default function TextureBackground({
 
   return (
     <>
-      {/* ── Image texture pleine section ── */}
+      {/* ── Image texture pleine section (fichiers locaux, sans optimiseur Vercel) ── */}
       <div
         ref={imgRef}
         className="absolute inset-0 select-none pointer-events-none"
         style={parallax ? { willChange: "transform", transform: "translateY(0px)" } : undefined}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={fondSrc(src, 1600)}
+          srcSet={fondSrcSet(src)}
           sizes="100vw"
-          priority={parallax}
-          quality={80}
-          className={`object-cover ${parallax ? "scale-[1.15]" : ""}`}
+          alt={alt}
+          loading={parallax ? "eager" : "lazy"}
+          fetchPriority={parallax ? "high" : "auto"}
+          decoding="async"
+          className={`absolute inset-0 h-full w-full object-cover ${parallax ? "scale-[1.15]" : ""}`}
         />
       </div>
 
