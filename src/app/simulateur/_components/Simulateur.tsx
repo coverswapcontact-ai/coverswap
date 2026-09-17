@@ -284,7 +284,7 @@ export default function Simulateur() {
   };
 
   if (!charge) {
-    return <div className="glass-card p-8 text-center text-gris-500">Chargement du simulateur…</div>;
+    return <div className="min-h-[520px] flex items-center justify-center text-gris-500">Chargement du simulateur…</div>;
   }
 
   return (

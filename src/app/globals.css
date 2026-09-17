@@ -5,12 +5,13 @@
   --color-rouge: #cc0000;
   --color-rouge-hover: #aa0000;
   --color-rouge-light: #ff1a1a;
+  --color-rouge-texte: #f04545; /* rouge des textes sur fond noir (5:1) ; le rouge des fonds reste #cc0000 */
 
   --color-gris-100: #f5f5f5;
   --color-gris-200: #e5e5e5;
   --color-gris-300: #d4d4d4;
   --color-gris-400: #a3a3a3;
-  --color-gris-500: #737373;
+  --color-gris-500: #8e8e8e; /* 5,6:1 sur le noir du site : lisible en petit texte */
   --color-gris-600: #525252;
   --color-gris-700: #404040;
   --color-gris-800: #262626;
@@ -117,6 +118,10 @@
 }
 
 @layer utilities {
+  /* Le rouge en texte : version plus claire pour le contraste sur fond noir */
+  .text-rouge {
+    color: var(--color-rouge-texte);
+  }
   /* Focus-visible for accessibility */
   a:focus-visible,
   button:focus-visible,
@@ -155,13 +160,10 @@
 /* ═══════════════════════════════════════════════════════════
    SCROLL REVEAL
 ═══════════════════════════════════════════════════════════ */
-/* Visible sans JavaScript : seul <html class="js"> masque, l'observateur révèle. */
-html.js .reveal:not(.revealed) {
-  opacity: 0;
-}
+/* Toujours visible (le texte compte pour le premier rendu) : seul un léger
+   glissement accompagne l'arrivée dans l'écran, quand JavaScript est là. */
 html.js .reveal {
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 html.js .reveal-up:not(.revealed)    { transform: translateY(24px); }
 html.js .reveal-left:not(.revealed)  { transform: translateX(-24px); }
