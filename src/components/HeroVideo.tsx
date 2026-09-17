@@ -3,43 +3,58 @@
 import { useState, useRef, useEffect } from "react";
 
 /**
- * Fond vidéo hero — stratégie anti-flash multi-couches :
- * 1. Conteneur avec background-image CSS = poster affiché dès le 1er rendu SSR
- * 2. Vidéo superposée avec attribut poster (fallback natif)
- * 3. play() forcé via ref (contourne les quirks autoplay mobile iOS/Android)
+ * Fond vidéo hero — le poster s'affiche dès le rendu serveur, la vidéo vient
+ * ensuite, et seulement si elle en vaut la peine :
+ *  - téléphone (< 768 px) : fichier 640 px (≈ 0,3 Mo) au lieu de la version bureau ;
+ *  - « réduire les animations » ou « économiser les données » activés : poster seul.
+ * Les deux fichiers sont muets (l'ancienne piste audio pesait pour rien).
  */
+const VIDEO_BUREAU = "/videos/hero-1080.mp4";
+const VIDEO_MOBILE = "/videos/hero-mobile.mp4";
+
 export default function HeroVideo() {
+  const [src, setSrc] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  /* Force le play dès que l'élément est dans le DOM — plus fiable que autoPlay seul */
+  useEffect(() => {
+    const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const economie = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    if (reduit || economie) return;
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    // Choix fait après le montage (inconnu côté serveur) : lecture d'un état externe.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSrc(mobile ? VIDEO_MOBILE : VIDEO_BUREAU);
+  }, []);
+
+  /* Force le play dès que la source est posée — plus fiable que autoPlay seul sur mobile */
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v || !src) return;
     const tryPlay = () => {
       v.play().catch(() => {
-        /* Si bloqué (ex: mode éco), on laisse le poster */
+        /* bloqué (mode éco, etc.) : le poster reste */
       });
     };
-    // Tentative immédiate + retry sur canplay
     tryPlay();
     v.addEventListener("canplay", tryPlay, { once: true });
     return () => v.removeEventListener("canplay", tryPlay);
-  }, []);
+  }, [src]);
 
   return (
     <div
       className="absolute inset-0 z-0 overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: "url(/videos/hero-poster.jpg)" }}
     >
-      {!videoError && (
+      {src && !videoError && (
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover object-center"
-          src="/videos/hero.mp4"
+          src={src}
           poster="/videos/hero-poster.jpg"
           autoPlay
           muted
+          loop
           playsInline
           preload="auto"
           aria-hidden="true"

@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TMP_DIR = "C:\\Users\\lucas\\AppData\\Local\\Temp\\sim_test";
-const OUT_DIR = resolve(__dirname, "../public/simulation-tests");
+const OUT_DIR = resolve(__dirname, "../.simulation-tests");
 const API_URL = "https://coverswap.fr/api/simulation";
 
 const TEST_IDENTITY = {

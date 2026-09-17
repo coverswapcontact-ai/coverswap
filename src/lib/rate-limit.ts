@@ -6,8 +6,9 @@
  *   2. Cap global    : M simulations totales sur tout le site par 24 h
  *      (protection budget OpenAI)
  *
- * Stockage en mémoire process — suffisant pour un déploiement Vercel/Node
- * mono-instance. Pour du multi-instance, brancher Upstash Redis plus tard.
+ * Stockage en mémoire process : sur Vercel, chaque instance a son compteur, la
+ * limite est donc indicative. La vraie garde est côté CRM (limite par visiteur
+ * et par contact) et, dès qu'elle est configurée, le captcha Turnstile.
  *
  * Les valeurs sont surchargeables via env :
  *   SIMULATION_DAILY_LIMIT_PER_IP   (défaut 3)
@@ -116,62 +117,3 @@ export function checkSimulationRateLimit(ip: string): RateLimitResult {
     retryAfterSec: 0,
   };
 }
-
-/**
- * Inspecte sans incrémenter — utile pour /api/simulation/quota
- * (afficher le compteur restant côté client avant la soumission).
- */
-export function peekSimulationRateLimit(ip: string): RateLimitResult {
-  const now = Date.now();
-
-  if (now > globalResetAt) {
-    return {
-      ok: true,
-      limit: PER_IP_LIMIT,
-      remaining: PER_IP_LIMIT,
-      resetAt: now + DAY_MS,
-      retryAfterSec: 0,
-    };
-  }
-
-  const entry = ipCounters.get(ip);
-  const used = entry && now < entry.resetAt ? entry.count : 0;
-  const remainingIp = Math.max(0, PER_IP_LIMIT - used);
-  const remainingGlobal = Math.max(0, GLOBAL_LIMIT - globalCount);
-  const remaining = Math.min(remainingIp, remainingGlobal);
-
-  if (remainingGlobal === 0) {
-    return {
-      ok: false,
-      reason: "global-quota",
-      limit: GLOBAL_LIMIT,
-      remaining: 0,
-      resetAt: globalResetAt,
-      retryAfterSec: Math.max(1, Math.ceil((globalResetAt - now) / 1000)),
-    };
-  }
-
-  if (remainingIp === 0) {
-    return {
-      ok: false,
-      reason: "ip-quota",
-      limit: PER_IP_LIMIT,
-      remaining: 0,
-      resetAt: entry!.resetAt,
-      retryAfterSec: Math.max(1, Math.ceil((entry!.resetAt - now) / 1000)),
-    };
-  }
-
-  return {
-    ok: true,
-    limit: PER_IP_LIMIT,
-    remaining,
-    resetAt: entry?.resetAt ?? now + DAY_MS,
-    retryAfterSec: 0,
-  };
-}
-
-export const SIMULATION_LIMITS = {
-  perIp: PER_IP_LIMIT,
-  global: GLOBAL_LIMIT,
-};

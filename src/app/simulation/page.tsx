@@ -490,15 +490,9 @@ export default function SimulationPage() {
   const [quota, setQuota] = useState<{ limit: number; remaining: number; resetAt: number } | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/simulation/quota", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled && data && typeof data.remaining === "number") {
-          setQuota({ limit: data.limit, remaining: data.remaining, resetAt: data.resetAt });
-        }
-      })
-      .catch(() => {});
+    // Le quota restant n'est connu qu'après une vraie demande (réponses prepare /
+    // simulation) : un compteur lu à l'avance serait celui d'une instance
+    // serverless au hasard, donc faux.
 
     // Reprise depuis le widget home : si projet + photo ont été choisis
     // sur la home page, on les pré-charge et on saute directement à l'étape 3.
@@ -518,10 +512,6 @@ export default function SimulationPage() {
     } catch {
       /* sessionStorage indisponible — on reste à l'étape 1 */
     }
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   /* ── Downscale client-side : évite les payloads énormes (sécurise le pipe)

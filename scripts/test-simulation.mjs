@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TMP_DIR = process.env.TMP_DIR || "C:\\Users\\lucas\\AppData\\Local\\Temp\\sim_test";
-const OUT_DIR = resolve(__dirname, "../public/simulation-tests");
+const OUT_DIR = resolve(__dirname, "../.simulation-tests");
 mkdirSync(OUT_DIR, { recursive: true });
 
 const API_URL = process.env.SIM_API_URL || "https://coverswap.fr/api/simulation";
