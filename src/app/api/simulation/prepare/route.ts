@@ -58,6 +58,16 @@ const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
   professionnel: "PRO",
 };
 
+
+/** Consentement mail transmis par le formulaire : booléen + texte figé horodaté. */
+function consentementDepuis(body: Record<string, unknown>): { consentementMail?: boolean; consentementTexte?: string } {
+  if (typeof body.consentementMail !== "boolean") return {};
+  return {
+    consentementMail: body.consentementMail,
+    consentementTexte: typeof body.consentementTexte === "string" ? body.consentementTexte.slice(0, 1000) : undefined,
+  };
+}
+
 /** Crée le lead dans le CRM (attendu) — équivalent au chemin sync, sans image. */
 async function pushLeadToCrm(body: Record<string, string>) {
   const { prenom, nom } = splitName(body.name);
@@ -91,6 +101,7 @@ async function pushLeadToCrm(body: Record<string, string>) {
     referenceChoisie,
     lienSimulation: body.lien_simulation || undefined,
     notes: notesParts.join(" — "),
+    ...consentementDepuis(body),
   });
 }
 

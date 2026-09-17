@@ -12,6 +12,16 @@ const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
   professionnel: "PRO",
 };
 
+
+/** Consentement mail transmis par le formulaire : booléen + texte figé horodaté. */
+function consentementDepuis(body: Record<string, unknown>): { consentementMail?: boolean; consentementTexte?: string } {
+  if (typeof body.consentementMail !== "boolean") return {};
+  return {
+    consentementMail: body.consentementMail,
+    consentementTexte: typeof body.consentementTexte === "string" ? body.consentementTexte.slice(0, 1000) : undefined,
+  };
+}
+
 /**
  * POST /api/devis-direct
  * Devis 1-clic après simulation — réutilise les infos déjà saisies.
@@ -63,6 +73,7 @@ export async function POST(req: NextRequest) {
     typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
     referenceChoisie,
     notes: notesParts.join(" — "),
+    ...consentementDepuis(body),
   });
 
   if (result.ok) return NextResponse.json({ ok: true, leadId: result.leadId ?? null });

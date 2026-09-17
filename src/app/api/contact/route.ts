@@ -64,6 +64,16 @@ function resolveSource(raw?: string): CrmSource {
   return "SITE_DEVIS";
 }
 
+
+/** Consentement mail transmis par le formulaire : booléen + texte figé horodaté. */
+function consentementDepuis(body: Record<string, unknown>): { consentementMail?: boolean; consentementTexte?: string } {
+  if (typeof body.consentementMail !== "boolean") return {};
+  return {
+    consentementMail: body.consentementMail,
+    consentementTexte: typeof body.consentementTexte === "string" ? body.consentementTexte.slice(0, 1000) : undefined,
+  };
+}
+
 /* ══════════════════════════════════════════════════════════════════
    POST /api/contact
    Traite à la fois les demandes de devis (/contact) et les
@@ -152,6 +162,7 @@ export async function POST(req: NextRequest) {
     imageBefore: photos[0],
     imageOriginal: photos[1],
     imageAfter: photos[2],
+    ...consentementDepuis(body),
   });
 
   if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null });

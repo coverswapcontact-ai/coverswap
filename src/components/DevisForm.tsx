@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { track } from "@/lib/analytics";
+import { consentementPourEnvoi } from "@/lib/consentement";
+import CaseConsentement from "./CaseConsentement";
 
 const projectTypes = [
   "Cuisine",
@@ -72,6 +74,7 @@ export default function DevisForm({
   const [error, setError] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [consentement, setConsentement] = useState(false);
 
   async function handlePhotos(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -128,6 +131,7 @@ export default function DevisForm({
           website: payload.website || "",
           photos,
           source,
+          ...consentementPourEnvoi(consentement, source),
         }),
       });
       if (!res.ok) {
@@ -143,6 +147,7 @@ export default function DevisForm({
         });
         form.reset();
         setPhotos([]);
+        setConsentement(false);
       }
     } catch {
       setError("Service indisponible. Veuillez réessayer.");
@@ -300,6 +305,8 @@ export default function DevisForm({
             </label>
           )}
         </div>
+
+        <CaseConsentement id="consentement-devis" checked={consentement} onChange={setConsentement} />
 
         {/* Honeypot - hidden from humans */}
         <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>

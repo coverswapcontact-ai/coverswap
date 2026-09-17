@@ -37,6 +37,9 @@ export interface CrmLeadPayload {
   prixDevis?: number;
   lienSimulation?: string;
   notes?: string;
+  // Consentement aux e-mails commerciaux : case distincte, texte figé horodaté (lib/consentement)
+  consentementMail?: boolean;
+  consentementTexte?: string;
   // Images base64 (data URL ou brut) rattachées à la simulation côté CRM
   imageBefore?: string;
   imageAfter?: string;
@@ -185,6 +188,8 @@ export async function sendLeadToCRM(payload: CrmLeadPayload): Promise<CrmResult>
     if (v === undefined || v === null || v === "") continue;
     cleaned[k] = v;
   }
+  // Un consentement se transmet toujours, même « non coché » : le CRM garde la trace datée.
+  if (typeof payload.consentementMail === "boolean") cleaned.consentementMail = payload.consentementMail;
 
   if (!cleaned.prenom || !cleaned.nom || !cleaned.telephone) {
     console.error("[CRM] contact incomplet (prenom/nom/telephone requis)", { champs: Object.keys(cleaned) });

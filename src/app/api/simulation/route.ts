@@ -120,6 +120,16 @@ const CRM_TYPE_MAP: Record<string, CrmTypeProjet> = {
   professionnel: "PRO",
 };
 
+
+/** Consentement mail transmis par le formulaire : booléen + texte figé horodaté. */
+function consentementDepuis(body: Record<string, unknown>): { consentementMail?: boolean; consentementTexte?: string } {
+  if (typeof body.consentementMail !== "boolean") return {};
+  return {
+    consentementMail: body.consentementMail,
+    consentementTexte: typeof body.consentementTexte === "string" ? body.consentementTexte.slice(0, 1000) : undefined,
+  };
+}
+
 function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
 
   const { prenom, nom } = splitName(body.name);
@@ -164,6 +174,7 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     notes: notesParts.join(" — "),
     imageBefore: body.photo_base64 || undefined,
     imageAfter: resultImage || undefined,
+    ...consentementDepuis(body),
   });
 }
 

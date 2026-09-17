@@ -5,6 +5,8 @@ import Image from "next/image";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import revetements from "@/data/revetements.json";
 import { track } from "@/lib/analytics";
+import { consentementPourEnvoi } from "@/lib/consentement";
+import CaseConsentement from "@/components/CaseConsentement";
 import { PROJECT_TYPES, getProject, createEmptyElements, type ProjectType } from "./projects";
 
 /* ══════════════════════════════════════════════════════════════════
@@ -469,7 +471,7 @@ export default function SimulationPage() {
   }
 
   // Step 3: Contact
-  const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "", consentement: false });
   const [honeypot, setHoneypot] = useState("");
 
   // Step 4: Result
@@ -638,6 +640,7 @@ export default function SimulationPage() {
       message: formData.message,
       project_type: currentProject.id,
       website: honeypot,
+      ...consentementPourEnvoi(formData.consentement, "simulation"),
     };
     // Ajoute dynamiquement zone1_*, zone2_*, zone3_*
     for (const el of currentProject.elements) {
@@ -767,6 +770,7 @@ export default function SimulationPage() {
         email: formData.email,
         project_type: currentProject.id,
         website: honeypot,
+        ...consentementPourEnvoi(formData.consentement, "simulation-devis"),
       };
       for (const el of currentProject.elements) {
         const sel = elements[el.key];
@@ -796,7 +800,7 @@ export default function SimulationPage() {
     setPreview(null);
     setProjectId(null);
     setElements(createEmptyElements(PROJECT_TYPES[0]));
-    setFormData({ name: "", phone: "", email: "", message: "" });
+    setFormData({ name: "", phone: "", email: "", message: "", consentement: false });
     setHoneypot("");
     setError("");
     setResultImage(null);
@@ -1130,6 +1134,8 @@ export default function SimulationPage() {
                   placeholder="Décrivez votre projet, dimensions, rendu souhaité..."
                 />
               </div>
+
+              <CaseConsentement id="consentement-simulation" checked={formData.consentement} onChange={(consentement) => setFormData({ ...formData, consentement })} />
 
               {/* Honeypot */}
               <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
