@@ -5,6 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Prestations Covering Montpellier & France — Cuisine, SDB, Meubles, Pro | CoverSwap" },
   description:
@@ -101,11 +102,11 @@ const trustReasons = [
   {
     icon: "\u2B50",
     title: "Films Cover Styl' premium",
-    description: "Marque leader mondial du covering architectural, 497 références au catalogue.",
+    description: `Marque leader mondial du covering architectural, ${NB_REFERENCES} références au catalogue.`,
   },
   {
     icon: "\uD83D\uDCE9",
-    title: "Devis gratuit sous 48h",
+    title: `Devis gratuit ${DELAI_REPONSE}`,
     description: "Recevez une estimation détaillée et personnalisée en moins de deux jours.",
   },
   {
@@ -293,7 +294,7 @@ export default function PrestationsPage() {
                   Un projet sur-mesure&nbsp;?
                 </h2>
                 <p className="text-gris-400 mb-6">
-                  Décrivez votre projet et recevez un devis détaillé sous 48h.
+                  Décrivez votre projet et recevez un devis détaillé {DELAI_REPONSE}.
                   Sans engagement.
                 </p>
                 <Link
@@ -356,7 +357,7 @@ export default function PrestationsPage() {
               className="block mt-12 glass-card p-8 border-rouge/20 bg-rouge/5 hover:border-rouge/40 transition-all duration-300 group text-center"
             >
               <h3 className="font-display text-2xl font-bold mb-2">
-                Catalogue de <span className="text-rouge">497 références</span> Cover&nbsp;Styl&rsquo;
+                Catalogue de <span className="text-rouge">{NB_REFERENCES} références</span> Cover&nbsp;Styl&rsquo;
               </h3>
               <p className="text-gris-400 mb-4 max-w-xl mx-auto">
                 Bois, marbre, b&eacute;ton, m&eacute;tal, couleurs unies, cuir&hellip; Parcourez l&rsquo;int&eacute;gralit&eacute; de notre catalogue pour trouver la finition id&eacute;ale.
@@ -429,7 +430,7 @@ export default function PrestationsPage() {
             </h2>
             <p className="text-gris-300 text-lg mb-10 max-w-xl mx-auto">
               D&eacute;crivez votre projet et recevez un devis
-              personnalis&eacute; sous 48h. Simulation IA disponible pour tous vos projets.
+              personnalis&eacute; {DELAI_REPONSE}. Simulation IA disponible pour tous vos projets.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

@@ -5,9 +5,10 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE, GARANTIE, NB_REFERENCES } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Covering Salle de Bain Montpellier & France | Film Adhésif Waterproof | CoverSwap" },
-  description: "Rénovez votre salle de bain à Montpellier, Pérols ou partout en France sans casser le carrelage. Film adhésif Cover Styl' waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit sous 48h.",
+  description: `Rénovez votre salle de bain à Montpellier, Pérols ou partout en France sans casser le carrelage. Film adhésif Cover Styl' waterproof, anti-moisissures, garanti 10 ans. Murs, sols, meubles vasque. Devis gratuit ${DELAI_REPONSE}.`,
   keywords: "covering salle de bain Montpellier, film adhésif salle de bain Hérault, rénovation carrelage adhésif, film waterproof salle de bain Pérols, covering carrelage Occitanie, revêtement adhésif douche",
   alternates: { canonical: "https://coverswap.fr/prestations/salle-de-bain" },
   openGraph: {
@@ -66,7 +67,7 @@ const comparatif = [
   { critere: "Durée des travaux", covering: "1 journée", classique: "2 \u00e0 3 semaines" },
   { critere: "Démolition nécessaire", covering: "Aucune", classique: "Oui (carrelage, plâtre)" },
   { critere: "Plombier requis", covering: "Non", classique: "Oui" },
-  { critere: "Durabilité", covering: "10 ans garanti", classique: "15-20 ans" },
+  { critere: "Durabilité", covering: `${GARANTIE} garanti`, classique: "15-20 ans" },
   { critere: "Réversible", covering: "Oui, retrait sans trace", classique: "Non" },
 ];
 
@@ -85,7 +86,7 @@ const stats = [
   { value: "100 %", label: "Waterproof" },
   { value: "1", label: "Journée de pose" },
   { value: "-70 %", label: "vs rénovation classique" },
-  { value: "10 ans", label: "Garantie" },
+  { value: `${GARANTIE}`, label: "Garantie" },
 ];
 
 export default function SalleDeBainPage() {
@@ -122,7 +123,7 @@ export default function SalleDeBainPage() {
           <ScrollReveal delay={0.2}>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/contact" className="btn-primary">Demander un devis gratuit</Link>
-              <Link href="/contact" className="btn-secondary">Devis gratuit en 48h</Link>
+              <Link href="/contact" className="btn-secondary">Devis gratuit {DELAI_REPONSE}</Link>
             </div>
           </ScrollReveal>
         </div>
@@ -312,7 +313,7 @@ export default function SalleDeBainPage() {
                     Decouvrez nos finitions <span className="text-rouge">pierre, marbre et beton</span> pour votre salle de bain
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
-                    Notre catalogue de 497 references Cover Styl&apos; comprend des dizaines de finitions waterproof ideales pour les pieces d&apos;eau : travertin, ardoise, marbre Carrara et bien plus.
+                    Notre catalogue de {NB_REFERENCES} références Cover Styl&apos; comprend des dizaines de finitions waterproof ideales pour les pieces d&apos;eau : travertin, ardoise, marbre Carrara et bien plus.
                   </p>
                 </div>
                 <div className="shrink-0">

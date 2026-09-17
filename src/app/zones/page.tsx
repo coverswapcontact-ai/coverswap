@@ -85,7 +85,7 @@ export default function ZonesIndexPage() {
                       </h2>
                       <span className="text-gris-500 text-xs">
                         {zone.codePostal.split(" / ")[0]} ·{" "}
-                        {zone.distanceKm === 0 ? "Atelier sur place" : `${zone.distanceKm} km depuis Pérols`}
+                        {zone.distanceKm === 0 ? "Notre commune" : `${zone.distanceKm} km depuis Pérols`}
                       </span>
                     </div>
                     <span className="w-9 h-9 rounded-full bg-rouge/10 border border-rouge/30 flex items-center justify-center shrink-0">

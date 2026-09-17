@@ -8,6 +8,7 @@ import CaseConsentement from "./CaseConsentement";
 import Turnstile, { reinitialiserTurnstile } from "./Turnstile";
 import { obtenirParcoursId } from "@/lib/parcours";
 
+import { DELAI_REPONSE } from "@/lib/offre";
 const projectTypes = [
   "Cuisine",
   "Salle de bain",
@@ -176,7 +177,7 @@ export default function DevisForm({
           </div>
           <h2 className="font-display text-2xl font-bold mb-2">Demande envoyée !</h2>
           <p className="text-gris-400 mb-6">
-            Nous vous recontactons avec votre devis sous 24 à 48 h.
+            Nous vous recontactons avec votre devis {DELAI_REPONSE}.
           </p>
           <button onClick={() => setSent(false)} className="btn-secondary text-sm px-6 py-3">
             Envoyer une autre demande

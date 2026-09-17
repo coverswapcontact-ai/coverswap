@@ -4,7 +4,7 @@ import { BreadcrumbSchema } from "@/components/JsonLd";
 import BlogClient from "@/components/BlogClient";
 
 export const metadata: Metadata = {
-  title: "Blog | CoverSwap — Conseils et tendances covering adhésif",
+  title: "Blog — Conseils et tendances covering adhésif",
   description:
     "Conseils, tendances et guides pratiques autour du covering adhésif et de la rénovation intérieure. Découvrez nos articles experts.",
   keywords:

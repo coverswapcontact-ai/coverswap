@@ -8,7 +8,7 @@ const navLinks = [
   { href: "/devis", label: "Devis en ligne", highlight: true },
   { href: "/simulation", label: "Simulation IA" },
   {
-    href: "#realisations",
+    href: "https://www.instagram.com/cover.swap/",
     label: "Réalisations",
     external: true,
     submenu: [

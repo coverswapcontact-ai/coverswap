@@ -5,6 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE, DELAI_REPONSE_COURT, NB_REFERENCES, PRIX_DEPUIS } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Covering Professionnel Montpellier & France | Comptoirs, Restaurants, Bureaux | CoverSwap" },
   description:
@@ -68,7 +69,7 @@ const avantages = [
   { title: "Conforme normes ERP", description: "Films classés M1/B1 (difficilement inflammables), conformes à la réglementation des établissements recevant du public." },
   { title: "Personnalisation logo/marque", description: "Impression numérique haute définition pour intégrer vos couleurs, votre logo et votre charte graphique." },
   { title: "Résistant usage intensif", description: "Films anti-rayures, anti-traces et résistants aux produits d'entretien professionnels les plus courants." },
-  { title: "Devis sous 48h", description: "Audit sur site gratuit et devis détaillé envoyé en 48 heures maximum pour ne pas ralentir vos projets." },
+  { title: `Devis ${DELAI_REPONSE}`, description: `Audit sur site gratuit et devis détaillé envoyé ${DELAI_REPONSE} pour ne pas ralentir vos projets.` },
   { title: "Garantie 10 ans pro", description: "Tous nos revêtements professionnels sont garantis 10 ans contre le décollement et l'usure prématurée." },
   { title: "-70% vs mobilier neuf", description: "Le covering coûte en moyenne 70% de moins que le remplacement complet de votre mobilier professionnel." },
 ];
@@ -84,7 +85,7 @@ const steps = [
     num: "02",
     title: "Devis & maquette",
     description:
-      "Vous recevez un rendu visuel personnalisé aux couleurs de votre marque et un devis détaillé sous 48 heures.",
+      `Vous recevez un rendu visuel personnalisé aux couleurs de votre marque et un devis détaillé ${DELAI_REPONSE}.`,
   },
   {
     num: "03",
@@ -101,11 +102,11 @@ const steps = [
 ];
 
 const comparatif = [
-  { critere: "Prix moyen", covering: "À partir de 40 EUR/m2", remplacement: "150 à 400 EUR/m2" },
+  { critere: "Prix moyen", covering: `À partir de ${PRIX_DEPUIS}`, remplacement: "150 à 400 €/m²" },
   { critere: "Délai", covering: "1 à 3 nuits", remplacement: "2 à 6 semaines" },
   { critere: "Fermeture nécessaire", covering: "Non", remplacement: "Oui, souvent plusieurs jours" },
   { critere: "Personnalisation", covering: "Illimitée (couleurs RAL, logos, motifs)", remplacement: "Limitée au catalogue fabricant" },
-  { critere: "Durabilité", covering: "7 à 10 ans garantis", remplacement: "10 à 15 ans" },
+  { critere: "Durabilité", covering: "Garanti 10 ans", remplacement: "10 à 15 ans" },
   { critere: "Impact écologique", covering: "Faible (pas de déchets lourds)", remplacement: "Élevé (mise en décharge)" },
 ];
 
@@ -132,7 +133,7 @@ const faqs = [
   },
   {
     q: "Quel est le délai pour un projet professionnel ?",
-    a: "Comptez 48h pour l'audit et le devis, puis 5 à 10 jours ouvrés pour la fabrication des films sur-mesure. La pose elle-même prend généralement 1 à 3 nuits selon la surface. Au total, votre projet est finalisé en 2 à 3 semaines.",
+    a: `Comptez ${DELAI_REPONSE_COURT} pour l'audit et le devis, puis 5 à 10 jours ouvrés pour la fabrication des films sur-mesure. La pose elle-même prend généralement 1 à 3 nuits selon la surface. Au total, votre projet est finalisé en 2 à 3 semaines.`,
   },
   {
     q: "Le covering résiste-t-il aux produits d'entretien professionnels ?",
@@ -420,7 +421,7 @@ export default function ProfessionnelPage() {
                     Consultez notre catalogue complet pour <span className="text-rouge">vos projets professionnels</span>
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
-                    497 references Cover Styl&apos; disponibles, dont des finitions personnalisables aux couleurs de votre marque. Comptoirs, murs, mobilier : trouvez la texture adaptee a votre secteur.
+                    {NB_REFERENCES} références Cover Styl&apos; disponibles, dont des finitions personnalisables aux couleurs de votre marque. Comptoirs, murs, mobilier : trouvez la texture adaptee a votre secteur.
                   </p>
                 </div>
                 <div className="shrink-0">
@@ -488,7 +489,7 @@ export default function ProfessionnelPage() {
                 Un projet professionnel ?
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Audit gratuit sur site, devis sous 48h, pose planifiée hors
+                Audit gratuit sur site, devis {DELAI_REPONSE}, pose planifiée hors
                 heures d&apos;ouverture. Transformez vos locaux sans perdre un
                 jour de chiffre d&apos;affaires.
               </p>

@@ -8,6 +8,7 @@ import { FAQSchema } from "@/components/JsonLd";
 import { track } from "@/lib/analytics";
 import { PROJECT_TYPES } from "@/app/simulation/projects";
 
+import { NB_REFERENCES } from "@/lib/offre";
 /** Clés sessionStorage pour transférer l'état du home → /simulation */
 const PENDING_PHOTO_KEY = "coverswap_pending_photo";
 const PENDING_PROJECT_KEY = "coverswap_pending_project";
@@ -127,7 +128,7 @@ export function SimulationSection() {
 
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-gris-300 text-lg md:text-xl leading-relaxed">
-              Uploadez une photo (cuisine, salle de bain, meubles, murs…). Choisissez parmi <strong className="text-white">497 références Cover Styl&apos;</strong>.
+              Uploadez une photo (cuisine, salle de bain, meubles, murs…). Choisissez parmi <strong className="text-white">{NB_REFERENCES} références Cover Styl&apos;</strong>.
               Notre IA génère un rendu photoréaliste en moins d&apos;une minute.
               <br className="hidden sm:block" />
               <span className="text-white font-medium">Sans email. Sans téléphone. Gratuit.</span>
@@ -360,7 +361,7 @@ export function SimulationSection() {
             {
               num: "02",
               title: "Texture",
-              desc: "Choisissez parmi 497 références Cover Styl'",
+              desc: `Choisissez parmi ${NB_REFERENCES} références Cover Styl'`,
               icon: (
                 <path
                   strokeLinecap="round"
@@ -461,7 +462,7 @@ export function FAQSection() {
     },
     {
       q: "Quelle est la durée de vie du covering ?",
-      a: "Nos revêtements haut de gamme ont une durée de vie de 7 à 10 ans en utilisation normale. Ils résistent aux UV, aux rayures légères et au nettoyage régulier.",
+      a: "Nos revêtements haut de gamme sont garantis 10 ans contre le décollement et la décoloration. Ils résistent aux UV, aux rayures légères et au nettoyage régulier.",
     },
     {
       q: "Intervenez-vous dans toute la France ?",

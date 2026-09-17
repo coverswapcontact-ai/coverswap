@@ -62,7 +62,6 @@ const LOCAL_BUSINESS_SCHEMA = {
     "https://www.instagram.com/cover.swap/",
     "https://www.facebook.com/coverswap",
     "https://www.tiktok.com/@cover.swap",
-    "https://www.linkedin.com/company/coverswap",
   ],
 };
 

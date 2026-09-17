@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Simulation IA | CoverSwap — Visualisez le rendu en 60 secondes",
+  title: "Simulation IA — Visualisez le rendu en 60 secondes",
   description:
     "Simulez gratuitement le rendu du covering adhésif sur votre projet (cuisine, salle de bain, meubles) grâce à notre IA. Résultat photoréaliste en 60 secondes.",
   keywords:

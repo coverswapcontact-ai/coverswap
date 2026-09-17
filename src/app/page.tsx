@@ -7,6 +7,7 @@ import TextureBackground from "@/components/TextureBackground";
 import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection, FAQSection } from "@/components/HomeClient";
 
+import { DELAI_REPONSE, NB_REFERENCES, PRIX_DEPUIS, PRIX_M2_DEPUIS, SURFACE_MINIMUM_M2 } from "@/lib/offre";
 /* ──────────────────────────────────────────────────────────────────
    METADATA — SEO
 ────────────────────────────────────────────────────────────────── */
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     absolute: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
   },
   description:
-    "Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Covering adhésif premium Cover Styl' posé en 1 journée, garanti 10 ans. Simulation IA gratuite, devis sous 24h. À partir de 80 €/m².",
+    `Rénovation cuisine sans travaux à Montpellier, Pérols et partout en France. Covering adhésif premium Cover Styl' posé en 1 journée, garanti 10 ans. Simulation IA gratuite, devis ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS}.`,
   openGraph: {
     title: "CoverSwap | Covering adhésif Cuisine & Salle de bain — Montpellier & France",
     description:
@@ -126,8 +127,8 @@ function HeroSection() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0M8 10.5h4m-4 3h4" />
             </svg>
             <span className="text-sm text-white font-medium">
-              À partir de <strong className="text-rouge">80&nbsp;€/m²</strong>
-              <span className="text-gris-400"> · surfaces lisses · à partir de 20&nbsp;m²</span>
+              À partir de <strong className="text-rouge">{PRIX_M2_DEPUIS}&nbsp;€/m²</strong>
+              <span className="text-gris-400"> · surfaces lisses · à partir de {SURFACE_MINIMUM_M2}&nbsp;m²</span>
             </span>
           </div>
         </div>
@@ -337,7 +338,7 @@ function PricingSection() {
 
             <p className="text-gris-400 uppercase text-xs tracking-widest mb-3">À partir de</p>
             <div className="flex items-baseline justify-center gap-2 mb-2">
-              <span className="font-display text-5xl md:text-8xl font-bold text-white">80</span>
+              <span className="font-display text-5xl md:text-8xl font-bold text-white">{PRIX_M2_DEPUIS}</span>
               <span className="font-display text-2xl md:text-4xl text-rouge font-bold">€ / m²</span>
             </div>
             <p className="text-gris-300 mb-8">Revêtement Cover Styl&apos; fourni et posé par nos soins</p>
@@ -345,7 +346,7 @@ function PricingSection() {
             <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
               {[
                 { title: "Surfaces lisses", desc: "Crédence, plan, façades planes" },
-                { title: "À partir de 20 m²", desc: "Surface minimale pour bénéficier de ce tarif" },
+                { title: `À partir de ${SURFACE_MINIMUM_M2} m²`, desc: "Surface minimale pour bénéficier de ce tarif" },
                 { title: "Tout inclus", desc: "Matériau premium + pose + finitions" },
               ].map((c) => (
                 <div key={c.title} className="bg-white/5 border border-white/10 rounded-xl p-4">
@@ -356,9 +357,9 @@ function PricingSection() {
             </div>
 
             <p className="text-xs text-gris-500 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Tarif indicatif de départ pour une surface plane à partir de 20&nbsp;m². Prix final ajusté selon la complexité
+              Tarif indicatif de départ pour une surface plane à partir de {SURFACE_MINIMUM_M2}&nbsp;m². Prix final ajusté selon la complexité
               (angles, reliefs, démontages nécessaires), la référence Cover Styl&apos; choisie et la zone d&apos;intervention.
-              Devis détaillé gratuit sous 24&nbsp;h.
+              Devis détaillé gratuit {DELAI_REPONSE}.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -449,7 +450,7 @@ function CatalogueSection() {
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.1}>
             <h2 className="font-display text-4xl md:text-5xl font-bold mt-3 mb-4">
-              Près de 500 références <span className="text-rouge">Cover Styl&rsquo;</span>
+              {NB_REFERENCES} références <span className="text-rouge">Cover Styl&rsquo;</span>
             </h2>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.2}>

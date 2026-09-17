@@ -1,23 +1,25 @@
-"use client";
-
-import { Suspense } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { BreadcrumbSchema } from "@/components/JsonLd";
-import DevisForm from "@/components/DevisForm";
+import { DELAI_REPONSE } from "@/lib/offre";
+import FormulaireContact from "./_components/FormulaireContact";
+
+export const metadata: Metadata = {
+  title: "Contact — Devis gratuit covering adhésif",
+  description: `Contactez CoverSwap pour un devis gratuit de covering adhésif. Rénovation cuisine, salle de bain, meubles et locaux pro. Réponse ${DELAI_REPONSE}.`,
+  keywords: "contact coverswap, devis covering, demande devis rénovation adhésive, covering montpellier contact",
+  alternates: { canonical: "https://coverswap.fr/contact" },
+  openGraph: {
+    title: "Contact CoverSwap — Devis gratuit covering adhésif",
+    description: `Contactez-nous pour un devis gratuit de covering adhésif. Réponse ${DELAI_REPONSE}.`,
+    url: "https://coverswap.fr/contact",
+    siteName: "CoverSwap",
+    locale: "fr_FR",
+    type: "website",
+  },
+};
 
 export default function ContactPage() {
-  return (
-    <Suspense fallback={null}>
-      <ContactPageInner />
-    </Suspense>
-  );
-}
-
-function ContactPageInner() {
-  const searchParams = useSearchParams();
-  const refParam = searchParams.get("ref");
-
   return (
     <div className="min-h-screen pt-28 pb-20">
       <BreadcrumbSchema items={[{ name: "Accueil", url: "https://coverswap.fr" }, { name: "Contact", url: "https://coverswap.fr/contact" }]} />
@@ -31,13 +33,13 @@ function ContactPageInner() {
             Demandez votre <span className="text-rouge">devis gratuit</span>
           </h1>
           <p className="text-gris-400 max-w-2xl mx-auto text-lg">
-            Décrivez votre projet et recevez une estimation personnalisée sous 48 h.
+            Décrivez votre projet et recevez une estimation personnalisée {DELAI_REPONSE}.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-12 items-start">
           {/* Form */}
-          <DevisForm source="coverswap.fr/contact" reference={refParam || undefined} />
+          <FormulaireContact />
 
           {/* Sidebar info */}
           <div className="space-y-8">

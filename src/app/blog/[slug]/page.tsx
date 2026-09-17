@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import TextureBackground from "@/components/TextureBackground";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import { NB_REFERENCES } from "@/lib/offre";
 import {
   getArticleBySlug,
   getRelatedArticles,
@@ -243,7 +244,7 @@ export default async function BlogPostPage({ params }: Props) {
                 </svg>
               </div>
               <h3 className="font-display font-bold text-lg mb-2">
-                Près de 500 finitions
+                {NB_REFERENCES} finitions
               </h3>
               <p className="text-sm text-gris-400 mb-5">
                 Explorez notre catalogue complet de revetements Cover Styl&apos; : bois, marbre, beton, metal et plus.

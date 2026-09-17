@@ -5,6 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { FAQSchema, ServiceSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Film pour Vitrage Montpellier & France | Solaire, Intimité, Sécurité | CoverSwap" },
   description:
@@ -170,7 +171,7 @@ const faqs = [
   },
   {
     q: "Combien de temps dure un film pour vitrage ?",
-    a: "Nos films professionnels ont une durée de vie de 10 à 15 ans en pose intérieure, et de 7 à 10 ans en pose extérieure. Ils sont garantis contre le décollement, le bullage et la décoloration pendant toute la durée de la garantie.",
+    a: "Nos films sont garantis 10 ans contre le décollement, le bullage et la décoloration. Leur durée de vie dépend de l'exposition : elle est plus longue en pose intérieure qu'en pose extérieure.",
   },
   {
     q: "Le film peut-il être retiré sans abîmer la vitre ?",
@@ -186,7 +187,7 @@ const faqs = [
   },
   {
     q: "Combien coûte la pose de film sur vitrage ?",
-    a: "Le prix varie selon le type de film et la surface à couvrir. Comptez en moyenne entre 35 et 90 EUR/m2 pose comprise, selon la complexité. Un devis gratuit et personnalisé est systématiquement établi après diagnostic de vos vitrages.",
+    a: `Le prix dépend du type de film et de la surface à couvrir. Le devis est gratuit, détaillé et vous parvient ${DELAI_REPONSE} après diagnostic de vos vitrages.`,
   },
 ];
 

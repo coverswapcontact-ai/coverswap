@@ -92,7 +92,7 @@ export const articles: BlogArticle[] = [
       ],
       tip: "Le nettoyant pour vitres sans ammoniaque est votre meilleur allié pour un covering impeccable. Vaporisez, essuyez avec un chiffon microfibre, et le tour est joué. Il dégraisse en douceur sans attaquer le film protecteur.",
       conclusion:
-        "Avec ces gestes simples, votre covering conservera son éclat pendant 7 à 10 ans. Un entretien minimal pour un résultat maximal — c'est tout l'avantage de la rénovation adhésive. En adoptant les bons réflexes dès la pose, vous protégez votre investissement et profitez d'un intérieur toujours aussi beau qu'au premier jour.",
+        "Avec ces gestes simples, votre covering conservera son éclat pendant au moins les 10 ans de sa garantie. Un entretien minimal pour un résultat maximal — c'est tout l'avantage de la rénovation adhésive. En adoptant les bons réflexes dès la pose, vous protégez votre investissement et profitez d'un intérieur toujours aussi beau qu'au premier jour.",
     },
     relatedSlugs: ["covering-adhesif-durabilite", "covering-adhesif-vs-peinture-cuisine"],
   },

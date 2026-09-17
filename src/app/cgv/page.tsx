@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Conditions Générales de Vente | CoverSwap",
+  title: "Conditions Générales de Vente",
   description: "Conditions générales de vente CoverSwap : prestations de rénovation intérieure par revêtements adhésifs texturés.",
   alternates: { canonical: "https://coverswap.fr/cgv" },
   robots: { index: true, follow: true },

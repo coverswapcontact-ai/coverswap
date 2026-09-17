@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ZONES, getZoneSlug } from "@/data/zones";
 
+import { DELAI_REPONSE } from "@/lib/offre";
 export default function Footer() {
   return (
     <footer className="bg-noir border-t border-white/10">
@@ -16,7 +17,7 @@ export default function Footer() {
             Prêt à transformer votre intérieur ?
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            Simulation IA gratuite en 60 secondes ou devis classique sous 48h. Sans engagement.
+            Simulation IA gratuite en 60 secondes ou devis classique {DELAI_REPONSE}. Sans engagement.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -58,7 +59,7 @@ export default function Footer() {
               Spécialiste de la rénovation intérieure par revêtements adhésifs texturés haut de gamme. Transformez votre espace en une journée.
             </p>
             <div className="flex gap-4">
-              {["instagram", "facebook", "tiktok", "linkedin"].map((social) => (
+              {["instagram", "facebook", "tiktok"].map((social) => (
                 <a
                   key={social}
                   href={

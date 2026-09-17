@@ -11,6 +11,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
+import { DELAI_REPONSE, PRIX_DEPUIS } from "@/lib/offre";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | CoverSwap",
   },
   description:
-    "Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis en 60s. À partir de 80 €/m² posé.",
+    `Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis gratuit ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS} posé.`,
   keywords:
     "covering adhésif, rénovation cuisine, covering salle de bain, covering meubles, revêtement adhésif, simulation IA, rénovation rapide",
   applicationName: "CoverSwap",
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     description:
-      "Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de 80 €/m² posé.",
+      `Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. À partir de ${PRIX_DEPUIS} posé.`,
     url: SITE_URL,
     siteName: "CoverSwap",
     locale: "fr_FR",

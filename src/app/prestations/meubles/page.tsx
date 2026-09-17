@@ -5,16 +5,17 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE, GARANTIE, NB_REFERENCES } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Covering Meubles Montpellier & France | Relooking Mobilier Adhésif | CoverSwap" },
   description:
-    "Donnez une seconde vie à vos meubles à Montpellier, Pérols ou partout en France avec le covering Cover Styl'. Commodes, buffets, bibliothèques, dressings. 497 références bois, marbre, couleurs. Garanti 10 ans.",
+    `Donnez une seconde vie à vos meubles à Montpellier, Pérols ou partout en France avec le covering Cover Styl'. Commodes, buffets, bibliothèques, dressings. ${NB_REFERENCES} références bois, marbre, couleurs. Garanti 10 ans.`,
   keywords:
     "covering meuble Montpellier, relooking meuble adhésif Hérault, film adhésif meuble Pérols, rénovation meuble sans poncer, covering mobilier Occitanie, habillage meuble adhésif",
   alternates: { canonical: "https://coverswap.fr/prestations/meubles" },
   openGraph: {
     title: "Covering Meubles Montpellier & France — Relooking mobilier | CoverSwap",
-    description: "Seconde vie à vos meubles avec le covering Cover Styl'. 497 références, garanti 10 ans, pose pro.",
+    description: `Seconde vie à vos meubles avec le covering Cover Styl'. ${NB_REFERENCES} références, garanti 10 ans, pose pro.`,
     url: "https://coverswap.fr/prestations/meubles",
     type: "website",
     siteName: "CoverSwap",
@@ -251,7 +252,7 @@ const faqs = [
   },
   {
     q: "Quelle est la durée de vie du covering sur un meuble ?",
-    a: "Avec un entretien normal (nettoyage à l\u2019éponge humide), le covering conserve son aspect d\u2019origine pendant 7 à 10 ans minimum. Nos films sont garantis contre le décollement et le jaunissement.",
+    a: "Avec un entretien normal (nettoyage à l\u2019éponge humide), nos films sont garantis 10 ans contre le décollement et le jaunissement, et le covering conserve son aspect d\u2019origine bien au-delà.",
   },
   {
     q: "Peut-on covering une table à manger en bois ?",
@@ -260,9 +261,9 @@ const faqs = [
 ];
 
 const stats = [
-  { value: "10 ans", label: "de durabilité garantie" },
+  { value: `${GARANTIE}`, label: "de durabilité garantie" },
   { value: "0", label: "ponçage nécessaire" },
-  { value: "497", label: "références Cover Styl'" },
+  { value: String(NB_REFERENCES), label: "références Cover Styl'" },
   { value: "100%", label: "réversible" },
 ];
 
@@ -485,7 +486,7 @@ export default function MeublesPage() {
                 </div>
                 <div className="text-center lg:text-left flex-1">
                   <h3 className="font-display text-2xl font-bold mb-2">
-                    Parcourez nos <span className="text-rouge">497 references</span> pour trouver la finition ideale
+                    Parcourez nos <span className="text-rouge">{NB_REFERENCES} références</span> pour trouver la finition ideale
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
                     Bois, marbre, beton, metal, couleurs unies : explorez le catalogue complet Cover Styl&apos; et trouvez la texture qui sublimera chacun de vos meubles.
@@ -552,7 +553,7 @@ export default function MeublesPage() {
                 Vos meubles méritent un relooking
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Décrivez votre projet meuble et recevez un devis détaillé sous 48h. Sans engagement.
+                Décrivez votre projet meuble et recevez un devis détaillé {DELAI_REPONSE}. Sans engagement.
               </p>
               <Link href="/contact" className="btn-primary text-lg px-10 py-5">
                 Demander un devis gratuit

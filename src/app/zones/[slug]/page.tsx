@@ -5,6 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import TextureBackground from "@/components/TextureBackground";
 import { FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import { ZONES, getZoneSlug, getZoneBySlug, type Zone } from "@/data/zones";
+import { DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_DEPUIS, texteOffre } from "@/lib/offre";
 
 /* ──────────────────────────────────────────────────────────────────
    STATIC GENERATION — pré-build des 8 pages au build time
@@ -26,7 +27,7 @@ export async function generateMetadata({
   if (!zone) return {};
 
   const title = `Covering Adhésif ${zone.ville} — Rénovation Cuisine & Salle de Bain en 1 Jour | CoverSwap`;
-  const description = `Covering adhésif premium à ${zone.ville} (${zone.codePostal.split(" / ")[0]}). Rénovation cuisine, salle de bain, meubles en 1 journée. Pose Cover Styl' garantie 10 ans, devis gratuit sous 24h. À partir de 80 €/m².`;
+  const description = `Covering adhésif premium à ${zone.ville} (${zone.codePostal.split(" / ")[0]}). Rénovation cuisine, salle de bain, meubles en 1 journée. Pose Cover Styl' garantie 10 ans, devis gratuit ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS}.`;
   const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
 
   return {
@@ -102,7 +103,7 @@ function ZoneLocalBusinessSchema({ zone }: { zone: Zone }) {
     "@context": "https://schema.org",
     "@type": "Service",
     name: `Covering adhésif à ${zone.ville}`,
-    description: `Rénovation par revêtement adhésif Cover Styl' à ${zone.ville} : cuisines, salles de bain, meubles, surfaces professionnelles. Pose en 1 journée, 497 références disponibles.`,
+    description: `Rénovation par revêtement adhésif Cover Styl' à ${zone.ville} : cuisines, salles de bain, meubles, surfaces professionnelles. Pose en 1 journée, ${NB_REFERENCES} références disponibles.`,
     url,
     provider: {
       "@type": "LocalBusiness",
@@ -156,7 +157,7 @@ export default async function ZonePage({
   return (
     <main className="bg-noir min-h-screen">
       <ZoneLocalBusinessSchema zone={zone} />
-      <FAQSchema faqs={zone.faqLocale.map((f) => ({ q: f.q, a: f.a }))} />
+      <FAQSchema faqs={zone.faqLocale.map((f) => ({ q: f.q, a: texteOffre(f.a) }))} />
       <BreadcrumbSchema
         items={[
           { name: "Accueil", url: "https://coverswap.fr" },
@@ -200,7 +201,7 @@ export default async function ZonePage({
             <p className="text-gris-300 text-lg max-w-3xl leading-relaxed mb-10">
               Vous habitez {zone.ville} et souhaitez moderniser votre cuisine, salle de bain ou vos meubles sans
               engager de gros travaux&nbsp;? Nous intervenons à {zone.ville} et dans toute la métropole avec le covering
-              adhésif Cover Styl&apos;&nbsp;: pose en 1 journée, 497 références au catalogue, garanti 10 ans.
+              adhésif Cover Styl&apos;&nbsp;: pose en 1 journée, {NB_REFERENCES} références au catalogue, garanti 10 ans.
             </p>
           </ScrollReveal>
 
@@ -210,7 +211,7 @@ export default async function ZonePage({
                 Simuler mon projet ({zone.ville})
               </Link>
               <Link href="/contact" className="btn-secondary">
-                Devis gratuit sous 24h
+                Devis gratuit {DELAI_REPONSE}
               </Link>
             </div>
           </ScrollReveal>
@@ -222,13 +223,13 @@ export default async function ZonePage({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                Atelier à {zone.distanceKm === 0 ? "Pérols (chez vous)" : `${zone.distanceKm} km de ${zone.ville}`}
+                {zone.distanceKm === 0 ? "Basés à Pérols, chez vous" : `Basés à Pérols, à ${zone.distanceKm} km`}
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Devis sous 24 à 48 h
+                Devis {DELAI_REPONSE}
               </div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -252,7 +253,7 @@ export default async function ZonePage({
 
           <ScrollReveal direction="up" delay={0.1}>
             <div className="text-gris-300 leading-relaxed space-y-5 text-base">
-              {zone.intro.split(/\n+/).filter(Boolean).map((para, idx) => (
+              {texteOffre(zone.intro).split(/\n+/).filter(Boolean).map((para, idx) => (
                 <p key={idx}>{para}</p>
               ))}
             </div>
@@ -340,7 +341,7 @@ export default async function ZonePage({
                 href: "/revetements",
                 title: "Catalogue Cover Styl'",
                 icon: "🎨",
-                desc: "Parcourez les 497 références : bois, pierre, métal, textile, couleurs unies.",
+                desc: `Parcourez les ${NB_REFERENCES} références : bois, pierre, métal, textile, couleurs unies.`,
               },
             ].map((p) => (
               <ScrollReveal key={p.href} direction="up">
@@ -376,7 +377,7 @@ export default async function ZonePage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <ScrollReveal direction="left">
               <div className="space-y-5">
-                <p className="text-gris-300 leading-relaxed">{zone.pourquoi}</p>
+                <p className="text-gris-300 leading-relaxed">{texteOffre(zone.pourquoi)}</p>
                 <p className="text-gris-300 leading-relaxed">
                   <strong className="text-white">Type d&apos;habitat couvert à {zone.ville}&nbsp;:</strong>{" "}
                   {zone.habitat}.
@@ -391,9 +392,9 @@ export default async function ZonePage({
                     value: `${zone.distanceKm === 0 ? "Sur place" : zone.distanceKm + " km"}`,
                     label: "depuis Pérols",
                   },
-                  { value: "24 à 48h", label: "pour un devis" },
+                  { value: `${DELAI_REPONSE_COURT}`, label: "pour un devis" },
                   { value: "1 jour", label: "de pose typique" },
-                  { value: "10 ans", label: "garanti Cover Styl'" },
+                  { value: `${GARANTIE}`, label: "garanti Cover Styl'" },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -442,7 +443,7 @@ export default async function ZonePage({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                   </summary>
-                  <p className="text-gris-400 mt-4 leading-relaxed">{faq.a}</p>
+                  <p className="text-gris-400 mt-4 leading-relaxed">{texteOffre(faq.a)}</p>
                 </details>
               </ScrollReveal>
             ))}
@@ -486,7 +487,7 @@ export default async function ZonePage({
                 Votre projet covering à <span className="text-rouge">{zone.ville}</span> commence ici
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Envoyez-nous une photo, recevez un rendu IA en 60 secondes et un devis détaillé sous 24 à 48 heures.
+                Envoyez-nous une photo, recevez un rendu IA en 60 secondes et un devis détaillé {DELAI_REPONSE}.
                 Sans engagement, sans visite obligatoire.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

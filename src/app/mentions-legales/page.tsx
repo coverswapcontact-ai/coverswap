@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Mentions légales | CoverSwap",
+  title: "Mentions légales",
   description: "Mentions légales du site CoverSwap : éditeur, hébergeur et informations légales.",
   alternates: { canonical: "https://coverswap.fr/mentions-legales" },
   robots: { index: true, follow: true },

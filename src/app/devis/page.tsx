@@ -4,17 +4,18 @@ import ScrollReveal from "@/components/ScrollReveal";
 import DevisForm from "@/components/DevisForm";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 
+import { DELAI_REPONSE } from "@/lib/offre";
 export const metadata: Metadata = {
-  title: { absolute: "Devis Covering en Ligne Gratuit — Réponse sous 24h | CoverSwap" },
+  title: { absolute: `Devis Covering en Ligne Gratuit — Réponse ${DELAI_REPONSE} | CoverSwap` },
   description:
-    "Demandez votre devis covering en ligne gratuit et sans engagement. Cuisine, salle de bain, meubles, pro à Montpellier, Pérols et partout en France. Joignez vos photos, réponse personnalisée sous 24 à 48 h.",
+    `Demandez votre devis covering en ligne gratuit et sans engagement. Cuisine, salle de bain, meubles, pro à Montpellier, Pérols et partout en France. Joignez vos photos, réponse personnalisée ${DELAI_REPONSE}.`,
   keywords:
     "devis covering en ligne, devis covering gratuit, devis rénovation cuisine, devis covering Montpellier, estimation covering adhésif, prix covering Hérault",
   alternates: { canonical: "https://coverswap.fr/devis" },
   openGraph: {
-    title: "Devis Covering en Ligne Gratuit — Réponse sous 24h | CoverSwap",
+    title: `Devis Covering en Ligne Gratuit — Réponse ${DELAI_REPONSE} | CoverSwap`,
     description:
-      "Devis covering gratuit et sans engagement. Réponse personnalisée sous 24 à 48 h. Montpellier, Pérols et France entière.",
+      `Devis covering gratuit et sans engagement. Réponse personnalisée ${DELAI_REPONSE}. Montpellier, Pérols et France entière.`,
     url: "https://coverswap.fr/devis",
     type: "website",
     siteName: "CoverSwap",
@@ -23,14 +24,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Devis Covering en Ligne Gratuit — Réponse sous 24h",
-    description: "Devis covering gratuit et sans engagement, réponse sous 24-48h.",
+    title: `Devis Covering en Ligne Gratuit — Réponse ${DELAI_REPONSE}`,
+    description: `Devis covering gratuit et sans engagement, réponse ${DELAI_REPONSE}.`,
     images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
 
 const avantages = [
-  { icon: "⚡", title: "Réponse sous 24-48 h", desc: "Devis détaillé et personnalisé par email." },
+  { icon: "⚡", title: `Réponse ${DELAI_REPONSE}`, desc: "Devis détaillé et personnalisé par email." },
   { icon: "🎁", title: "100 % gratuit", desc: "Sans engagement, sans frais cachés." },
   { icon: "📐", title: "Devis détaillé", desc: "Fourniture + pose incluses, un prix clair et sans surprise." },
   { icon: "🇫🇷", title: "France entière", desc: "Intervention partout en France métropolitaine." },
@@ -39,7 +40,7 @@ const avantages = [
 const etapes = [
   { num: "1", title: "Décrivez votre projet", desc: "Type de surface, dimensions approximatives, style souhaité." },
   { num: "2", title: "On étudie votre demande", desc: "Estimation personnalisée selon la gamme Cover Styl' choisie." },
-  { num: "3", title: "Vous recevez votre devis", desc: "Détaillé, gratuit, sous 24 à 48 h. Vous décidez ensuite." },
+  { num: "3", title: "Vous recevez votre devis", desc: `Détaillé, gratuit, ${DELAI_REPONSE}. Vous décidez ensuite.` },
 ];
 
 export default function DevisPage() {
@@ -60,7 +61,7 @@ export default function DevisPage() {
           <ScrollReveal direction="fade">
             <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-xs border border-rouge/30 rounded-full px-4 py-1.5 mb-6">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-sm text-gris-300">Devis gratuit · réponse sous 24-48 h</span>
+              <span className="text-sm text-gris-300">Devis gratuit · réponse {DELAI_REPONSE}</span>
             </div>
           </ScrollReveal>
           <ScrollReveal direction="up" delay={0.1}>
@@ -71,7 +72,7 @@ export default function DevisPage() {
           <ScrollReveal direction="up" delay={0.2}>
             <p className="text-gris-300 text-lg max-w-2xl mx-auto leading-relaxed">
               Cuisine, salle de bain, meubles ou local pro : décrivez votre projet, joignez quelques
-              photos et recevez une estimation personnalisée sous 24 à 48 h. Sans engagement.
+              photos et recevez une estimation personnalisée {DELAI_REPONSE}. Sans engagement.
             </p>
           </ScrollReveal>
         </div>

@@ -5,10 +5,11 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { ServiceSchema, FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import Breadcrumb from "@/components/Breadcrumb";
 
+import { DELAI_REPONSE, GARANTIE, NB_REFERENCES } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: "Covering Cuisine Montpellier & France | Relooking Plan de Travail Sans Travaux | CoverSwap" },
   description:
-    "Rénovez votre cuisine à Montpellier, Pérols ou partout en France en 1 journée avec le covering adhésif Cover Styl'. Plans de travail, crédences, façades de meubles. 497 références marbre, bois, béton. Garanti 10 ans. Devis gratuit sous 24h.",
+    `Rénovez votre cuisine à Montpellier, Pérols ou partout en France en 1 journée avec le covering adhésif Cover Styl'. Plans de travail, crédences, façades de meubles. ${NB_REFERENCES} références marbre, bois, béton. Garanti 10 ans. Devis gratuit ${DELAI_REPONSE}.`,
   keywords:
     "covering cuisine Montpellier, relooking cuisine sans travaux Hérault, film adhésif plan de travail, rénovation cuisine adhésif Pérols, covering plan de travail, covering meuble cuisine, revêtement adhésif cuisine Occitanie",
   alternates: {
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Covering Cuisine Montpellier & France — Relooking sans travaux | CoverSwap",
     description:
-      "Rénovation cuisine en 1 journée à Montpellier, Pérols et partout en France. 497 références Cover Styl', garanti 10 ans. Devis gratuit.",
+      `Rénovation cuisine en 1 journée à Montpellier, Pérols et partout en France. ${NB_REFERENCES} références Cover Styl', garanti 10 ans. Devis gratuit.`,
     url: "https://coverswap.fr/prestations/cuisine",
     type: "website",
     siteName: "CoverSwap",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Covering Cuisine Montpellier — Relooking sans travaux",
-    description: "Cuisine rénovée en 1 journée. 497 références Cover Styl'. Garantie 10 ans.",
+    description: `Cuisine rénovée en 1 journée. ${NB_REFERENCES} références Cover Styl'. Garantie 10 ans.`,
     images: ["https://coverswap.fr/og-image.jpg"],
   },
 };
@@ -50,7 +51,7 @@ const faqs = [
   },
   {
     q: "Combien de temps dure un covering cuisine ?",
-    a: "Avec un entretien normal, nos revêtements conservent leur aspect pendant 7 à 10 ans minimum. Ils sont garantis contre le décollement, le jaunissement et la délamination. Passé ce délai, le film peut être retiré et remplacé par une nouvelle finition.",
+    a: "Nos revêtements sont garantis 10 ans contre le décollement, le jaunissement et la délamination, et conservent leur aspect bien au-delà avec un entretien normal. Passé ce délai, le film peut être retiré et remplacé par une nouvelle finition.",
   },
   {
     q: "Le covering supporte-t-il l'eau et les projections ?",
@@ -157,13 +158,13 @@ const steps = [
     num: "01",
     title: "Envoyez vos photos",
     description:
-      "Photographiez votre cuisine sous différents angles. Notre IA analyse les surfaces et génère un devis détaillé en 48 heures.",
+      `Photographiez votre cuisine sous différents angles. Nous analysons vos surfaces et vous envoyons un devis détaillé ${DELAI_REPONSE}.`,
   },
   {
     num: "02",
     title: "Choix des finitions",
     description:
-      "Sélectionnez vos textures parmi 497 références Cover Styl'. Nous vous envoyons des échantillons physiques pour valider couleurs et toucher.",
+      `Sélectionnez vos textures parmi ${NB_REFERENCES} références Cover Styl'. Nous vous envoyons des échantillons physiques pour valider couleurs et toucher.`,
   },
   {
     num: "03",
@@ -195,8 +196,8 @@ const comparatif = [
   { critere: "Durée des travaux", covering: "1 journée", classique: "2 à 3 semaines" },
   { critere: "Poussière / Bruit", covering: "Aucun", classique: "Important" },
   { critere: "Déménagement nécessaire", covering: "Non", classique: "Souvent oui" },
-  { critere: "Durabilité", covering: "7 à 10 ans garanti", classique: "15 à 20 ans" },
-  { critere: "Personnalisation", covering: "497 références Cover Styl', changeable", classique: "Limitée au choix initial" },
+  { critere: "Durabilité", covering: "Garanti 10 ans", classique: "15 à 20 ans" },
+  { critere: "Personnalisation", covering: `${NB_REFERENCES} références Cover Styl', changeable`, classique: "Limitée au choix initial" },
   { critere: "Impact écologique", covering: "Minimal (0 déchet)", classique: "Élevé (démolition, transport)" },
 ];
 
@@ -295,7 +296,7 @@ export default function CuisinePage() {
                 {[
                   { value: "1 journée", label: "de pose" },
                   { value: "5x", label: "moins cher" },
-                  { value: "10 ans", label: "de garantie" },
+                  { value: `${GARANTIE}`, label: "de garantie" },
                   { value: "100%", label: "satisfaction" },
                 ].map((stat) => (
                   <div
@@ -346,7 +347,7 @@ export default function CuisinePage() {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-4">
-              497 références Cover Styl&apos; pour <span className="text-rouge">votre style</span>
+              {NB_REFERENCES} références Cover Styl&apos; pour <span className="text-rouge">votre style</span>
             </h2>
             <p className="text-gris-400 text-center max-w-2xl mx-auto mb-16">
               Chaque finition est sélectionnée pour son réalisme, sa durabilité et sa résistance aux contraintes
@@ -471,10 +472,10 @@ export default function CuisinePage() {
                 </div>
                 <div className="text-center lg:text-left flex-1">
                   <h3 className="font-display text-2xl font-bold mb-2">
-                    Explorez notre catalogue de <span className="text-rouge">497 références Cover Styl&apos;</span> pour votre cuisine
+                    Explorez notre catalogue de <span className="text-rouge">{NB_REFERENCES} références Cover Styl&apos;</span> pour votre cuisine
                   </h3>
                   <p className="text-gris-400 leading-relaxed">
-                    Parcourez notre catalogue complet de 497 références Cover Styl&apos; : marbre, bois, béton, métal et bien plus. Trouvez la finition parfaite pour chaque surface de votre cuisine.
+                    Parcourez notre catalogue complet de {NB_REFERENCES} références Cover Styl&apos; : marbre, bois, béton, métal et bien plus. Trouvez la finition parfaite pour chaque surface de votre cuisine.
                   </p>
                 </div>
                 <div className="shrink-0">
@@ -540,7 +541,7 @@ export default function CuisinePage() {
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
                 Envoyez-nous les photos de votre cuisine et recevez un aperçu réaliste ainsi qu&apos;un devis
-                personnalisé sous 48 heures. Simulation gratuite, sans engagement.
+                personnalisé {DELAI_REPONSE}. Simulation gratuite, sans engagement.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/simulation" className="btn-primary text-lg px-10 py-5">
