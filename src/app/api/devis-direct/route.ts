@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { parcoursIdValide } from "@/lib/parcours";
+import { verifierJetonDevis } from "@/lib/jeton-devis";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -43,6 +45,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Sans captcha ici : le jeton signé émis par la simulation (même parcours,
+  // même lead, deux heures) tient lieu de preuve.
+  const parcoursId = parcoursIdValide(body.parcoursId);
+  const jeton = verifierJetonDevis(body.jetonDevis, parcoursId);
+  if (!jeton.ok) {
+    return NextResponse.json({ error: "Session de simulation expirée : relancez une simulation ou utilisez le formulaire de devis." }, { status: 401 });
+  }
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
+
   const { prenom, nom } = splitName(body.name);
   const projectType = body.project_type || "cuisine";
 
@@ -64,17 +75,23 @@ export async function POST(req: NextRequest) {
     refs,
   ].filter(Boolean);
 
-  const result = await sendLeadToCRM({
-    prenom,
-    nom,
-    telephone: body.phone,
-    email: body.email,
-    source: "SITE_DEVIS",
-    typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
-    referenceChoisie,
-    notes: notesParts.join(" — "),
-    ...consentementDepuis(body),
-  });
+  const result = await sendLeadToCRM(
+    {
+      prenom,
+      nom,
+      telephone: body.phone,
+      email: body.email,
+      ville: body.ville || undefined,
+      codePostal: body.codePostal || undefined,
+      source: "SITE_DEVIS",
+      typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
+      referenceChoisie,
+      parcoursId,
+      notes: notesParts.join(" — "),
+      ...consentementDepuis(body),
+    },
+    { ipVisiteur: ip }
+  );
 
   if (result.ok) return NextResponse.json({ ok: true, leadId: result.leadId ?? null });
   if (result.emailFallback) return NextResponse.json({ ok: true, leadId: null, viaMail: true });

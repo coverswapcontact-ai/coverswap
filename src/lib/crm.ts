@@ -37,6 +37,13 @@ export interface CrmLeadPayload {
   prixDevis?: number;
   lienSimulation?: string;
   notes?: string;
+  // Champs structurés (formulaire du site)
+  message?: string;
+  styleSouhaite?: string;
+  /** Identifiant du parcours navigateur : simulation puis devis = même fiche CRM. */
+  parcoursId?: string;
+  /** Photos jointes à la demande (data URL), 4 au plus. */
+  photos?: string[];
   // Consentement aux e-mails commerciaux : case distincte, texte figé horodaté (lib/consentement)
   consentementMail?: boolean;
   consentementTexte?: string;
@@ -86,6 +93,8 @@ function formatLeadHtml(payload: Record<string, unknown>, error: string): string
     ["Source", payload.source],
     ["Type projet", payload.typeProjet],
     ["Référence", payload.referenceChoisie],
+    ["Style souhaité", payload.styleSouhaite],
+    ["Message", payload.message],
     ["Notes", payload.notes],
   ];
   const tableRows = rows
@@ -133,7 +142,7 @@ async function sendFallbackEmail(payload: Record<string, unknown>, error: string
 /* ══════════════════════════════════════════════════════════════════
    ENVOI — une tentative vers le webhook
 ══════════════════════════════════════════════════════════════════ */
-async function sendPayload(cleaned: Record<string, unknown>): Promise<CrmResult & { retryable?: boolean }> {
+async function sendPayload(cleaned: Record<string, unknown>, ipVisiteur?: string): Promise<CrmResult & { retryable?: boolean }> {
   const url = process.env.CRM_WEBHOOK_URL;
   const secret = process.env.CRM_WEBHOOK_SECRET;
 
@@ -141,7 +150,7 @@ async function sendPayload(cleaned: Record<string, unknown>): Promise<CrmResult 
     return { ok: false, error: !url ? "CRM_WEBHOOK_URL absente" : "CRM_WEBHOOK_SECRET absente" };
   }
 
-  const hasImages = !!(cleaned.imageBefore || cleaned.imageAfter || cleaned.imageOriginal);
+  const hasImages = !!(cleaned.imageBefore || cleaned.imageAfter || cleaned.imageOriginal || (Array.isArray(cleaned.photos) && cleaned.photos.length));
   const timeout = hasImages ? TIMEOUT_WITH_IMAGES_MS : TIMEOUT_MS;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -149,7 +158,12 @@ async function sendPayload(cleaned: Record<string, unknown>): Promise<CrmResult 
   try {
     const res = await fetch(url.trim(), {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Webhook-Secret": secret.trim() },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Webhook-Secret": secret.trim(),
+        // Le CRM limite les demandes par visiteur : il a besoin de l'adresse d'origine, pas de celle de Vercel.
+        ...(ipVisiteur && ipVisiteur !== "unknown" ? { "X-Visiteur-Ip": ipVisiteur } : {}),
+      },
       body: JSON.stringify(cleaned),
       signal: controller.signal,
     });
@@ -182,7 +196,7 @@ async function sendPayload(cleaned: Record<string, unknown>): Promise<CrmResult 
 /* ══════════════════════════════════════════════════════════════════
    API PUBLIQUE — sendLeadToCRM (à AWAITER par la route appelante)
 ══════════════════════════════════════════════════════════════════ */
-export async function sendLeadToCRM(payload: CrmLeadPayload): Promise<CrmResult> {
+export async function sendLeadToCRM(payload: CrmLeadPayload, options: { ipVisiteur?: string } = {}): Promise<CrmResult> {
   const cleaned: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(payload)) {
     if (v === undefined || v === null || v === "") continue;
@@ -196,11 +210,13 @@ export async function sendLeadToCRM(payload: CrmLeadPayload): Promise<CrmResult>
     return { ok: false, error: "incomplete-payload" };
   }
 
-  let result = await sendPayload(cleaned);
+  if (Array.isArray(payload.photos) && payload.photos.length === 0) delete cleaned.photos;
+
+  let result = await sendPayload(cleaned, options.ipVisiteur);
   if (!result.ok && result.retryable) {
     console.warn(`[CRM] premier envoi échoué (${result.error}) — nouvel essai`);
     await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-    result = await sendPayload(cleaned);
+    result = await sendPayload(cleaned, options.ipVisiteur);
   }
 
   if (result.ok) {
@@ -214,6 +230,7 @@ export async function sendLeadToCRM(payload: CrmLeadPayload): Promise<CrmResult>
   delete lean.imageBefore;
   delete lean.imageAfter;
   delete lean.imageOriginal;
+  delete lean.photos;
   console.error(`[CRM] ÉCHEC (${result.error}) source=${cleaned.source} tel=${cleaned.telephone} — mail de secours`);
   const emailFallback = await sendFallbackEmail(lean, result.error || "unknown");
   if (!emailFallback) console.error("[CRM] ÉCHEC TOTAL : ni CRM ni mail de secours — le visiteur reçoit une erreur");

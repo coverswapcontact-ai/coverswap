@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, mapTypeProjet, type CrmSource } from "@/lib/crm";
+import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
+import { parcoursIdValide } from "@/lib/parcours";
 
 // L'envoi au CRM est attendu (photos comprises) : au-delà des 10 s par défaut de Vercel.
 export const maxDuration = 30;
@@ -124,46 +126,47 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Captcha (Cloudflare Turnstile) — neutre tant que la clé n'est pas configurée.
+  const captcha = await verifierTurnstile(body.turnstileToken, ip);
+  if (!captcha.ok) {
+    console.warn(`[/api/contact] captcha refusé (${captcha.raison}) ip=${ip}`);
+    return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
+  }
+
   /* ── Normalisation payload CRM ── */
   const { prenom, nom } = splitName(name);
   const source = resolveSource(typeof body.source === "string" ? body.source : undefined);
   const typeProjet = mapTypeProjet(typeof body.type_projet === "string" ? body.type_projet : undefined);
 
-  /* ── Photos du projet (base64 data URLs, downscalées côté client) ──
-     Le CRM dispose de 3 emplacements image sur un lead ; on y mappe jusqu'à
-     3 photos jointes pour que Lucas les voie directement sur la fiche. */
+  /* ── Photos du projet (data URL, réduites côté client) : jusqu'à 4, en champ dédié ── */
   const photos = Array.isArray(body.photos)
-    ? (body.photos as unknown[])
-        .filter((p): p is string => typeof p === "string" && p.startsWith("data:image"))
-        .slice(0, 3)
+    ? (body.photos as unknown[]).filter((p): p is string => typeof p === "string" && p.startsWith("data:image")).slice(0, 4)
     : [];
 
-  const notes = [
-    body.message ? `${body.message}` : null,
-    body.style ? `Style: ${body.style}` : null,
-    body.reference ? `Réf catalogue: ${body.reference}` : null,
-    photos.length ? `${photos.length} photo(s) jointe(s)` : null,
-  ]
-    .filter(Boolean)
-    .join(" — ");
+  const texte = (valeur: unknown, max: number) => (typeof valeur === "string" && valeur.trim() ? valeur.trim().slice(0, max) : undefined);
+  const notes = body.reference ? `Réf catalogue : ${body.reference}` : undefined;
 
   /* ── Envoi au CRM, ATTENDU : sur Vercel, répondre avant la fin du fetch le tue ── */
-  const resultat = await sendLeadToCRM({
-    prenom,
-    nom,
-    telephone: phone,
-    email: (body.email as string) || undefined,
-    ville: (body.ville as string) || undefined,
-    codePostal: (body.codePostal as string) || undefined,
-    source,
-    typeProjet,
-    referenceChoisie: (body.reference as string) || undefined,
-    notes: notes || undefined,
-    imageBefore: photos[0],
-    imageOriginal: photos[1],
-    imageAfter: photos[2],
-    ...consentementDepuis(body),
-  });
+  const resultat = await sendLeadToCRM(
+    {
+      prenom,
+      nom,
+      telephone: phone,
+      email: texte(body.email, 200),
+      ville: texte(body.ville, 120),
+      codePostal: texte(body.codePostal, 12),
+      source,
+      typeProjet,
+      referenceChoisie: texte(body.reference, 80),
+      message: texte(body.message, 4000),
+      styleSouhaite: texte(body.style, 200),
+      parcoursId: parcoursIdValide(body.parcoursId),
+      photos,
+      notes,
+      ...consentementDepuis(body),
+    },
+    { ipVisiteur: ip }
+  );
 
   if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null });
   // CRM en panne mais contact parti par mail au gérant : la demande est bien prise.

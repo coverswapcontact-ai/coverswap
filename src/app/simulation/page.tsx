@@ -7,6 +7,8 @@ import revetements from "@/data/revetements.json";
 import { track } from "@/lib/analytics";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import CaseConsentement from "@/components/CaseConsentement";
+import Turnstile, { reinitialiserTurnstile } from "@/components/Turnstile";
+import { obtenirParcoursId } from "@/lib/parcours";
 import { PROJECT_TYPES, getProject, createEmptyElements, type ProjectType } from "./projects";
 
 /* ══════════════════════════════════════════════════════════════════
@@ -471,8 +473,11 @@ export default function SimulationPage() {
   }
 
   // Step 3: Contact
-  const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "", consentement: false });
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", ville: "", codePostal: "", message: "", consentement: false });
   const [honeypot, setHoneypot] = useState("");
+  const [jetonCaptcha, setJetonCaptcha] = useState<string | null>(null);
+  // Lead créé par la simulation + jeton signé pour le devis 1-clic (même parcours, même fiche CRM).
+  const [session, setSession] = useState<{ leadId: string | null; jetonDevis: string | null }>({ leadId: null, jetonDevis: null });
 
   // Step 4: Result
   const [submitting, setSubmitting] = useState(false);
@@ -637,11 +642,16 @@ export default function SimulationPage() {
       name: formData.name,
       phone: formData.phone,
       email: formData.email,
+      ville: formData.ville,
+      codePostal: formData.codePostal,
       message: formData.message,
       project_type: currentProject.id,
       website: honeypot,
+      parcoursId: obtenirParcoursId(),
+      turnstileToken: jetonCaptcha,
       ...consentementPourEnvoi(formData.consentement, "simulation"),
     };
+    const premiereReference = currentProject.elements.map((el) => elements[el.key]).find((sel) => sel?.enabled && sel.ref)?.ref ?? null;
     // Ajoute dynamiquement zone1_*, zone2_*, zone3_*
     for (const el of currentProject.elements) {
       const sel = elements[el.key];
@@ -690,6 +700,7 @@ export default function SimulationPage() {
         track("simulation_failed", { status: res.status, reason: data?.reason || "unknown" });
         return;
       }
+      setSession({ leadId: data.leadId ?? null, jetonDevis: data.jetonDevis ?? null });
       onSuccess(data.image || data.result_url || data.photo_url || null);
     };
 
@@ -717,7 +728,9 @@ export default function SimulationPage() {
           }
 
           if (prep.ok && prepData.prompt && prepData.sig) {
+            setSession({ leadId: prepData.leadId ?? null, jetonDevis: prepData.jetonDevis ?? null });
             // Génération lourde sur Railway — le navigateur attend (pas de cap).
+            // leadId signé : Railway rattache photo avant + rendu à la fiche CRM.
             const gen = await fetch(SIMULATE_URL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -726,6 +739,8 @@ export default function SimulationPage() {
                 swatchUrls: prepData.swatchUrls,
                 sig: prepData.sig,
                 exp: prepData.exp,
+                leadId: prepData.leadId ?? undefined,
+                referenceChoisie: premiereReference ?? undefined,
                 photo_base64: preview,
               }),
             });
@@ -757,6 +772,8 @@ export default function SimulationPage() {
       track("simulation_failed", { reason: "network" });
     } finally {
       setSubmitting(false);
+      reinitialiserTurnstile();
+      setJetonCaptcha(null);
     }
   };
 
@@ -768,8 +785,12 @@ export default function SimulationPage() {
         name: formData.name,
         phone: formData.phone,
         email: formData.email,
+        ville: formData.ville,
+        codePostal: formData.codePostal,
         project_type: currentProject.id,
         website: honeypot,
+        parcoursId: obtenirParcoursId(),
+        jetonDevis: session.jetonDevis,
         ...consentementPourEnvoi(formData.consentement, "simulation-devis"),
       };
       for (const el of currentProject.elements) {
@@ -800,7 +821,8 @@ export default function SimulationPage() {
     setPreview(null);
     setProjectId(null);
     setElements(createEmptyElements(PROJECT_TYPES[0]));
-    setFormData({ name: "", phone: "", email: "", message: "", consentement: false });
+    setFormData({ name: "", phone: "", email: "", ville: "", codePostal: "", message: "", consentement: false });
+    setSession({ leadId: null, jetonDevis: null });
     setHoneypot("");
     setError("");
     setResultImage(null);
@@ -1124,6 +1146,34 @@ export default function SimulationPage() {
                   placeholder="jean@email.com"
                 />
               </div>
+              <div className="grid grid-cols-[1fr_130px] gap-3">
+                <div>
+                  <label htmlFor="simulation-ville" className="block text-sm text-gris-400 mb-1.5">Ville du projet</label>
+                  <input
+                    id="simulation-ville"
+                    type="text"
+                    autoComplete="address-level2"
+                    value={formData.ville}
+                    onChange={(e) => setFormData({ ...formData, ville: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge"
+                    placeholder="Montpellier"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="simulation-cp" className="block text-sm text-gris-400 mb-1.5">Code postal</label>
+                  <input
+                    id="simulation-cp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="postal-code"
+                    maxLength={5}
+                    value={formData.codePostal}
+                    onChange={(e) => setFormData({ ...formData, codePostal: e.target.value.replace(/\D/g, "") })}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gris-600 focus:border-rouge focus:outline-hidden focus:ring-1 focus:ring-rouge"
+                    placeholder="34000"
+                  />
+                </div>
+              </div>
               <div>
                 <label className="block text-sm text-gris-400 mb-1.5">Description du projet</label>
                 <textarea
@@ -1136,6 +1186,8 @@ export default function SimulationPage() {
               </div>
 
               <CaseConsentement id="consentement-simulation" checked={formData.consentement} onChange={(consentement) => setFormData({ ...formData, consentement })} />
+
+              <Turnstile action="simulation" onToken={setJetonCaptcha} />
 
               {/* Honeypot */}
               <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>

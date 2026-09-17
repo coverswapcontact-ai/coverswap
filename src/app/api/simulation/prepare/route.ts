@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
+import { parcoursIdValide } from "@/lib/parcours";
+import { signerJetonDevis } from "@/lib/jeton-devis";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/app/simulation/projects";
 import { buildImagePrompt, type ElementInfo } from "@/lib/simulation-prompt";
@@ -69,7 +72,7 @@ function consentementDepuis(body: Record<string, unknown>): { consentementMail?:
 }
 
 /** Crée le lead dans le CRM (attendu) — équivalent au chemin sync, sans image. */
-async function pushLeadToCrm(body: Record<string, string>) {
+async function pushLeadToCrm(body: Record<string, string>, ip: string) {
   const { prenom, nom } = splitName(body.name);
   const projectType = body.project_type || "cuisine";
 
@@ -100,9 +103,12 @@ async function pushLeadToCrm(body: Record<string, string>) {
     typeProjet: CRM_TYPE_MAP[projectType] || "AUTRE",
     referenceChoisie,
     lienSimulation: body.lien_simulation || undefined,
+    ville: body.ville || undefined,
+    codePostal: body.codePostal || undefined,
+    parcoursId: parcoursIdValide(body.parcoursId),
     notes: notesParts.join(" — "),
     ...consentementDepuis(body),
-  });
+  }, { ipVisiteur: ip });
 }
 
 export async function POST(req: NextRequest) {
@@ -138,12 +144,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nom, téléphone et email requis." }, { status: 400 });
   }
 
+  const captcha = await verifierTurnstile(body.turnstileToken, ip);
+  if (!captcha.ok) {
+    console.warn(`[/api/simulation/prepare] captcha refusé (${captcha.raison}) ip=${ip}`);
+    return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
+  }
+
   // Crée le lead AVANT la génération, et l'attend : un contact enregistré même
   // si l'image échoue ensuite. Si rien ne peut l'enregistrer, on ne génère pas.
-  const lead = await pushLeadToCrm(body);
+  const lead = await pushLeadToCrm(body, ip);
   if (!lead.ok && !lead.emailFallback) {
     return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
   }
+  const leadId = lead.leadId ?? "";
 
   // Parse les zones + ordonne les swatches présents.
   const elements: Record<string, ElementInfo | null> = { zone1: null, zone2: null, zone3: null };
@@ -186,9 +199,10 @@ export async function POST(req: NextRequest) {
     swatchCount: swatchUrls.length,
   });
 
-  // Signature : empêche la falsification du prompt et le détournement des swatchUrls.
+  // Signature : empêche la falsification du prompt, le détournement des swatchUrls
+  // et le rattachement des images à la fiche d'un autre (leadId signé).
   const exp = Date.now() + TOKEN_TTL_MS;
-  const payloadToSign = `${prompt}\n${swatchUrls.join(",")}\n${exp}`;
+  const payloadToSign = leadId ? `${prompt}\n${swatchUrls.join(",")}\n${exp}\n${leadId}` : `${prompt}\n${swatchUrls.join(",")}\n${exp}`;
   const sig = crypto.createHmac("sha256", secret).update(payloadToSign).digest("hex");
 
   return NextResponse.json(
@@ -198,6 +212,8 @@ export async function POST(req: NextRequest) {
       swatchUrls,
       sig,
       exp,
+      leadId: leadId || null,
+      jetonDevis: signerJetonDevis(parcoursIdValide(body.parcoursId) ?? "", leadId) ?? null,
       rateLimit: { limit: rl.limit, remaining: rl.remaining, resetAt: rl.resetAt },
     },
     { headers: rateLimitHeaders(rl) }

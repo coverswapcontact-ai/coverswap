@@ -5,6 +5,8 @@ import Link from "next/link";
 import { track } from "@/lib/analytics";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import CaseConsentement from "./CaseConsentement";
+import Turnstile, { reinitialiserTurnstile } from "./Turnstile";
+import { obtenirParcoursId } from "@/lib/parcours";
 
 const projectTypes = [
   "Cuisine",
@@ -75,6 +77,7 @@ export default function DevisForm({
   const [photos, setPhotos] = useState<string[]>([]);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [consentement, setConsentement] = useState(false);
+  const [jetonCaptcha, setJetonCaptcha] = useState<string | null>(null);
 
   async function handlePhotos(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
@@ -124,6 +127,8 @@ export default function DevisForm({
           name: payload.nom || "",
           phone: payload.telephone || "",
           email: payload.email || "",
+          ville: payload.ville || "",
+          codePostal: payload.code_postal || "",
           type_projet: payload.type_projet || "",
           style: payload.style || "",
           message: payload.message || "",
@@ -131,6 +136,8 @@ export default function DevisForm({
           website: payload.website || "",
           photos,
           source,
+          parcoursId: obtenirParcoursId(),
+          turnstileToken: jetonCaptcha,
           ...consentementPourEnvoi(consentement, source),
         }),
       });
@@ -153,6 +160,8 @@ export default function DevisForm({
       setError("Service indisponible. Veuillez réessayer.");
     } finally {
       setSending(false);
+      reinitialiserTurnstile();
+      setJetonCaptcha(null);
     }
   }
 
@@ -182,8 +191,9 @@ export default function DevisForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Nom complet *</label>
+            <label htmlFor="devis-nom" className="block text-sm font-medium mb-2">Nom complet *</label>
             <input
+              id="devis-nom"
               name="nom"
               required
               placeholder="Jean Dupont"
@@ -191,8 +201,9 @@ export default function DevisForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Email *</label>
+            <label htmlFor="devis-email" className="block text-sm font-medium mb-2">Email *</label>
             <input
+              id="devis-email"
               name="email"
               type="email"
               required
@@ -204,8 +215,9 @@ export default function DevisForm({
 
         <div className="grid sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Téléphone *</label>
+            <label htmlFor="devis-telephone" className="block text-sm font-medium mb-2">Téléphone *</label>
             <input
+              id="devis-telephone"
               name="telephone"
               type="tel"
               required
@@ -214,8 +226,9 @@ export default function DevisForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Type de projet *</label>
+            <label htmlFor="devis-type" className="block text-sm font-medium mb-2">Type de projet *</label>
             <select
+              id="devis-type"
               name="type_projet"
               required
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50 transition-colors appearance-none"
@@ -228,10 +241,39 @@ export default function DevisForm({
           </div>
         </div>
 
+        <div className="grid sm:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="devis-ville" className="block text-sm font-medium mb-2">Ville du projet *</label>
+            <input
+              id="devis-ville"
+              name="ville"
+              required
+              autoComplete="address-level2"
+              placeholder="Montpellier"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+            />
+          </div>
+          <div>
+            <label htmlFor="devis-cp" className="block text-sm font-medium mb-2">Code postal *</label>
+            <input
+              id="devis-cp"
+              name="code_postal"
+              required
+              inputMode="numeric"
+              pattern="[0-9]{5}"
+              title="5 chiffres"
+              autoComplete="postal-code"
+              placeholder="34000"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+            />
+          </div>
+        </div>
+
         {/* Style souhaité */}
         <div>
-          <label className="block text-sm font-medium mb-2">Style souhaité</label>
+          <label htmlFor="devis-style" className="block text-sm font-medium mb-2">Style souhaité</label>
           <input
+            id="devis-style"
             name="style"
             placeholder="ex : Marbre blanc, Bois chêne, Noir mat..."
             className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
@@ -249,8 +291,9 @@ export default function DevisForm({
 
         {/* Message */}
         <div>
-          <label className="block text-sm font-medium mb-2">Votre message *</label>
+          <label htmlFor="devis-message" className="block text-sm font-medium mb-2">Votre message *</label>
           <textarea
+            id="devis-message"
             name="message"
             required
             rows={4}
@@ -313,6 +356,8 @@ export default function DevisForm({
           <label htmlFor="website">Website</label>
           <input type="text" id="website" name="website" autoComplete="off" />
         </div>
+
+        <Turnstile action="devis" onToken={setJetonCaptcha} />
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">

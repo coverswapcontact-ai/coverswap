@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
+import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
+import { parcoursIdValide } from "@/lib/parcours";
+import { signerJetonDevis } from "@/lib/jeton-devis";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/app/simulation/projects";
 import { buildImagePrompt } from "@/lib/simulation-prompt";
@@ -130,7 +133,7 @@ function consentementDepuis(body: Record<string, unknown>): { consentementMail?:
   };
 }
 
-function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
+function pushLeadToCrm(body: Record<string, string>, ip: string, resultImage?: string) {
 
   const { prenom, nom } = splitName(body.name);
   const projectType = body.project_type || "cuisine";
@@ -174,8 +177,11 @@ function pushLeadToCrm(body: Record<string, string>, resultImage?: string) {
     notes: notesParts.join(" — "),
     imageBefore: body.photo_base64 || undefined,
     imageAfter: resultImage || undefined,
+    ville: body.ville || undefined,
+    codePostal: body.codePostal || undefined,
+    parcoursId: parcoursIdValide(body.parcoursId),
     ...consentementDepuis(body),
-  });
+  }, { ipVisiteur: ip });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -213,8 +219,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Photo requise." }, { status: 400 });
   }
 
+  const captcha = await verifierTurnstile(body.turnstileToken, ip);
+  if (!captcha.ok) {
+    console.warn(`[/api/simulation] captcha refusé (${captcha.raison}) ip=${ip}`);
+    return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
+  }
+
   /* ── Créer le lead dans le CRM dès maintenant (avant génération), et l'attendre ── */
-  const lead = await pushLeadToCrm(body);
+  const lead = await pushLeadToCrm(body, ip);
   if (!lead.ok && !lead.emailFallback) {
     return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: lead.error }, { status: 502 });
   }
@@ -461,12 +473,14 @@ export async function POST(req: NextRequest) {
     const resultImage = `data:image/png;base64,${attempt.b64}`;
 
     /* ── Rendu terminé : on renvoie la simulation (images) au CRM, en l'attendant ── */
-    await pushLeadToCrm(body, resultImage);
+    await pushLeadToCrm(body, ip, resultImage);
 
     return NextResponse.json(
       {
         success: true,
         image: resultImage,
+        leadId: lead.leadId ?? null,
+        jetonDevis: signerJetonDevis(parcoursIdValide(body.parcoursId) ?? "", lead.leadId ?? "") ?? null,
         references: {
           credence: body.credence_ref || "",
           plan: body.plan_ref || "",

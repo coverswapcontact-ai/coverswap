@@ -15,6 +15,7 @@ export async function GET() {
       crm: !!(process.env.CRM_WEBHOOK_URL && process.env.CRM_WEBHOOK_SECRET),
       secoursMail: !!process.env.RESEND_API_KEY,
       simulateurRailway: !!process.env.SIMULATE_TOKEN_SECRET,
+      captcha: !!process.env.TURNSTILE_SECRET_KEY,
     },
     { headers: { "Cache-Control": "no-store" } }
   );
