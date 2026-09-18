@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import ImageReference from "@/components/ImageReference";
 import { useMemo, useState } from "react";
 import revetements from "@/data/revetements.json";
 
@@ -31,6 +31,7 @@ export default function ChoixReference({ choisie, onChoisir }: { choisie: Refere
   const [recherche, setRecherche] = useState("");
   const [famille, setFamille] = useState<string | null>(choisie?.famille ?? null);
   const [page, setPage] = useState(0);
+  const [sansImage, setSansImage] = useState<Set<string>>(new Set());
 
   const filtrees = useMemo(() => {
     const q = recherche.toLowerCase().trim();
@@ -84,16 +85,30 @@ export default function ChoixReference({ choisie, onChoisir }: { choisie: Refere
       <ul className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
         {visibles.map((r) => {
           const active = choisie?.id === r.id;
+          // Sans échantillon, pas de rendu fidèle : la référence reste visible mais ne se choisit pas.
+          const indisponible = sansImage.has(r.id);
           return (
             <li key={r.id}>
               <button
                 type="button"
                 aria-pressed={active}
+                disabled={indisponible}
+                title={indisponible ? "Échantillon momentanément indisponible : choisissez une autre finition pour la simulation." : undefined}
                 onClick={() => onChoisir(r)}
-                className={`w-full text-left rounded-lg overflow-hidden border-2 transition-colors ${active ? "border-rouge" : "border-transparent hover:border-white/30"}`}
+                className={`w-full text-left rounded-lg overflow-hidden border-2 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${active ? "border-rouge" : "border-transparent hover:border-white/30"}`}
               >
                 <div className="relative aspect-square bg-gris-800">
-                  <Image src={r.image} alt={`${r.nom} (${r.id})`} fill sizes="(max-width: 640px) 30vw, 120px" loading="lazy" className="object-cover" />
+                  <ImageReference
+                    src={r.image}
+                    alt={`${r.nom} (${r.id})`}
+                    reference={r.id}
+                    nom={r.nom}
+                    famille={r.famille}
+                    sizes="(max-width: 640px) 30vw, 120px"
+                    className="object-cover"
+                    compact
+                    onEchec={() => setSansImage((d) => new Set(d).add(r.id))}
+                  />
                 </div>
                 <span className="block px-2 py-1.5 bg-white/5">
                   <span className="block text-xs font-medium text-white truncate">{r.nom}</span>

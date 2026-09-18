@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import Image from "next/image";
+import ImageReference from "@/components/ImageReference";
 import Link from "next/link";
 import TextureBackground from "@/components/TextureBackground";
 import revetements from "@/data/revetements.json";
@@ -337,12 +337,13 @@ const ProductCard = React.memo(function ProductCard({ item, onClick }: { item: R
       className="group relative aspect-square rounded-xl overflow-hidden bg-gris-800 border border-white/5 hover:border-white/20 transition-all duration-500 text-left"
     >
       {/* Image */}
-      <Image
+      <ImageReference
         src={item.image}
         alt={`Revêtement adhésif Cover Styl' ${item.nom} (${familleLabel}, finition ${item.finition}) — référence ${item.id}`}
-        fill
+        reference={item.id}
+        nom={item.nom}
+        famille={item.famille}
         sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-        loading="lazy"
         className="object-cover transition-transform duration-500 group-hover:scale-105"
       />
 
@@ -412,14 +413,17 @@ function DetailModal({ item, onClose }: { item: Reference; onClose: () => void }
           {!imgLoaded && (
             <div className="absolute inset-0 bg-gris-800 animate-pulse" />
           )}
-          <Image
+          <ImageReference
+            key={item.image}
             src={item.image}
             alt={`Revêtement adhésif Cover Styl' ${item.nom} en grand format — référence ${item.id}`}
-            fill
+            reference={item.id}
+            nom={item.nom}
+            famille={item.famille}
             sizes="600px"
-            quality={80}
+            prioritaire
             className={`object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
-            onLoad={() => setImgLoaded(true)}
+            onCharge={() => setImgLoaded(true)}
           />
           {/* Family badge on image */}
           <div className="absolute top-4 left-4">

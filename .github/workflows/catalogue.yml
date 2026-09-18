@@ -1,0 +1,19 @@
+# Chaque lundi : vérifie que les 497 images du catalogue répondent toujours chez Cover Styl'.
+# En cas d'échec, GitHub prévient par mail ; la réparation se lance à la main :
+#   node scripts/verifier-catalogue.mjs --reparer
+name: Catalogue — images
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/verifier-catalogue.mjs
