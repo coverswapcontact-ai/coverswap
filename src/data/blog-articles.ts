@@ -1,4 +1,4 @@
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_COURANT_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
 
 /**
  * Guides : les vraies questions que les gens posent avant un covering, avec
@@ -46,7 +46,7 @@ export const articles: BlogArticle[] = [
     readTime: "5 min",
     image: "/images/fonds/photo-1758315417321-83eb30a39710",
     content: {
-      intro: `Le covering se facture au mètre linéaire de film posé, fourni et posé. Chez CoverSwap, le prix au mètre va de ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € dans la plupart des cas ; une cuisine complète — façades, plan de travail, crédence — se situe entre ${cuisineMin} et ${cuisineMax}. Voici comment ce chiffre se construit, pour lire un devis sans surprise.`,
+      intro: `Le covering se facture au mètre linéaire de film posé, fourni et posé. Chez CoverSwap, le prix au mètre va de ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € : il se détermine au devis selon la complexité de la pose, pas selon le seul revêtement choisi. En ordre de grandeur, une cuisine complète — façades, plan de travail, crédence — se situe entre ${cuisineMin} et ${cuisineMax}. Voici comment ce chiffre se construit, pour lire un devis sans surprise.`,
       sections: [
         {
           title: "Pourquoi au mètre linéaire, et pas au mètre carré",
@@ -54,7 +54,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Ce qui fait varier le prix au mètre",
-          text: `Trois choses. La gamme du film : une couleur unie mate coûte moins qu'un bois texturé, une pierre ou un textile (jusqu'à environ 30 % d'écart). La taille du chantier : plus le métrage est grand, plus le prix au mètre baisse, par paliers (jusqu'à 10 m, 10 à 15 m, au-delà). La complexité : des façades planes se posent vite ; des tiroirs nombreux, des moulures, un îlot avec retours prennent plus de temps. C'est pour cela que le devis détaille chaque surface avec son métrage et sa finition.`,
+          text: `La complexité de la pose, avant tout. Le nombre de découpes : des façades planes se posent vite ; des tiroirs nombreux, des moulures, des prises, un îlot avec retours prennent du temps. L'accessibilité : une surface dégagée à hauteur d'homme ne se travaille pas comme un dessus de meuble haut ou un recoin derrière une vasque. L'état du support : une surface saine et lisse est prête ; un support abîmé se répare et se prépare avant la pose. Le métrage : plus il est grand, plus le prix au mètre baisse. Le revêtement choisi compte aussi, mais moins qu'on ne le croit. Résultat : de grandes surfaces planes sans découpe se situent vers ${PRIX_ML_MIN} €/ml, une pose complexe monte jusqu'à ${PRIX_ML_MAX} €/ml, et aucun des deux n'est la règle. C'est pour cela que le devis détaille chaque surface avec son métrage.`,
         },
         {
           title: "Les fourchettes constatées",
@@ -70,7 +70,7 @@ export const articles: BlogArticle[] = [
         },
       ],
       tip: "Envoyez des photos de face avec un objet de taille connue (une feuille A4 posée sur le plan de travail) : le métrage se lit mieux et le devis est plus juste dès le premier envoi.",
-      conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € le mètre linéaire posé, ${cuisineMin} à ${cuisineMax} pour une cuisine complète. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
+      conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € le mètre linéaire posé selon la complexité de la pose, ${cuisineMin} à ${cuisineMax} pour une cuisine complète. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
     },
     relatedSlugs: ["covering-adhesif-vs-peinture-cuisine", "comment-se-passe-une-pose-de-covering", "covering-adhesif-durabilite"],
   },
@@ -147,7 +147,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Le prix",
-          text: `Repeindre soi-même coûte peu en matériel, beaucoup en temps et en risque de résultat inégal ; faire repeindre par un peintre revient souvent au niveau du covering. Le covering se chiffre au mètre linéaire, ${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} € posé, soit ${cuisineMin} à ${cuisineMax} pour une cuisine complète.`,
+          text: `Repeindre soi-même coûte peu en matériel, beaucoup en temps et en risque de résultat inégal ; faire repeindre par un peintre revient souvent au niveau du covering. Le covering se chiffre au mètre linéaire, ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € posé selon la complexité de la pose, soit en ordre de grandeur ${cuisineMin} à ${cuisineMax} pour une cuisine complète.`,
         },
         {
           title: "Quand la peinture reste le bon choix",
@@ -269,7 +269,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Métal, textile, paillettes",
-          text: "Inox brossé, laiton, cuivre pour un comptoir ou une crédence ; cuir et textile pour une tête de lit ou une porte ; paillettes pour un accent. Ce sont les gammes les plus hautes : le prix au mètre monte d'environ 20 à 30 % par rapport à une couleur unie.",
+          text: "Inox brossé, laiton, cuivre pour un comptoir ou une crédence ; cuir et textile pour une tête de lit ou une porte ; paillettes pour un accent. Ces films demandent une pose plus soignée (sens du brossage, raccords visibles) : le devis en tient compte.",
         },
         {
           title: "Pourquoi on valide sur échantillon",

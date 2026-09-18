@@ -1,4 +1,4 @@
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_PLAGE, euros } from "@/lib/offre";
+import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
 import { ENTREPRISE } from "@/lib/entreprise";
 
 export type QuestionReponse = { q: string; a: string };
@@ -14,7 +14,7 @@ export const FAQ_GENERALE: QuestionReponse[] = [
   },
   {
     q: "Combien coûte une rénovation par covering ?",
-    a: `Nous facturons au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE} selon la gamme choisie, la taille du chantier et la complexité de la pose. Une cuisine complète se situe généralement entre ${euros(FOURCHETTES.cuisine.min)} et ${euros(FOURCHETTES.cuisine.max)}, une salle de bain entre ${euros(FOURCHETTES.sdb.min)} et ${euros(FOURCHETTES.sdb.max)}, un meuble seul ${euros(FOURCHETTES.meuble.min)} et plus. Le devis est gratuit et vous répond ${DELAI_REPONSE}.`,
+    a: `Nous facturons au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE}. ${PRIX_EXPLICATION} En ordre de grandeur, une cuisine complète se situe généralement entre ${euros(FOURCHETTES.cuisine.min)} et ${euros(FOURCHETTES.cuisine.max)}, une salle de bain entre ${euros(FOURCHETTES.sdb.min)} et ${euros(FOURCHETTES.sdb.max)}, un meuble seul ${euros(FOURCHETTES.meuble.min)} et plus. Le devis est gratuit et vous répond ${DELAI_REPONSE}.`,
   },
   {
     q: "Combien de temps dure la pose ?",

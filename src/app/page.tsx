@@ -11,13 +11,13 @@ import { FAQ_GENERALE } from "@/data/faq";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MAX, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: { absolute: "CoverSwap — Rénover sans casser : covering adhésif à Montpellier" },
-  description: `Cuisines, salles de bain, meubles et locaux professionnels recouverts d'un film Cover Styl' en une journée, sans travaux. Simulation sur votre photo, devis ${DELAI_REPONSE}, ${PRIX_PLAGE} fourni et posé, garantie ${GARANTIE_ANS} ans. Montpellier, Hérault, France sur devis.`,
+  description: `Cuisines, salles de bain, meubles et locaux professionnels recouverts d'un film Cover Styl' en une journée, sans travaux. Simulation sur votre photo, devis ${DELAI_REPONSE}, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose, garantie ${GARANTIE_ANS} ans. Montpellier, Hérault, France sur devis.`,
   alternates: { canonical: ENTREPRISE.site },
 };
 
@@ -40,7 +40,15 @@ function Hero() {
       <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 py-28 md:py-32">
         <p className="text-rouge font-bold text-sm uppercase tracking-widest mb-4">Covering adhésif · Montpellier &amp; France</p>
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight mb-6 max-w-4xl text-balance">
-          Rénover sans casser.
+          Transformez votre
+          <br />
+          intérieur en{" "}
+          <span className="relative inline-block">
+            <span className="text-rouge">1 journée</span>
+            <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none" aria-hidden>
+              <path d="M2 10C50 2 100 2 150 6C200 10 250 4 298 8" stroke="#CC0000" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+          </span>
         </h1>
         <p className="text-gris-200 text-lg md:text-2xl max-w-2xl leading-relaxed mb-8">
           Cuisine, salle de bain, meubles, locaux professionnels : un film Cover Styl&apos; posé sur vos surfaces existantes. Une journée de pose, réversible, garanti {GARANTIE_ANS} ans.
@@ -55,7 +63,7 @@ function Hero() {
         </div>
         <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gris-300">
           <li>Devis gratuit {DELAI_REPONSE}</li>
-          <li>Dès {PRIX_ML_MIN} €/ml fourni et posé</li>
+          <li>{PRIX_PLAGE} fourni et posé, selon la pose</li>
           <li>{NB_REFERENCES} finitions Cover Styl&apos;</li>
         </ul>
       </div>
@@ -66,7 +74,7 @@ function Hero() {
 function CeQueCaChange() {
   const points = [
     { titre: "Pas de travaux", texte: "Le film se pose sur l'existant : pas de démontage, pas de poussière, pas de séchage. La pièce est utilisable le soir même." },
-    { titre: "Un prix lisible", texte: `Au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE} selon la gamme et la taille du chantier. Le devis détaille chaque surface.` },
+    { titre: "Un prix lisible", texte: `Au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE}. Ce qui fait le chiffre, c'est la pose — ${FACTEURS_PRIX} — et le devis le détaille surface par surface.` },
     { titre: "Réversible et garanti", texte: `Le film se retire à chaud sans abîmer le support. Pose et films garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration.` },
   ];
   return (
@@ -146,7 +154,7 @@ function Tarifs() {
         <div>
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">Des prix au mètre linéaire</h2>
           <p className="text-gris-300 leading-relaxed mb-4">
-            Nous mesurons le film réellement posé et le facturons fourni et posé : <strong className="text-white">{PRIX_PLAGE}</strong> selon la gamme Cover Styl&apos; choisie, la taille du chantier et la complexité de la pose. Plus le métrage est grand, plus le prix au mètre baisse.
+            Nous mesurons le film réellement posé et le facturons fourni et posé : <strong className="text-white">{PRIX_PLAGE}</strong>. Le prix ne dépend pas du seul revêtement : il se détermine au devis selon la complexité de la pose — {FACTEURS_PRIX}. De grandes surfaces planes sans découpe se situent vers {PRIX_ML_MIN} €/ml ; une pose complexe monte jusqu&apos;à {PRIX_ML_MAX} €/ml. Ni l&apos;un ni l&apos;autre n&apos;est la règle : c&apos;est le devis, gratuit, qui fixe le chiffre.
           </p>
           <p className="text-sm text-gris-500 mb-6">{ENTREPRISE.tvaMention}. Devis gratuit, valable 30 jours, acompte de 30 % à la commande.</p>
           <Link href="/devis" className="btn-primary">

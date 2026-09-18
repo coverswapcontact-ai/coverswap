@@ -5,7 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import TextureBackground from "@/components/TextureBackground";
 import { FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import { ZONES, getZoneSlug, getZoneBySlug, type Zone } from "@/data/zones";
-import { DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_DEPUIS, texteOffre } from "@/lib/offre";
+import { DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
 
 /* ──────────────────────────────────────────────────────────────────
    STATIC GENERATION — pré-build des 8 pages au build time
@@ -27,7 +27,7 @@ export async function generateMetadata({
   if (!zone) return {};
 
   const title = `Covering Adhésif ${zone.ville} — Rénovation Cuisine & Salle de Bain en 1 Jour | CoverSwap`;
-  const description = `Covering adhésif premium à ${zone.ville} (${zone.codePostal.split(" / ")[0]}). Rénovation cuisine, salle de bain, meubles en 1 journée. Pose Cover Styl' garantie 10 ans, devis gratuit ${DELAI_REPONSE}. À partir de ${PRIX_DEPUIS}.`;
+  const description = `Covering adhésif premium à ${zone.ville} (${zone.codePostal.split(" / ")[0]}). Rénovation cuisine, salle de bain, meubles en 1 journée. Pose Cover Styl' garantie 10 ans, devis gratuit ${DELAI_REPONSE}. Prix au mètre linéaire, ${PRIX_PLAGE} selon la complexité de la pose.`;
   const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
 
   return {

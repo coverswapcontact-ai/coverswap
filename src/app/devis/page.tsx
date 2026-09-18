@@ -39,7 +39,7 @@ const avantages = [
 
 const etapes = [
   { num: "1", title: "Décrivez votre projet", desc: "Type de surface, dimensions approximatives, style souhaité." },
-  { num: "2", title: "On étudie votre demande", desc: "Estimation personnalisée selon la gamme Cover Styl' choisie." },
+  { num: "2", title: "On étudie votre demande", desc: "Chiffrage au mètre linéaire selon la complexité de la pose : découpes, accès, état du support, métrage." },
   { num: "3", title: "Vous recevez votre devis", desc: `Détaillé, gratuit, ${DELAI_REPONSE}. Vous décidez ensuite.` },
 ];
 

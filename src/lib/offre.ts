@@ -5,8 +5,8 @@ import revetements from "@/data/revetements.json";
  * Tout texte qui cite un délai, une garantie, un prix ou le nombre de
  * références lit ici — jamais un nombre en dur dans une page.
  *
- * Les prix suivent la grille réelle du CRM (calcul-devis) : facturation au
- * mètre linéaire de film posé, prix fourni et posé, TVA non applicable.
+ * Facturation au mètre linéaire de film posé, prix fourni et posé, TVA non
+ * applicable. Le mètre carré n'est jamais une unité de prix ici.
  */
 
 /** Délai de réponse à une demande de devis ou de contact. */
@@ -20,18 +20,23 @@ export const GARANTIE = `${GARANTIE_ANS} ans`;
 export const GARANTIE_ETENDUE_ANS = 15;
 
 /**
- * Tarif au mètre linéaire, fourni et posé (base 15 € × coefficient de
- * quantité 7 à 10 × gamme 1,00 à 1,30 × complexité 1,0 à 1,2) :
- *  - 105 €/ml : grands chantiers (plus de 15 ml), gamme Essential, pose simple ;
- *  - ~170 €/ml : petits chantiers, gamme bois/pierre/béton ;
- *  - jusqu'à ~235 €/ml : petit chantier, gamme la plus haute, pose complexe.
- * Le site annonce la plage courante et renvoie au devis pour le chiffre exact.
+ * Tarif au mètre linéaire de film posé, fourni et posé. Le prix ne dépend pas
+ * du seul revêtement : il se détermine au devis selon la complexité de la pose
+ * (nombre de découpes, accessibilité, état du support, métrage).
+ *  - autour de 50 €/ml : grandes surfaces planes, sans découpe ;
+ *  - jusqu'à 150 €/ml : pose complexe (découpes nombreuses, accès difficile,
+ *    support à préparer, petit métrage).
+ * Le site annonce toujours la plage entière et dit ce qui la fait varier :
+ * ni le bas ni le haut ne sont la norme.
  */
-export const PRIX_ML_MIN = 105;
-export const PRIX_ML_COURANT_MAX = 170;
-export const PRIX_DEPUIS = `${PRIX_ML_MIN} €/ml`;
-export const PRIX_PLAGE = `${PRIX_ML_MIN} à ${PRIX_ML_COURANT_MAX} €/ml`;
+export const PRIX_ML_MIN = 50;
+export const PRIX_ML_MAX = 150;
+export const PRIX_PLAGE = `${PRIX_ML_MIN} à ${PRIX_ML_MAX} €/ml`;
 export const UNITE_PRIX = "mètre linéaire de film posé";
+/** Ce qui fait le prix au mètre : la pose, pas le seul choix du revêtement. */
+export const FACTEURS_PRIX = "le nombre de découpes, l'accessibilité, l'état du support et le métrage";
+/** La phrase de référence, reprise telle quelle partout où le prix est expliqué. */
+export const PRIX_EXPLICATION = `Le prix au mètre linéaire se détermine au devis, selon la complexité de la pose : ${FACTEURS_PRIX}. Il va de ${PRIX_ML_MIN} €/ml pour de grandes surfaces planes sans découpe à ${PRIX_ML_MAX} €/ml pour une pose complexe : ni l'un ni l'autre n'est la règle, c'est le devis qui fixe le chiffre.`;
 
 /** Fourchettes constatées par type de projet, fourni et posé. */
 export const FOURCHETTES = {
@@ -61,10 +66,11 @@ export const OFFRE = {
   garantie: GARANTIE,
   garantieAns: GARANTIE_ANS,
   garantieEtendueAns: GARANTIE_ETENDUE_ANS,
-  prixDepuis: PRIX_DEPUIS,
   prixPlage: PRIX_PLAGE,
   prixMlMin: PRIX_ML_MIN,
-  prixMlCourantMax: PRIX_ML_COURANT_MAX,
+  prixMlMax: PRIX_ML_MAX,
+  facteursPrix: FACTEURS_PRIX,
+  prixExplication: PRIX_EXPLICATION,
   unitePrix: UNITE_PRIX,
   fourchettes: FOURCHETTES,
   dureePose: DUREE_POSE,
@@ -88,5 +94,5 @@ export function fourchette(cle: keyof typeof FOURCHETTES): string {
 
 /** Remplace les marqueurs {NB}, {DELAI} et {PRIX} d'un texte de données (zones) par les valeurs de l'offre. */
 export function texteOffre(texte: string): string {
-  return texte.replaceAll("{NB}", String(NB_REFERENCES)).replaceAll("{DELAI}", DELAI_REPONSE).replaceAll("{PRIX}", PRIX_DEPUIS);
+  return texte.replaceAll("{NB}", String(NB_REFERENCES)).replaceAll("{DELAI}", DELAI_REPONSE).replaceAll("{PRIX}", PRIX_PLAGE);
 }

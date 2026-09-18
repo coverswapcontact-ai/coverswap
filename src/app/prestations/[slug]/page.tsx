@@ -7,7 +7,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
 import { PRESTATIONS, getPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_REPONSE, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
+import { DELAI_REPONSE, FACTEURS_PRIX, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -129,7 +129,7 @@ export default async function PagePrestation({ params }: Props) {
             <div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">Combien ça coûte</h2>
               <p className="text-gris-300 leading-relaxed max-w-2xl">{p.prix.texte}</p>
-              <p className="text-sm text-gris-500 mt-4">Tarif au mètre linéaire de film posé, fourni et posé : {PRIX_PLAGE}. {ENTREPRISE.tvaMention}.</p>
+              <p className="text-sm text-gris-500 mt-4">Tarif au mètre linéaire de film posé, fourni et posé : {PRIX_PLAGE}, déterminé au devis selon {FACTEURS_PRIX}. {ENTREPRISE.tvaMention}.</p>
             </div>
             <div className="text-center md:text-right">
               <p className="text-gris-400 text-sm uppercase tracking-widest">{p.prix.fourchette === "sur devis" ? "Prix" : "Ordre de grandeur"}</p>

@@ -1,6 +1,6 @@
 import { ENTREPRISE } from "@/lib/entreprise";
 import { ZONES } from "@/data/zones";
-import { PRIX_ML_MIN, PRIX_ML_COURANT_MAX } from "@/lib/offre";
+import { PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
 
 /**
  * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
@@ -34,7 +34,7 @@ export const LOCAL_BUSINESS = {
   url: ENTREPRISE.site,
   telephone: ENTREPRISE.telephoneInternational,
   email: ENTREPRISE.email,
-  priceRange: `${PRIX_ML_MIN}-${PRIX_ML_COURANT_MAX} €/ml`,
+  priceRange: `${PRIX_ML_MIN}-${PRIX_ML_MAX} €/ml`,
   currenciesAccepted: "EUR",
   paymentAccepted: "Virement, chèque, espèces",
   slogan: "Rénover sans casser",
@@ -95,7 +95,7 @@ export function ServiceSchema({ name, description, url, typeProjet }: { name: st
             "@type": "UnitPriceSpecification",
             priceCurrency: "EUR",
             minPrice: PRIX_ML_MIN,
-            maxPrice: PRIX_ML_COURANT_MAX,
+            maxPrice: PRIX_ML_MAX,
             unitText: "mètre linéaire de film posé, fourni et posé",
           },
           availability: "https://schema.org/InStock",

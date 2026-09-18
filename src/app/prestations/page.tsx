@@ -8,7 +8,7 @@ import { DELAI_REPONSE, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
 
 export const metadata: Metadata = {
   title: { absolute: "Prestations de covering adhésif — cuisine, salle de bain, meubles, pro, vitrages | CoverSwap" },
-  description: `Ce que CoverSwap recouvre et comment : cuisines, salles de bain, meubles, locaux professionnels, vitrages. Films Cover Styl', pose en une journée, ${PRIX_PLAGE} fourni et posé, garantie ${GARANTIE_ANS} ans.`,
+  description: `Ce que CoverSwap recouvre et comment : cuisines, salles de bain, meubles, locaux professionnels, vitrages. Films Cover Styl', pose en une journée, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose, garantie ${GARANTIE_ANS} ans.`,
   alternates: { canonical: `${ENTREPRISE.site}/prestations` },
 };
 
@@ -21,7 +21,7 @@ export default function PagePrestations() {
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Prestations" }]} />
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-5 max-w-3xl text-balance">Ce que nous recouvrons</h1>
           <p className="text-gris-300 text-lg max-w-2xl leading-relaxed">
-            Un film adhésif Cover Styl&apos; posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace. Tarif au mètre linéaire, {PRIX_PLAGE} fourni et posé, devis gratuit {DELAI_REPONSE}.
+            Un film adhésif Cover Styl&apos; posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace. Tarif au mètre linéaire, {PRIX_PLAGE} fourni et posé : le chiffre se détermine au devis selon la complexité de la pose. Devis gratuit {DELAI_REPONSE}.
           </p>
         </div>
       </section>
