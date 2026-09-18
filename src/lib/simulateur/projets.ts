@@ -2,16 +2,27 @@
  * Configuration des types de projets pour le simulateur multi-projet.
  *
  * Chaque projet définit :
- *  - ses zones modifiables (éléments)
+ *  - ses surfaces modifiables (lib/simulateur/surfaces : une consigne d'image par surface)
  *  - le contexte pour le prompt IA
  *  - les labels UX
  *  - le mapping CRM
  */
 
+import { SURFACES, type Surface } from "@/lib/simulateur/surfaces";
+
+/** Une surface proposée dans un projet : sa clé est l'identifiant de la surface (lib/simulateur/surfaces). */
 export interface ProjectElement {
   key: string;
   label: string;
   description: string;
+  exclut: string[];
+}
+
+function elementsDe(ids: string[]): ProjectElement[] {
+  return ids.map((id) => {
+    const s: Surface = SURFACES[id];
+    return { key: s.id, label: s.label, description: s.description, exclut: s.exclut ?? [] };
+  });
 }
 
 export interface ProjectType {
@@ -35,14 +46,10 @@ export const PROJECT_TYPES: ProjectType[] = [
     id: "cuisine",
     label: "Cuisine",
     icon: "🍳",
-    description: "Crédence, plan de travail, façades",
+    description: "Façades, meubles hauts ou bas, plan de travail, crédence",
     uploadHint: "Votre photo de cuisine",
     uploadTip: "Prenez la photo de face, bien éclairée, cadrant l'ensemble de la cuisine",
-    elements: [
-      { key: "zone1", label: "Crédence", description: "Le mur entre le plan de travail et les meubles hauts" },
-      { key: "zone2", label: "Plan de travail", description: "La surface horizontale de travail" },
-      { key: "zone3", label: "Façades", description: "Les portes et tiroirs de vos meubles" },
-    ],
+    elements: elementsDe(["facades-cuisine", "meubles-hauts", "meubles-bas", "plan-de-travail", "credence"]),
     promptRoomType: "kitchen",
     promptSurfaceContext: "kitchen surfaces — backsplash/splashback (crédence), countertops/worktops, and cabinet doors/drawer fronts (façades)",
     promptKeepUntouched: [
@@ -64,14 +71,10 @@ export const PROJECT_TYPES: ProjectType[] = [
     id: "salle-de-bain",
     label: "Salle de bain",
     icon: "🚿",
-    description: "Meuble vasque, carrelage mural, paroi de douche",
+    description: "Meuble vasque, plan vasque, carrelage mural, tablier de baignoire",
     uploadHint: "Votre photo de salle de bain",
     uploadTip: "Photographiez l'ensemble de la pièce, de face, bien éclairée",
-    elements: [
-      { key: "zone1", label: "Meuble vasque", description: "Le meuble sous le lavabo et ses façades" },
-      { key: "zone2", label: "Carrelage mural", description: "Les murs carrelés ou la crédence de la salle de bain" },
-      { key: "zone3", label: "Paroi de douche / Baignoire", description: "Le contour de la douche ou de la baignoire" },
-    ],
+    elements: elementsDe(["meuble-vasque", "plan-vasque", "carrelage-mural", "tablier-baignoire"]),
     promptRoomType: "bathroom",
     promptSurfaceContext: "bathroom surfaces — vanity/sink cabinet fronts (NOT the sink bowl), wall tiles or wall cladding, and shower surround or bathtub side panel (NOT the bathtub interior)",
     promptKeepUntouched: [
@@ -93,14 +96,10 @@ export const PROJECT_TYPES: ProjectType[] = [
     id: "meubles",
     label: "Meubles / Dressing",
     icon: "🪑",
-    description: "Façades, étagères, structure",
+    description: "Portes de dressing et placards, meuble TV, commode, buffet",
     uploadHint: "Votre photo du meuble ou dressing",
     uploadTip: "Prenez la photo de face, portes fermées, bien éclairé",
-    elements: [
-      { key: "zone1", label: "Façades / Portes", description: "Les portes, tiroirs et panneaux avant" },
-      { key: "zone2", label: "Plateau / Tablettes", description: "Le dessus et les étagères visibles" },
-      { key: "zone3", label: "Côtés / Structure", description: "Les panneaux latéraux et la structure" },
-    ],
+    elements: elementsDe(["portes-dressing", "meuble-tv", "meuble-complet"]),
     promptRoomType: "furniture/wardrobe/closet",
     promptSurfaceContext: "furniture covering surfaces — cabinet/wardrobe door fronts and drawer fronts (façades), top surface and visible shelves, and side panels and structural frame",
     promptKeepUntouched: [
@@ -124,11 +123,7 @@ export const PROJECT_TYPES: ProjectType[] = [
     description: "Mur d'accent, mur principal, plafond",
     uploadHint: "Votre photo de la pièce",
     uploadTip: "Cadrez le mur entier de face, du sol au plafond si possible",
-    elements: [
-      { key: "zone1", label: "Mur principal", description: "Le mur le plus large ou le plus visible" },
-      { key: "zone2", label: "Mur d'accent", description: "Un second mur ou une portion décorative" },
-      { key: "zone3", label: "Plafond", description: "La surface du plafond" },
-    ],
+    elements: elementsDe(["mur-principal", "mur-accent", "plafond"]),
     promptRoomType: "interior room (walls and ceiling)",
     promptSurfaceContext: "wall and ceiling SURFACES only — main wall, accent/feature wall, and ceiling (NOT the architectural elements on them)",
     promptKeepUntouched: [
@@ -148,16 +143,12 @@ export const PROJECT_TYPES: ProjectType[] = [
   },
   {
     id: "professionnel",
-    label: "Bureau / Comptoir pro",
+    label: "Local professionnel",
     icon: "💼",
-    description: "Bureau, rangements, habillage mural",
+    description: "Bar, comptoir, distributeur, mobilier, rangements, habillage mural",
     uploadHint: "Votre photo de l'espace professionnel",
     uploadTip: "Photographiez l'espace de face avec un bon éclairage",
-    elements: [
-      { key: "zone1", label: "Bureau / Comptoir", description: "La surface de travail ou comptoir d'accueil" },
-      { key: "zone2", label: "Façades / Rangements", description: "Les portes de placard et rangements" },
-      { key: "zone3", label: "Habillage mural", description: "Le revêtement mural ou panneau décoratif" },
-    ],
+    elements: elementsDe(["comptoir-habillage", "comptoir-plateau", "mobilier-pro", "rangements-pro", "habillage-mural"]),
     promptRoomType: "professional workspace / reception desk / office",
     promptSurfaceContext: "professional space surfaces — desk top or reception counter top surface, storage/cabinet door fronts, and wall cladding or decorative wall panel",
     promptKeepUntouched: [

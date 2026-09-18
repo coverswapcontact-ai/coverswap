@@ -12,7 +12,7 @@ export type EtatSimulateur = {
   projet: string;
   photo: string | null;
   selections: Record<string, { ref: string; nom: string; famille: string; finition: string; categorie: string; tags: string[]; image: string } | null>;
-  resultat: { image: string; simulationSiteId: string | null; references: { zone: string; libelle: string; ref: string; nom: string }[] } | null;
+  resultat: { image: string; /** La photo au cadrage exact du rendu, quand le serveur l'a rognée au format du modèle. */ avant?: string | null; simulationSiteId: string | null; references: { zone: string; libelle: string; ref: string; nom: string }[] } | null;
   /** Identifiants des simulations de la session (pour tout rattacher à la même fiche). */
   simulationSiteIds: string[];
   /** Rendus sans identifiant côté serveur (chemin de secours) : envoyés avec la demande. */

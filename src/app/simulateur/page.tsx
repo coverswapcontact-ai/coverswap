@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 const ETAPES = [
   { titre: "Photographier la pièce", texte: "Une photo de face, bien éclairée, de la cuisine, de la salle de bain, du meuble ou du local. Téléphone ou ordinateur." },
-  { titre: "Choisir les surfaces et la finition", texte: `Crédence, plan de travail, façades… et pour chacune une finition parmi ${NB_REFERENCES} références Cover Styl'.` },
+  { titre: "Choisir les surfaces et la finition", texte: `Façades, meubles hauts ou bas, plan de travail, crédence, plan vasque, portes de dressing, meuble TV, comptoir… jusqu'à quatre surfaces, et pour chacune une finition parmi ${NB_REFERENCES} références Cover Styl'.` },
   { titre: "Voir le résultat", texte: "Le rendu s'affiche en avant / après en moins d'une minute. Vos coordonnées ne sont demandées que pour le recevoir avec un devis." },
 ];
 

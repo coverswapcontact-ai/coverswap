@@ -4,6 +4,9 @@ import { parcoursIdValide } from "@/lib/parcours";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/lib/simulateur/projets";
 import { buildImagePrompt } from "@/lib/simulation-prompt";
+import { lireSelections } from "@/lib/simulateur/selections";
+import { rognerAuFormat, tailleSelonRatio } from "@/lib/simulateur/cadrage";
+import { MESSAGES_ECHEC, classerErreurOpenAI } from "@/lib/simulateur/erreurs-generation";
 
 // Max duration côté Vercel (Hobby = 60s max, Pro = 300s).
 // gpt-image-1 quality "medium" 1024px → ~20-35s, large marge avant kill.
@@ -51,19 +54,6 @@ function rateLimitHeaders(result: {
     "X-RateLimit-Reset": String(Math.floor(result.resetAt / 1000)),
     ...(result.retryAfterSec > 0 ? { "Retry-After": String(result.retryAfterSec) } : {}),
   };
-}
-
-/* ──────────────────────────────────────────────────────────────────
-   TYPES
-────────────────────────────────────────────────────────────────── */
-interface ElementInfo {
-  ref: string;
-  name: string;
-  famille: string;
-  finition?: string;
-  categorie?: string;
-  tags?: string[];
-  imageUrl?: string;
 }
 
 /* ──────────────────────────────────────────────────────────────────
@@ -153,27 +143,15 @@ export async function POST(req: NextRequest) {
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey.includes("REPLACE")) {
-    return NextResponse.json({ error: "Clé API OpenAI non configurée." }, { status: 500 });
+    console.error("[simulation] OPENAI_API_KEY absente : génération impossible");
+    return NextResponse.json({ error: MESSAGES_ECHEC["service-indisponible"], reason: "service-indisponible" }, { status: 503 });
   }
 
-  /* ── Parse elements (generic: zone1, zone2, zone3) ── */
-  const elements: Record<string, ElementInfo | null> = {};
-  for (const zoneKey of ["zone1", "zone2", "zone3"]) {
-    const ref = body[`${zoneKey}_ref`];
-    if (ref) {
-      elements[zoneKey] = {
-        ref,
-        name: body[`${zoneKey}_name`] || "",
-        famille: body[`${zoneKey}_famille`] || "",
-        finition: body[`${zoneKey}_finition`],
-        categorie: body[`${zoneKey}_categorie`],
-        tags: body[`${zoneKey}_tags`],
-        imageUrl: body[`${zoneKey}_image`],
-      };
-    } else {
-      elements[zoneKey] = null;
-    }
-  }
+  /* ── Surfaces choisies (références relues dans le catalogue du site) ── */
+  const project: ProjectType = getProject(typeof body.project_type === "string" ? body.project_type : "cuisine");
+  const lecture = lireSelections(body, project);
+  if (!lecture.ok) return NextResponse.json({ error: lecture.erreur, reason: lecture.raison }, { status: 400 });
+  const { choix, swatchUrls } = lecture;
 
   try {
     /* ══════════════════════════════════════════════════════════════
@@ -181,73 +159,20 @@ export async function POST(req: NextRequest) {
        BUG FIX : si un swatch échoue à se télécharger, on échoue PROPREMENT
        au lieu de laisser l'IA inventer une couleur (ancien comportement).
     ══════════════════════════════════════════════════════════════ */
-    const textureEntries: { key: string; el: ElementInfo; buffer: Buffer }[] = [];
-    const downloadResults = await Promise.all(
-      Object.entries(elements).map(async ([key, el]) => {
-        if (!el?.imageUrl) return { key, el, buffer: null as Buffer | null };
-        const buffer = await downloadImage(el.imageUrl);
-        return { key, el, buffer };
-      })
-    );
-
-    const failedDownloads: { key: string; ref: string; name: string }[] = [];
-    for (const { key, el, buffer } of downloadResults) {
-      if (!el) continue;
-      if (el.imageUrl && !buffer) {
-        // Swatch attendu mais échec → on rejette (ne pas laisser l'IA inventer)
-        failedDownloads.push({ key, ref: el.ref, name: el.name });
-      } else if (buffer && el) {
-        textureEntries.push({ key, el, buffer });
-      }
-    }
-
-    if (failedDownloads.length > 0) {
-      const refs = failedDownloads.map((f) => `${f.ref} (${f.name})`).join(", ");
-      console.error(`[simulation] Swatch download failed for: ${refs}`);
+    const buffers = await Promise.all(swatchUrls.map((url) => downloadImage(url)));
+    const manquants = swatchUrls.filter((_, i) => !buffers[i]);
+    if (manquants.length > 0) {
+      const refs = choix.filter((c) => manquants.includes(c.revetement.imageUrl ?? "")).map((c) => `${c.revetement.ref} (${c.revetement.name})`).join(", ");
+      console.error(`[simulation] échantillon(s) introuvable(s) : ${refs}`);
       return NextResponse.json(
-        {
-          error: `Impossible de télécharger les images de référence (${refs}). Réessayez dans quelques secondes.`,
-          reason: "swatch-download-failed",
-        },
+        { error: `L'échantillon de ${refs} ne répond pas pour le moment : choisissez une autre finition ou réessayez dans un instant. Votre photo est conservée.`, reason: "swatch-download-failed" },
         { status: 502, headers: rateLimitHeaders(rl) }
       );
     }
+    const textureEntries = buffers.map((buffer, i) => ({ key: String(i), buffer: buffer as Buffer }));
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`[simulation] Downloaded ${textureEntries.length} texture reference images`);
-    }
-
-    /* ══════════════════════════════════════════════════════════════
-       STEP 2: Build the image edit prompt (no GPT-4.1-mini needed)
-       Direct, precise prompt with visual references
-    ══════════════════════════════════════════════════════════════ */
-
-    // Map each element to its texture image index (if available)
-    const imageIndexMap: Record<string, number | null> = {};
-    for (const zk of ["zone1", "zone2", "zone3"]) imageIndexMap[zk] = null;
-    textureEntries.forEach((entry, idx) => {
-      imageIndexMap[entry.key] = idx;
-    });
-
-    // Labels dynamiques par zone (envoyés par le front)
-    const zoneLabels: Record<string, string> = {
-      zone1: body.zone1_label || "Zone 1",
-      zone2: body.zone2_label || "Zone 2",
-      zone3: body.zone3_label || "Zone 3",
-    };
-
-    // Contexte du type de projet pour le prompt — source unique : src/app/simulation/projects.ts
-    const projectType = body.project_type || "cuisine";
-    const project: ProjectType = getProject(projectType);
-
-    // Prompt construit via la lib partagée (source unique : src/lib/simulation-prompt.ts)
-    const imagePrompt = buildImagePrompt({
-      project,
-      zoneLabels,
-      elements,
-      imageIndexMap,
-      swatchCount: textureEntries.length,
-    });
+    // Consigne construite par la source unique (src/lib/simulation-prompt.ts)
+    const imagePrompt = buildImagePrompt({ project, choix });
 
     /* ══════════════════════════════════════════════════════════════
        STEP 3: Call OpenAI Image Edit with all images
@@ -258,19 +183,10 @@ export async function POST(req: NextRequest) {
     // Detect orientation to pick best matching output size
     // gpt-image-1 supports: 1024x1024, 1536x1024 (landscape), 1024x1536 (portrait)
     // We pick the size that best matches the input aspect ratio to avoid any zoom/crop effect
+    // Photo mise au format du modèle (rognée, centrée) : le rendu garde le même cadrage que l'« avant » renvoyé.
     const dims = getImageDimensions(kitchenBuffer);
-    let outputSize = "1024x1024";
-    if (dims) {
-      const ratio = dims.width / dims.height;
-      // Phone landscape (16:9, 4:3) → landscape output
-      if (ratio > 1.15) outputSize = "1536x1024";
-      // Phone portrait (9:16, 3:4) → portrait output
-      else if (ratio < 0.85) outputSize = "1024x1536";
-      // Near-square photos → square output (best match)
-    }
-    if (process.env.NODE_ENV !== "production") {
-      console.log(`[simulation] Input: ${dims?.width}x${dims?.height} (ratio ${dims ? (dims.width / dims.height).toFixed(2) : "?"}) → output: ${outputSize}`);
-    }
+    const outputSize = dims ? tailleSelonRatio(dims.width, dims.height) : "1024x1024";
+    const cadree = await rognerAuFormat(kitchenBuffer, outputSize);
 
     /* ══════════════════════════════════════════════════════════════
        STEP 3: Helper — Appel OpenAI avec quality + timeout configurable.
@@ -283,11 +199,11 @@ export async function POST(req: NextRequest) {
 
     async function attemptOpenAI(quality: "low" | "medium", timeoutMs: number): Promise<AttemptResult> {
       const formData = new FormData();
-      formData.append("model", "gpt-image-1");
+      formData.append("model", process.env.OPENAI_IMAGE_MODEL || "gpt-image-1");
       formData.append("prompt", imagePrompt);
       formData.append("size", outputSize);
       formData.append("quality", quality);
-      formData.append("image[]", new Blob([new Uint8Array(kitchenBuffer)], { type: "image/png" }), "kitchen.png");
+      formData.append("image[]", new Blob([new Uint8Array(cadree.photo)], { type: "image/png" }), "photo.png");
       for (const entry of textureEntries) {
         formData.append("image[]", new Blob([new Uint8Array(entry.buffer)], { type: "image/jpeg" }), `texture_${entry.key}.jpg`);
       }
@@ -357,16 +273,12 @@ export async function POST(req: NextRequest) {
 
     let attempt = await attemptOpenAI("low", remainingBudget());
 
-    // Photo refusée par OpenAI (4xx hors 429) : retry inutile, abandon immédiat.
+    // Refus net d'OpenAI (4xx hors 429) : relancer ne changerait rien. On dit au visiteur
+    // ce qui se passe vraiment : une panne chez nous (crédit, clé) n'est pas un défaut de sa photo.
     if (!attempt.ok && attempt.isUserError) {
-      const userMessage =
-        attempt.status === 400
-          ? "L'IA a refusé cette photo (probablement trop sombre, floue ou non conforme). Essayez une autre photo bien éclairée."
-          : "Erreur lors de la génération. Réessayez ou contactez-nous.";
-      return NextResponse.json(
-        { error: userMessage, reason: "openai-user-error", status: attempt.status },
-        { status: 502, headers: rateLimitHeaders(rl) }
-      );
+      const raison = classerErreurOpenAI(attempt.status, attempt.raw);
+      console.error(`[simulation] génération refusée (${raison}) status=${attempt.status}`);
+      return NextResponse.json({ error: MESSAGES_ECHEC[raison], reason: raison, status: attempt.status }, { status: raison === "service-indisponible" ? 503 : 502, headers: rateLimitHeaders(rl) });
     }
 
     // Échec RAPIDE non-timeout (5xx/réseau/réponse vide) + budget suffisant → 1 retry.
@@ -376,18 +288,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!attempt.ok) {
-      console.error(`[simulation] Génération échouée (${attempt.isTimeout ? "timeout" : "status " + attempt.status})`);
-      // Le lead + la photo sont DÉJÀ enregistrés dans le CRM (pushLeadToCrm au
-      // début). On ne perd donc jamais le contact : message rassurant orienté
-      // conversion plutôt qu'un "Oups erreur" sec.
-      return NextResponse.json(
-        {
-          error:
-            "Nos serveurs de génération sont très sollicités à l'instant. Bonne nouvelle : votre demande est bien enregistrée — nous vous recontactons très vite avec votre simulation. Vous pouvez aussi réessayer dans un instant.",
-          reason: attempt.isTimeout ? "openai-timeout" : "openai-error",
-        },
-        { status: attempt.isTimeout ? 504 : 502, headers: rateLimitHeaders(rl) }
-      );
+      const raison = attempt.isTimeout ? "delai" : classerErreurOpenAI(attempt.status, attempt.raw);
+      console.error(`[simulation] génération échouée (${raison}) status=${attempt.status ?? "?"}`);
+      // Aucune coordonnée n'a encore été donnée à ce stade : on ne promet pas un rappel,
+      // on propose de réessayer ou de laisser ses coordonnées (la photo reste en mémoire).
+      return NextResponse.json({ error: MESSAGES_ECHEC[raison], reason: raison }, { status: attempt.isTimeout ? 504 : raison === "service-indisponible" ? 503 : 502, headers: rateLimitHeaders(rl) });
     }
 
     const resultImage = `data:image/png;base64,${attempt.b64}`;
@@ -397,11 +302,8 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         image: resultImage,
-        references: {
-          credence: body.credence_ref || "",
-          plan: body.plan_ref || "",
-          facade: body.facade_ref || "",
-        },
+        imageAvant: cadree.avant ? `data:image/jpeg;base64,${cadree.avant.toString("base64")}` : null,
+        references: choix.map((c) => ({ surface: c.surface.id, ref: c.revetement.ref })),
         rateLimit: {
           limit: rl.limit,
           remaining: rl.remaining,
@@ -412,6 +314,6 @@ export async function POST(req: NextRequest) {
     );
   } catch (err) {
     console.error("Simulation error:", err);
-    return NextResponse.json({ error: "Service indisponible." }, { status: 502 });
+    return NextResponse.json({ error: MESSAGES_ECHEC.erreur, reason: "erreur" }, { status: 502 });
   }
 }

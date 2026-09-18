@@ -8,7 +8,9 @@ import { getProject } from "@/lib/simulateur/projets";
  * POST /api/simulation/contact — après le résultat du simulateur, la personne
  * laisse ses coordonnées : le lead est créé dans le CRM, ses simulations du
  * parcours (gardées côté CRM) lui sont rattachées, et les rendus faits par le
- * chemin de secours (sans identifiant) partent avec la demande.
+ * chemin de secours (sans identifiant) partent avec la demande. Si la génération
+ * n'a pas abouti, la demande part quand même, avec la photo et les finitions
+ * choisies : la simulation sera faite à la main.
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -43,6 +45,10 @@ export async function POST(req: NextRequest) {
     ? (body.rendusLocaux as { avant?: unknown; apres?: unknown; references?: unknown }[]).filter((r) => typeof r.avant === "string" && typeof r.apres === "string").slice(0, 3)
     : [];
   const references = texte(body.references, 500);
+  // Génération non aboutie (crédit épuisé, panne, photo refusée) : la photo du visiteur part avec sa
+  // demande pour que la simulation soit faite à la main. ~6 Mo au plus, image uniquement.
+  const echec = texte(body.simulationEchouee, 60);
+  const photoAvant = typeof body.photoAvant === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(body.photoAvant) && body.photoAvant.length < 8_000_000 ? body.photoAvant : undefined;
 
   const resultat = await sendLeadToCRM(
     {
@@ -58,7 +64,12 @@ export async function POST(req: NextRequest) {
       message: texte(body.message, 4000),
       parcoursId: parcoursIdValide(body.parcoursId),
       simulationIds,
-      notes: references ? `Simulation ${projet.id} : ${references}` : `Simulation ${projet.id}`,
+      notes: echec
+        ? `SIMULATION À RÉALISER À LA MAIN — la génération n'a pas abouti sur le site (${echec}). Projet ${projet.id}${references ? ` : ${references}` : ""}. ${photoAvant ? "Photo du visiteur jointe." : "Photo non transmise."}`
+        : references
+          ? `Simulation ${projet.id} : ${references}`
+          : `Simulation ${projet.id}`,
+      photos: photoAvant && echec ? [photoAvant] : undefined,
       // Chemin de secours (pas d'identifiant côté CRM) : le dernier rendu part avec la demande.
       imageBefore: typeof rendus[0]?.avant === "string" ? (rendus[0].avant as string) : undefined,
       imageAfter: typeof rendus[0]?.apres === "string" ? (rendus[0].apres as string) : undefined,
@@ -70,7 +81,7 @@ export async function POST(req: NextRequest) {
     { ipVisiteur: ip }
   );
 
-  if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null, simulations: resultat.simulations ?? 0, consentement: resultat.consentement ?? null });
+  if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null, simulations: resultat.simulations ?? 0, photos: resultat.photos ?? 0, consentement: resultat.consentement ?? null });
   if (resultat.emailFallback) return NextResponse.json({ success: true, leadId: null, viaMail: true });
   return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: resultat.error }, { status: 502 });
 }

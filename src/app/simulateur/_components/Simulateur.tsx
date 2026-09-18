@@ -7,6 +7,7 @@ import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import CaseConsentement from "@/components/CaseConsentement";
 import Turnstile, { reinitialiserTurnstile } from "@/components/Turnstile";
 import { PROJECT_TYPES, getProject } from "@/lib/simulateur/projets";
+import { SURFACES_MAX } from "@/lib/simulateur/surfaces";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import { envoyerEvenement } from "@/lib/evenements-site";
 import { obtenirParcoursId } from "@/lib/parcours";
@@ -26,7 +27,14 @@ type Etape = 1 | 2 | 3;
 type Selections = EtatSimulateur["selections"];
 type Rendu = NonNullable<EtatSimulateur["resultat"]>;
 
+type Formulaire = { name: string; phone: string; email: string; ville: string; codePostal: string; message: string; consentement: boolean };
+/** Génération qui n'a pas abouti : la personne peut quand même laisser ses coordonnées, avec sa photo. */
+type Echec = { message: string; raison: string };
+
 const SIMULATE_URL = process.env.NEXT_PUBLIC_SIMULATE_URL;
+/** Raisons pour lesquelles réessayer tout de suite ne sert à rien : on met la demande par coordonnées en avant. */
+const PANNES = ["service-indisponible", "global-quota", "ip-quota", "quota"];
+const CHAMP = "w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50";
 const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, selections: {}, resultat: null, simulationSiteIds: [], rendusLocaux: [], majLe: 0 };
 
 function versSelection(r: Reference): NonNullable<Selections[string]> {
@@ -61,16 +69,66 @@ function Indicateur({ etape, onRetour }: { etape: Etape; onRetour: (e: Etape) =>
   );
 }
 
+/** Les champs de contact, communs à la demande après un rendu et à la demande quand la génération a échoué. */
+function ChampsContact({ prefixe, formulaire, onChange }: { prefixe: string; formulaire: Formulaire; onChange: (f: Formulaire) => void }) {
+  return (
+    <>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor={`${prefixe}-nom`} className="block text-sm mb-1">
+            Nom complet *
+          </label>
+          <input id={`${prefixe}-nom`} required autoComplete="name" value={formulaire.name} onChange={(e) => onChange({ ...formulaire, name: e.target.value })} className={CHAMP} />
+        </div>
+        <div>
+          <label htmlFor={`${prefixe}-tel`} className="block text-sm mb-1">
+            Téléphone *
+          </label>
+          <input id={`${prefixe}-tel`} required type="tel" inputMode="tel" autoComplete="tel" value={formulaire.phone} onChange={(e) => onChange({ ...formulaire, phone: e.target.value })} className={CHAMP} />
+        </div>
+        <div>
+          <label htmlFor={`${prefixe}-email`} className="block text-sm mb-1">
+            E-mail *
+          </label>
+          <input id={`${prefixe}-email`} required type="email" autoComplete="email" value={formulaire.email} onChange={(e) => onChange({ ...formulaire, email: e.target.value })} className={CHAMP} />
+        </div>
+        <div className="grid grid-cols-[1fr_110px] gap-3">
+          <div>
+            <label htmlFor={`${prefixe}-ville`} className="block text-sm mb-1">
+              Ville *
+            </label>
+            <input id={`${prefixe}-ville`} required autoComplete="address-level2" value={formulaire.ville} onChange={(e) => onChange({ ...formulaire, ville: e.target.value })} className={CHAMP} />
+          </div>
+          <div>
+            <label htmlFor={`${prefixe}-cp`} className="block text-sm mb-1">
+              Code postal *
+            </label>
+            <input id={`${prefixe}-cp`} required inputMode="numeric" pattern="[0-9]{5}" title="5 chiffres" autoComplete="postal-code" maxLength={5} value={formulaire.codePostal} onChange={(e) => onChange({ ...formulaire, codePostal: e.target.value.replace(/\D/g, "") })} className={CHAMP} />
+          </div>
+        </div>
+      </div>
+      <div>
+        <label htmlFor={`${prefixe}-message`} className="block text-sm mb-1">
+          Un mot sur votre projet (facultatif)
+        </label>
+        <textarea id={`${prefixe}-message`} rows={2} value={formulaire.message} onChange={(e) => onChange({ ...formulaire, message: e.target.value })} className={`${CHAMP} resize-none`} />
+      </div>
+      <CaseConsentement id={`consentement-${prefixe}`} checked={formulaire.consentement} onChange={(consentement) => onChange({ ...formulaire, consentement })} />
+    </>
+  );
+}
+
 export default function Simulateur() {
   const [charge, setCharge] = useState(false);
   const [etape, setEtape] = useState<Etape>(1);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
   const [zoneOuverte, setZoneOuverte] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [echecGeneration, setEchecGeneration] = useState<Echec | null>(null);
   const [occupe, setOccupe] = useState<"photo" | "generation" | "envoi" | null>(null);
   const [progression, setProgression] = useState<string>("");
   const [jetonCaptcha, setJetonCaptcha] = useState<string | null>(null);
-  const [formulaire, setFormulaire] = useState({ name: "", phone: "", email: "", ville: "", codePostal: "", message: "", consentement: false });
+  const [formulaire, setFormulaire] = useState<Formulaire>({ name: "", phone: "", email: "", ville: "", codePostal: "", message: "", consentement: false });
   const [envoye, setEnvoye] = useState<{ leadId: string | null; simulations: number } | null>(null);
   const fichierRef = useRef<HTMLInputElement>(null);
   const projet = useMemo(() => getProject(etat.projet), [etat.projet]);
@@ -136,6 +194,7 @@ export default function Simulateur() {
   const generer = async () => {
     if (!etat.photo || !peutGenerer) return;
     setErreur(null);
+    setEchecGeneration(null);
     setOccupe("generation");
     setProgression("Préparation…");
     const debut = Date.now();
@@ -143,31 +202,27 @@ export default function Simulateur() {
     const origine = lireOrigine();
     envoyerEvenement("SIMULATION_LANCEE", { projet: projet.id, zones: selectionsActives.length });
 
-    const charge: Record<string, unknown> = { project_type: projet.id, parcoursId, turnstileToken: jetonCaptcha };
-    for (const el of projet.elements) {
-      const sel = etat.selections[el.key];
-      charge[`${el.key}_ref`] = sel?.ref ?? "";
-      charge[`${el.key}_name`] = sel?.nom ?? "";
-      charge[`${el.key}_label`] = el.label;
-      charge[`${el.key}_famille`] = sel?.famille ?? "";
-      charge[`${el.key}_finition`] = sel?.finition ?? "";
-      charge[`${el.key}_categorie`] = sel?.categorie ?? "";
-      charge[`${el.key}_tags`] = sel?.tags ?? [];
-      charge[`${el.key}_image`] = sel?.image ?? "";
-    }
+    const charge: Record<string, unknown> = {
+      project_type: projet.id,
+      parcoursId,
+      turnstileToken: jetonCaptcha,
+      // La référence seule : le serveur relit nom, famille et échantillon dans le catalogue.
+      selections: selectionsActives.map(({ el, sel }) => ({ surface: el.key, ref: sel!.ref })),
+    };
 
     const echec = (message: string, raison: string) => {
-      setErreur(message);
+      setEchecGeneration({ message, raison });
       envoyerEvenement("SIMULATION_ECHEC", { etape: "generation", raison, duree_ms: Date.now() - debut });
     };
-    const reussite = (image: string, simulationSiteId: string | null) => {
+    const reussite = (image: string, simulationSiteId: string | null, avant: string | null = null) => {
       const refs = references();
-      const rendu: Rendu = { image, simulationSiteId, references: refs };
+      const rendu: Rendu = { image, avant, simulationSiteId, references: refs };
       mettreAJour({
         resultat: rendu,
         simulationSiteIds: simulationSiteId ? [...etat.simulationSiteIds, simulationSiteId] : etat.simulationSiteIds,
-        rendusLocaux: simulationSiteId ? etat.rendusLocaux : [...etat.rendusLocaux.slice(-2), { avant: etat.photo!, apres: image, references: refs }],
+        rendusLocaux: simulationSiteId ? etat.rendusLocaux : [...etat.rendusLocaux.slice(-2), { avant: avant ?? etat.photo!, apres: image, references: refs }],
       });
+      setEchecGeneration(null);
       setEtape(3);
       envoyerEvenement("SIMULATION_RESULTAT", { projet: projet.id, duree_ms: Date.now() - debut, garde: !!simulationSiteId });
     };
@@ -202,11 +257,16 @@ export default function Simulateur() {
         });
         const genData = await gen.json().catch(() => ({}));
         if (gen.ok && genData.image) {
-          reussite(genData.image, genData.simulationSiteId ?? null);
+          reussite(genData.image, genData.simulationSiteId ?? null, typeof genData.imageAvant === "string" ? genData.imageAvant : null);
           return;
         }
         if (gen.status === 429) {
           echec(genData.error || "Limite de simulations atteinte pour aujourd'hui.", genData.reason || "quota");
+          return;
+        }
+        // Panne de notre côté (crédit, clé) ou photo refusée : le repli utiliserait le même service, on le dit tout de suite.
+        if (genData.reason === "service-indisponible" || genData.reason === "photo-refusee") {
+          echec(genData.error, genData.reason);
           return;
         }
         console.warn("[simulateur] génération CRM échouée, repli synchrone :", gen.status, genData.reason);
@@ -215,12 +275,12 @@ export default function Simulateur() {
       const sync = await fetch("/api/simulation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...charge, photo_base64: etat.photo }) });
       const syncData = await sync.json().catch(() => ({}));
       if (sync.ok && syncData.image) {
-        reussite(syncData.image, null);
+        reussite(syncData.image, null, typeof syncData.imageAvant === "string" ? syncData.imageAvant : null);
         return;
       }
-      echec(syncData.error || "La génération n'a pas abouti. Votre photo est conservée : réessayez dans un instant.", syncData.reason || `sync-${sync.status}`);
+      echec(syncData.error || "La génération n'a pas abouti. Votre photo et vos choix sont conservés : réessayez, ou laissez-nous vos coordonnées et nous vous envoyons la simulation.", syncData.reason || `sync-${sync.status}`);
     } catch {
-      echec("Connexion interrompue pendant la génération. Votre photo et vos choix sont conservés : réessayez.", "reseau");
+      echec("Connexion interrompue pendant la génération. Votre photo et vos choix sont conservés : réessayez, ou laissez-nous vos coordonnées et nous vous envoyons la simulation.", "reseau");
     } finally {
       setOccupe(null);
       setProgression("");
@@ -232,7 +292,9 @@ export default function Simulateur() {
   /* ── Étape 3 : demande de devis ── */
   const envoyer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!etat.resultat) return;
+    if (!etat.resultat && !(echecGeneration && etat.photo)) return;
+    const sansRendu = !etat.resultat;
+    const refs = etat.resultat?.references ?? references();
     setErreur(null);
     setOccupe("envoi");
     try {
@@ -245,8 +307,10 @@ export default function Simulateur() {
           parcoursId: obtenirParcoursId(),
           simulationIds: etat.simulationSiteIds,
           rendusLocaux: etat.rendusLocaux,
-          referenceChoisie: etat.resultat.references[0]?.ref,
-          references: etat.resultat.references.map((r) => `${r.libelle} : ${r.ref} (${r.nom})`).join(" | "),
+          referenceChoisie: refs[0]?.ref,
+          references: refs.map((r) => `${r.libelle} : ${r.ref} (${r.nom})`).join(" | "),
+          // Sans rendu, la photo part avec la demande : la simulation sera faite à la main.
+          ...(sansRendu ? { photoAvant: etat.photo, simulationEchouee: echecGeneration?.raison ?? "inconnue" } : {}),
           turnstileToken: jetonCaptcha,
           ...acquisitionPourEnvoi(),
           formulaire: `simulateur · ${window.location.pathname}`,
@@ -255,14 +319,14 @@ export default function Simulateur() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setErreur(data.error || "Envoi impossible pour le moment. Vos rendus sont conservés : réessayez.");
+        setErreur(data.error || "Envoi impossible pour le moment. Votre photo et vos choix sont conservés : réessayez.");
         envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "simulateur", statut: res.status, raison: data.reason });
         return;
       }
       setEnvoye({ leadId: data.leadId ?? null, simulations: data.simulations ?? 0 });
-      envoyerEvenement("DEVIS_DEMANDE", { formulaire: "simulateur", projet: projet.id, simulations: etat.simulationSiteIds.length + etat.rendusLocaux.length });
+      envoyerEvenement("DEVIS_DEMANDE", { formulaire: "simulateur", projet: projet.id, simulations: etat.simulationSiteIds.length + etat.rendusLocaux.length, sans_rendu: sansRendu });
     } catch {
-      setErreur("Connexion interrompue. Vos rendus sont conservés : réessayez.");
+      setErreur("Connexion interrompue. Votre photo et vos choix sont conservés : réessayez.");
       envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "simulateur", raison: "reseau" });
     } finally {
       setOccupe(null);
@@ -276,6 +340,7 @@ export default function Simulateur() {
     setEtat({ ...ETAT_VIDE, projet: etat.projet });
     setEnvoye(null);
     setErreur(null);
+    setEchecGeneration(null);
     setEtape(1);
   };
 
@@ -355,6 +420,7 @@ export default function Simulateur() {
                 {projet.elements.map((el) => {
                   const sel = etat.selections[el.key] ?? null;
                   const ouverte = zoneOuverte === el.key;
+                  const plafond = !sel && selectionsActives.length >= SURFACES_MAX;
                   return (
                     <li key={el.key} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                       <div className="flex items-center justify-between gap-3">
@@ -366,7 +432,7 @@ export default function Simulateur() {
                           ) : null}
                           <div className="min-w-0">
                             <p className="font-display font-bold">{el.label}</p>
-                            <p className="text-xs text-gris-500 truncate">{sel ? `${sel.nom} · ${sel.ref}` : el.description}</p>
+                            <p className="text-xs text-gris-500 truncate">{sel ? `${sel.nom} · ${sel.ref}` : plafond ? `${SURFACES_MAX} surfaces au plus par rendu` : el.description}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -375,7 +441,7 @@ export default function Simulateur() {
                               Retirer
                             </button>
                           ) : null}
-                          <button type="button" aria-expanded={ouverte} onClick={() => setZoneOuverte(ouverte ? null : el.key)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${sel ? "bg-white/10 text-white" : "bg-rouge text-white"}`}>
+                          <button type="button" aria-expanded={ouverte} disabled={plafond} onClick={() => setZoneOuverte(ouverte ? null : el.key)} className={`rounded-full px-3 py-1.5 text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed ${sel ? "bg-white/10 text-white" : "bg-rouge text-white"}`}>
                             {sel ? "Modifier" : "Choisir"}
                           </button>
                         </div>
@@ -385,7 +451,10 @@ export default function Simulateur() {
                           <ChoixReference
                             choisie={sel ? { id: sel.ref, nom: sel.nom, famille: sel.famille, categorie: sel.categorie, finition: sel.finition, image: sel.image, tags: sel.tags } : null}
                             onChoisir={(r) => {
-                              mettreAJour({ selections: { ...etat.selections, [el.key]: versSelection(r) } });
+                              // « Façades (toutes) » et « Meubles hauts / bas » couvrent les mêmes meubles : le dernier choix l'emporte.
+                              const suivantes: Selections = { ...etat.selections, [el.key]: versSelection(r) };
+                              for (const autre of el.exclut) suivantes[autre] = null;
+                              mettreAJour({ selections: suivantes });
                               setZoneOuverte(null);
                             }}
                           />
@@ -406,6 +475,40 @@ export default function Simulateur() {
               <Turnstile action="simulateur" onToken={setJetonCaptcha} />
             </div>
           </div>
+
+          {/* La génération n'a pas abouti : on dit pourquoi, la photo reste, et la demande peut partir quand même. */}
+          {echecGeneration ? (
+            envoye ? (
+              <div role="status" className="rounded-2xl border border-green-500/40 bg-green-500/10 p-6">
+                <h3 className="font-display text-xl font-bold mb-2">Demande bien reçue</h3>
+                <p className="text-gris-300">
+                  Votre photo et vos choix de finitions nous sont parvenus. Nous réalisons la simulation et vous l&apos;envoyons par e-mail avec votre devis, {DELAI_REPONSE}. Besoin de nous joindre avant ? {ENTREPRISE.telephone}.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-amber-400/40 bg-amber-400/5 p-6 space-y-5">
+                <div role="alert">
+                  <h3 className="font-display text-xl font-bold mb-2">{PANNES.includes(echecGeneration.raison) ? "La simulation ne peut pas être générée maintenant" : "La simulation n'a pas abouti"}</h3>
+                  <p className="text-gris-200 text-sm leading-relaxed">{echecGeneration.message}</p>
+                </div>
+                {PANNES.includes(echecGeneration.raison) ? null : (
+                  <button type="button" onClick={() => void generer()} disabled={!peutGenerer} className="btn-secondary disabled:opacity-50">
+                    Réessayer avec la même photo
+                  </button>
+                )}
+                <form onSubmit={(e) => void envoyer(e)} className="space-y-4 border-t border-white/10 pt-5">
+                  <div>
+                    <h4 className="font-display text-lg font-bold">Recevoir ma simulation et un devis par e-mail</h4>
+                    <p className="text-sm text-gris-400">Nous faisons la simulation pour vous à partir de cette photo et de vos choix. Devis gratuit {DELAI_REPONSE}, sans engagement.</p>
+                  </div>
+                  <ChampsContact prefixe="echec" formulaire={formulaire} onChange={setFormulaire} />
+                  <button type="submit" disabled={occupe === "envoi"} className="btn-primary w-full disabled:opacity-50">
+                    {occupe === "envoi" ? "Envoi…" : "Envoyer ma photo et recevoir ma simulation"}
+                  </button>
+                </form>
+              </div>
+            )
+          ) : null}
         </section>
       ) : null}
 
@@ -415,7 +518,7 @@ export default function Simulateur() {
           <h2 id="etape-resultat" className="font-display text-2xl font-bold">
             Votre {projet.label.toLowerCase()}, avant / après
           </h2>
-          <BeforeAfterSlider beforeImage={etat.photo} afterImage={etat.resultat.image} beforeLabel="Avant" afterLabel="Après" />
+          <BeforeAfterSlider beforeImage={etat.resultat.avant ?? etat.photo} afterImage={etat.resultat.image} beforeLabel="Avant" afterLabel="Après" />
           <ul className="flex flex-wrap gap-2 text-xs text-gris-400">
             {etat.resultat.references.map((r) => (
               <li key={r.zone} className="rounded-full border border-white/10 px-3 py-1">
@@ -446,47 +549,7 @@ export default function Simulateur() {
                 <h3 className="font-display text-xl font-bold">Recevoir ce rendu et un devis</h3>
                 <p className="text-sm text-gris-400">Devis gratuit {DELAI_REPONSE}, sans engagement. Toutes vos simulations de la session sont jointes.</p>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="sim-nom" className="block text-sm mb-1">
-                    Nom complet *
-                  </label>
-                  <input id="sim-nom" required autoComplete="name" value={formulaire.name} onChange={(e) => setFormulaire({ ...formulaire, name: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50" />
-                </div>
-                <div>
-                  <label htmlFor="sim-tel" className="block text-sm mb-1">
-                    Téléphone *
-                  </label>
-                  <input id="sim-tel" required type="tel" inputMode="tel" autoComplete="tel" value={formulaire.phone} onChange={(e) => setFormulaire({ ...formulaire, phone: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50" />
-                </div>
-                <div>
-                  <label htmlFor="sim-email" className="block text-sm mb-1">
-                    E-mail *
-                  </label>
-                  <input id="sim-email" required type="email" autoComplete="email" value={formulaire.email} onChange={(e) => setFormulaire({ ...formulaire, email: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50" />
-                </div>
-                <div className="grid grid-cols-[1fr_110px] gap-3">
-                  <div>
-                    <label htmlFor="sim-ville" className="block text-sm mb-1">
-                      Ville *
-                    </label>
-                    <input id="sim-ville" required autoComplete="address-level2" value={formulaire.ville} onChange={(e) => setFormulaire({ ...formulaire, ville: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50" />
-                  </div>
-                  <div>
-                    <label htmlFor="sim-cp" className="block text-sm mb-1">
-                      Code postal *
-                    </label>
-                    <input id="sim-cp" required inputMode="numeric" pattern="[0-9]{5}" title="5 chiffres" autoComplete="postal-code" maxLength={5} value={formulaire.codePostal} onChange={(e) => setFormulaire({ ...formulaire, codePostal: e.target.value.replace(/\D/g, "") })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50" />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="sim-message" className="block text-sm mb-1">
-                  Un mot sur votre projet (facultatif)
-                </label>
-                <textarea id="sim-message" rows={2} value={formulaire.message} onChange={(e) => setFormulaire({ ...formulaire, message: e.target.value })} className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50 resize-none" />
-              </div>
-              <CaseConsentement id="consentement-simulateur" checked={formulaire.consentement} onChange={(consentement) => setFormulaire({ ...formulaire, consentement })} />
+              <ChampsContact prefixe="sim" formulaire={formulaire} onChange={setFormulaire} />
               <Turnstile action="simulateur-devis" onToken={setJetonCaptcha} />
               <button type="submit" disabled={occupe === "envoi"} className="btn-primary w-full disabled:opacity-50">
                 {occupe === "envoi" ? "Envoi…" : "Recevoir mon devis"}

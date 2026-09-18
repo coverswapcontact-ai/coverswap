@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { checkSimulationRateLimit } from "@/lib/rate-limit";
 import { getProject, type ProjectType } from "@/lib/simulateur/projets";
-import { buildImagePrompt, type ElementInfo } from "@/lib/simulation-prompt";
+import { buildImagePrompt } from "@/lib/simulation-prompt";
+import { lireSelections } from "@/lib/simulateur/selections";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 import { parcoursIdValide } from "@/lib/parcours";
 
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: Record<string, string>;
+  let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
@@ -65,37 +66,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
   }
 
-  // Zones et échantillons, dans l'ordre
-  const elements: Record<string, ElementInfo | null> = { zone1: null, zone2: null, zone3: null };
-  const swatchUrls: string[] = [];
-  const imageIndexMap: Record<string, number | null> = { zone1: null, zone2: null, zone3: null };
-  for (const zoneKey of ["zone1", "zone2", "zone3"]) {
-    const ref = body[`${zoneKey}_ref`];
-    const imageUrl = body[`${zoneKey}_image`];
-    if (!ref) continue;
-    elements[zoneKey] = {
-      ref,
-      name: body[`${zoneKey}_name`] || "",
-      famille: body[`${zoneKey}_famille`] || "",
-      finition: body[`${zoneKey}_finition`],
-      categorie: body[`${zoneKey}_categorie`],
-      tags: body[`${zoneKey}_tags`] as unknown as string[] | undefined,
-      imageUrl,
-    };
-    if (imageUrl) {
-      imageIndexMap[zoneKey] = swatchUrls.length;
-      swatchUrls.push(imageUrl);
-    }
-  }
-  if (swatchUrls.length === 0) return NextResponse.json({ error: "Choisissez au moins une surface et sa finition.", reason: "aucune-zone" }, { status: 400 });
-
-  const project: ProjectType = getProject(body.project_type || "cuisine");
-  const zoneLabels: Record<string, string> = {
-    zone1: body.zone1_label || "Zone 1",
-    zone2: body.zone2_label || "Zone 2",
-    zone3: body.zone3_label || "Zone 3",
-  };
-  const prompt = buildImagePrompt({ project, zoneLabels, elements, imageIndexMap, swatchCount: swatchUrls.length });
+  // Surfaces choisies : la référence est relue dans le catalogue du site, rien du navigateur n'entre dans la consigne
+  const project: ProjectType = getProject(typeof body.project_type === "string" ? body.project_type : "cuisine");
+  const lecture = lireSelections(body, project);
+  if (!lecture.ok) return NextResponse.json({ error: lecture.erreur, reason: lecture.raison }, { status: 400 });
+  const { choix, swatchUrls } = lecture;
+  const prompt = buildImagePrompt({ project, choix });
 
   // Signature : prompt, échantillons, expiration et parcours — le CRM la vérifie
   // avant de générer et rattache la simulation à ce parcours, pas à un autre.
