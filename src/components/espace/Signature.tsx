@@ -53,7 +53,7 @@ export function Signature({ ref, onChange }: { ref?: Ref<SignatureRef>; onChange
         <canvas
           ref={toile}
           className="block h-40 w-full touch-none rounded-2xl"
-          aria-label="Zone de signature : signez avec le doigt"
+          aria-label="Zone de signature&nbsp;: signez avec le doigt"
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
             dessin.current = { actif: true, points: [point(e)] };

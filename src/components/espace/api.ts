@@ -106,7 +106,7 @@ export function creerClient(racine: string, apercu: string | null, surReseau: (e
       reponse = await fetch(url(chemin), { ...init, cache: "no-store", referrerPolicy: "no-referrer" });
     } catch {
       surReseau(false);
-      throw new ErreurEspace("Pas de réseau pour l'instant. Rien n'est perdu : réessayez dans un moment.", 0);
+      throw new ErreurEspace("Pas de réseau pour l'instant. Rien n'est perdu\u00a0: réessayez dans un moment.", 0);
     }
     surReseau(true);
     const corps = (await reponse.json().catch(() => ({}))) as { error?: string; raison?: string };
@@ -141,7 +141,7 @@ export function envoyerPhoto(client: Client, fichier: Blob, nom: string, progres
       if (requete.status >= 200 && requete.status < 300) resoudre(corps);
       else rejeter(new ErreurEspace(corps.error ?? "Photo refusée.", requete.status));
     };
-    const coupure = () => rejeter(new ErreurEspace("Réseau coupé : la photo repartira toute seule.", 0));
+    const coupure = () => rejeter(new ErreurEspace("Réseau coupé\u00a0: la photo repartira toute seule.", 0));
     requete.onerror = coupure;
     requete.ontimeout = coupure;
     const formulaire = new FormData();

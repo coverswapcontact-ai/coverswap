@@ -20,8 +20,8 @@ export function EtapeAcompte({ etat, onRetour, client }: { etat: Etat; client: C
   return (
     <div className="space-y-5">
       <EnteteEtape
-        titre={etat.devis?.accepte ? `Merci${etat.prenom ? ` ${etat.prenom}` : ""}, c'est signé !` : "L'acompte et la suite"}
-        phrase={acompte && !acompte.complet ? "Il ne reste qu'une chose à faire : l'acompte, qui réserve votre date." : "Tout est en ordre de votre côté. Voici la suite."}
+        titre={etat.devis?.accepte ? `Merci${etat.prenom ? ` ${etat.prenom}` : ""}, c'est signé\u00a0!` : "L'acompte et la suite"}
+        phrase={acompte && !acompte.complet ? "Il ne reste qu'une chose à faire\u00a0: l'acompte, qui réserve votre date." : "Tout est en ordre de votre côté. Voici la suite."}
         onRetour={onRetour}
       />
 
@@ -36,7 +36,7 @@ export function EtapeAcompte({ etat, onRetour, client }: { etat: Etat; client: C
               <Surtitre ton="rouge">Acompte à régler</Surtitre>
               <p className="mt-1 font-display text-[36px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{euros(acompte.montant - acompte.recu)}</p>
               <p className="mt-1.5 text-[15px] text-[#4F4A44]">
-                {etat.devis?.acomptePct ? `${etat.devis.acomptePct} % du devis, ` : ""}par virement, quand vous voulez. Le solde se règle à la fin du chantier.
+                {etat.devis?.acomptePct ? `${etat.devis.acomptePct}\u00a0% du devis, ` : ""}par virement, quand vous voulez. Le solde se règle à la fin du chantier.
               </p>
             </div>
             {etat.virement ? (
@@ -78,8 +78,8 @@ export function EtapeAcompte({ etat, onRetour, client }: { etat: Etat; client: C
                   onClick={() =>
                     void client
                       .envoyerJson<{ url?: string }>("/paiement-carte", "POST", {})
-                      .then((r) => (r.url ? window.location.assign(r.url) : setCarte("Le paiement par carte arrive bientôt : utilisez le virement pour l'instant.")))
-                      .catch(() => setCarte("Le paiement par carte n'est pas encore ouvert : utilisez le virement pour l'instant."))
+                      .then((r) => (r.url ? window.location.assign(r.url) : setCarte("Le paiement par carte arrive bientôt\u00a0: utilisez le virement pour l'instant.")))
+                      .catch(() => setCarte("Le paiement par carte n'est pas encore ouvert\u00a0: utilisez le virement pour l'instant."))
                   }
                 >
                   Payer l&apos;acompte par carte
@@ -92,12 +92,12 @@ export function EtapeAcompte({ etat, onRetour, client }: { etat: Etat; client: C
       ) : null}
 
       <Carte>
-        <Surtitre>Et ensuite ?</Surtitre>
+        <Surtitre>Et ensuite&nbsp;?</Surtitre>
         <ol className="mt-3 space-y-4">
           {[
-            { titre: date ? `Rendez-vous le ${dateLongue(date)}` : "Je vous appelle pour fixer la date", texte: date ? "C'est noté de mon côté. Une question d'ici là : appelez-moi." : "Dans les jours qui viennent, pour choisir ensemble un jour qui vous arrange.", fait: Boolean(date) },
-            { titre: "Avant mon passage", texte: "Videz les meubles que l'on recouvre et dégagez le plan de travail. Pas besoin de démonter quoi que ce soit : je m'en occupe.", fait: false },
-            { titre: "Le jour J", texte: "Une cuisine se pose en général en une journée ; je vous confirme la durée en fixant la date. Pas de séchage, pas de gravats : la pièce est utilisable le soir même.", fait: false },
+            { titre: date ? `Rendez-vous le ${dateLongue(date)}` : "Je vous appelle pour fixer la date", texte: date ? "C'est noté de mon côté. Une question d'ici là\u00a0: appelez-moi." : "Dans les jours qui viennent, pour choisir ensemble un jour qui vous arrange.", fait: Boolean(date) },
+            { titre: "Avant mon passage", texte: "Videz les meubles que l'on recouvre et dégagez le plan de travail. Pas besoin de démonter quoi que ce soit\u00a0: je m'en occupe.", fait: false },
+            { titre: "Le jour J", texte: "Une cuisine se pose en général en une journée\u00a0; je vous confirme la durée en fixant la date. Pas de séchage, pas de gravats\u00a0: la pièce est utilisable le soir même.", fait: false },
             { titre: "Après", texte: "Un nettoyage courant suffit à l'entretien. Le solde se règle à la fin du chantier.", fait: false },
           ].map((etape, i) => (
             <li key={etape.titre} className="flex gap-3">
@@ -118,7 +118,8 @@ export function EtapeAcompte({ etat, onRetour, client }: { etat: Etat; client: C
 export function ApresChantier({ etat, client, onEtat, onRetour }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onRetour: () => void }) {
   const [note, setNote] = useState(0);
   const [texte, setTexte] = useState("");
-  const [publication, setPublication] = useState(true);
+  // Publier un avis demande un accord donné, pas une case cochée d'avance.
+  const [publication, setPublication] = useState(false);
   const [occupe, setOccupe] = useState(false);
   const [probleme, setProbleme] = useState<string | null>(null);
   const avis = etat.apres?.avis ?? null;
@@ -153,7 +154,7 @@ export function ApresChantier({ etat, client, onEtat, onRetour }: { etat: Etat; 
       <Carte className="space-y-4">
         <Surtitre>Votre avis compte</Surtitre>
         {avis ? (
-          <Annonce ton="succes">Merci pour votre avis ({avis.note}/5) !</Annonce>
+          <Annonce ton="succes">Merci pour votre avis ({avis.note}/5)&nbsp;!</Annonce>
         ) : (
           <>
             <div className="flex justify-between" role="radiogroup" aria-label="Votre note">

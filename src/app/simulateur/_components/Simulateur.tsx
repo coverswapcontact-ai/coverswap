@@ -388,7 +388,7 @@ export default function Simulateur() {
             <label className="flex flex-col items-center justify-center gap-2 w-full min-h-44 rounded-2xl border-2 border-dashed border-white/15 hover:border-rouge/50 bg-white/[0.02] cursor-pointer p-6 text-center transition-colors">
               <span className="font-display font-bold text-lg">{occupe === "photo" ? "Préparation de la photo…" : "Prendre ou choisir une photo"}</span>
               <span className="text-xs text-gris-500">JPEG, PNG, HEIC — réduite automatiquement avant l&apos;envoi</span>
-              <input ref={fichierRef} type="file" accept="image/*,.heic,.heif" capture="environment" className="sr-only" disabled={occupe === "photo"} onChange={(e) => void choisirPhoto(e.target.files?.[0])} />
+              <input ref={fichierRef} type="file" accept="image/*" capture="environment" className="sr-only" disabled={occupe === "photo"} onChange={(e) => void choisirPhoto(e.target.files?.[0])} />
             </label>
             {etat.photo ? (
               <button type="button" onClick={() => setEtape(2)} className="btn-secondary mt-4 w-full sm:w-auto">

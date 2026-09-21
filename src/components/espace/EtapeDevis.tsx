@@ -66,7 +66,9 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
   }
 
   const champ = "min-h-[54px] w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 text-[17px] text-[#1A1A1A] placeholder:text-[#8A857E] focus:border-[#1A1A1A] focus:outline-none";
-  const coordonneesOk = !aCompleter || (coord.adresse.trim().length >= 3 && /^\d{5}$/.test(coord.codePostal) && coord.ville.trim() && /.+@.+\..+/.test(coord.email.trim()));
+  // L'e-mail est demandé, jamais exigé : sans lui, le devis signé reste ici. S'il est écrit, il doit être lisible.
+  const emailOk = !coord.email.trim() || /.+@.+\..+/.test(coord.email.trim());
+  const coordonneesOk = !aCompleter || (coord.adresse.trim().length >= 3 && /^\d{5}$/.test(coord.codePostal) && coord.ville.trim() && emailOk);
   const pret = accepte && nom.trim().length >= 2 && coordonneesOk && !apercu;
   // Ce qui manque encore, dit en clair sous le bouton : un bouton grisé sans explication bloque.
   const manques = [
@@ -74,14 +76,14 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
     aCompleter && coord.adresse.trim().length < 3 ? "indiquer le numéro et la rue du chantier" : null,
     aCompleter && !/^\d{5}$/.test(coord.codePostal) ? "indiquer le code postal" : null,
     aCompleter && !coord.ville.trim() ? "indiquer la ville" : null,
-    aCompleter && !/.+@.+\..+/.test(coord.email.trim()) ? "indiquer votre e-mail" : null,
-    !accepte ? "cocher la case « J'accepte »" : null,
+    aCompleter && !emailOk ? "corriger votre e-mail (ou le laisser vide)" : null,
+    !accepte ? "cocher la case «\u00a0J'accepte\u00a0»" : null,
   ].filter((m): m is string => m !== null);
   const resteAFaire = manques.length > 1 ? `${manques.slice(0, -1).join(", ")} et ${manques[manques.length - 1]}` : manques[0];
 
   return (
     <div className="space-y-5">
-      <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci !` : "Tout est là, lisible ici. Prenez votre temps : une question, appelez-moi."} onRetour={onRetour} />
+      <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-moi."} onRetour={onRetour} />
 
       <Carte className="space-y-4">
         <div>
@@ -122,7 +124,7 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
             <div className="rounded-2xl bg-[#F6F5F2] p-3">
               <span className="block text-[13.5px] text-[#5F5A53]">À la commande</span>
               <span className="block font-display text-[20px] font-semibold text-[#1A1A1A] tabular-nums">{euros(devis.acompte)}</span>
-              <span className="block text-[13px] text-[#5F5A53]">acompte {devis.acomptePct ? `de ${devis.acomptePct} %` : ""}</span>
+              <span className="block text-[13px] text-[#5F5A53]">acompte {devis.acomptePct ? `de ${devis.acomptePct}\u00a0%` : ""}</span>
             </div>
             <div className="rounded-2xl bg-[#F6F5F2] p-3">
               <span className="block text-[13.5px] text-[#5F5A53]">À la fin du chantier</span>
@@ -148,7 +150,7 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
         <Carte className="border-[#1F7A4D] bg-[#F3FAF6]">
           <Surtitre ton="vert">Bon pour accord donné</Surtitre>
           <p className="mt-1.5 text-[16px] leading-relaxed text-[#17563A]">
-            Par {devis.accepte.nom}, le {dateLongue(devis.accepte.le)}. {etat.acompte && !etat.acompte.complet ? "Dernière étape : l'acompte." : ""}
+            Par {devis.accepte.nom}, le {dateLongue(devis.accepte.le)}. {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte." : ""}
           </p>
           <BoutonPrincipal className="mt-3" onClick={onSuite}>
             {etat.acompte && !etat.acompte.complet ? "Régler l'acompte" : "La suite"}
@@ -192,7 +194,8 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
                 <input className={champ} placeholder="Code postal" inputMode="numeric" autoComplete="postal-code" maxLength={5} value={coord.codePostal} onChange={(e) => setCoord({ ...coord, codePostal: e.target.value.replace(/\D/g, "") })} aria-label="Code postal" />
                 <input className={champ} placeholder="Ville" autoComplete="address-level2" value={coord.ville} onChange={(e) => setCoord({ ...coord, ville: e.target.value })} aria-label="Ville" />
               </div>
-              <input className={champ} type="email" inputMode="email" placeholder="E-mail (pour recevoir le devis signé)" autoComplete="email" value={coord.email} onChange={(e) => setCoord({ ...coord, email: e.target.value })} aria-label="E-mail" />
+              <input className={champ} type="email" inputMode="email" placeholder="E-mail (facultatif)" autoComplete="email" value={coord.email} onChange={(e) => setCoord({ ...coord, email: e.target.value })} aria-label="E-mail, facultatif&nbsp;: pour recevoir une copie du devis signé" />
+              <p className="-mt-1 px-1 text-[14px] leading-snug text-[#5F5A53]">Pour recevoir une copie du devis signé. Sans e-mail, il reste ici, dans votre espace.</p>
             </fieldset>
           ) : (
             <label className="block">

@@ -58,12 +58,13 @@ export function Surtitre({ children, ton = "gris" }: { children: ReactNode; ton?
 }
 
 /** En-tête d'une étape : retour à l'accueil, titre, une phrase. */
-export function EnteteEtape({ titre, phrase, onRetour }: { titre: string; phrase?: ReactNode; onRetour: () => void }) {
+export function EnteteEtape({ titre, phrase, onRetour, avant }: { titre: string; phrase?: ReactNode; onRetour: () => void; avant?: ReactNode }) {
   return (
     <div className="pt-1">
       <button type="button" onClick={onRetour} className={cx("-ml-2 flex min-h-[44px] items-center gap-1 rounded-xl px-2 text-[16px] font-medium text-[#1A1A1A] active:bg-[#ECEAE5]", FOCUS)}>
         <IconeRetour /> Mon projet
       </button>
+      {avant ? <div className="mt-3">{avant}</div> : null}
       <h1 className="mt-3 font-display text-[29px] leading-[1.12] font-semibold tracking-tight text-balance text-[#1A1A1A]">{titre}</h1>
       {phrase ? <p className="mt-2.5 text-[17px] leading-relaxed text-[#4F4A44]">{phrase}</p> : null}
     </div>

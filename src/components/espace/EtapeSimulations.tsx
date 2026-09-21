@@ -82,7 +82,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
       <div className="space-y-5">
         <EnteteEtape titre="Vos simulations" phrase={`Je prépare vos simulations, sur votre propre photo. Vous les trouverez ici ${etat.simulationsEnPreparation?.delai ?? "sous 24 h"}, et je vous préviens par SMS.`} onRetour={onRetour} />
         <Carte>
-          <p className="text-[16px] leading-relaxed text-[#3F3B36]">En attendant, vous pouvez ajouter des photos ou préciser vos goûts : plus j&apos;en sais, plus la première proposition sera juste.</p>
+          <p className="text-[16px] leading-relaxed text-[#3F3B36]">En attendant, vous pouvez ajouter des photos ou préciser vos goûts&nbsp;: plus j&apos;en sais, plus la première proposition sera juste.</p>
         </Carte>
       </div>
     );
@@ -91,7 +91,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
   const choixUne = etat.choix?.mode === "UNE" ? etat.choix.simulationId : null;
   const resumeChoix =
     etat.choix?.mode === "COMPOSITE"
-      ? etat.choix.zones.map((z) => `${z.libelle || z.zone} : ${z.nom || z.ref}`).join(" · ")
+      ? etat.choix.zones.map((z) => `${z.libelle || z.zone}\u00a0: ${z.nom || z.ref}`).join(" · ")
       : choixUne
         ? nomDe(sims.find((s) => s.id === choixUne) ?? sims[0], rangs.get(choixUne) ?? 0)
         : null;
@@ -105,7 +105,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
             ? "Vous avez fait votre choix. Vous pouvez encore changer d'avis."
             : sims.length > 1
               ? "Glissez sur l'image pour voir avant et après. Choisissez celle qui vous plaît — ou composez votre mélange."
-              : "Glissez sur l'image pour voir avant et après. Elle vous plaît ? Dites-le moi en un geste. Sinon, je vous fais une autre proposition."
+              : "Glissez sur l'image pour voir avant et après. Elle vous plaît\u00a0? Dites-le-moi en un geste. Sinon, je vous fais une autre proposition."
         }
         onRetour={onRetour}
       />
@@ -114,7 +114,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
         <Carte className="border-[#1A1A1A]">
           <Surtitre ton="vert">Votre choix</Surtitre>
           <p className="mt-1.5 text-[17px] font-semibold text-[#1A1A1A]">{resumeChoix}</p>
-          <p className="mt-1 text-[15px] text-[#4F4A44]">Je prépare votre devis sur cette base.</p>
+          <p className="mt-1 text-[15px] text-[#4F4A44]">{etat.devis ? "Votre devis est prêt, sur cette base." : "Je prépare votre devis sur cette base\u00a0: il arrive ici même, très vite."}</p>
           {etat.devis ? (
             <BoutonPrincipal className="mt-3" onClick={onSuite}>
               Voir mon devis
@@ -185,7 +185,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
                   <BoutonPrincipal
                     disabled={occupe !== null || choisie}
                     className={choisie ? "!bg-[#1F7A4D] !text-white" : undefined}
-                    onClick={() => void envoyer("/choix", { simulationId: s.id }, "C'est noté, merci ! Je prépare votre devis sur cette base.", `choix-${s.id}`)}
+                    onClick={() => void envoyer("/choix", { simulationId: s.id }, "C'est noté, merci\u00a0!", `choix-${s.id}`)}
                   >
                     {occupe === `choix-${s.id}` ? "Un instant…" : choisie ? "✓ Mon choix" : "Je choisis celle-ci"}
                   </BoutonPrincipal>
@@ -199,7 +199,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
       {composable ? (
         <Carte>
           <Surtitre>Composer mon mélange</Surtitre>
-          <p className="mt-1 text-[15px] leading-relaxed text-[#4F4A44]">Une teinte vous plaît sur une proposition, une autre ailleurs ? Choisissez zone par zone.</p>
+          <p className="mt-1 text-[15px] leading-relaxed text-[#4F4A44]">Une teinte vous plaît sur une proposition, une autre ailleurs&nbsp;? Choisissez zone par zone.</p>
           {composer ? (
             <div className="mt-3 space-y-4">
               {[...options.entries()].map(([cle, liste]) => (
@@ -234,7 +234,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
               ))}
               <BoutonPrincipal
                 disabled={occupe !== null}
-                onClick={() => void envoyer("/choix", { zones: Object.entries(composition).map(([zone, simulationId]) => ({ zone, simulationId })) }, "C'est noté, merci ! Je prépare votre devis avec ce mélange.", "composition")}
+                onClick={() => void envoyer("/choix", { zones: Object.entries(composition).map(([zone, simulationId]) => ({ zone, simulationId })) }, "C'est noté, merci\u00a0! Votre mélange est enregistré.", "composition")}
               >
                 {occupe === "composition" ? "Un instant…" : "Valider mon mélange"}
               </BoutonPrincipal>
@@ -248,7 +248,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
       ) : null}
 
       <Carte>
-        <Surtitre>Rien ne vous convient tout à fait ?</Surtitre>
+        <Surtitre>Rien ne vous convient tout à fait&nbsp;?</Surtitre>
         {demande === null ? (
           <BoutonSecondaire className="mt-3" onClick={() => setDemande("")} disabled={apercu}>
             Demander une autre proposition
@@ -259,7 +259,7 @@ export function EtapeSimulations({ etat, client, onEtat, onRetour, onSuite }: { 
               Dites-moi ce que vous aimeriez (plus clair, un bois plus chaud, garder les portes blanches…)
             </label>
             <textarea id="autre" rows={3} maxLength={1000} value={demande} onChange={(e) => setDemande(e.target.value)} className="w-full rounded-2xl border border-[#D3CFC8] px-4 py-3 text-[17px] focus:border-[#1A1A1A] focus:outline-none" />
-            <BoutonPrincipal disabled={occupe !== null} onClick={() => void envoyer("/proposition", { commentaire: demande }, "Message bien reçu : je vous prépare une autre proposition.", "proposition").then(() => setDemande(null))}>
+            <BoutonPrincipal disabled={occupe !== null} onClick={() => void envoyer("/proposition", { commentaire: demande }, "Message bien reçu\u00a0: je vous prépare une autre proposition.", "proposition").then(() => setDemande(null))}>
               {occupe === "proposition" ? "Envoi…" : "Envoyer ma demande"}
             </BoutonPrincipal>
           </div>

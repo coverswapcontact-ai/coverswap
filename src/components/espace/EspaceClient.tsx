@@ -116,25 +116,32 @@ export default function EspaceClient({ jeton, baseApi, apercu }: { jeton: string
   return (
     <div className="min-h-[100dvh] bg-[#F5F4F1] pb-[calc(6rem+env(safe-area-inset-bottom))] text-[#1A1A1A] [color-scheme:light]">
       {client.apercu ? (
-        <p className="sticky top-0 z-30 bg-[#FFF1C7] px-4 py-2.5 text-center text-[14px] font-medium text-[#5C4200]">Aperçu : l&apos;espace tel que votre client le voit. Rien n&apos;est enregistré, vos visites ne comptent pas.</p>
+        <p className="sticky top-0 z-30 bg-[#FFF1C7] px-4 py-2.5 text-center text-[14px] font-medium text-[#5C4200]">Aperçu&nbsp;: l&apos;espace tel que votre client le voit. Rien n&apos;est enregistré, vos visites ne comptent pas.</p>
       ) : null}
-      {!enLigne ? <p className="sticky top-0 z-30 bg-[#1A1A1A] px-4 py-2.5 text-center text-[14px] text-white">Pas de réseau : vous voyez la dernière version. Rien n&apos;est perdu.</p> : null}
-      <header className="mx-auto flex max-w-xl items-center justify-between px-5 pt-[calc(1rem+env(safe-area-inset-top))] pb-2">
+      {!enLigne ? <p className="sticky top-0 z-30 bg-[#1A1A1A] px-4 py-2.5 text-center text-[14px] text-white">Pas de réseau&nbsp;: vous voyez la dernière version. Rien n&apos;est perdu.</p> : null}
+      <header className="mx-auto flex max-w-xl items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))] pb-1">
         <Logo />
         <span className="text-[13px] font-medium text-[#6B665F]">Votre espace privé</span>
       </header>
-      <main className="mx-auto max-w-xl px-4 pt-2">{contenu}</main>
+      <main className="mx-auto max-w-xl px-4 pt-1.5">{contenu}</main>
       <footer className="mx-auto max-w-xl px-6 pt-8 pb-2 text-center text-[13px] leading-relaxed text-[#6B665F]">
-        Cet espace vous est réservé : ne partagez pas son adresse. Vos photos servent uniquement à préparer votre projet.
+        {/* Ce que deviennent ses photos se dit sur la page des photos, là où il les envoie. */}
+        Cet espace vous est réservé&nbsp;: ne partagez pas son adresse.
         <br />
         Lien valable jusqu&apos;au {new Date(etat.expireLe).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}.
       </footer>
-      <div className="fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#F5F4F1] via-[#F5F4F1]/95 to-transparent px-4 pt-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+      {/* Toujours à l'écran, mais en retrait : le seul bouton rouge reste celui de l'action du moment. */}
+      <div className="fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#F5F4F1] via-[#F5F4F1]/90 to-transparent px-4 pt-3 pb-[calc(0.625rem+env(safe-area-inset-bottom))]">
         <a
           href={`tel:${etat.contact.telephoneLien}`}
-          className="mx-auto flex h-14 max-w-xl items-center justify-center gap-2.5 rounded-2xl bg-[#1A1A1A] text-[16.5px] font-semibold text-white shadow-[0_6px_20px_rgba(26,26,26,0.25)] active:bg-black focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#CC0000]"
+          className="mx-auto flex h-[52px] max-w-xl items-center justify-center gap-2.5 rounded-2xl border border-[#D3CFC8] bg-white text-[16px] font-semibold text-[#1A1A1A] shadow-[0_4px_18px_rgba(26,26,26,0.12)] active:bg-[#F2F0EC] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
         >
-          <IconeTelephone /> Appeler {etat.contact.prenom} · {etat.contact.telephone}
+          <span className="text-[#CC0000]">
+            <IconeTelephone />
+          </span>
+          <span>
+            Appeler {etat.contact.prenom} · <span className="tabular-nums">{etat.contact.telephone}</span>
+          </span>
         </a>
       </div>
     </div>
@@ -164,42 +171,58 @@ function Accueil({ etat, client, aller }: { etat: Etat; client: Client; aller: (
     { vue: "acompte", titre: "Acompte et suite", etat: !etat.devis?.accepte || !etat.acompte ? "Après votre accord" : etat.acompte.complet ? "Reçu" : `À régler · ${euros(etat.acompte.montant - etat.acompte.recu)}`, ouvert: Boolean(etat.devis?.accepte), fait: Boolean(etat.acompte?.complet) },
   ];
 
+  const essaiEnTete = etat.etape === "PROJET" ? essaiSite : null;
+  // Avant la signature, la phrase qui rassure se lit au pied du bouton : là où l'on hésite.
+  const avantSignature = !etat.devis?.accepte && ["PHOTOS", "PROJET", "SIMULATIONS", "ATTENTE_SIMULATION", "ATTENTE_DEVIS", "DEVIS"].includes(etat.etape);
+
+  // Tout le haut tient dans l'écran d'un iPhone, barres de Safari comprises (≈ 390 × 660, 375 × 560
+  // pour un SE) : bonjour, qui je suis en une ligne, le chemin en cinq étapes, puis l'action et son bouton.
   return (
-    <div className="space-y-5">
-      <div className="px-1 pt-2">
-        <h1 className="font-display text-[31px] leading-[1.1] font-semibold tracking-tight text-[#1A1A1A]">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</h1>
-        <p className="mt-1.5 text-[18px] leading-snug text-[#4F4A44]">voici {projet.projet}.</p>
+    <div className="space-y-4 [@media(max-height:620px)]:space-y-3">
+      <div className="px-1 pt-1">
+        <h1 className="font-display text-[28px] leading-[1.1] font-semibold tracking-tight text-[#1A1A1A] [@media(max-height:620px)]:text-[25px]">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</h1>
+        <p className="mt-1 text-[17px] leading-snug text-[#4F4A44]">voici {projet.projet}.</p>
       </div>
 
-      <div className="flex items-center gap-3.5 px-1">
+      <div className="flex items-center gap-3 px-1">
         {etat.contact.portrait ? (
           // eslint-disable-next-line @next/next/no-img-element -- photo servie par le CRM
-          <img src={client.url("/portrait")} alt={etat.contact.nom} className="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-white" referrerPolicy="no-referrer" />
+          <img src={client.url("/portrait")} alt={etat.contact.nom} className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white" referrerPolicy="no-referrer" />
         ) : (
-          <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#1A1A1A] font-display text-[22px] font-semibold text-white" aria-hidden>
-            L<span className="absolute -right-0.5 -bottom-0.5 h-4 w-4 rotate-45 rounded-[3px] border-2 border-[#F5F4F1] bg-[#CC0000]" />
+          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#1A1A1A] font-display text-[18px] font-semibold text-white" aria-hidden>
+            L<span className="absolute -right-0.5 -bottom-0.5 h-3.5 w-3.5 rotate-45 rounded-[3px] border-2 border-[#F5F4F1] bg-[#CC0000]" />
           </span>
         )}
-        <p className="text-[15px] leading-snug text-[#4F4A44]">
-          <span className="block text-[16.5px] font-semibold text-[#1A1A1A]">{etat.contact.nom}</span>
-          {etat.contact.role}. Je vous accompagne de la photo au chantier, sans engagement tant que vous n&apos;avez pas signé.
+        <p className="min-w-0 text-[14.5px] leading-snug text-[#4F4A44]">
+          <span className="block text-[16px] font-semibold text-[#1A1A1A]">{etat.contact.nom}</span>
+          {etat.contact.role}
         </p>
       </div>
 
       <Progression etat={etat} />
 
-      <Carte className="space-y-4 border-[#1A1A1A]/10 p-5 shadow-[0_8px_30px_rgba(26,26,26,0.08)]">
+      <Carte className="space-y-3.5 border-[#1A1A1A]/10 p-5 shadow-[0_8px_30px_rgba(26,26,26,0.08)] [@media(max-height:620px)]:space-y-3 [@media(max-height:620px)]:p-4">
         <div className="flex items-center gap-2">
           <span aria-hidden className="h-2.5 w-2.5 rotate-45 bg-[#CC0000]" />
           <Surtitre ton="rouge">{action.surtitre}</Surtitre>
         </div>
-        <h2 className="font-display text-[25px] leading-[1.15] font-semibold tracking-tight text-balance text-[#1A1A1A]">{action.titre}</h2>
-        {etat.etape === "PROJET" && essaiSite ? (
-          <AvantApres apres={client.url(`/simulations/${essaiSite.id}`)} avant={essaiSite.avant ? client.url(`/simulations/${essaiSite.id}/avant`) : null} alt="Votre essai sur le site" />
+        <h2 className="font-display text-[23px] leading-[1.15] font-semibold tracking-tight text-balance text-[#1A1A1A] [@media(max-height:620px)]:text-[21px]">{action.titre}</h2>
+        {/* Son essai du site : l'image d'abord, le bouton juste dessous, l'explication ensuite (tout tient dans l'écran). */}
+        {essaiEnTete ? (
+          <AvantApres apres={client.url(`/simulations/${essaiEnTete.id}`)} avant={essaiEnTete.avant ? client.url(`/simulations/${essaiEnTete.id}/avant`) : null} alt="Votre essai sur le site" className="aspect-[2/1] [@media(max-height:620px)]:aspect-[5/2] [&>img:first-child]:h-full [&>img:first-child]:object-cover" />
         ) : null}
-        {etat.etape === "DEVIS" && etat.devis ? <p className="font-display text-[34px] leading-none font-semibold tabular-nums">{euros(etat.devis.total)}</p> : null}
-        <p className="text-[17px] leading-relaxed text-[#3F3B36]">{action.texte}</p>
+        {etat.etape === "DEVIS" && etat.devis ? <p className="font-display text-[32px] leading-none font-semibold tabular-nums">{euros(etat.devis.total)}</p> : null}
+        {essaiEnTete ? null : <p className="text-[16.5px] leading-relaxed text-[#3F3B36]">{action.texte}</p>}
         {action.vue ? <BoutonPrincipal onClick={() => aller(action.vue!)}>{action.bouton}</BoutonPrincipal> : null}
+        {essaiEnTete ? <p className="text-[15.5px] leading-relaxed text-[#3F3B36]">{action.texte}</p> : null}
+        {avantSignature ? (
+          <p className="flex items-center justify-center gap-1.5 text-center text-[14px] text-[#5F5A53]">
+            <span className="text-[#1F7A4D]">
+              <IconeCoche />
+            </span>
+            Aucun engagement avant votre signature
+          </p>
+        ) : null}
         {action.secondaires.length > 0 ? (
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             {action.secondaires.map((s) => (
@@ -242,7 +265,7 @@ function Progression({ etat }: { etat: Etat }) {
           <span className={cx("block h-1.5 rounded-full", e.fait ? "bg-[#1A1A1A]" : e.courante ? "bg-[#CC0000]" : "bg-[#DDD9D2]")} />
           <span className={cx("mt-1.5 block text-[12px] leading-tight tracking-[-0.01em]", e.courante ? "font-semibold text-[#B00000]" : e.fait ? "font-medium text-[#1A1A1A]" : "text-[#6B665F]")}>
             {e.libelle}
-            <span className="sr-only">{e.fait ? " : fait" : e.courante ? " : en cours" : " : à venir"}</span>
+            <span className="sr-only">{e.fait ? "\u00a0: fait" : e.courante ? "\u00a0: en cours" : "\u00a0: à venir"}</span>
           </span>
         </li>
       ))}
@@ -258,21 +281,21 @@ function actionPrincipale(etat: Etat): Action {
   const nouvelles = etat.simulations.filter((s) => s.nouvelle && s.source !== "SITE").length;
   switch (etape) {
     case "PHOTOS":
-      return { surtitre: "À faire maintenant", titre: `Envoyez-moi quelques photos de ${projet.votre}`, texte: "C'est ce qui me permet de préparer votre simulation, sur votre propre pièce. Deux minutes suffisent, je vous guide.", bouton: "Envoyer mes photos", vue: "photos", secondaires: [] };
+      return { surtitre: "À faire maintenant", titre: `Envoyez-moi quelques photos de ${projet.votre}`, texte: "Pour préparer votre simulation sur votre propre pièce. Deux minutes suffisent, je vous guide.", bouton: "Envoyer mes photos", vue: "photos", secondaires: [] };
     case "PROJET":
       return etat.simulations.some((s) => s.source === "SITE")
-        ? { surtitre: "À faire maintenant", titre: "Votre essai sur le site : un bon point de départ", texte: "Dites-moi maintenant ce que vous voulez changer et ce qui vous plaît : je prépare mes propositions sur cette base.", bouton: "Préciser mon projet", vue: "projet", secondaires: [{ vue: "photos", libelle: "Ajouter des photos" }] }
-        : { surtitre: "À faire maintenant", titre: "Dites-moi ce que vous voulez changer", texte: "Quelques choix à toucher, pas de formulaire : les zones à rafraîchir, vos goûts, la taille de la pièce.", bouton: "Préciser mon projet", vue: "projet", secondaires: [{ vue: "photos", libelle: "Ajouter des photos" }] };
+        ? { surtitre: "À faire maintenant", titre: "Votre essai sur le site", texte: "Un bon point de départ. Dites-moi ce que vous voulez changer et ce qui vous plaît\u00a0: je prépare mes propositions sur cette base.", bouton: "Préciser mon projet", vue: "projet", secondaires: [{ vue: "photos", libelle: "Ajouter des photos" }] }
+        : { surtitre: "À faire maintenant", titre: "Dites-moi ce que vous voulez changer", texte: "Quelques choix à toucher, pas de formulaire\u00a0: les zones à rafraîchir, vos goûts, la taille de la pièce.", bouton: "Préciser mon projet", vue: "projet", secondaires: [{ vue: "photos", libelle: "Ajouter des photos" }] };
     case "ATTENTE_SIMULATION":
       return { surtitre: "Je m'en occupe", titre: "Je prépare vos simulations", texte: `Merci, j'ai tout ce qu'il me faut. Vous les trouverez ici ${etat.simulationsEnPreparation?.delai ?? "sous 24 h"}, et je vous préviens par SMS.`, secondaires: [{ vue: "photos", libelle: "Ajouter des photos" }, { vue: "projet", libelle: "Modifier mon projet" }] };
     case "SIMULATIONS":
-      return { surtitre: nouvelles ? "Nouveau" : "À faire maintenant", titre: etat.simulations.length > 1 ? "Vos simulations sont prêtes" : "Votre simulation est prête", texte: etat.simulations.length > 1 ? "Comparez avant et après sur votre photo, puis choisissez celle qui vous plaît — ou composez votre mélange." : "Comparez avant et après sur votre photo : validez-la en un geste, ou demandez une autre proposition.", bouton: etat.simulations.length > 1 ? "Voir et choisir" : "Voir ma simulation", vue: "simulations", secondaires: [] };
+      return { surtitre: nouvelles ? "Nouveau" : "À faire maintenant", titre: etat.simulations.length > 1 ? "Vos simulations sont prêtes" : "Votre simulation est prête", texte: etat.simulations.length > 1 ? "Comparez avant et après sur votre photo, puis choisissez celle qui vous plaît — ou composez votre mélange." : "Comparez avant et après sur votre photo\u00a0: validez-la en un geste, ou demandez une autre proposition.", bouton: etat.simulations.length > 1 ? "Voir et choisir" : "Voir ma simulation", vue: "simulations", secondaires: [] };
     case "ATTENTE_DEVIS":
-      return { surtitre: "Je m'en occupe", titre: "Je prépare votre devis", texte: "Vous avez fait votre choix : je vous envoie le devis ici même, très vite. Vous pourrez le valider en un geste.", secondaires: [{ vue: "simulations", libelle: "Revoir mon choix" }] };
+      return { surtitre: "Je m'en occupe", titre: "Je prépare votre devis", texte: "Vous avez fait votre choix\u00a0: je vous envoie le devis ici même, très vite. Vous pourrez le valider en un geste.", secondaires: [{ vue: "simulations", libelle: "Revoir mon choix" }] };
     case "DEVIS":
       return { surtitre: "À faire maintenant", titre: "Votre devis est prêt", texte: "Tout est détaillé, lisible ici. Si tout vous convient, vous donnez votre accord en un geste.", bouton: "Voir mon devis", vue: "devis", secondaires: etat.simulations.length ? [{ vue: "simulations", libelle: "Revoir les simulations" }] : [] };
     case "ACOMPTE":
-      return { surtitre: "C'est signé", titre: "Dernière étape : l'acompte", texte: `Il réserve votre date${etat.acompte ? ` : ${euros(etat.acompte.montant - etat.acompte.recu)}, par virement` : ""}. Je vous appelle ensuite pour fixer le jour du chantier.`, bouton: "Voir comment régler", vue: "acompte", secondaires: [{ vue: "devis", libelle: "Revoir mon devis" }] };
+      return { surtitre: "C'est signé", titre: "Dernière étape\u00a0: l'acompte", texte: `Il réserve votre date${etat.acompte ? `\u00a0: ${euros(etat.acompte.montant - etat.acompte.recu)}, par virement` : ""}. Je vous appelle ensuite pour fixer le jour du chantier.`, bouton: "Voir comment régler", vue: "acompte", secondaires: [{ vue: "devis", libelle: "Revoir mon devis" }] };
     case "CHANTIER":
       return { surtitre: "Votre chantier", titre: etat.chantier?.date ? `Rendez-vous le ${dateCourte(etat.chantier.date)}` : "Je vous appelle pour fixer la date", texte: "Voici ce qu'il faut préparer avant mon passage, et comment se déroule la journée.", bouton: "La suite", vue: "acompte", secondaires: [] };
     case "TERMINE":
@@ -308,7 +331,7 @@ function LienInvalide({ erreur, onReessayer }: { erreur: ErreurEspace; onReessay
       <Logo />
       <h1 className="mt-8 font-display text-[26px] leading-tight font-semibold text-balance">{reseau ? "Impossible d'ouvrir votre espace" : expire ? "Ce lien n'est plus actif" : "Ce lien n'est pas valide"}</h1>
       <p className="mt-3 max-w-sm text-[16.5px] leading-relaxed text-[#4F4A44]">
-        {reseau ? erreur.message : expire ? "Pour votre sécurité, les liens ont une durée de vie limitée. Demandez-m'en un nouveau : je vous l'envoie par SMS dans la minute." : "Vérifiez que vous avez ouvert le lien en entier, tel que reçu par SMS. Sinon, appelez-moi : je vous en envoie un nouveau."}
+        {reseau ? erreur.message : expire ? "Pour votre sécurité, les liens ont une durée de vie limitée. Demandez-m'en un nouveau\u00a0: je vous l'envoie par SMS dans la minute." : "Vérifiez que vous avez ouvert le lien en entier, tel que reçu par SMS. Sinon, appelez-moi\u00a0: je vous en envoie un nouveau."}
       </p>
       {reseau ? (
         <button type="button" onClick={onReessayer} className="mt-6 min-h-[56px] w-full max-w-xs rounded-2xl bg-[#CC0000] text-[17px] font-semibold text-white">

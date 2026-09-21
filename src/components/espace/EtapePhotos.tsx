@@ -115,15 +115,15 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
       {recu || (recues > 0 && attente.length === 0 && envois.length > 0) ? (
         <div className="space-y-3">
           <Annonce ton="succes">
-            <strong className="font-semibold">Merci, j&apos;ai bien reçu vos photos.</strong> Je prépare votre simulation ; je vous préviens par SMS dès qu&apos;elle est là.
+            <strong className="font-semibold">Merci, j&apos;ai bien reçu vos photos.</strong> Je prépare votre simulation&nbsp;; je vous préviens par SMS dès qu&apos;elle est là.
           </Annonce>
-          {attente.length === 0 ? <BoutonPrincipal onClick={onSuite}>Continuer : mon projet</BoutonPrincipal> : null}
+          {attente.length === 0 ? <BoutonPrincipal onClick={onSuite}>Continuer&nbsp;: mon projet</BoutonPrincipal> : null}
         </div>
       ) : null}
 
       <Carte className="space-y-3">
         <input ref={camera} type="file" accept="image/*" capture="environment" className="sr-only" id="prise-photo" onChange={(e) => void ajouter(e.target.files)} />
-        <input ref={galerie} type="file" accept="image/*,.heic,.heif" multiple className="sr-only" id="choix-photos" onChange={(e) => void ajouter(e.target.files)} />
+        <input ref={galerie} type="file" accept="image/*" multiple className="sr-only" id="choix-photos" onChange={(e) => void ajouter(e.target.files)} />
         {recues > 0 ? (
           <BoutonSecondaire onClick={() => camera.current?.click()} disabled={apercu}>
             <IconeAppareil /> Prendre une autre photo
@@ -151,7 +151,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
                 {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local, pas encore envoyé */}
                 <img src={e.apercu} alt="" className={cx("h-full w-full object-cover", e.etat !== "echec" && "opacity-70")} />
                 <div className="absolute inset-x-0 bottom-0 bg-black/55 px-2 py-1.5 text-[12px] font-medium text-white" aria-live="polite">
-                  {e.etat === "echec" ? (e.message ? "Refusée" : "En attente") : e.etat === "envoi" ? `Envoi… ${Math.round(e.part * 100)} %` : "En file"}
+                  {e.etat === "echec" ? (e.message ? "Refusée" : "En attente") : e.etat === "envoi" ? `Envoi… ${Math.round(e.part * 100)}\u00a0%` : "En file"}
                   <span className="mt-1 block h-1 overflow-hidden rounded-full bg-white/30">
                     <span className="block h-full bg-white transition-[width]" style={{ width: `${Math.round(e.part * 100)}%` }} />
                   </span>
@@ -170,7 +170,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
           </ul>
           {enAttenteDeReseau.length > 0 ? (
             <div className="mt-3 space-y-2">
-              <Annonce>Pas de réseau pour l&apos;instant. Vos photos sont gardées dans votre téléphone : elles partiront toutes seules, même si vous fermez cette page.</Annonce>
+              <Annonce>Pas de réseau pour l&apos;instant. Vos photos sont gardées dans votre téléphone&nbsp;: elles partiront toutes seules, même si vous fermez cette page.</Annonce>
               <BoutonSecondaire onClick={() => void vider()}>Réessayer maintenant</BoutonSecondaire>
             </div>
           ) : null}
@@ -216,11 +216,11 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème : je ne regarde que les meubles.</p>
+        <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: je ne regarde que les meubles.</p>
       </Carte>
 
-      {recues > 0 && !recu ? <BoutonPrincipal onClick={onSuite}>Continuer : mon projet</BoutonPrincipal> : null}
-      <p className="px-1 text-[13.5px] leading-relaxed text-[#6B665F]">Vos photos restent privées : elles servent uniquement à préparer votre projet et ne sont jamais publiées sans votre accord.</p>
+      {recues > 0 && !recu ? <BoutonPrincipal onClick={onSuite}>Continuer&nbsp;: mon projet</BoutonPrincipal> : null}
+      <p className="px-1 text-[13.5px] leading-relaxed text-[#6B665F]">Vos photos restent privées&nbsp;: elles servent uniquement à préparer votre projet et ne sont jamais publiées sans votre accord.</p>
     </div>
   );
 }
