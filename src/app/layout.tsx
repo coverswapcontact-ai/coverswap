@@ -90,17 +90,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    // suppressHydrationWarning : le script ci-dessous ajoute la classe « js » avant l'hydratation (écart attendu, sans effet).
+    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <head>
         {/* Le contenu est visible sans JavaScript ; cette classe autorise les apparitions douces (ScrollReveal). */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-        {/* Preload haute priorité du poster hero — affichage instantané */}
-        <link
-          rel="preload"
-          as="image"
-          href="/videos/hero-poster.jpg"
-          fetchPriority="high"
-        />
       </head>
       <body className="font-sans antialiased">
         {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans mesure d'audience ni habillage commercial. */}

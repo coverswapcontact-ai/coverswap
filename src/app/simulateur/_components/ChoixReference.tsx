@@ -3,6 +3,7 @@
 import ImageReference from "@/components/ImageReference";
 import { useMemo, useState } from "react";
 import revetements from "@/data/revetements.json";
+import { correspondRecherche } from "@/lib/recherche-finitions";
 
 export interface Reference {
   id: string;
@@ -34,10 +35,10 @@ export default function ChoixReference({ choisie, onChoisir }: { choisie: Refere
   const [sansImage, setSansImage] = useState<Set<string>>(new Set());
 
   const filtrees = useMemo(() => {
-    const q = recherche.toLowerCase().trim();
+    const q = recherche.trim();
     return CATALOGUE.filter((r) => {
       if (famille && r.famille !== famille) return false;
-      if (q && !`${r.nom} ${r.id} ${r.famille} ${r.tags.join(" ")}`.toLowerCase().includes(q)) return false;
+      if (q && !correspondRecherche(r, q)) return false;
       return true;
     });
   }, [recherche, famille]);

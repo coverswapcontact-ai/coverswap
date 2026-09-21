@@ -238,6 +238,7 @@ export default function Simulateur() {
       // 2) Génération sur le serveur sans limite de temps (CRM), sinon repli synchrone
       if (SIMULATE_URL && prep.ok && prepData.prompt && prepData.sig) {
         setProgression("Génération du rendu… 20 à 60 secondes");
+        // Serveur de génération injoignable (panne, réseau filtré) : on ne s'arrête pas là, le repli prend le relais.
         const gen = await fetch(SIMULATE_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -254,13 +255,13 @@ export default function Simulateur() {
             campagne: origine.campagne,
             photo_base64: etat.photo,
           }),
-        });
-        const genData = await gen.json().catch(() => ({}));
-        if (gen.ok && genData.image) {
+        }).catch(() => null);
+        const genData = gen ? await gen.json().catch(() => ({})) : { reason: "injoignable" };
+        if (gen?.ok && genData.image) {
           reussite(genData.image, genData.simulationSiteId ?? null, typeof genData.imageAvant === "string" ? genData.imageAvant : null);
           return;
         }
-        if (gen.status === 429) {
+        if (gen?.status === 429) {
           echec(genData.error || "Limite de simulations atteinte pour aujourd'hui.", genData.reason || "quota");
           return;
         }
@@ -269,7 +270,7 @@ export default function Simulateur() {
           echec(genData.error, genData.reason);
           return;
         }
-        console.warn("[simulateur] génération CRM échouée, repli synchrone :", gen.status, genData.reason);
+        console.warn("[simulateur] génération CRM échouée, repli synchrone :", gen?.status ?? "injoignable", genData.reason);
       }
       setProgression("Génération du rendu (secours)… jusqu'à 60 secondes");
       const sync = await fetch("/api/simulation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...charge, photo_base64: etat.photo }) });

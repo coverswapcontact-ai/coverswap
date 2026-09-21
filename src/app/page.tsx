@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { preload } from "react-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection } from "@/components/HomeClient";
@@ -34,6 +35,8 @@ const TEMOINS: Record<string, { nom: string; ref: string; image: string }> = {
 const COMPTES = (revetements as { famille: string }[]).reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.famille]: (acc[r.famille] ?? 0) + 1 }), {});
 
 function Hero() {
+  // Poster du hero en priorité haute — seulement sur l'accueil (les autres pages, dont l'espace client, ne le chargent plus).
+  preload("/videos/hero-poster.jpg", { as: "image", fetchPriority: "high" });
   return (
     <section className="relative min-h-[88vh] md:min-h-screen flex items-center overflow-hidden">
       <HeroVideo />
