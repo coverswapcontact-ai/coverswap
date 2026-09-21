@@ -9,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
+import HorsEspaceClient from "@/components/HorsEspaceClient";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
@@ -102,32 +103,37 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        {/* GTM noscript fallback */}
-        {process.env.NEXT_PUBLIC_GTM_ID && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-        )}
-        <LocalBusinessSchema />
-        <OrganizationSchema />
-        <Suspense fallback={null}>
-          <ScrollToTop />
-        </Suspense>
-        <Suspense fallback={null}>
-          <SuiviParcours />
-        </Suspense>
-        <Header />
+        {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans mesure d'audience ni habillage commercial. */}
+        <HorsEspaceClient>
+          {/* GTM noscript fallback */}
+          {process.env.NEXT_PUBLIC_GTM_ID && (
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          )}
+          <LocalBusinessSchema />
+          <OrganizationSchema />
+          <Suspense fallback={null}>
+            <ScrollToTop />
+          </Suspense>
+          <Suspense fallback={null}>
+            <SuiviParcours />
+          </Suspense>
+          <Header />
+        </HorsEspaceClient>
         <main id="main-content">{children}</main>
-        <Footer />
-        <CookieBanner />
-        <WhatsAppButton />
-        <Analytics />
-        <VercelAnalytics />
+        <HorsEspaceClient>
+          <Footer />
+          <CookieBanner />
+          <WhatsAppButton />
+          <Analytics />
+          <VercelAnalytics />
+        </HorsEspaceClient>
       </body>
     </html>
   );
