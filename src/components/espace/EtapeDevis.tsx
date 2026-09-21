@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
+import { AvantApres } from "./AvantApres";
 import { Signature, type SignatureRef } from "./Signature";
-import { Annonce, BoutonPrincipal, Carte, EnteteEtape, Surtitre, cx } from "./ui";
+import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 
 /**
- * Étape 4 — le devis, lisible sur un téléphone : ce qui est inclus, le prix,
+ * Onglet Devis — lisible sur un téléphone : ce qui est inclus, le prix,
  * l'acompte, les conditions (celles du PDF, mot pour mot). L'adresse du
  * chantier et l'e-mail ne sont demandés qu'ici, s'ils manquent, avec la saisie
  * assistée de l'adresse. Puis le bon pour accord : une case, une signature au
@@ -18,7 +19,7 @@ type Adresse = { libelle: string; adresse: string; codePostal: string; ville: st
 const UNITES: Record<string, string> = { ml: "m", jour: "jour", forfait: "forfait" };
 const quantite = (q: number, unite: string) => (unite === "forfait" ? "Forfait" : `${String(Math.round(q * 100) / 100).replace(".", ",")} ${UNITES[unite] ?? unite}${unite === "jour" && q > 1 ? "s" : ""}`);
 
-export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onRetour: () => void; onSuite: () => void }) {
+export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void }) {
   const devis = etat.devis!;
   const apercu = Boolean(client.apercu);
   const [coord, setCoord] = useState({ nom: etat.coordonnees.nom || "", adresse: etat.coordonnees.adresse, codePostal: etat.coordonnees.codePostal, ville: etat.coordonnees.ville, email: etat.coordonnees.email ?? "" });
@@ -83,7 +84,7 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
 
   return (
     <div className="space-y-5">
-      <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-moi."} onRetour={onRetour} />
+      <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-nous."} />
 
       <Carte className="space-y-4">
         <div>
@@ -150,17 +151,17 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
         <Carte className="border-[#1F7A4D] bg-[#F3FAF6]">
           <Surtitre ton="vert">Bon pour accord donné</Surtitre>
           <p className="mt-1.5 text-[16px] leading-relaxed text-[#17563A]">
-            Par {devis.accepte.nom}, le {dateLongue(devis.accepte.le)}. {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte." : ""}
+            Par {devis.accepte.nom}, le {dateLongue(devis.accepte.le)}. {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte, dans l'onglet Paiement." : ""}
           </p>
           <BoutonPrincipal className="mt-3" onClick={onSuite}>
-            {etat.acompte && !etat.acompte.complet ? "Régler l'acompte" : "La suite"}
+            {etat.acompte && !etat.acompte.complet ? "Voir le paiement" : "La suite"}
           </BoutonPrincipal>
         </Carte>
       ) : (
         <Carte className="space-y-4">
           <div>
             <Surtitre ton="rouge">Donner mon accord</Surtitre>
-            <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">Aucun paiement maintenant. L&apos;acompte se règle ensuite, par virement.</p>
+            <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">Aucun paiement maintenant. L&apos;acompte se règle ensuite, dans l&apos;onglet Paiement.</p>
           </div>
 
           {aCompleter ? (
@@ -230,6 +231,52 @@ export function EtapeDevis({ etat, client, onEtat, onRetour, onSuite }: { etat: 
           <p className="text-center text-[13.5px] leading-relaxed text-[#6B665F]">La date, l&apos;heure et votre accord sont enregistrés comme preuve. Votre devis reste ici, à relire quand vous voulez.</p>
         </Carte>
       )}
+    </div>
+  );
+}
+
+/** Simulation validée, devis pas encore émis : CoverSwap s'en occupe ; il peut encore changer d'avis. */
+export function DevisEnPreparation({ etat, client, onSimulations }: { etat: Etat; client: Client; onSimulations: () => void }) {
+  const choix = etat.choix;
+  const simulation = choix?.mode === "UNE" ? etat.simulations.find((s) => s.id === choix.simulationId) : null;
+  return (
+    <div className="space-y-5">
+      <EnteteEtape titre="Votre devis" phrase="CoverSwap prépare votre devis sur la base de la simulation que vous avez validée. Il arrive ici même, très vite." />
+      {simulation ? (
+        <Carte className="space-y-3 p-3">
+          <AvantApres apres={client.url(`/simulations/${simulation.id}`)} avant={simulation.avant ? client.url(`/simulations/${simulation.id}/avant`) : null} alt="Votre simulation validée" />
+          <ul className="space-y-1.5 px-1 pb-1">
+            {simulation.zones.map((z) => (
+              <li key={`${z.zone}-${z.ref}`} className="flex items-center gap-2.5 text-[15px]">
+                {/* eslint-disable-next-line @next/next/no-img-element -- échantillon servi par le CRM */}
+                <img src={client.url(`/echantillons/${encodeURIComponent(z.ref)}?l=320`)} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-black/10" loading="lazy" referrerPolicy="no-referrer" />
+                <span>
+                  <span className="text-[#5F5A53]">{z.libelle}&nbsp;: </span>
+                  <span className="font-semibold text-[#1A1A1A]">{z.nom || z.ref}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Carte>
+      ) : choix?.mode === "COMPOSITE" ? (
+        <Carte>
+          <Surtitre ton="vert">Votre mélange validé</Surtitre>
+          <ul className="mt-2 space-y-1.5 text-[15.5px]">
+            {choix.zones.map((z) => (
+              <li key={`${z.zone}-${z.ref}`}>
+                <span className="text-[#5F5A53]">{z.libelle || z.zone}&nbsp;: </span>
+                <span className="font-semibold">{z.nom || z.ref}</span>
+              </li>
+            ))}
+          </ul>
+        </Carte>
+      ) : null}
+      {etat.choixModifiable !== false ? (
+        <>
+          <p className="px-1 text-[15px] leading-relaxed text-[#5F5A53]">Vous pouvez encore changer de simulation tant que le devis n&apos;est pas établi.</p>
+          <BoutonSecondaire onClick={onSimulations}>Revoir mes simulations</BoutonSecondaire>
+        </>
+      ) : null}
     </div>
   );
 }

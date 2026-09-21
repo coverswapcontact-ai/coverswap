@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { envoyerPhoto, ErreurEspace, nomDuProjet, type Client, type Etat } from "./api";
+import { envoyerPhoto, ErreurEspace, MESSAGE_APERCU, nomDuProjet, type Client, type Etat } from "./api";
 import { mettreEnFile, photosEnFile, reduirePhoto, retirerDeLaFile, type PhotoEnFile } from "./file-photos";
 import { CuisineDeFace, IconeAppareil, IconeCoche, IconeGalerie } from "./Illustrations";
 import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 
 /**
- * Étape 1 — les photos : le point de bascule. Un guide qui se lit en dix
+ * Onglet Photos — le point de bascule. Un guide qui se lit en dix
  * secondes, l'appareil photo ou la galerie en un geste, chaque photo à l'écran
  * tout de suite avec sa progression. Réseau faible : réduite avant l'envoi ;
  * coupé : gardée dans le téléphone et renvoyée seule, même le lendemain.
@@ -42,9 +42,10 @@ const PRISES = [
   { cadre: "detail" as const, titre: "Un détail", aide: "Une porte et sa poignée, de près" },
 ];
 
-export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: { etat: Etat; client: Client; jeton: string; onEtat: (etat: Etat) => void; onRetour: () => void; onSuite: () => void }) {
+export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Etat; client: Client; jeton: string; onEtat: (etat: Etat) => void; onSuite: () => void }) {
   const [envois, setEnvois] = useState<EtatEnvoi[]>([]);
   const [recu, setRecu] = useState(false);
+  const [aperculu, setAperculu] = useState(false);
   const enCours = useRef(false);
   const camera = useRef<HTMLInputElement>(null);
   const galerie = useRef<HTMLInputElement>(null);
@@ -126,15 +127,14 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
   return (
     <div className="space-y-5">
       <EnteteEtape
-        titre={recues > 0 ? "Vos photos" : `Envoyez-moi quelques photos de ${projet.votre}`}
-        phrase={recues > 0 ? `${recues > 1 ? `Vos ${recues} photos sont bien arrivées` : "Votre photo est bien arrivée"}. Vous pouvez en ajouter à tout moment, même plus tard.` : "Trois ou quatre photos suffisent. C'est ce qui me permet de préparer votre simulation, sur votre propre pièce."}
-        onRetour={onRetour}
+        titre={recues > 0 ? "Vos photos" : `Envoyez-nous quelques photos de ${projet.votre}`}
+        phrase={recues > 0 ? `${recues > 1 ? `Vos ${recues} photos sont bien arrivées` : "Votre photo est bien arrivée"}. Vous pouvez en ajouter à tout moment, même plus tard.` : "Trois ou quatre photos suffisent. C'est sur elles que se font vos simulations, dans votre propre pièce."}
       />
 
       {recu || (recues > 0 && attente.length === 0 && envois.length > 0) ? (
         <div className="space-y-3">
           <Annonce ton="succes">
-            <strong className="font-semibold">Merci, j&apos;ai bien reçu vos photos.</strong> Je prépare votre simulation&nbsp;; je vous préviens par SMS dès qu&apos;elle est là.
+            <strong className="font-semibold">Merci, vos photos sont bien arrivées.</strong> Étape suivante&nbsp;: votre projet, en quelques gestes.
           </Annonce>
           {attente.length === 0 ? <BoutonPrincipal onClick={onSuite}>Continuer&nbsp;: mon projet</BoutonPrincipal> : null}
         </div>
@@ -144,17 +144,18 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
         <input ref={camera} type="file" accept="image/*" capture="environment" className="sr-only" id="prise-photo" onChange={(e) => void ajouter(e.target.files)} />
         <input ref={galerie} type="file" accept="image/*" multiple className="sr-only" id="choix-photos" onChange={(e) => void ajouter(e.target.files)} />
         {recues > 0 ? (
-          <BoutonSecondaire onClick={() => camera.current?.click()} disabled={apercu}>
+          <BoutonSecondaire onClick={() => (apercu ? setAperculu(true) : camera.current?.click())}>
             <IconeAppareil /> Prendre une autre photo
           </BoutonSecondaire>
         ) : (
-          <BoutonPrincipal onClick={() => camera.current?.click()} disabled={apercu}>
+          <BoutonPrincipal onClick={() => (apercu ? setAperculu(true) : camera.current?.click())}>
             <IconeAppareil /> Prendre une photo
           </BoutonPrincipal>
         )}
-        <BoutonSecondaire onClick={() => galerie.current?.click()} disabled={apercu}>
+        <BoutonSecondaire onClick={() => (apercu ? setAperculu(true) : galerie.current?.click())}>
           <IconeGalerie /> Choisir dans mes photos
         </BoutonSecondaire>
+        {aperculu ? <Annonce>{MESSAGE_APERCU}</Annonce> : null}
         <p className="text-center text-[14px] text-[#5F5A53]">Plusieurs d&apos;un coup, c&apos;est possible. Formats iPhone acceptés.</p>
       </Carte>
 
@@ -252,7 +253,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: je ne regarde que les meubles.</p>
+        <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: seuls les meubles comptent.</p>
       </Carte>
 
       {recues > 0 && !recu ? <BoutonPrincipal onClick={onSuite}>Continuer&nbsp;: mon projet</BoutonPrincipal> : null}

@@ -154,3 +154,68 @@ export const IconeSuite = () => (
     <path d="m9 18 6-6-6-6" />
   </svg>
 );
+
+/* ── Icônes des onglets (trait 2 px, 24 × 24) ─────────────────────────── */
+
+const Trait = ({ taille = 24, children }: { taille?: number; children: React.ReactNode }) => (
+  <svg width={taille} height={taille} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    {children}
+  </svg>
+);
+
+export const IconeCadenas = ({ taille = 14 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </Trait>
+);
+
+/** Projet : la règle du métreur. */
+export const IconeProjet = ({ taille = 24 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <path d="M3 17 17 3l4 4L7 21H3z" />
+    <path d="m7 13 2 2M10 10l2 2M13 7l2 2" />
+  </Trait>
+);
+
+/** Simulations : l'image et sa baguette. */
+export const IconeSimulation = ({ taille = 24 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <rect x="3" y="5" width="14" height="14" rx="2" />
+    <path d="m3 15 4-4 3 3 2-2 5 5" />
+    <path d="M19 3v4M17 5h4M21 11v2M20 12h2" />
+  </Trait>
+);
+
+export const IconeDevis = ({ taille = 24 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+    <path d="M14 3v6h6M8 13h8M8 17h5" />
+  </Trait>
+);
+
+export const IconePaiement = ({ taille = 24 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <path d="M2 10h20M6 15h4" />
+  </Trait>
+);
+
+export const IconeCoeur = ({ taille = 20, plein = false }: { taille?: number; plein?: boolean }) => (
+  <svg width={taille} height={taille} viewBox="0 0 24 24" fill={plein ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+  </svg>
+);
+
+export const IconeLoupe = ({ taille = 20 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </Trait>
+);
+
+export const IconePlus = ({ taille = 20 }: { taille?: number }) => (
+  <Trait taille={taille}>
+    <path d="M12 5v14M5 12h14" />
+  </Trait>
+);

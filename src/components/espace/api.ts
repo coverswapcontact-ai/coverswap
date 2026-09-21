@@ -1,12 +1,14 @@
 /**
  * L'espace client parle au CRM, et à lui seul : chaque adresse part du jeton
- * signé de la page (`racine`). Aucun outil de mesure, aucun tiers.
+ * signé de la page (`racine`). Aucun outil de mesure, aucun tiers — même les
+ * échantillons du catalogue passent par le CRM.
  */
 
 export type ZoneTeinte = { zone: string; libelle: string; ref: string; nom: string };
 export type EtapeEspace = "PHOTOS" | "PROJET" | "SIMULATIONS" | "ATTENTE_SIMULATION" | "ATTENTE_DEVIS" | "DEVIS" | "ACOMPTE" | "CHANTIER" | "TERMINE";
 export type CleProgression = "PHOTOS" | "PROJET" | "SIMULATIONS" | "DEVIS" | "ACOMPTE";
 
+/** Le projet (v3) : zones, taille, un mot. Goûts et délai des versions précédentes : gardés tels quels, plus demandés. */
 export type ProjetClient = {
   zones: string[];
   styles: string[];
@@ -17,11 +19,29 @@ export type ProjetClient = {
   precisions: string;
 };
 
+/** SITE : son essai sur coverswap.fr ; CLIENT : créée par lui dans son espace ; CRM : préparée par CoverSwap. */
+export type SourceSimulation = "SITE" | "CRM" | "CLIENT";
+
+/** Les simulations qu'il crée lui-même : ce qu'il lui reste, ce qui tourne, et si le service répond. */
+export type Creation = {
+  gratuites: number;
+  accordees: number;
+  faites: number;
+  restantes: number;
+  enCours: { id: string; le: string }[];
+  demandeesLe: string | null;
+  disponible: boolean;
+  zones: { zone: string; libelle: string }[];
+  zonesProjet: string[];
+};
+
+export type Onglet = { cle: CleProgression; libelle: string; fait: boolean; courante: boolean; verrouillee?: boolean; raison?: string | null };
+
 export type SimulationClient = {
   id: string;
   titre: string | null;
   description: string | null;
-  source: "SITE" | "CRM";
+  source: SourceSimulation;
   zones: ZoneTeinte[];
   avant: boolean;
   le: string;
@@ -45,7 +65,7 @@ export type Etat = {
   typeProjet: string;
   projet: string;
   etape: EtapeEspace;
-  etapes: { cle: CleProgression; libelle: string; fait: boolean; courante: boolean }[];
+  etapes: Onglet[];
   photos: { id: string }[];
   monProjet: ProjetClient | null;
   connu: { tailleCuisine: string | null; delai: string | null; delaiTexte: string | null; proprietaire: boolean | null; zones: string[]; refsSite: string[] };
@@ -76,8 +96,19 @@ export type Etat = {
   chantier: { date: string | null } | null;
   apres: { photos: { id: string }[]; avis: { note: number; texte: string; le: string } | null } | null;
   contact: { nom: string; prenom: string; role: string; telephone: string; telephoneLien: string; portrait: boolean };
+  /** v3 : l'espace parle au nom de CoverSwap ; le numéro reste celui de Lucas. (Absents d'un état gardé avant la v3.) */
+  marque?: { nom: string; telephone: string; telephoneLien: string };
+  creation?: Creation;
+  favoris?: string[];
+  choixModifiable?: boolean;
   expireLe: string;
 };
+
+/** Le numéro à appeler, au nom de CoverSwap (un état gardé d'avant la v3 n'a que `contact`). */
+export const marqueDe = (etat: Etat) => etat.marque ?? { nom: "CoverSwap", telephone: etat.contact.telephone, telephoneLien: etat.contact.telephoneLien };
+
+/** Aperçu depuis le CRM : chaque geste le dit, rien ne part. */
+export const MESSAGE_APERCU = "Aperçu : c'est la vue de votre client, en lecture seule. Rien n'est enregistré.";
 
 export class ErreurEspace extends Error {
   constructor(
@@ -86,6 +117,11 @@ export class ErreurEspace extends Error {
     readonly raison?: string
   ) {
     super(message);
+  }
+
+  /** Passager (réseau coupé, serveur qui souffle) : on garde et on réessaie ; sinon, on le dit. */
+  get passager(): boolean {
+    return this.status === 0 || this.status >= 500 || this.status === 429;
   }
 }
 
@@ -118,7 +154,9 @@ export function creerClient(racine: string, apercu: string | null, surReseau: (e
     apercu,
     url,
     appeler,
-    envoyerJson: (chemin, methode, corps) => appeler(chemin, { method: methode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) }),
+    // En aperçu, aucun geste ne part — et aucun ne reste muet : l'écran affiche pourquoi.
+    envoyerJson: (chemin, methode, corps) =>
+      apercu ? Promise.reject(new ErreurEspace(MESSAGE_APERCU, 403, "apercu")) : appeler(chemin, { method: methode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) }),
   };
 }
 
