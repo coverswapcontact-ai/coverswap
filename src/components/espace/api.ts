@@ -23,16 +23,38 @@ export type ProjetClient = {
 export type SourceSimulation = "SITE" | "CRM" | "CLIENT";
 
 /** Les simulations qu'il crée lui-même : ce qu'il lui reste, ce qui tourne, et si le service répond. */
+export type Piece = { piece: string; libelle: string; aide: string; zones: { zone: string; libelle: string }[] };
+
 export type Creation = {
   gratuites: number;
   accordees: number;
+  /** Faites dans l'espace ET sur coverswap.fr : les deux comptent. */
   faites: number;
+  faitesSite?: number;
   restantes: number;
   enCours: { id: string; le: string }[];
   demandeesLe: string | null;
   disponible: boolean;
   zones: { zone: string; libelle: string }[];
   zonesProjet: string[];
+  /** Toutes les pièces du simulateur du site ; `piece` : celle de son projet. (Absents d'un état gardé avant le 22/09.) */
+  piece?: string;
+  pieces?: Piece[];
+};
+
+/** Une ligne de paiement : ce qui est dû, ce qui est payé, quand et comment. */
+export type LignePaiement = { montant: number; statut: "PAYE" | "PARTIEL" | "A_REGLER"; recu: number; payeLe: string | null; moyen: string | null };
+
+export type Paiement = {
+  devisNumero: string;
+  signeLe: string | null;
+  total: number;
+  recu: number;
+  reste: number;
+  acompte: (LignePaiement & { pct: number | null }) | null;
+  solde: LignePaiement;
+  encaissements: { montant: number; le: string; moyen: string | null }[];
+  regle: boolean;
 };
 
 export type Onglet = { cle: CleProgression; libelle: string; fait: boolean; courante: boolean; verrouillee?: boolean; raison?: string | null };
@@ -68,10 +90,14 @@ export type Etat = {
   etapes: Onglet[];
   photos: { id: string }[];
   monProjet: ProjetClient | null;
+  /** Projet validé (pastille verte) ; `projetManque` : ce qu'il faut encore pour pouvoir le valider. */
+  projetValide?: { le: string; par: "CLIENT" | "LUCAS" } | null;
+  projetManque?: string | null;
   connu: { tailleCuisine: string | null; delai: string | null; delaiTexte: string | null; proprietaire: boolean | null; zones: string[]; refsSite: string[] };
   simulations: SimulationClient[];
   simulationsEnPreparation: { delai: string } | null;
   propositionDemandeeLe: string | null;
+  propositionMessage?: string | null;
   choix: Choix | null;
   coordonnees: { nom: string; adresse: string; codePostal: string; ville: string; email: string | null; completes: boolean };
   devis: {
@@ -87,9 +113,13 @@ export type Etat = {
     mentionTva: string;
     emisLe: string;
     valableJusquau: string;
-    accepte: { le: string; nom: string } | null;
-    pdf: string;
+    /** ESPACE : bon pour accord donné ici (retirable tant que rien n'est engagé) ; CRM : signé hors de l'espace. */
+    accepte: { le: string; nom: string; source?: "ESPACE" | "CRM"; retirable?: boolean } | null;
+    /** Devis émis avant le CRM : pas de détail ligne à ligne. */
+    repris?: boolean;
+    pdf: string | null;
   } | null;
+  paiement?: Paiement | null;
   acompte: { montant: number; recu: number; complet: boolean } | null;
   virement: { titulaire: string; iban: string; bic: string; reference: string } | null;
   paiementCarte: boolean;

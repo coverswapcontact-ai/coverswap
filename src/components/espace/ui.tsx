@@ -152,6 +152,48 @@ export function Enregistrement({ etat, className }: { etat: EtatEnregistrement; 
   );
 }
 
+/**
+ * Un geste qui DÉFAIT quelque chose (retirer une photo, annuler une validation,
+ * retirer un accord) : un bouton évident, une confirmation courte sur place
+ * (pas de fenêtre, pas de menu caché), qui se referme seule au bout de
+ * quelques secondes si on ne confirme pas.
+ */
+export function BoutonAConfirmer({ libelle, question, confirmer = "Oui", onConfirme, occupe = false, className }: { libelle: ReactNode; question: string; confirmer?: string; onConfirme: () => void; occupe?: boolean; className?: string }) {
+  const [demande, setDemande] = useState(false);
+  useEffect(() => {
+    if (!demande) return;
+    const t = window.setTimeout(() => setDemande(false), 20000);
+    return () => window.clearTimeout(t);
+  }, [demande]);
+  if (!demande)
+    return (
+      <button type="button" disabled={occupe} onClick={() => setDemande(true)} className={cx("flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl px-4 text-[15.5px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4 active:bg-[#F2F0EC] disabled:opacity-50", FOCUS, className)}>
+        {libelle}
+      </button>
+    );
+  return (
+    <div role="group" aria-label={question} className={cx("rounded-2xl border border-[#D3CFC8] bg-white p-3", className)}>
+      <p className="px-1 text-[15.5px] leading-snug font-semibold text-[#1A1A1A]">{question}</p>
+      <div className="mt-2.5 grid grid-cols-2 gap-2">
+        <button type="button" onClick={() => setDemande(false)} className={cx("min-h-[48px] rounded-xl border border-[#D3CFC8] bg-white text-[15.5px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]", FOCUS)}>
+          Non
+        </button>
+        <button
+          type="button"
+          disabled={occupe}
+          onClick={() => {
+            setDemande(false);
+            onConfirme();
+          }}
+          className={cx("min-h-[48px] rounded-xl bg-[#1A1A1A] text-[15.5px] font-semibold text-white active:bg-[#333] disabled:opacity-50", FOCUS)}
+        >
+          {occupe ? "Un instant…" : confirmer}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** Un onglet pas encore ouvert : pourquoi, et ce qui l'ouvre. */
 export function Verrou({ titre, raison, action }: { titre: string; raison: string; action?: { libelle: string; onClick: () => void } | null }) {
   return (

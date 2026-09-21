@@ -3,14 +3,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ErreurEspace, MESSAGE_APERCU, nomDuProjet, type Client, type Etat, type ProjetClient } from "./api";
 import { CuisineDeFace, PlanCuisine } from "./Illustrations";
-import { Annonce, BoutonSecondaire, CaseCarte, Enregistrement, EnteteEtape, cx, type EtatEnregistrement } from "./ui";
+import { IconeCoche } from "./Illustrations";
+import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, CaseCarte, Enregistrement, EnteteEtape, Surtitre, cx, type EtatEnregistrement } from "./ui";
 
 /**
  * Onglet Projet (v3) : ce qu'il veut rafraîchir, la taille à peu près, un mot
  * libre. Plus de goûts ni de délai — les teintes se choisissent dans ses
- * simulations. Pas de bouton « valider » : chaque geste s'enregistre tout seul,
- * et le dit. Sans réseau, c'est gardé dans le téléphone et renvoyé au retour
- * du réseau ; un refus du serveur s'affiche tel quel (jamais de bouton muet).
+ * simulations. Chaque geste s'enregistre tout seul, et le dit. Sans réseau,
+ * c'est gardé dans le téléphone et renvoyé au retour du réseau ; un refus du
+ * serveur s'affiche tel quel (jamais de bouton muet).
+ *
+ * Quand tout est rempli, il VALIDE son projet : pastille verte ici et chez
+ * CoverSwap. Validé, le projet se relit d'un coup d'œil ; « Modifier » le
+ * rouvre — ce qui le dévalide (la pastille tombe, CoverSwap le sait), jusqu'à
+ * ce qu'il le revalide.
  */
 
 const ZONES_PAR_PROJET: Record<string, { id: string; libelle: string; aide: string; dessin?: string }[]> = {
@@ -75,6 +81,7 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
   const [projet, setProjet] = useState<ProjetClient>(initial.projet);
   const [enregistrement, setEnregistrement] = useState<EtatEnregistrement>({ etat: "" });
   const [modifie, setModifie] = useState(false);
+  const [validation, setValidation] = useState<{ occupe: boolean; message: { ton: "erreur" | "info"; texte: string } | null }>({ occupe: false, message: null });
   const courant = useRef(projet);
   const minuterie = useRef<number | null>(null);
   const enVol = useRef(false);
@@ -135,6 +142,7 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
   function changer(modif: (avant: ProjetClient) => ProjetClient, delai = 600) {
     touche.current = true;
     setModifie(true);
+    setValidation((v) => (v.message ? { ...v, message: null } : v));
     const suite = modif(courant.current);
     courant.current = suite;
     setProjet(suite);
@@ -202,14 +210,105 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
     return () => window.clearTimeout(t);
   }, [enregistrement]);
 
+  /** Ce qui manque pour valider, dit tout de suite (sans attendre le serveur). */
+  const manque =
+    projet.zones.length === 0
+      ? "Touchez d'abord ce que vous voulez rafraîchir."
+      : projet.zones.every((z) => z === "autre") && !projet.precisions.trim()
+        ? "Vous avez choisi « autre chose » : dites-nous quoi, en quelques mots."
+        : cuisine && !projet.repere && !projet.metres
+          ? "Indiquez la taille de votre cuisine, à peu près."
+          : null;
+
+  async function valider() {
+    if (apercu) return setValidation({ occupe: false, message: { ton: "info", texte: MESSAGE_APERCU } });
+    if (manque) {
+      // On l'emmène là où il manque quelque chose : il n'a pas à chercher.
+      document.getElementById(projet.zones.length === 0 ? "titre-zones" : /taille/.test(manque) ? "titre-taille" : "titre-note")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return setValidation({ occupe: false, message: { ton: "erreur", texte: manque } });
+    }
+    setValidation({ occupe: true, message: null });
+    // Ce qui attendait d'être enregistré part d'abord : on valide la dernière version, pas l'avant-dernière.
+    if (minuterie.current) {
+      window.clearTimeout(minuterie.current);
+      minuterie.current = null;
+    }
+    await enregistrer();
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/projet/validation", "POST", {});
+      onEtat(espace);
+      setValidation({ occupe: false, message: null });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (erreur) {
+      setValidation({ occupe: false, message: { ton: "erreur", texte: erreur instanceof ErreurEspace && erreur.status === 0 ? "Pas de réseau : votre projet est gardé, validez-le dès son retour." : erreur instanceof Error ? erreur.message : "Réessayez dans un instant." } });
+    }
+  }
+
+  async function rouvrir() {
+    if (apercu) return setValidation({ occupe: false, message: { ton: "info", texte: MESSAGE_APERCU } });
+    setValidation({ occupe: true, message: null });
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/projet/devalidation", "POST", {});
+      onEtat(espace);
+      setValidation({ occupe: false, message: null });
+      window.scrollTo({ top: 0 });
+    } catch (erreur) {
+      setValidation({ occupe: false, message: { ton: "erreur", texte: erreur instanceof Error ? erreur.message : "Réessayez dans un instant." } });
+    }
+  }
+
   const basculer = (liste: string[], valeur: string) => (liste.includes(valeur) ? liste.filter((v) => v !== valeur) : [...liste, valeur]);
   const reelles = zones.filter((z) => z.id !== "autre");
   const tout = reelles.every((z) => projet.zones.includes(z.id));
   const precise = projet.zones.length > 0 || projet.precisions.trim().length > 0;
 
+  // Validé : le projet se relit d'un coup d'œil. « Modifier » le rouvre (et le dévalide).
+  if (etat.projetValide) {
+    const repere = REPERES.find((r) => r.id === projet.repere);
+    return (
+      <div className="space-y-5">
+        <EnteteEtape titre="Votre projet" phrase="Votre projet est validé. CoverSwap l'a bien reçu." />
+        <Carte className="space-y-4 border-2 border-[#1F7A4D]">
+          <p className="inline-flex items-center gap-2 rounded-full bg-[#E7F3EC] px-3 py-1.5 text-[14.5px] font-semibold text-[#17563A]">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1F7A4D] text-white" aria-hidden>
+              <IconeCoche taille={11} />
+            </span>
+            Projet validé
+          </p>
+          <dl className="space-y-3 text-[16.5px] leading-snug">
+            <div>
+              <dt><Surtitre>À rafraîchir</Surtitre></dt>
+              <dd className="mt-1 font-semibold text-[#1A1A1A]">{projet.zones.map((z) => zones.find((x) => x.id === z)?.libelle ?? z).join(", ")}</dd>
+            </div>
+            {projet.metres || repere ? (
+              <div>
+                <dt><Surtitre>Taille</Surtitre></dt>
+                <dd className="mt-1 font-semibold text-[#1A1A1A]">{[repere?.libelle, projet.metres ? `≈ ${String(projet.metres).replace(".", ",")} m` : null].filter(Boolean).join(" · ")}</dd>
+              </div>
+            ) : null}
+            {projet.precisions.trim() ? (
+              <div>
+                <dt><Surtitre>Votre mot</Surtitre></dt>
+                <dd className="mt-1 whitespace-pre-wrap text-[#1A1A1A]">« {projet.precisions.trim()} »</dd>
+              </div>
+            ) : null}
+          </dl>
+        </Carte>
+        {validation.message ? <Annonce ton={validation.message.ton}>{validation.message.texte}</Annonce> : null}
+        <BoutonPrincipal onClick={onSuite}>
+          Étape suivante&nbsp;: vos simulations <span aria-hidden>→</span>
+        </BoutonPrincipal>
+        <BoutonSecondaire onClick={() => void rouvrir()} disabled={validation.occupe}>
+          {validation.occupe ? "Un instant…" : "Modifier mon projet"}
+        </BoutonSecondaire>
+        <p className="px-1 text-center text-[14px] leading-relaxed text-[#6B665F]">Modifier rouvre votre projet&nbsp;: vous le validerez à nouveau ensuite.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-7">
-      <EnteteEtape titre="Votre projet" phrase={`Touchez ce que vous voulez rafraîchir dans ${nom.votre}. Tout s'enregistre au fur et à mesure.`} />
+    <div className="space-y-7 pb-24">
+      <EnteteEtape titre="Votre projet" phrase={`Touchez ce que vous voulez rafraîchir dans ${nom.votre}, puis validez. Tout s'enregistre au fur et à mesure.`} />
 
       {initial.depuis.length > 0 && !modifie ? <Annonce>Prérempli d&apos;après {initial.depuis.join(" et ")}. Modifiez si besoin.</Annonce> : null}
 
@@ -296,15 +395,23 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
         />
       </section>
 
-      {precise ? (
-        <BoutonSecondaire onClick={onSuite}>
-          Étape suivante&nbsp;: vos simulations <span aria-hidden>→</span>
-        </BoutonSecondaire>
-      ) : null}
-
-      {/* Discret : une pastille au-dessus des onglets, qui dit ce qui se passe (et reste si quelque chose coince). */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(4.4rem+env(safe-area-inset-bottom))] z-20 flex justify-center px-4">
-        <Enregistrement etat={enregistrement} className="text-center drop-shadow-[0_2px_8px_rgba(26,26,26,0.12)]" />
+      {/* Toujours sous le pouce, au-dessus des onglets : l'état de l'enregistrement, et le bouton qui valide. */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(3.9rem+env(safe-area-inset-bottom))] z-20 px-4 pb-2">
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-1.5">
+          {/* Ce qui manque pour valider se dit ICI, à côté du bouton : pas en bas d'une page qu'il ne voit pas. */}
+          {validation.message ? (
+            <div className="pointer-events-auto w-full drop-shadow-[0_4px_14px_rgba(26,26,26,0.16)]">
+              <Annonce ton={validation.message.ton}>{validation.message.texte}</Annonce>
+            </div>
+          ) : (
+            <Enregistrement etat={enregistrement} className="text-center drop-shadow-[0_2px_8px_rgba(26,26,26,0.12)]" />
+          )}
+          {precise ? (
+            <BoutonPrincipal onClick={() => void valider()} disabled={validation.occupe} className="pointer-events-auto shadow-[0_8px_24px_rgba(26,26,26,0.18)]">
+              {validation.occupe ? "Validation…" : "Valider mon projet"}
+            </BoutonPrincipal>
+          ) : null}
+        </div>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "./AvantApres";
 import { Signature, type SignatureRef } from "./Signature";
-import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
+import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 
 /**
  * Onglet Devis — lisible sur un téléphone : ce qui est inclus, le prix,
@@ -48,6 +48,22 @@ export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; clie
         .then(({ adresses }) => setSuggestions(adresses.filter((a) => a.adresse)))
         .catch(() => setSuggestions([]));
     }, 250);
+  }
+
+  /** Il revient sur son accord (possible tant que rien n'est payé ni planifié) : CoverSwap est prévenu, la preuve de l'accord reste gardée. */
+  async function retirerAccord() {
+    setOccupe(true);
+    setProbleme(null);
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/accord/retrait", "POST", {});
+      onEtat(espace);
+      setAccepte(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (e) {
+      setProbleme(e instanceof Error ? e.message : "Réessayez dans un instant.");
+    } finally {
+      setOccupe(false);
+    }
   }
 
   async function donnerAccord() {
@@ -94,7 +110,8 @@ export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; clie
             Émis le {dateCourte(devis.emisLe)} · valable jusqu&apos;au {dateCourte(devis.valableJusquau)}
           </p>
         </div>
-        <ul className="divide-y divide-[#EEEBE6] border-y border-[#EEEBE6]">
+        {devis.lignes.length === 0 ? <p className="border-y border-[#EEEBE6] py-3 text-[15.5px] leading-relaxed text-[#3F3B36]">Le détail des prestations figure sur votre devis{devis.pdf ? ", à ouvrir en PDF ci-dessous" : " papier"}.</p> : null}
+        <ul className={cx("divide-y divide-[#EEEBE6] border-y border-[#EEEBE6]", devis.lignes.length === 0 && "hidden")}>
           {devis.lignes.map((ligne, i) =>
             ligne.type === "SECTION" ? (
               <li key={i} className="pt-3 pb-1.5 text-[13px] font-semibold tracking-[0.06em] text-[#6B665F] uppercase">
@@ -142,20 +159,28 @@ export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; clie
             </li>
           ))}
         </ul>
-        <a href={client.url(`/${devis.pdf}`)} target="_blank" rel="noopener noreferrer" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-[#D3CFC8] text-[16px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]">
-          Voir le devis en PDF
-        </a>
+        {devis.pdf ? (
+          <a href={client.url(`/${devis.pdf}`)} target="_blank" rel="noopener noreferrer" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-[#D3CFC8] text-[16px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]">
+            Voir le devis en PDF
+          </a>
+        ) : null}
       </Carte>
 
       {devis.accepte ? (
         <Carte className="border-[#1F7A4D] bg-[#F3FAF6]">
-          <Surtitre ton="vert">Bon pour accord donné</Surtitre>
+          <Surtitre ton="vert">{devis.accepte.source === "CRM" ? "Devis signé" : "Bon pour accord donné"}</Surtitre>
           <p className="mt-1.5 text-[16px] leading-relaxed text-[#17563A]">
-            Par {devis.accepte.nom}, le {dateLongue(devis.accepte.le)}. {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte, dans l'onglet Paiement." : ""}
+            {devis.accepte.source === "CRM" ? `Signé le ${dateLongue(devis.accepte.le)}.` : `Par ${devis.accepte.nom}, le ${dateLongue(devis.accepte.le)}.`} {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte, dans l'onglet Paiement." : ""}
           </p>
           <BoutonPrincipal className="mt-3" onClick={onSuite}>
-            {etat.acompte && !etat.acompte.complet ? "Voir le paiement" : "La suite"}
+            {etat.acompte && !etat.acompte.complet ? "Voir le paiement" : "Voir le paiement et la suite"}
           </BoutonPrincipal>
+          {probleme ? <div className="mt-3"><Annonce ton="erreur">{probleme}</Annonce></div> : null}
+          {devis.accepte.retirable ? (
+            <BoutonAConfirmer className="mt-2" libelle="Revenir sur mon accord" question="Retirer votre bon pour accord ? CoverSwap en sera prévenu." confirmer="Oui, retirer" occupe={occupe} onConfirme={() => void retirerAccord()} />
+          ) : devis.accepte.source !== "CRM" ? (
+            <p className="mt-3 text-[14px] leading-relaxed text-[#3F5F4E]">Votre projet est engagé. Pour revenir sur votre accord, appelez CoverSwap.</p>
+          ) : null}
         </Carte>
       ) : (
         <Carte className="space-y-4">

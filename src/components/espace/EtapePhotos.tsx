@@ -46,11 +46,30 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
   const [envois, setEnvois] = useState<EtatEnvoi[]>([]);
   const [recu, setRecu] = useState(false);
   const [aperculu, setAperculu] = useState(false);
+  // Retirer une photo : un geste évident sous la photo, une confirmation courte, un mot qui dit que c'est fait.
+  const [aRetirer, setARetirer] = useState<string | null>(null);
+  const [retrait, setRetrait] = useState(false);
+  const [retire, setRetire] = useState<{ ton: "succes" | "erreur"; texte: string } | null>(null);
   const enCours = useRef(false);
   const camera = useRef<HTMLInputElement>(null);
   const galerie = useRef<HTMLInputElement>(null);
   const apercu = Boolean(client.apercu);
   const projet = nomDuProjet(etat.typeProjet);
+
+  async function retirer(photoId: string) {
+    setRetrait(true);
+    setRetire(null);
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>(`/photos/${photoId}/retrait`, "POST", {});
+      onEtat(espace);
+      setRetire({ ton: "succes", texte: "Photo retirée. Vous pouvez en déposer d'autres." });
+    } catch (erreur) {
+      setRetire({ ton: "erreur", texte: erreur instanceof Error ? erreur.message : "Photo non retirée : réessayez dans un instant." });
+    } finally {
+      setRetrait(false);
+      setARetirer(null);
+    }
+  }
 
   const maj = (cle: string, modif: Partial<EtatEnvoi>) => setEnvois((liste) => liste.map((e) => (e.cle === cle ? { ...e, ...modif } : e)));
 
@@ -179,15 +198,32 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
               </li>
             ))}
             {etat.photos.map((p) => (
-              <li key={p.id} className="relative aspect-square overflow-hidden rounded-xl bg-[#ECEAE5]">
-                {/* eslint-disable-next-line @next/next/no-img-element -- photo privée servie par le CRM */}
-                <img src={client.url(`/photos/${p.id}`)} alt="Photo déposée" className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
-                <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#1F7A4D] text-white" aria-label="Reçue">
-                  <IconeCoche />
-                </span>
+              <li key={p.id} className="flex flex-col gap-1">
+                <div className="relative aspect-square overflow-hidden rounded-xl bg-[#ECEAE5]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- photo privée servie par le CRM */}
+                  <img src={client.url(`/photos/${p.id}`)} alt="Photo déposée" className={cx("h-full w-full object-cover", aRetirer === p.id && "opacity-40")} loading="lazy" referrerPolicy="no-referrer" />
+                  <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#1F7A4D] text-white" aria-label="Reçue">
+                    <IconeCoche />
+                  </span>
+                </div>
+                {aRetirer === p.id ? (
+                  <div className="grid grid-cols-2 gap-1" role="group" aria-label="Retirer cette photo ?">
+                    <button type="button" onClick={() => setARetirer(null)} className="min-h-[44px] rounded-lg border border-[#D3CFC8] bg-white text-[14px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]">
+                      Non
+                    </button>
+                    <button type="button" disabled={retrait} onClick={() => void retirer(p.id)} className="min-h-[44px] rounded-lg bg-[#1A1A1A] text-[14px] font-semibold text-white disabled:opacity-50">
+                      {retrait ? "…" : "Retirer"}
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => (apercu ? setAperculu(true) : setARetirer(p.id))} aria-label="Retirer cette photo" className="min-h-[44px] rounded-lg text-[14px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4 active:bg-[#F2F0EC]">
+                    Retirer
+                  </button>
+                )}
               </li>
             ))}
           </ul>
+          {retire ? <div className="mt-3"><Annonce ton={retire.ton}>{retire.texte}</Annonce></div> : null}
           {enAttenteDeReseau.length > 0 ? (
             <div className="mt-3 space-y-2">
               <Annonce>Pas de réseau pour l&apos;instant. Vos photos sont gardées dans votre téléphone&nbsp;: elles partiront toutes seules, même si vous fermez cette page.</Annonce>

@@ -6,15 +6,20 @@ import { AvantApres } from "./AvantApres";
 import { vignette } from "./CatalogueTeintes";
 import { CreationSimulation } from "./CreationSimulation";
 import { IconePlus } from "./Illustrations";
-import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Feuille, FOCUS, Surtitre, cx } from "./ui";
+import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Feuille, FOCUS, Surtitre, cx } from "./ui";
 
 /**
- * Onglet Simulations : sa galerie (son essai du site, celles qu'il a créées,
- * celles que CoverSwap a publiées pour lui), et le simulateur, intégré. Une
- * simulation s'ouvre en grand, avant / après au doigt, avec la teinte de
- * chaque zone ; un bouton la valide — c'est ce qui ouvre le devis. Il peut
- * changer d'avis tant que le devis n'est pas établi, ou composer son mélange
- * zone par zone.
+ * Onglet Simulations, en deux sous-onglets :
+ *  - « Mes simulations » : sa galerie — ses essais du site, celles qu'il a
+ *    créées ici, celles que CoverSwap a publiées pour lui. Chacune s'ouvre en
+ *    grand, avant / après au doigt, avec la teinte de chaque zone. C'est ICI
+ *    qu'il valide celle qui lui plaît (ce qui ouvre le devis) — et qu'il peut
+ *    annuler sa validation ou en valider une autre tant que le devis n'est pas
+ *    établi, composer son mélange, demander une autre proposition (et retirer
+ *    sa demande).
+ *  - « Créer une simulation » : le simulateur, qui repart toujours de zéro
+ *    (CreationSimulation). Une fois lancée, il est ramené dans « Mes
+ *    simulations », où elle arrive.
  */
 
 type Vue = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres";
@@ -25,10 +30,11 @@ const ORIGINE: Record<SimulationClient["source"], string> = { SITE: "Sur le site
 
 /** Des noms que le client reconnaît : « Essai sur le site », « Votre simulation 2 », « Proposition 1 ». */
 function nommer(sims: SimulationClient[]): Map<string, string> {
-  const rangs = { CLIENT: 0, CRM: 0 };
+  const rangs = { CLIENT: 0, CRM: 0, SITE: 0 };
   const noms = new Map<string, string>();
+  const plusieursEssais = sims.filter((s) => s.source === "SITE").length > 1;
   for (const s of [...sims].sort((a, b) => a.le.localeCompare(b.le))) {
-    if (s.source === "SITE") noms.set(s.id, "Essai sur le site");
+    if (s.source === "SITE") noms.set(s.id, plusieursEssais ? `Essai sur le site ${++rangs.SITE}` : "Essai sur le site");
     else if (s.source === "CLIENT") noms.set(s.id, `Votre simulation ${++rangs.CLIENT}`);
     else noms.set(s.id, `Proposition ${++rangs.CRM}`);
   }
@@ -60,7 +66,10 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   const noms = useMemo(() => nommer(sims), [sims]);
   const triees = useMemo(() => [...sims].sort((a, b) => b.le.localeCompare(a.le)), [sims]);
   const [ouverte, setOuverte] = useState<string | null>(null);
-  const [creer, setCreer] = useState(false);
+  // Sans simulation encore : on arrive sur « Créer ». Sinon sur sa galerie.
+  const [sousOnglet, setSousOnglet] = useState<"mes" | "creer">(() => (sims.length === 0 && (creation?.enCours.length ?? 0) === 0 ? "creer" : "mes"));
+  // Le simulateur repart de zéro à chaque passage : remonté (clé) à chaque ouverture du sous-onglet.
+  const [passage, setPassage] = useState(0);
   const [occupe, setOccupe] = useState<string | null>(null);
   const [message, setMessage] = useState<{ ton: "succes" | "erreur" | "info"; texte: string } | null>(null);
   const [erreurVue, setErreurVue] = useState<string | null>(null);
@@ -122,6 +131,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
           if (suivi.statut === "PRETE") {
             await recharger();
             setMessage({ ton: "succes", texte: "Votre simulation est prête. La voici !" });
+            setSousOnglet("mes");
             if (suivi.simulationId) setOuverte(suivi.simulationId);
           } else {
             setMessage({ ton: "erreur", texte: suivi.message ?? "Cette simulation n'a pas abouti. Elle ne compte pas\u00a0: vous pouvez la relancer." });
@@ -206,8 +216,43 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
 
   const ouvrirCreation = () => {
     setMessage(null);
-    setCreer(true);
+    setPassage((n) => n + 1);
+    setSousOnglet("creer");
+    window.scrollTo({ top: 0 });
   };
+
+  /** Il revient sur sa validation : l'onglet Devis se referme, CoverSwap le sait. */
+  async function annulerValidation() {
+    setOccupe("devalidation");
+    setErreurVue(null);
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/choix/retrait", "POST", {});
+      onEtat(espace);
+      setComposition({});
+      setMessage({ ton: "info", texte: "Validation annulée. Validez la simulation qui vous plaît quand vous voulez." });
+      setOuverte(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (erreur) {
+      const texte = erreur instanceof Error ? erreur.message : "Réessayez dans un instant.";
+      setErreurVue(texte);
+      setMessage({ ton: erreur instanceof ErreurEspace && erreur.raison === "apercu" ? "info" : "erreur", texte });
+    } finally {
+      setOccupe(null);
+    }
+  }
+
+  async function retirerDemande() {
+    setOccupe("retrait-proposition");
+    try {
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/proposition/retrait", "POST", {});
+      onEtat(espace);
+      setMessage({ ton: "info", texte: "Demande retirée." });
+    } catch (erreur) {
+      setMessage({ ton: erreur instanceof ErreurEspace && erreur.raison === "apercu" ? "info" : "erreur", texte: erreur instanceof Error ? erreur.message : "Réessayez dans un instant." });
+    } finally {
+      setOccupe(null);
+    }
+  }
 
   async function demanderPlus() {
     setOccupe("demande");
@@ -236,47 +281,76 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
     }
   }
 
-  const bloc = (() => {
-    if (!creation) return null;
-    if (!creation.disponible)
-      return <Annonce>La création de simulations est momentanément indisponible. Vos choix sont gardés&nbsp;: réessayez un peu plus tard, ou appelez CoverSwap.</Annonce>;
-    // Une à la fois : pendant qu'elle se prépare, pas de second bouton rouge qui lui fait concurrence.
-    if (suivies.length > 0) return null;
-    if (creation.restantes > 0) {
-      const principal = sims.length === 0;
-      const Bouton = principal ? BoutonPrincipal : BoutonSecondaire;
-      return (
-        <div className="space-y-2">
-          <Bouton onClick={ouvrirCreation}>
-            <IconePlus /> {sims.length === 0 ? "Créer ma simulation" : "Créer une autre simulation"}
-          </Bouton>
-          <p className="text-center text-[14px] text-[#5F5A53]">
-            Il vous en reste {creation.restantes} sur {creation.gratuites + creation.accordees}.
-          </p>
-        </div>
-      );
-    }
-    if (suivies.length > 0 || creation.enCours.length > 0) return null;
-    const total = creation.gratuites + creation.accordees;
-    return (
-      <Carte className="space-y-3">
-        <p className="text-[16px] leading-relaxed text-[#1A1A1A]">
-          {total > 1 ? `Vous avez utilisé vos ${total} simulations.` : "Vous avez utilisé votre simulation."} Demandez-en d&apos;autres à CoverSwap.
+  // Dans la galerie : un seul bouton vers « Créer » (pas pendant qu'une simulation se prépare : une à la fois).
+  const bloc =
+    creation && creation.disponible && suivies.length === 0 ? (
+      <div className="space-y-2">
+        <BoutonSecondaire onClick={ouvrirCreation}>
+          <IconePlus /> {creation.restantes > 0 ? "Créer une autre simulation" : "Demander d'autres simulations"}
+        </BoutonSecondaire>
+        <p className="text-center text-[14px] text-[#5F5A53]">
+          {creation.restantes > 0 ? `Il vous en reste ${creation.restantes} sur ${creation.gratuites + creation.accordees}.` : `Vous avez utilisé vos ${creation.gratuites + creation.accordees} simulations.`}
         </p>
-        {creation.demandeesLe ? (
-          <p className="text-[15px] text-[#1F6B45]">Demande envoyée le {dateCourte(creation.demandeesLe)}&nbsp;: CoverSwap vous répond très vite.</p>
+      </div>
+    ) : null;
+
+  const sousOnglets = (
+    <div role="tablist" aria-label="Simulations" className="grid grid-cols-2 gap-1 rounded-2xl bg-[#E9E6E0] p-1">
+      {(
+        [
+          { cle: "mes", libelle: sims.length > 0 ? `Mes simulations (${sims.length})` : "Mes simulations" },
+          { cle: "creer", libelle: "Créer une simulation" },
+        ] as const
+      ).map((o) => (
+        <button
+          key={o.cle}
+          type="button"
+          role="tab"
+          aria-selected={sousOnglet === o.cle}
+          onClick={() => (o.cle === "creer" ? (sousOnglet === "creer" ? undefined : ouvrirCreation()) : setSousOnglet("mes"))}
+          className={cx("min-h-[48px] rounded-xl px-2 text-[15px] leading-tight font-semibold transition-colors", sousOnglet === o.cle ? "bg-white text-[#1A1A1A] shadow-[0_1px_3px_rgba(26,26,26,0.12)]" : "text-[#5F5A53] active:bg-[#DDD9D2]", FOCUS)}
+        >
+          {o.libelle}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (sousOnglet === "creer") {
+    return (
+      <div className="space-y-5">
+        <EnteteEtape titre="Créer une simulation" phrase="Votre photo, vos teintes : CoverSwap les applique sur votre pièce, en une minute environ." />
+        {sousOnglets}
+        {suivies.length > 0 ? (
+          <Annonce>Une simulation est déjà en préparation&nbsp;: elle arrive dans «&nbsp;Mes simulations&nbsp;». Attendez-la avant d&apos;en lancer une autre.</Annonce>
         ) : (
-          <BoutonSecondaire onClick={() => void demanderPlus()} disabled={occupe === "demande"}>
-            {occupe === "demande" ? "Envoi…" : "Demander d'autres simulations"}
-          </BoutonSecondaire>
+          <CreationSimulation
+            key={passage}
+            etat={etat}
+            client={client}
+            jeton={jeton}
+            onEtat={onEtat}
+            favoris={favoris}
+            onFavori={basculerFavori}
+            onDemanderPlus={() => void demanderPlus()}
+            demandeEnCours={occupe === "demande"}
+            onLancee={(id) => {
+              setSuivies((avant) => [...avant.filter((s) => s.id !== id), { id, le: new Date().toISOString() }]);
+              setMessage(null);
+              setSousOnglet("mes");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
         )}
-      </Carte>
+        {message && message.ton !== "succes" ? <Annonce ton={message.ton}>{message.texte}</Annonce> : null}
+      </div>
     );
-  })();
+  }
 
   return (
     <div className="space-y-5">
-      <EnteteEtape titre={sims.length > 1 ? "Vos simulations" : "Votre simulation"} phrase={phrase} />
+      <EnteteEtape titre="Mes simulations" phrase={phrase} />
+      {sousOnglets}
       {message ? <Annonce ton={message.ton}>{message.texte}</Annonce> : null}
 
       {suivies.length > 0 ? (
@@ -325,6 +399,18 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
         </ul>
       ) : suivies.length === 0 && (etat.simulationsEnPreparation || etat.propositionDemandeeLe) ? (
         <Annonce>CoverSwap prépare une proposition pour vous&nbsp;: elle apparaîtra ici, et vous serez prévenu par SMS.</Annonce>
+      ) : suivies.length === 0 ? (
+        <Carte className="space-y-3 text-center">
+          <p className="text-[17px] leading-relaxed text-[#1A1A1A]">Vous n&apos;avez pas encore de simulation.</p>
+          <BoutonPrincipal onClick={ouvrirCreation}>
+            <IconePlus /> Créer ma simulation
+          </BoutonPrincipal>
+        </Carte>
+      ) : null}
+
+      {/* Ce qui est validé se voit d'ici — et s'annule d'ici, tant que le devis n'est pas établi. */}
+      {valideeNom && modifiable ? (
+        <BoutonAConfirmer libelle="Annuler ma validation" question="Annuler votre validation ? Votre devis ne sera plus préparé." confirmer="Oui, annuler" occupe={occupe === "devalidation"} onConfirme={() => void annulerValidation()} />
       ) : null}
 
       {bloc}
@@ -390,7 +476,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
       {sims.length > 0 ? (
         <Carte>
           <Surtitre>Besoin d&apos;un avis&nbsp;?</Surtitre>
-          {demande === null ? (
+          {etat.propositionDemandeeLe ? null : demande === null ? (
             <BoutonSecondaire className="mt-3" onClick={() => setDemande("")}>
               Demander une proposition à CoverSwap
             </BoutonSecondaire>
@@ -405,7 +491,15 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
               </BoutonPrincipal>
             </div>
           )}
-          {etat.propositionDemandeeLe ? <p className="mt-2.5 text-[14px] text-[#5F5A53]">Demande envoyée le {dateCourte(etat.propositionDemandeeLe)}&nbsp;: CoverSwap s&apos;en occupe.</p> : null}
+          {etat.propositionDemandeeLe ? (
+            <div className="mt-3 space-y-2 rounded-2xl bg-[#F1EFEA] p-3">
+              <p className="text-[15px] leading-snug text-[#3F3B36]">
+                Demande envoyée le {dateCourte(etat.propositionDemandeeLe)}&nbsp;: CoverSwap s&apos;en occupe.
+                {etat.propositionMessage ? <span className="mt-1 block whitespace-pre-wrap text-[#1A1A1A]">« {etat.propositionMessage} »</span> : null}
+              </p>
+              <BoutonAConfirmer libelle="Retirer ma demande" question="Retirer votre demande ?" confirmer="Oui, retirer" occupe={occupe === "retrait-proposition"} onConfirme={() => void retirerDemande()} className="bg-transparent" />
+            </div>
+          ) : null}
         </Carte>
       ) : null}
 
@@ -425,7 +519,10 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
               etat.devis ? (
                 <BoutonPrincipal onClick={() => aller("devis")}>Voir mon devis</BoutonPrincipal>
               ) : (
-                <p className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-[#E7F3EC] px-4 text-center text-[16px] font-semibold text-[#17563A]">✓ Validée&nbsp;: CoverSwap prépare votre devis</p>
+                <div className="space-y-1.5">
+                  <p className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-[#E7F3EC] px-4 text-center text-[16px] font-semibold text-[#17563A]">✓ Validée&nbsp;: CoverSwap prépare votre devis</p>
+                  <BoutonAConfirmer libelle="Annuler ma validation" question="Annuler votre validation ?" confirmer="Oui, annuler" occupe={occupe === "devalidation"} onConfirme={() => void annulerValidation()} />
+                </div>
               )
             ) : modifiable ? (
               <BoutonPrincipal
@@ -472,24 +569,6 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
         ) : null}
       </Feuille>
 
-      {creer && creation ? (
-        <CreationSimulation
-          ouverte
-          onFermer={() => setCreer(false)}
-          etat={etat}
-          client={client}
-          jeton={jeton}
-          onEtat={onEtat}
-          favoris={favoris}
-          onFavori={basculerFavori}
-          onLancee={(id) => {
-            setSuivies((avant) => [...avant.filter((s) => s.id !== id), { id, le: new Date().toISOString() }]);
-            setCreer(false);
-            setMessage(null);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
-      ) : null}
     </div>
   );
 }

@@ -261,6 +261,8 @@ function prochainPas(etat: Etat): Pas {
     case "PHOTOS":
       return { phrase: `Envoyez-nous quelques photos de ${projet.votre} : c'est la première étape.`, bouton: "Envoyer mes photos", vue: "photos" };
     case "PROJET":
+      // Il a déjà rempli son projet : il ne lui reste qu'à le valider.
+      if (etat.monProjet && etat.monProjet.zones.length > 0 && !etat.projetValide) return { phrase: "Votre projet est presque prêt : relisez-le et validez-le.", bouton: "Valider mon projet", vue: "projet" };
       return { phrase: etat.photos.length > 0 || sims.some((s) => s.source === "SITE") ? "Vos photos sont là, précisez votre projet." : "Précisez votre projet en quelques gestes.", bouton: "Préciser mon projet", vue: "projet" };
     case "SIMULATIONS":
     case "ATTENTE_SIMULATION": {
@@ -278,7 +280,7 @@ function prochainPas(etat: Etat): Pas {
     case "ACOMPTE":
       return { phrase: "C'est signé ! Il reste l'acompte, qui réserve votre date.", bouton: "Voir le paiement", vue: "paiement" };
     case "CHANTIER":
-      return { phrase: etat.chantier?.date ? `Rendez-vous le ${dateCourte(etat.chantier.date)} : tout est prêt.` : "C'est réglé : CoverSwap vous appelle pour fixer la date du chantier.", bouton: "Préparer le chantier", vue: "paiement" };
+      return { phrase: etat.chantier?.date ? `Rendez-vous le ${dateCourte(etat.chantier.date)} : tout est prêt.` : "Votre acompte est bien reçu : CoverSwap vous appelle pour fixer la date du chantier.", bouton: "Préparer le chantier", vue: "paiement" };
     case "TERMINE":
       return { phrase: "Votre chantier est terminé. Merci de votre confiance !", bouton: etat.apres?.avis ? "Voir les photos" : "Voir les photos et donner mon avis", vue: "apres" };
   }
