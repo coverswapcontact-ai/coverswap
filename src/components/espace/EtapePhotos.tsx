@@ -15,6 +15,25 @@ import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitr
 
 type EtatEnvoi = { cle: string; apercu: string; part: number; etat: "attente" | "envoi" | "echec" | "ok"; message?: string };
 
+/** Salle de bain, meubles, local : les prises utiles, sans dessin de cuisine. */
+const PRISES_AUTRES: Record<string, { titre: string; aide: string }[]> = {
+  SDB: [
+    { titre: "Vue d'ensemble", aide: "Depuis la porte, toute la pièce dans l'image" },
+    { titre: "Le meuble vasque", aide: "De face, les portes et le plan entiers" },
+    { titre: "Un détail", aide: "Une porte, une poignée ou un joint, de près" },
+  ],
+  MEUBLES: [
+    { titre: "Le meuble entier", aide: "De face\u00a0: reculez pour qu'il tienne dans l'image" },
+    { titre: "Les portes", aide: "Bien droit, portes fermées" },
+    { titre: "Un détail", aide: "Une poignée, un chant, l'état de la surface" },
+  ],
+  PRO: [
+    { titre: "Vue d'ensemble", aide: "Le comptoir ou le mobilier dans son local" },
+    { titre: "De face", aide: "Chaque meuble à recouvrir, bien droit" },
+    { titre: "Un détail", aide: "Un angle, un chant, l'état de la surface" },
+  ],
+};
+
 const PRISES = [
   { cadre: "ensemble" as const, titre: "Vue d'ensemble", aide: "Reculez au maximum, toute la pièce dans l'image" },
   { cadre: "hauts" as const, titre: "Meubles hauts", aide: "De face, les portes entières" },
@@ -184,15 +203,32 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onRetour, onSuite }: 
 
       <Carte>
         <Surtitre>Quelles photos prendre</Surtitre>
-        <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-4">
-          {PRISES.map((prise) => (
-            <li key={prise.cadre} className="flex flex-col gap-1.5">
-              <CuisineDeFace cadre={prise.cadre} className="w-full rounded-xl bg-[#F7F6F3] p-1.5" />
-              <span className="text-[15px] leading-tight font-semibold text-[#1A1A1A]">{prise.titre}</span>
-              <span className="text-[13.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
-            </li>
-          ))}
-        </ul>
+        {PRISES_AUTRES[etat.typeProjet] ? (
+          // Hors cuisine : pas de dessin de cuisine (il égarerait), trois prises dites simplement.
+          <ul className="mt-3 space-y-3">
+            {PRISES_AUTRES[etat.typeProjet].map((prise) => (
+              <li key={prise.titre} className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1EFEA] text-[#1A1A1A]" aria-hidden>
+                  <IconeAppareil taille={18} />
+                </span>
+                <span>
+                  <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{prise.titre}</span>
+                  <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-4">
+            {PRISES.map((prise) => (
+              <li key={prise.cadre} className="flex flex-col gap-1.5">
+                <CuisineDeFace cadre={prise.cadre} className="w-full rounded-xl bg-[#F7F6F3] p-1.5" />
+                <span className="text-[15px] leading-tight font-semibold text-[#1A1A1A]">{prise.titre}</span>
+                <span className="text-[13.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </Carte>
 
       <Carte>
