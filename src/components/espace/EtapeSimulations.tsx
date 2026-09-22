@@ -403,7 +403,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
           })}
         </ul>
       ) : suivies.length === 0 && (etat.simulationsEnPreparation || etat.propositionDemandeeLe) ? (
-        <Annonce>CoverSwap prépare une proposition pour vous&nbsp;: elle apparaîtra ici, et vous serez prévenu par SMS.</Annonce>
+        <Annonce>CoverSwap prépare une proposition pour vous&nbsp;: elle apparaîtra ici, et vous serez prévenu par e-mail.</Annonce>
       ) : suivies.length === 0 ? (
         <Carte className="space-y-3 text-center">
           <p className="text-[17px] leading-relaxed text-[#1A1A1A]">Vous n&apos;avez pas encore de simulation.</p>

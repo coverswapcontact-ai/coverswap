@@ -54,7 +54,7 @@ export function EcranConfirmation({ compte, client, onReponse }: { compte: Compt
         <h1 id="titre-confirmation" className="mt-1.5 font-display text-[29px] leading-[1.13] font-semibold tracking-tight text-balance text-[#1A1A1A]">
           Pour votre sécurité, confirmez que c&apos;est bien vous.
         </h1>
-        <p className="mt-3 text-[17px] leading-relaxed text-[#4F4A44]">Vous n&apos;êtes pas venu depuis un moment. Tapez les <strong>4 derniers chiffres</strong> du numéro de téléphone sur lequel vous recevez nos SMS.</p>
+        <p className="mt-3 text-[17px] leading-relaxed text-[#4F4A44]">Vous n&apos;êtes pas venu depuis un moment. Tapez les <strong>4 derniers chiffres</strong> du numéro de téléphone que vous nous avez donné.</p>
       </div>
       <label className="block">
         <span className="sr-only">Les 4 derniers chiffres de votre téléphone</span>
@@ -337,7 +337,7 @@ export function Contact({ compte, client }: { compte: Compte; client: Client }) 
     try {
       await client.envoyerJson("/message", "POST", { texte });
       setTexte("");
-      setEtat({ ton: "succes", texte: "Message envoyé : CoverSwap vous répond vite, par téléphone ou par SMS." });
+      setEtat({ ton: "succes", texte: "Message envoyé : CoverSwap vous répond vite, par téléphone ou par e-mail." });
     } catch (e) {
       setEtat({ ton: "erreur", texte: e instanceof ErreurEspace && e.status === 0 ? "Pas de réseau : votre message n'est pas parti. Réessayez dans un moment." : e instanceof Error ? e.message : "Réessayez dans un instant." });
     } finally {

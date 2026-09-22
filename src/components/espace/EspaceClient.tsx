@@ -517,8 +517,8 @@ function LienInvalide({ erreur, onReessayer }: { erreur: ErreurEspace; onReessay
         {reseau
           ? erreur.message
           : desactive
-            ? "Ce lien a été remplacé ou désactivé. Demandez-nous le nouveau : nous vous l'envoyons par SMS dans la minute."
-            : "Vérifiez que vous avez ouvert le lien en entier, tel que reçu par SMS. Sinon, appelez-nous : nous vous en envoyons un nouveau."}
+            ? "Ce lien a été remplacé ou désactivé. Demandez-nous le nouveau : nous vous l'envoyons par e-mail."
+            : "Vérifiez que vous avez ouvert le lien en entier, tel que vous l'avez reçu. Sinon, appelez-nous : nous vous en envoyons un nouveau."}
       </p>
       {reseau ? (
         <button type="button" onClick={onReessayer} className="mt-6 min-h-[56px] w-full max-w-xs rounded-2xl bg-[#CC0000] text-[17px] font-semibold text-white">

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const MISE_A_JOUR = "17 septembre 2026";
+const MISE_A_JOUR = "22 septembre 2026";
 
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
@@ -25,6 +25,8 @@ const SOUS_TRAITANTS: { nom: string; role: string; lieu: string }[] = [
   { nom: "Vercel Inc.", role: "hébergement du site et exécution des formulaires", lieu: "États-Unis (données servies depuis l'Europe)" },
   { nom: "Railway Corp.", role: "hébergement de notre outil de gestion des demandes (fiches, photos, simulations)", lieu: "centre de données dans l'Union européenne" },
   { nom: "OpenAI, L.L.C.", role: "génération du rendu du simulateur à partir de votre photo", lieu: "États-Unis" },
+  { nom: "Anthropic, PBC", role: "aide à la rédaction de nos réponses à vos e-mails (seules les informations utiles à la réponse lui sont transmises)", lieu: "États-Unis" },
+  { nom: "Google Ireland Ltd (Gmail, Google Drive)", role: "notre messagerie (vos e-mails et nos réponses) et la copie de sauvegarde de vos documents", lieu: "Irlande / États-Unis" },
   { nom: "Resend, Inc.", role: "envoi des e-mails de notification et de secours", lieu: "États-Unis" },
   { nom: "Google Ireland Ltd (Tag Manager, Analytics)", role: "mesure d'audience, avec votre accord", lieu: "Irlande / États-Unis" },
   { nom: "Meta Platforms Ireland Ltd (pixel)", role: "mesure des campagnes publicitaires, avec votre accord, lorsqu'il est activé", lieu: "Irlande / États-Unis" },
@@ -104,6 +106,20 @@ export default function PolitiqueConfidentialite() {
               uniquement avec un identifiant et un mot de passe, et ne sont jamais publiées ni transmises à des tiers autres que les
               prestataires techniques listés ci-dessous. Pour le simulateur, votre photo est transmise à OpenAI le temps de produire le rendu ;
               selon les conditions de son API, OpenAI n&apos;utilise pas ces images pour entraîner ses modèles.
+            </p>
+          </Section>
+
+          <Section titre="Nos échanges par e-mail">
+            <p>
+              Nous vous écrivons de nous-mêmes à quatre moments : quand votre simulation est prête, quand votre devis est disponible,
+              quand nous recevons votre paiement et quand votre chantier est terminé. Ces messages concernent votre projet ; ils ne sont pas
+              commerciaux. Une relance, elle, porte toujours un lien de désinscription, et une désinscription est définitive.
+            </p>
+            <p>
+              Pour vous répondre plus vite, nous pouvons nous faire aider d&apos;un assistant de rédaction (Anthropic). Il ne reçoit que ce
+              qui est utile à la réponse — votre message, nos échanges précédents, l&apos;état de votre projet —, jamais vos photos. Chaque
+              réponse est relue et envoyée par nous. Selon les conditions de son API, Anthropic n&apos;utilise pas ces données pour entraîner
+              ses modèles.
             </p>
           </Section>
 
