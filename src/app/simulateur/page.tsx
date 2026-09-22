@@ -5,6 +5,7 @@ import { FAQ_SIMULATEUR } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import Simulateur from "./_components/Simulateur";
+import { chargerPrestations, libellesDuSimulateur } from "@/lib/prestations";
 
 export const metadata: Metadata = {
   title: { absolute: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap" },
@@ -18,7 +19,8 @@ const ETAPES = [
   { titre: "Voir le résultat", texte: "Le rendu s'affiche en avant / après en moins d'une minute. Vos coordonnées ne sont demandées que pour le recevoir avec un devis." },
 ];
 
-export default function PageSimulateur() {
+export default async function PageSimulateur() {
+  const libelles = libellesDuSimulateur(await chargerPrestations());
   return (
     <main className="bg-noir min-h-screen">
       <HowToSchema name="Simuler un covering sur sa propre photo" description="Trois étapes, sans inscription." etapes={ETAPES} dureeTotale="PT2M" />
@@ -29,7 +31,7 @@ export default function PageSimulateur() {
         <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-3 text-balance">Votre pièce, avec le revêtement de votre choix</h1>
         <p className="text-gris-300 text-lg max-w-2xl mb-8">Une photo, une finition, un résultat en moins d&apos;une minute. Gratuit, sans inscription : vos coordonnées ne servent qu&apos;à recevoir le rendu et un devis.</p>
         <div className="glass-card p-5 sm:p-8">
-          <Simulateur />
+          <Simulateur libelles={libelles} />
         </div>
         <section className="mt-16 max-w-3xl">
           <h2 className="font-display text-2xl font-bold mb-6">Comment ça marche</h2>

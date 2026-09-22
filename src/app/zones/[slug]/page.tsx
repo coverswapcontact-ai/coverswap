@@ -196,7 +196,7 @@ export default async function ZonePage({
               Zone d&apos;intervention · {zone.codePostal.split(" / ")[0]}
             </span>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold mb-6 tracking-tight max-w-4xl">
-              Covering adhésif à <span className="text-rouge">{zone.ville}</span> — Rénovez votre cuisine en 1 journée
+              Covering adhésif à <span className="text-rouge">{zone.ville}</span> — Cuisine, salle de bain, meubles : rénovés en 1 journée
             </h1>
             <p className="text-gris-300 text-lg max-w-3xl leading-relaxed mb-10">
               Vous habitez {zone.ville} et souhaitez moderniser votre cuisine, salle de bain ou vos meubles sans

@@ -26,6 +26,15 @@ type Choix = { piece: string; photoId: string | null; teintes: Record<string, { 
 const cleEchec = (jeton: string) => `espace-creation-echec:${jeton.split("-")[0]}`;
 
 /** Les choix d'un lancement qui n'est pas parti : repris une fois, puis oubliés. */
+/** Après un échec (réseau, refus) : ses choix sont gardés pour la prochaine tentative, avec l'heure (6 h au plus). */
+function garderEchec(jeton: string, choix: Choix): void {
+  try {
+    localStorage.setItem(cleEchec(jeton), JSON.stringify({ ...choix, le: Date.now() }));
+  } catch {
+    // stockage indisponible : ses choix restent à l'écran
+  }
+}
+
 function reprendreEchec(jeton: string): Choix | null {
   try {
     const brut = localStorage.getItem(cleEchec(jeton));
@@ -62,9 +71,11 @@ export function CreationSimulation({
   demandeEnCours: boolean;
 }) {
   const creation = etat.creation;
-  // Toutes les pièces du site ; un CRM pas encore à jour n'en donne qu'une (celle du projet).
-  const pieces: Piece[] = useMemo(() => creation?.pieces ?? [{ piece: creation?.piece ?? etat.typeProjet ?? "CUISINE", libelle: "Votre projet", aide: "", zones: creation?.zones ?? [] }], [creation, etat.typeProjet]);
-  const pieceDuProjet = pieces.some((p) => p.piece === (creation?.piece ?? etat.typeProjet)) ? (creation?.piece ?? etat.typeProjet) : pieces[0].piece;
+  // Les familles de son projet d'abord (les autres restent repliées) ; un CRM pas encore à jour n'en donne qu'une.
+  const pieces: Piece[] = useMemo(() => creation?.pieces ?? [{ piece: creation?.piece ?? "CUISINE", libelle: "Votre projet", aide: "", zones: creation?.zones ?? [] }], [creation]);
+  const duProjet = pieces.filter((p) => p.duProjet);
+  const pieceDuProjet = (duProjet[0] ?? pieces[0]).piece;
+  const [autresPieces, setAutresPieces] = useState(false);
   const [choix, setChoix] = useState<Choix>(() => reprendreEchec(jeton) ?? { piece: pieceDuProjet, photoId: null, teintes: {} });
   const [zoneEnChoix, setZoneEnChoix] = useState<string | null>(null);
   const [envoi, setEnvoi] = useState<number | null>(null);
@@ -74,7 +85,9 @@ export function CreationSimulation({
   const galerie = useRef<HTMLInputElement>(null);
   const apercu = Boolean(client.apercu);
   const piece = pieces.find((p) => p.piece === choix.piece) ?? pieces[0];
-  const zones = piece.zones;
+  // Les surfaces des parties qu'il a cochées dans son projet d'abord.
+  const zones = [...piece.zones].sort((a, b) => Number((piece.cochees ?? []).includes(b.zone)) - Number((piece.cochees ?? []).includes(a.zone)));
+  const piecesMontrees = duProjet.length && !autresPieces && !duProjet.some((p) => p.piece === piece.piece) ? [...duProjet, piece] : duProjet.length && !autresPieces ? duProjet : pieces;
   const choisies = zones.filter((z) => choix.teintes[z.zone]);
   // Une photo retirée entre-temps ne reste pas choisie.
   const photoId = choix.photoId && etat.photos.some((p) => p.id === choix.photoId) ? choix.photoId : null;
@@ -132,11 +145,7 @@ export function CreationSimulation({
     } catch (erreur) {
       const e = erreur instanceof ErreurEspace ? erreur : new ErreurEspace("Réessayez dans un instant.", 500);
       // Rien n'est parti : ses choix sont gardés pour la prochaine tentative (et seulement pour elle).
-      try {
-        localStorage.setItem(cleEchec(jeton), JSON.stringify({ ...choix, le: Date.now() }));
-      } catch {
-        // stockage indisponible : ses choix restent à l'écran
-      }
+      garderEchec(jeton, choix);
       setMessage({ ton: e.raison === "apercu" ? "info" : "erreur", texte: e.status === 0 ? "Pas de réseau : votre simulation n'est pas partie. Vos choix sont gardés : relancez dès le retour du réseau." : e.message });
     } finally {
       setOccupe(false);
@@ -221,7 +230,7 @@ export function CreationSimulation({
             <Etape numero={2} fait /> Ce que montre la photo
           </h2>
           <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="La pièce ou le meuble à simuler">
-            {pieces.map((p) => {
+            {piecesMontrees.map((p) => {
               const active = p.piece === piece.piece;
               return (
                 <button key={p.piece} type="button" role="radio" aria-checked={active} onClick={() => modifier((c) => (c.piece === p.piece ? c : { ...c, piece: p.piece, teintes: {} }))} className={cx("min-h-[48px] rounded-full border-2 px-4 text-[15.5px] font-semibold", active ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#E2DFD9] bg-white text-[#1A1A1A] active:bg-[#F6F5F2]", FOCUS)}>
@@ -230,6 +239,11 @@ export function CreationSimulation({
               );
             })}
           </div>
+          {duProjet.length && piecesMontrees.length < pieces.length ? (
+            <button type="button" onClick={() => setAutresPieces(true)} className={cx("min-h-[44px] px-1 text-[15px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4", FOCUS)}>
+              Une autre pièce&nbsp;?
+            </button>
+          ) : null}
         </section>
       ) : null}
 

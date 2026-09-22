@@ -5,6 +5,7 @@ import { preload } from "react-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection } from "@/components/HomeClient";
+import { chargerPrestations, libellesDuSimulateur } from "@/lib/prestations";
 import Realisations from "@/components/Realisations";
 import { FAQSchema } from "@/components/JsonLd";
 import { PRESTATIONS } from "@/data/prestations";
@@ -276,14 +277,15 @@ function CTAFinal() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const libelles = libellesDuSimulateur(await chargerPrestations());
   return (
     <>
       <Hero />
       <CeQueCaChange />
       <Prestations />
       <Realisations apercu />
-      <SimulationSection />
+      <SimulationSection libelles={libelles} />
       <CommentCaMarche />
       <Tarifs />
       <Catalogue />

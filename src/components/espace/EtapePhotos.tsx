@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { envoyerPhoto, ErreurEspace, MESSAGE_APERCU, nomDuProjet, type Client, type Etat } from "./api";
+import { envoyerPhoto, ErreurEspace, famillesDe, MESSAGE_APERCU, motsDe, type Client, type Etat, type Prestations, type PrisePhoto } from "./api";
 import { mettreEnFile, photosEnFile, reduirePhoto, retirerDeLaFile, type PhotoEnFile } from "./file-photos";
 import { CuisineDeFace, IconeAppareil, IconeCoche, IconeGalerie } from "./Illustrations";
 import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
@@ -15,34 +15,14 @@ import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitr
 
 type EtatEnvoi = { cle: string; apercu: string; part: number; etat: "attente" | "envoi" | "echec" | "ok"; message?: string };
 
-/** Salle de bain, meubles, local : les prises utiles, sans dessin de cuisine. */
-const PRISES_AUTRES: Record<string, { titre: string; aide: string }[]> = {
-  SDB: [
-    { titre: "Vue d'ensemble", aide: "Depuis la porte, toute la pièce dans l'image" },
-    { titre: "Le meuble vasque", aide: "De face, les portes et le plan entiers" },
-    { titre: "Un détail", aide: "Une porte, une poignée ou un joint, de près" },
-  ],
-  MEUBLES: [
-    { titre: "Le meuble entier", aide: "De face\u00a0: reculez pour qu'il tienne dans l'image" },
-    { titre: "Les portes", aide: "Bien droit, portes fermées" },
-    { titre: "Un détail", aide: "Une poignée, un chant, l'état de la surface" },
-  ],
-  PRO: [
-    { titre: "Vue d'ensemble", aide: "Le comptoir ou le mobilier dans son local" },
-    { titre: "De face", aide: "Chaque meuble à recouvrir, bien droit" },
-    { titre: "Un détail", aide: "Un angle, un chant, l'état de la surface" },
-  ],
-};
-
-const PRISES = [
-  { cadre: "ensemble" as const, titre: "Vue d'ensemble", aide: "Reculez au maximum, toute la pièce dans l'image" },
-  { cadre: "hauts" as const, titre: "Meubles hauts", aide: "De face, les portes entières" },
-  { cadre: "bas" as const, titre: "Meubles bas", aide: "De face, à hauteur de poitrine" },
-  { cadre: "plan" as const, titre: "Plan de travail", aide: "En légère plongée, sur toute sa longueur" },
-  { cadre: "detail" as const, titre: "Un détail", aide: "Une porte et sa poignée, de près" },
+/** Sans famille connue : les prises qui valent pour tout (ni cuisine, ni salle de bain par défaut). */
+const PRISES_GENERALES: PrisePhoto[] = [
+  { titre: "Vue d'ensemble", aide: "Reculez : toute la pièce, ou tout le meuble, dans l'image" },
+  { titre: "De face", aide: "Bien droit, portes fermées" },
+  { titre: "Un détail", aide: "Une porte, une poignée ou un chant, de près" },
 ];
 
-export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Etat; client: Client; jeton: string; onEtat: (etat: Etat) => void; onSuite: () => void }) {
+export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite }: { etat: Etat; client: Client; jeton: string; prestations?: Prestations; onEtat: (etat: Etat) => void; onSuite: () => void }) {
   const [envois, setEnvois] = useState<EtatEnvoi[]>([]);
   const [recu, setRecu] = useState(false);
   const [aperculu, setAperculu] = useState(false);
@@ -54,7 +34,14 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
   const camera = useRef<HTMLInputElement>(null);
   const galerie = useRef<HTMLInputElement>(null);
   const apercu = Boolean(client.apercu);
-  const projet = nomDuProjet(etat.typeProjet);
+  // Une photo gardée hors ligne repart dans SON projet, pas dans celui ouvert au retour du réseau.
+  const cleFile = etat.code ? `${jeton.split("-")[0]}~${etat.code}` : jeton;
+  // Le guide et les mots suivent SA famille : une salle de bain ne se photographie pas comme une cuisine.
+  const mots = motsDe(etat);
+  const familles = famillesDe(etat)
+    .map((id) => prestations?.familles.find((f) => f.id === id))
+    .filter((f): f is NonNullable<typeof f> => Boolean(f));
+  const cuisineSeule = familles.length === 1 && familles[0].id === "CUISINE";
 
   async function retirer(photoId: string) {
     setRetrait(true);
@@ -78,7 +65,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
     if (enCours.current || apercu) return;
     enCours.current = true;
     try {
-      for (const photo of await photosEnFile(jeton)) {
+      for (const photo of await photosEnFile(cleFile)) {
         maj(photo.cle, { etat: "envoi", part: 0, message: undefined });
         try {
           const resultat = await envoyerPhoto(client, photo.blob, photo.nom, (part) => maj(photo.cle, { part }));
@@ -102,12 +89,12 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
     } finally {
       enCours.current = false;
     }
-  }, [apercu, client, jeton, onEtat]);
+  }, [apercu, client, cleFile, onEtat]);
 
   // Au retour sur la page : ce qui attendait dans le téléphone réapparaît et repart.
   useEffect(() => {
     let actif = true;
-    void photosEnFile(jeton).then((attente) => {
+    void photosEnFile(cleFile).then((attente) => {
       if (!actif || attente.length === 0) return;
       setEnvois((liste) => [...liste, ...attente.filter((p) => !liste.some((e) => e.cle === p.cle)).map((p) => ({ cle: p.cle, apercu: URL.createObjectURL(p.blob), part: 0, etat: "attente" as const }))]);
       void vider();
@@ -120,7 +107,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
       window.removeEventListener("online", relancer);
       window.clearInterval(minuterie);
     };
-  }, [jeton, vider]);
+  }, [cleFile, vider]);
 
   async function ajouter(fichiers: FileList | null) {
     if (!fichiers?.length || apercu) return;
@@ -130,7 +117,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
       const apercuUrl = URL.createObjectURL(fichier);
       setEnvois((e) => [...e, { cle, apercu: apercuUrl, part: 0, etat: "attente" }]);
       const { blob, nom } = await reduirePhoto(fichier);
-      const enFile: PhotoEnFile = { cle, jeton, blob, nom, ajouteeLe: Date.now() + i };
+      const enFile: PhotoEnFile = { cle, jeton: cleFile, blob, nom, ajouteeLe: Date.now() + i };
       await mettreEnFile(enFile);
     }
     if (camera.current) camera.current.value = "";
@@ -146,7 +133,7 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
   return (
     <div className="space-y-5">
       <EnteteEtape
-        titre={recues > 0 ? "Vos photos" : `Envoyez-nous quelques photos de ${projet.votre}`}
+        titre={recues > 0 ? "Vos photos" : familles.length === 1 ? `Envoyez-nous quelques photos ${mots.de}` : "Envoyez-nous quelques photos de ce que vous voulez rénover"}
         phrase={recues > 0 ? `${recues > 1 ? `Vos ${recues} photos sont bien arrivées` : "Votre photo est bien arrivée"}. Vous pouvez en ajouter à tout moment, même plus tard.` : "Trois ou quatre photos suffisent. C'est sur elles que se font vos simulations, dans votre propre pièce."}
       />
 
@@ -240,55 +227,79 @@ export function EtapePhotos({ etat, client, jeton, onEtat, onSuite }: { etat: Et
 
       <Carte>
         <Surtitre>Quelles photos prendre</Surtitre>
-        {PRISES_AUTRES[etat.typeProjet] ? (
-          // Hors cuisine : pas de dessin de cuisine (il égarerait), trois prises dites simplement.
-          <ul className="mt-3 space-y-3">
-            {PRISES_AUTRES[etat.typeProjet].map((prise) => (
-              <li key={prise.titre} className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1EFEA] text-[#1A1A1A]" aria-hidden>
-                  <IconeAppareil taille={18} />
-                </span>
-                <span>
-                  <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{prise.titre}</span>
-                  <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
+        {cuisineSeule ? (
           <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-4">
-            {PRISES.map((prise) => (
-              <li key={prise.cadre} className="flex flex-col gap-1.5">
+            {familles[0].photos.map((prise) => (
+              <li key={prise.titre} className="flex flex-col gap-1.5">
                 <CuisineDeFace cadre={prise.cadre} className="w-full rounded-xl bg-[#F7F6F3] p-1.5" />
                 <span className="text-[15px] leading-tight font-semibold text-[#1A1A1A]">{prise.titre}</span>
                 <span className="text-[13.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
               </li>
             ))}
           </ul>
+        ) : (
+          // Hors cuisine (ou plusieurs pièces) : pas de dessin de cuisine, il égarerait ; les prises de chaque famille.
+          <div className="mt-3 space-y-4">
+            {(familles.length ? familles : [null]).map((f) => (
+              <div key={f?.id ?? "general"}>
+                {familles.length > 1 && f ? <p className="mb-2 text-[15px] font-semibold text-[#1A1A1A]">{f.libelle}</p> : null}
+                <ul className="space-y-3">
+                  {(f?.photos ?? PRISES_GENERALES).map((prise) => (
+                    <li key={prise.titre} className="flex items-start gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1EFEA] text-[#1A1A1A]" aria-hidden>
+                        <IconeAppareil taille={18} />
+                      </span>
+                      <span>
+                        <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{prise.titre}</span>
+                        <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         )}
       </Carte>
 
       <Carte>
         <Surtitre>Pour une belle simulation</Surtitre>
-        <ul className="mt-3 grid grid-cols-3 gap-2 text-center">
-          {[
-            { bon: true, titre: "De loin, en plein jour", style: {} },
-            { bon: false, titre: "Pas de trop près", style: { transform: "scale(3.2)", transformOrigin: "22% 74%" } },
-            { bon: false, titre: "Pas à contre-jour", style: { filter: "brightness(0.42) contrast(1.35)" } },
-          ].map((exemple) => (
-            <li key={exemple.titre} className="flex flex-col gap-1.5">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#ECEAE5]">
-                {/* eslint-disable-next-line @next/next/no-img-element -- illustration du site */}
-                <img src="/images/fonds/photo-1639405069836-f82aa6dcb900-800.jpg" alt="" className="h-full w-full object-cover" style={exemple.style} />
-                {!exemple.bon && exemple.titre.includes("contre-jour") ? <span className="absolute inset-0 bg-[radial-gradient(circle_at_18%_40%,rgba(255,255,255,0.95),rgba(255,255,255,0)_45%)]" aria-hidden /> : null}
-                <span className={cx("absolute bottom-1.5 left-1.5 flex h-7 w-7 items-center justify-center rounded-full text-[15px] font-bold text-white", exemple.bon ? "bg-[#1F7A4D]" : "bg-[#CC0000]")} aria-hidden>
-                  {exemple.bon ? "✓" : "✕"}
+        {cuisineSeule ? (
+          <ul className="mt-3 grid grid-cols-3 gap-2 text-center">
+            {[
+              { bon: true, titre: "De loin, en plein jour", style: {} },
+              { bon: false, titre: "Pas de trop près", style: { transform: "scale(3.2)", transformOrigin: "22% 74%" } },
+              { bon: false, titre: "Pas à contre-jour", style: { filter: "brightness(0.42) contrast(1.35)" } },
+            ].map((exemple) => (
+              <li key={exemple.titre} className="flex flex-col gap-1.5">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#ECEAE5]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- illustration du site */}
+                  <img src="/images/fonds/photo-1639405069836-f82aa6dcb900-800.jpg" alt="" className="h-full w-full object-cover" style={exemple.style} />
+                  {!exemple.bon && exemple.titre.includes("contre-jour") ? <span className="absolute inset-0 bg-[radial-gradient(circle_at_18%_40%,rgba(255,255,255,0.95),rgba(255,255,255,0)_45%)]" aria-hidden /> : null}
+                  <span className={cx("absolute bottom-1.5 left-1.5 flex h-7 w-7 items-center justify-center rounded-full text-[15px] font-bold text-white", exemple.bon ? "bg-[#1F7A4D]" : "bg-[#CC0000]")} aria-hidden>
+                    {exemple.bon ? "✓" : "✕"}
+                  </span>
+                </div>
+                <span className="text-[13.5px] leading-tight font-medium text-[#1A1A1A]">{exemple.titre}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {[
+              { bon: true, texte: "De loin, en plein jour, bien droit" },
+              { bon: false, texte: "Pas de trop près : on doit tout voir" },
+              { bon: false, texte: "Pas à contre-jour, face à une fenêtre" },
+            ].map((conseil) => (
+              <li key={conseil.texte} className="flex items-center gap-3 text-[15.5px] text-[#1A1A1A]">
+                <span className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white", conseil.bon ? "bg-[#1F7A4D]" : "bg-[#CC0000]")} aria-hidden>
+                  {conseil.bon ? "✓" : "✕"}
                 </span>
-              </div>
-              <span className="text-[13.5px] leading-tight font-medium text-[#1A1A1A]">{exemple.titre}</span>
-            </li>
-          ))}
-        </ul>
+                {conseil.texte}
+              </li>
+            ))}
+          </ul>
+        )}
         <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: seuls les meubles comptent.</p>
       </Carte>
 

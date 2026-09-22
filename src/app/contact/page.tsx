@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { DELAI_REPONSE } from "@/lib/offre";
 import FormulaireContact from "./_components/FormulaireContact";
+import { chargerPrestations } from "@/lib/prestations";
 
 export const metadata: Metadata = {
   title: "Contact — Devis gratuit covering adhésif",
@@ -19,7 +20,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const familles = await chargerPrestations();
   return (
     <div className="min-h-screen pt-28 pb-20">
       <BreadcrumbSchema items={[{ name: "Accueil", url: "https://coverswap.fr" }, { name: "Contact", url: "https://coverswap.fr/contact" }]} />
@@ -39,7 +41,7 @@ export default function ContactPage() {
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-12 items-start">
           {/* Form */}
-          <FormulaireContact />
+          <FormulaireContact familles={familles} />
 
           {/* Sidebar info */}
           <div className="space-y-8">

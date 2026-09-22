@@ -118,7 +118,8 @@ function ChampsContact({ prefixe, formulaire, onChange }: { prefixe: string; for
   );
 }
 
-export default function Simulateur() {
+/** `libelles` : les noms des familles de prestations (fichier unique du CRM) pour les pièces. */
+export default function Simulateur({ libelles = {} }: { libelles?: Record<string, { label: string; description: string }> }) {
   const [charge, setCharge] = useState(false);
   const [etape, setEtape] = useState<Etape>(1);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
@@ -377,7 +378,7 @@ export default function Simulateur() {
                   onClick={() => mettreAJour({ projet: p.id, selections: {} })}
                   className={`rounded-full px-4 py-2 text-sm font-medium border transition-colors ${etat.projet === p.id ? "bg-rouge border-rouge text-white" : "border-white/15 text-gris-300 hover:border-white/40"}`}
                 >
-                  {p.label}
+                  {libelles[p.id]?.label ?? p.label}
                 </button>
               ))}
             </div>

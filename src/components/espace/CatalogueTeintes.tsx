@@ -49,9 +49,12 @@ export function CatalogueTeintes({
   onFavori,
   onChoisir,
   client,
+  consultation = false,
 }: {
   ouvert: boolean;
   onFermer: () => void;
+  /** Le catalogue de l'espace (hors simulation) : on regarde, on garde ses favoris ; rien à « choisir ». */
+  consultation?: boolean;
   zone: string;
   choisie: string | null;
   favoris: string[];
@@ -99,7 +102,7 @@ export function CatalogueTeintes({
 
   return (
     <>
-      <Feuille ouverte={ouvert} onFermer={onFermer} titre={`Teinte pour\u00a0: ${zone}`} sousTitre="Touchez un échantillon pour le voir en grand." libelleFermer="Retour">
+      <Feuille ouverte={ouvert} onFermer={onFermer} titre={consultation ? "Le catalogue Cover Styl'" : `Teinte pour\u00a0: ${zone}`} sousTitre="Touchez un échantillon pour le voir en grand." libelleFermer="Retour">
         <div className="sticky top-0 z-10 -mx-4 space-y-2.5 bg-[#F5F4F1] px-4 pt-1 pb-3">
           <label className="relative block">
             <span className="sr-only">Chercher une teinte</span>
@@ -192,7 +195,12 @@ export function CatalogueTeintes({
         sousTitre={agrandie ? `${libelleFamille(agrandie.famille)} · réf. ${agrandie.id}` : null}
         libelleFermer="Retour au catalogue"
         pied={
-          agrandie ? (
+          agrandie && consultation ? (
+            <BoutonPrincipal onClick={() => onFavori(agrandie.id)} aria-pressed={favoris.includes(agrandie.id)}>
+              <IconeCoeur plein={favoris.includes(agrandie.id)} />
+              {favoris.includes(agrandie.id) ? "Dans mes favoris" : "Ajouter à mes favoris"}
+            </BoutonPrincipal>
+          ) : agrandie ? (
             <BoutonPrincipal
               disabled={indisponibles.has(agrandie.id)}
               onClick={() => {
@@ -216,12 +224,14 @@ export function CatalogueTeintes({
                 <img src={client.url(`/echantillons/${encodeURIComponent(agrandie.id)}`)} alt={`Échantillon ${agrandie.nom}`} referrerPolicy="no-referrer" className="aspect-square w-full object-cover" onError={() => setIndisponibles((d) => new Set(d).add(agrandie.id))} />
               )}
             </div>
+            {consultation ? null : (
             <BoutonSecondaire onClick={() => onFavori(agrandie.id)} aria-pressed={favoris.includes(agrandie.id)}>
               <span className={favoris.includes(agrandie.id) ? "text-[#CC0000]" : "text-[#5F5A53]"}>
                 <IconeCoeur plein={favoris.includes(agrandie.id)} />
               </span>
               {favoris.includes(agrandie.id) ? "Dans mes favoris" : "Ajouter à mes favoris"}
             </BoutonSecondaire>
+            )}
             <p className="px-1 text-[14px] leading-relaxed text-[#5F5A53]">Le rendu exact dépend de la lumière de votre pièce&nbsp;: la simulation le montre sur votre photo.</p>
           </div>
         ) : null}

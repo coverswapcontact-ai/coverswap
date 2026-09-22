@@ -286,6 +286,7 @@ const TYPE_PROJET_MAP: Record<string, CrmTypeProjet> = {
   sdb: "SDB",
   meubles: "MEUBLES",
   meuble: "MEUBLES",
+  mobilier: "MEUBLES",
   "comptoir / accueil pro": "PRO",
   "bureau / espace de travail": "PRO",
   professionnel: "PRO",

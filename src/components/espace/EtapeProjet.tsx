@@ -1,97 +1,91 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ErreurEspace, MESSAGE_APERCU, nomDuProjet, type Client, type Etat, type ProjetClient } from "./api";
-import { CuisineDeFace, PlanCuisine } from "./Illustrations";
-import { IconeCoche } from "./Illustrations";
-import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, CaseCarte, Enregistrement, EnteteEtape, Surtitre, cx, type EtatEnregistrement } from "./ui";
+import { ErreurEspace, MESSAGE_APERCU, motsDe, type Client, type Etat, type FamillePublique, type IdFamille, type Prestations, type ProjetClient, type SelectionPrestations, type TailleProjet } from "./api";
+import { DessinFamille, IconeCoche, PlanCuisine } from "./Illustrations";
+import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, CaseCarte, Enregistrement, EnteteEtape, Surtitre, cx, FOCUS, type EtatEnregistrement } from "./ui";
 
 /**
- * Onglet Projet (v3) : ce qu'il veut rafraîchir, la taille à peu près, un mot
- * libre. Plus de goûts ni de délai — les teintes se choisissent dans ses
- * simulations. Chaque geste s'enregistre tout seul, et le dit. Sans réseau,
- * c'est gardé dans le téléphone et renvoyé au retour du réseau ; un refus du
- * serveur s'affiche tel quel (jamais de bouton muet).
+ * Onglet Projet (mission 5) : ce qu'il veut rénover, en deux niveaux simples.
+ * D'abord les quatre familles — Cuisine, Salle de bain, Mobilier,
+ * Professionnel —, en grandes cartes dessinées ; pour chaque famille cochée, ses
+ * sous-parties se déplient juste dessous. Puis la taille, à peu près, dans les
+ * mots de la famille (mètres de meubles pour une cuisine, nombre de portes pour
+ * un dressing), et un mot libre. Rien ne se déplie tant qu'aucune famille n'est
+ * cochée : l'écran reste léger.
  *
- * Quand tout est rempli, il VALIDE son projet : pastille verte ici et chez
- * CoverSwap. Validé, le projet se relit d'un coup d'œil ; « Modifier » le
- * rouvre — ce qui le dévalide (la pastille tombe, CoverSwap le sait), jusqu'à
- * ce qu'il le revalide.
+ * Chaque geste s'enregistre tout seul, et le dit ; sans réseau, c'est gardé dans
+ * le téléphone et renvoyé au retour du réseau. Quand tout est rempli, il VALIDE
+ * son projet (pastille verte ici et chez CoverSwap) ; « Modifier » le rouvre.
+ * Un projet signé, ou sur lequel le devis est établi, se relit sans se modifier.
  */
 
-const ZONES_PAR_PROJET: Record<string, { id: string; libelle: string; aide: string; dessin?: string }[]> = {
-  CUISINE: [
-    { id: "meubles-hauts", libelle: "Façades hautes", aide: "Au-dessus du plan de travail", dessin: "meubles-hauts" },
-    { id: "meubles-bas", libelle: "Façades basses", aide: "Portes, tiroirs, îlot", dessin: "meubles-bas" },
-    { id: "plan-de-travail", libelle: "Plan de travail", aide: "Le dessus et son chant", dessin: "plan-de-travail" },
-    { id: "credence", libelle: "Crédence", aide: "Le mur derrière le plan", dessin: "credence" },
-    { id: "autre", libelle: "Autre chose", aide: "Précisez dans la note" },
-  ],
-  SDB: [
-    { id: "meuble-vasque", libelle: "Meuble vasque", aide: "Les façades sous le lavabo" },
-    { id: "plan-vasque", libelle: "Plan vasque", aide: "Le dessus autour du lavabo" },
-    { id: "carrelage-mural", libelle: "Murs carrelés", aide: "Recouvrir le carrelage" },
-    { id: "autre", libelle: "Autre chose", aide: "Précisez dans la note" },
-  ],
-  MEUBLES: [
-    { id: "portes-dressing", libelle: "Dressing, placards", aide: "Portes battantes ou coulissantes" },
-    { id: "meuble-tv", libelle: "Meuble TV", aide: "Façades, dessus et côtés" },
-    { id: "meuble-complet", libelle: "Commode, buffet, bureau", aide: "Un meuble seul" },
-    { id: "autre", libelle: "Autre chose", aide: "Précisez dans la note" },
-  ],
-  PRO: [
-    { id: "comptoir-habillage", libelle: "Bar, comptoir", aide: "La façade et le plateau" },
-    { id: "mobilier-pro", libelle: "Mobilier", aide: "Distributeur, présentoir, casiers" },
-    { id: "rangements-pro", libelle: "Rangements", aide: "Placards et armoires" },
-    { id: "habillage-mural", libelle: "Un mur", aide: "Un mur ou un panneau" },
-    { id: "autre", libelle: "Autre chose", aide: "Précisez dans la note" },
-  ],
-};
+type Saisie = { familles: SelectionPrestations; tailles: Partial<Record<IdFamille, TailleProjet>>; precisions: string };
+const VIDE: Saisie = { familles: {}, tailles: {}, precisions: "" };
+const ORDRE: IdFamille[] = ["CUISINE", "SDB", "MEUBLES", "PRO"];
 
-const REPERES = [
-  { id: "une-rangee", libelle: "Un seul mur", aide: "≈ 3 m", metres: 3 },
-  { id: "en-l", libelle: "En L", aide: "≈ 5 m", metres: 5 },
-  { id: "en-u", libelle: "En U", aide: "≈ 7 m", metres: 7 },
-  { id: "ilot", libelle: "Avec îlot", aide: "≈ 8 m", metres: 8 },
-] as const;
+const famillesCochees = (s: SelectionPrestations): IdFamille[] => ORDRE.filter((id) => id in s);
 
-const VIDE: ProjetClient = { zones: [], styles: [], propositions: false, metres: null, repere: null, delai: null, precisions: "" };
-
-/** Ce qu'on sait déjà, pour ne jamais redemander. Les goûts et le délai d'avant la v3 restent dans l'objet, intacts. */
-function prerempli(etat: Etat): { projet: ProjetClient; depuis: string[] } {
-  if (etat.monProjet) return { projet: { ...VIDE, ...etat.monProjet }, depuis: [] };
-  const depuis: string[] = [];
-  const projet = { ...VIDE };
-  if (etat.connu.zones.length) {
-    projet.zones = etat.connu.zones;
-    depuis.push("votre simulation sur le site");
+/** Ce qu'on sait déjà, pour ne jamais redemander : son projet, sinon ce que laisse deviner sa demande. */
+function prerempli(etat: Etat, prestations: Prestations | undefined): { saisie: Saisie; depuis: string | null } {
+  const p: ProjetClient | null = etat.monProjet;
+  if (p?.familles && Object.keys(p.familles).length > 0) return { saisie: { familles: { ...p.familles }, tailles: { ...(p.tailles ?? {}) }, precisions: p.precisions ?? "" }, depuis: null };
+  const saisie: Saisie = { ...VIDE, precisions: p?.precisions ?? "", tailles: { ...(p?.tailles ?? {}) } };
+  const devinees = (etat.famillesSuggerees ?? []).filter((id) => prestations?.familles.some((f) => f.id === id));
+  if (devinees.length) {
+    for (const id of devinees) saisie.familles[id] = [];
+    // Ses simulations du site disent déjà ce qu'il a essayé (façades, plan…) : proposé coché.
+    const zones = new Set(etat.connu.zones);
+    if (devinees.includes("CUISINE")) {
+      const parties = [zones.has("meubles-hauts") && "facades-hautes", zones.has("meubles-bas") && "facades-basses", zones.has("plan-de-travail") && "plan-de-travail", zones.has("credence") && "credence"].filter((x): x is string => Boolean(x));
+      saisie.familles.CUISINE = parties;
+    }
+    return { saisie, depuis: etat.connu.zones.length ? "votre simulation sur le site" : "votre demande" };
   }
-  const taille = (etat.connu.tailleCuisine ?? "").toLowerCase();
-  if (taille) {
-    projet.repere = /ilot|îlot/.test(taille) ? "ilot" : /grande/.test(taille) ? "en-u" : /moyenne/.test(taille) ? "en-l" : /petite/.test(taille) ? "une-rangee" : null;
-    const metres = Number(/(\d+(?:[.,]\d+)?)\s*(m|mètre|metre)/.exec(taille)?.[1]?.replace(",", "."));
-    projet.metres = metres > 0 && metres <= 60 ? metres : (REPERES.find((r) => r.id === projet.repere)?.metres ?? null);
-    depuis.push("votre demande");
-  }
-  return { projet, depuis };
+  return { saisie, depuis: null };
 }
 
-export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void }) {
-  const initial = useMemo(() => prerempli(etat), [etat]);
-  const [projet, setProjet] = useState<ProjetClient>(initial.projet);
+/** Ce qui manque pour valider, dit tout de suite (la même règle que le CRM). */
+function manqueDe(saisie: Saisie, familles: FamillePublique[]): { texte: string; cible: string } | null {
+  const cochees = famillesCochees(saisie.familles);
+  if (cochees.length === 0) return { texte: "Touchez d'abord ce que vous voulez rénover.", cible: "titre-familles" };
+  for (const id of cochees) {
+    const f = familles.find((x) => x.id === id);
+    if (f && (saisie.familles[id] ?? []).length === 0) return { texte: `${f.libelle} : cochez ce que vous voulez traiter.`, cible: `famille-${id}` };
+  }
+  const seulementAutre = cochees.every((id) => (saisie.familles[id] ?? []).every((sp) => sp === "autre" || sp === "autre-meuble"));
+  if (seulementAutre && !saisie.precisions.trim()) return { texte: "Vous avez choisi « autre » : dites-nous quoi, en quelques mots.", cible: "titre-note" };
+  for (const id of cochees) {
+    const f = familles.find((x) => x.id === id);
+    const t = saisie.tailles[id];
+    if (f?.taille.requise && !t?.repere && !t?.valeur) return { texte: `Indiquez la taille ${f.mots.de}, à peu près.`, cible: `taille-${id}` };
+  }
+  return null;
+}
+
+function libelleTaille(f: FamillePublique, t: TailleProjet | undefined): string | null {
+  if (!t || (!t.repere && !t.valeur)) return null;
+  const repere = f.taille.reperes.find((r) => r.id === t.repere);
+  const valeur = t.valeur ? (f.taille.unite === "portes" ? `${t.valeur} porte${t.valeur > 1 ? "s" : ""}` : `≈ ${String(t.valeur).replace(".", ",")} m`) : null;
+  return [repere?.libelle, valeur].filter(Boolean).join(" · ") || null;
+}
+
+export function EtapeProjet({ etat, client, prestations, onEtat, onSuite }: { etat: Etat; client: Client; prestations: Prestations | undefined; onEtat: (etat: Etat) => void; onSuite: () => void }) {
+  const familles = useMemo(() => prestations?.familles ?? [], [prestations]);
+  const initial = useMemo(() => prerempli(etat, prestations), [etat, prestations]);
+  const [saisie, setSaisie] = useState<Saisie>(initial.saisie);
   const [enregistrement, setEnregistrement] = useState<EtatEnregistrement>({ etat: "" });
   const [modifie, setModifie] = useState(false);
   const [validation, setValidation] = useState<{ occupe: boolean; message: { ton: "erreur" | "info"; texte: string } | null }>({ occupe: false, message: null });
-  const courant = useRef(projet);
+  const courant = useRef(saisie);
   const minuterie = useRef<number | null>(null);
   const enVol = useRef(false);
   const encore = useRef(false);
   const touche = useRef(false);
   const apercu = Boolean(client.apercu);
-  const zones = ZONES_PAR_PROJET[etat.typeProjet] ?? ZONES_PAR_PROJET.CUISINE;
-  const cuisine = (etat.typeProjet ?? "CUISINE") === "CUISINE";
-  const nom = nomDuProjet(etat.typeProjet);
-  const cleLocale = `espace-projet:${client.racine}`;
+  const mots = motsDe(etat);
+  const modifiable = etat.projetModifiable?.ok ?? true;
+  const cleLocale = `espace-projet:${client.racine}:${etat.code ?? ""}`;
 
   /** Un envoi à la fois, toujours la dernière version : pas d'ancienne réponse qui écrase une saisie récente. */
   async function enregistrer(garder = false): Promise<void> {
@@ -120,11 +114,9 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
           setEnregistrement({ etat: "ok" });
         } catch (erreur) {
           if (erreur instanceof ErreurEspace && !erreur.passager) {
-            // Refusé pour de bon (valeur hors limites…) : on le dit, en clair.
             setEnregistrement({ etat: "erreur", message: erreur.message });
             return;
           }
-          // Réseau coupé ou serveur indisponible : gardé ici, renvoyé au retour du réseau.
           try {
             localStorage.setItem(cleLocale, JSON.stringify(valeur));
           } catch {
@@ -139,13 +131,13 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
     }
   }
 
-  function changer(modif: (avant: ProjetClient) => ProjetClient, delai = 600) {
+  function changer(modif: (avant: Saisie) => Saisie, delai = 600) {
     touche.current = true;
     setModifie(true);
     setValidation((v) => (v.message ? { ...v, message: null } : v));
     const suite = modif(courant.current);
     courant.current = suite;
-    setProjet(suite);
+    setSaisie(suite);
     if (!apercu) setEnregistrement({ etat: "en-cours" });
     if (minuterie.current) window.clearTimeout(minuterie.current);
     minuterie.current = window.setTimeout(() => {
@@ -168,8 +160,8 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
         const garde = localStorage.getItem(cleLocale);
         if (!garde) return;
         if (!touche.current) {
-          courant.current = { ...VIDE, ...(JSON.parse(garde) as ProjetClient) };
-          setProjet(courant.current);
+          courant.current = { ...VIDE, ...(JSON.parse(garde) as Saisie) };
+          setSaisie(courant.current);
           touche.current = true;
         }
         void enregistrer();
@@ -192,43 +184,32 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cleLocale]);
 
-  // L'écran a pu s'ouvrir sur la dernière version gardée dans le téléphone : quand la version à jour
-  // arrive (préremplissage compris), elle remplace les réponses de départ — tant qu'il n'a rien touché.
+  // La version à jour (préremplissage compris) remplace celle de départ — tant qu'il n'a rien touché.
   useEffect(() => {
     const attente = window.setTimeout(() => {
       if (touche.current) return;
-      courant.current = initial.projet;
-      setProjet(initial.projet);
+      courant.current = initial.saisie;
+      setSaisie(initial.saisie);
     }, 0);
     return () => window.clearTimeout(attente);
   }, [initial]);
 
-  // « Enregistré » s'efface au bout de quelques secondes ; une erreur ou une attente reste affichée.
   useEffect(() => {
     if (enregistrement.etat !== "ok") return;
     const t = window.setTimeout(() => setEnregistrement((e) => (e.etat === "ok" ? { etat: "" } : e)), 2600);
     return () => window.clearTimeout(t);
   }, [enregistrement]);
 
-  /** Ce qui manque pour valider, dit tout de suite (sans attendre le serveur). */
-  const manque =
-    projet.zones.length === 0
-      ? "Touchez d'abord ce que vous voulez rafraîchir."
-      : projet.zones.every((z) => z === "autre") && !projet.precisions.trim()
-        ? "Vous avez choisi « autre chose » : dites-nous quoi, en quelques mots."
-        : cuisine && !projet.repere && !projet.metres
-          ? "Indiquez la taille de votre cuisine, à peu près."
-          : null;
+  const manque = manqueDe(saisie, familles);
 
   async function valider() {
     if (apercu) return setValidation({ occupe: false, message: { ton: "info", texte: MESSAGE_APERCU } });
     if (manque) {
       // On l'emmène là où il manque quelque chose : il n'a pas à chercher.
-      document.getElementById(projet.zones.length === 0 ? "titre-zones" : /taille/.test(manque) ? "titre-taille" : "titre-note")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return setValidation({ occupe: false, message: { ton: "erreur", texte: manque } });
+      document.getElementById(manque.cible)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return setValidation({ occupe: false, message: { ton: "erreur", texte: manque.texte } });
     }
     setValidation({ occupe: true, message: null });
-    // Ce qui attendait d'être enregistré part d'abord : on valide la dernière version, pas l'avant-dernière.
     if (minuterie.current) {
       window.clearTimeout(minuterie.current);
       minuterie.current = null;
@@ -240,7 +221,7 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
       setValidation({ occupe: false, message: null });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (erreur) {
-      setValidation({ occupe: false, message: { ton: "erreur", texte: erreur instanceof ErreurEspace && erreur.status === 0 ? "Pas de réseau : votre projet est gardé, validez-le dès son retour." : erreur instanceof Error ? erreur.message : "Réessayez dans un instant." } });
+      setValidation({ occupe: false, message: { ton: "erreur", texte: erreur instanceof ErreurEspace && erreur.status === 0 ? "Pas de réseau : votre projet est gardé, validez-le dès son retour." : erreur instanceof Error ? erreur.message : "Réessayez dans un instant." } });
     }
   }
 
@@ -257,14 +238,70 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
     }
   }
 
-  const basculer = (liste: string[], valeur: string) => (liste.includes(valeur) ? liste.filter((v) => v !== valeur) : [...liste, valeur]);
-  const reelles = zones.filter((z) => z.id !== "autre");
-  const tout = reelles.every((z) => projet.zones.includes(z.id));
-  const precise = projet.zones.length > 0 || projet.precisions.trim().length > 0;
+  const basculerFamille = (id: IdFamille) =>
+    changer((s) => {
+      const familles = { ...s.familles };
+      const tailles = { ...s.tailles };
+      if (id in familles) {
+        delete familles[id];
+        delete tailles[id];
+      } else familles[id] = [];
+      return { ...s, familles, tailles };
+    });
+  const basculerPartie = (id: IdFamille, sp: string) =>
+    changer((s) => {
+      const liste = s.familles[id] ?? [];
+      return { ...s, familles: { ...s.familles, [id]: liste.includes(sp) ? liste.filter((x) => x !== sp) : [...liste, sp] } };
+    });
+  const poserTaille = (id: IdFamille, t: TailleProjet) => changer((s) => ({ ...s, tailles: { ...s.tailles, [id]: t } }));
+
+  if (!prestations) return <EnteteEtape titre="Votre projet" phrase="Chargement…" />;
+
+  const cochees = famillesCochees(saisie.familles);
+  const resume = (
+    <dl className="space-y-3 text-[16.5px] leading-snug">
+      {cochees.map((id) => {
+        const f = familles.find((x) => x.id === id)!;
+        const parties = (saisie.familles[id] ?? []).map((sp) => f.sousParties.find((x) => x.id === sp)?.libelle).filter(Boolean);
+        const taille = libelleTaille(f, saisie.tailles[id]);
+        return (
+          <div key={id}>
+            <dt>
+              <Surtitre>{f.libelle}</Surtitre>
+            </dt>
+            <dd className="mt-1 font-semibold text-[#1A1A1A]">
+              {parties.join(", ") || "À préciser"}
+              {taille ? <span className="block text-[15px] font-normal text-[#5F5A53]">{taille}</span> : null}
+            </dd>
+          </div>
+        );
+      })}
+      {saisie.precisions.trim() ? (
+        <div>
+          <dt>
+            <Surtitre>Votre mot</Surtitre>
+          </dt>
+          <dd className="mt-1 whitespace-pre-wrap text-[#1A1A1A]">« {saisie.precisions.trim()} »</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
+
+  // Signé, ou le devis est établi dessus : il se relit ; un appel suffit pour le changer.
+  if (!modifiable) {
+    return (
+      <div className="space-y-5">
+        <EnteteEtape titre="Votre projet" phrase={etat.projetModifiable?.raison ?? "Votre projet est arrêté."} />
+        <Carte className="space-y-4">{cochees.length ? resume : <p className="text-[16px] text-[#3F3B36]">Votre projet a été précisé avec CoverSwap, au téléphone.</p>}</Carte>
+        <BoutonPrincipal onClick={onSuite}>
+          Voir la suite <span aria-hidden>→</span>
+        </BoutonPrincipal>
+      </div>
+    );
+  }
 
   // Validé : le projet se relit d'un coup d'œil. « Modifier » le rouvre (et le dévalide).
   if (etat.projetValide) {
-    const repere = REPERES.find((r) => r.id === projet.repere);
     return (
       <div className="space-y-5">
         <EnteteEtape titre="Votre projet" phrase="Votre projet est validé. CoverSwap l'a bien reçu." />
@@ -275,24 +312,7 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
             </span>
             Projet validé
           </p>
-          <dl className="space-y-3 text-[16.5px] leading-snug">
-            <div>
-              <dt><Surtitre>À rafraîchir</Surtitre></dt>
-              <dd className="mt-1 font-semibold text-[#1A1A1A]">{projet.zones.map((z) => zones.find((x) => x.id === z)?.libelle ?? z).join(", ")}</dd>
-            </div>
-            {projet.metres || repere ? (
-              <div>
-                <dt><Surtitre>Taille</Surtitre></dt>
-                <dd className="mt-1 font-semibold text-[#1A1A1A]">{[repere?.libelle, projet.metres ? `≈ ${String(projet.metres).replace(".", ",")} m` : null].filter(Boolean).join(" · ")}</dd>
-              </div>
-            ) : null}
-            {projet.precisions.trim() ? (
-              <div>
-                <dt><Surtitre>Votre mot</Surtitre></dt>
-                <dd className="mt-1 whitespace-pre-wrap text-[#1A1A1A]">« {projet.precisions.trim()} »</dd>
-              </div>
-            ) : null}
-          </dl>
+          {resume}
         </Carte>
         {validation.message ? <Annonce ton={validation.message.ton}>{validation.message.texte}</Annonce> : null}
         <BoutonPrincipal onClick={onSuite}>
@@ -308,97 +328,111 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
 
   return (
     <div className="space-y-7 pb-24">
-      <EnteteEtape titre="Votre projet" phrase={`Touchez ce que vous voulez rafraîchir dans ${nom.votre}, puis validez. Tout s'enregistre au fur et à mesure.`} />
+      <EnteteEtape titre="Votre projet" phrase={cochees.length ? `Cochez ce que vous voulez traiter, puis validez. Tout s'enregistre au fur et à mesure.` : "Touchez ce que vous voulez rénover. Plusieurs choix possibles."} />
 
-      {initial.depuis.length > 0 && !modifie ? <Annonce>Prérempli d&apos;après {initial.depuis.join(" et ")}. Modifiez si besoin.</Annonce> : null}
+      {initial.depuis && !modifie ? <Annonce>Prérempli d&apos;après {initial.depuis}. Modifiez si besoin.</Annonce> : null}
 
-      <section aria-labelledby="titre-zones" className="space-y-3">
-        <h2 id="titre-zones" className="px-1 text-[18px] font-semibold text-[#1A1A1A]">
-          Ce que vous voulez rafraîchir
+      <section aria-labelledby="titre-familles" className="space-y-3">
+        <h2 id="titre-familles" className="px-1 text-[18px] font-semibold text-[#1A1A1A]">
+          Ce que vous voulez rénover
         </h2>
-        <div className="grid grid-cols-2 gap-2.5">
-          {zones.map((zone) => (
-            <CaseCarte
-              key={zone.id}
-              coche={projet.zones.includes(zone.id)}
-              onBasculer={() => changer((p) => ({ ...p, zones: basculer(p.zones, zone.id) }))}
-              titre={zone.libelle}
-              aide={zone.aide}
-              illustration={zone.dessin ? <CuisineDeFace allume={[zone.dessin]} className="w-full rounded-lg bg-[#F7F6F3] p-1" /> : undefined}
-              className={zone.id === "autre" && cuisine ? "justify-end" : undefined}
-            />
-          ))}
-          <button
-            type="button"
-            role="checkbox"
-            aria-checked={tout}
-            onClick={() => changer((p) => ({ ...p, zones: tout ? p.zones.filter((z) => z === "autre") : [...new Set([...p.zones, ...reelles.map((z) => z.id)])] }))}
-            className={cx(
-              "flex min-h-[64px] items-center justify-center rounded-2xl border-2 px-3 text-center text-[16px] font-semibold",
-              tout ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-dashed border-[#CFCAC2] bg-transparent text-[#1A1A1A] active:bg-[#F6F5F2]"
-            )}
-          >
-            {tout ? "✓ Tout" : cuisine ? "Toute la cuisine" : "Tout"}
-          </button>
-        </div>
+        <ul className="space-y-2.5">
+          {familles.map((f) => {
+            const coche = f.id in saisie.familles;
+            return (
+              <li key={f.id} id={`famille-${f.id}`} className={cx("overflow-hidden rounded-2xl border-2 bg-white", coche ? "border-[#1A1A1A]" : "border-[#E2DFD9]")}>
+                <button type="button" role="checkbox" aria-checked={coche} onClick={() => basculerFamille(f.id)} className={cx("flex w-full items-center gap-3 p-3 text-left active:bg-[#F6F5F2]", FOCUS)}>
+                  <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[18px] leading-snug font-semibold text-[#1A1A1A]">{f.libelle}</span>
+                    <span className="mt-0.5 block text-[14.5px] leading-snug text-[#5F5A53]">{f.aide}</span>
+                  </span>
+                  <span aria-hidden className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold", coche ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#BDB8B0] bg-white")}>
+                    {coche ? "✓" : ""}
+                  </span>
+                </button>
+                {coche ? (
+                  // Ses sous-parties se déplient juste dessous : ce qu'il veut traiter dans cette famille.
+                  <div className="border-t border-[#ECE9E3] bg-[#FAF9F7] p-3">
+                    <p className="mb-2 px-0.5 text-[15px] font-medium text-[#3F3B36]">Qu&apos;est-ce qu&apos;on recouvre&nbsp;?</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {f.sousParties.map((sp) => (
+                        <CaseCarte key={sp.id} coche={(saisie.familles[f.id] ?? []).includes(sp.id)} onBasculer={() => basculerPartie(f.id, sp.id)} titre={sp.libelle} aide={sp.aide} />
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
-      <section aria-labelledby="titre-taille" className="space-y-3">
-        <div className="px-1">
-          <h2 id="titre-taille" className="text-[18px] font-semibold text-[#1A1A1A]">
-            {cuisine ? "La taille, à peu près" : "Combien de mètres de meubles, environ"}
-          </h2>
-          <p className="mt-0.5 text-[15px] text-[#5F5A53]">Une estimation suffit&nbsp;: nous mesurerons sur place.</p>
-        </div>
-        {cuisine ? (
-          <div className="grid grid-cols-2 gap-2.5">
-            {REPERES.map((repere) => (
-              <CaseCarte
-                key={repere.id}
-                coche={projet.repere === repere.id}
-                onBasculer={() => changer((p) => (p.repere === repere.id ? { ...p, repere: null, metres: null } : { ...p, repere: repere.id, metres: repere.metres }))}
-                titre={repere.libelle}
-                aide={repere.aide}
-                illustration={<PlanCuisine forme={repere.id} className="h-16 w-full" />}
-              />
-            ))}
-          </div>
-        ) : null}
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6E3DD] bg-white p-2">
-          <button type="button" aria-label="Moins" onClick={() => changer((p) => ({ ...p, metres: Math.max(0.5, (p.metres ?? 3) - 0.5) }))} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
-            −
-          </button>
-          <span className="text-center" aria-live="polite">
-            <span className="block font-display text-[26px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{projet.metres ? `≈ ${String(projet.metres).replace(".", ",")} m` : "—"}</span>
-            <span className="text-[13px] text-[#5F5A53]">de meubles, mis bout à bout</span>
-          </span>
-          <button type="button" aria-label="Plus" onClick={() => changer((p) => ({ ...p, metres: Math.min(60, (p.metres ?? 2.5) + 0.5) }))} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
-            +
-          </button>
-        </div>
-      </section>
+      {cochees.map((id) => {
+        const f = familles.find((x) => x.id === id)!;
+        const t = saisie.tailles[id] ?? { repere: null, valeur: null };
+        const q = f.taille;
+        const unite = q.unite === "portes" ? "portes" : "m";
+        return (
+          <section key={id} id={`taille-${id}`} aria-labelledby={`titre-taille-${id}`} className="space-y-3">
+            <div className="px-1">
+              <h2 id={`titre-taille-${id}`} className="text-[18px] font-semibold text-[#1A1A1A]">
+                {q.titre}
+              </h2>
+              <p className="mt-0.5 text-[15px] text-[#5F5A53]">{q.aide}</p>
+            </div>
+            {q.reperes.length ? (
+              <div className="grid grid-cols-2 gap-2.5">
+                {q.reperes.map((r) => (
+                  <CaseCarte
+                    key={r.id}
+                    coche={t.repere === r.id}
+                    onBasculer={() => poserTaille(id, t.repere === r.id ? { repere: null, valeur: null } : { repere: r.id, valeur: r.valeur })}
+                    titre={r.libelle}
+                    aide={r.aide}
+                    illustration={id === "CUISINE" ? <PlanCuisine forme={r.id as "une-rangee" | "en-l" | "en-u" | "ilot"} className="h-16 w-full" /> : undefined}
+                  />
+                ))}
+              </div>
+            ) : null}
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6E3DD] bg-white p-2">
+              <button type="button" aria-label="Moins" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.max(q.min, Math.round(((t.valeur ?? q.depart + q.pas) - q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
+                −
+              </button>
+              <span className="text-center" aria-live="polite">
+                <span className="block font-display text-[26px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{t.valeur ? (unite === "portes" ? `${t.valeur}` : `≈ ${String(t.valeur).replace(".", ",")} m`) : "—"}</span>
+                <span className="text-[13px] text-[#5F5A53]">{unite === "portes" ? "portes, à peu près" : id === "CUISINE" ? "de meubles, mis bout à bout" : "à peu près"}</span>
+              </span>
+              <button type="button" aria-label="Plus" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.min(q.max, Math.round(((t.valeur ?? q.depart - q.pas) + q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
+                +
+              </button>
+            </div>
+          </section>
+        );
+      })}
 
-      <section aria-labelledby="titre-note" className="space-y-2">
-        <label id="titre-note" htmlFor="precisions" className="block px-1">
-          <span className="block text-[18px] font-semibold text-[#1A1A1A]">Un mot pour CoverSwap</span>
-          <span className="block text-[15px] text-[#5F5A53]">Facultatif. Vous pouvez aussi dicter avec le micro du clavier.</span>
-        </label>
-        <textarea
-          id="precisions"
-          rows={4}
-          maxLength={1000}
-          value={projet.precisions}
-          onChange={(e) => changer((p) => ({ ...p, precisions: e.target.value }), 1200)}
-          onBlur={() => vider()}
-          placeholder="Garder les poignées, un plan de travail qui résiste à la chaleur…"
-          className="w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 py-3 text-[17px] leading-relaxed text-[#1A1A1A] placeholder:text-[#8A857E] focus:border-[#1A1A1A] focus:outline-none"
-        />
-      </section>
+      {cochees.length ? (
+        <section aria-labelledby="titre-note" className="space-y-2">
+          <label id="titre-note" htmlFor="precisions" className="block px-1">
+            <span className="block text-[18px] font-semibold text-[#1A1A1A]">Un mot pour CoverSwap</span>
+            <span className="block text-[15px] text-[#5F5A53]">Facultatif. Vous pouvez aussi dicter avec le micro du clavier.</span>
+          </label>
+          <textarea
+            id="precisions"
+            rows={4}
+            maxLength={1000}
+            value={saisie.precisions}
+            onChange={(e) => changer((s) => ({ ...s, precisions: e.target.value }), 1200)}
+            onBlur={() => vider()}
+            placeholder={cochees.includes("CUISINE") ? "Garder les poignées, un plan de travail qui résiste à la chaleur…" : cochees.includes("SDB") ? "Garder la vasque, une teinte claire qui ne marque pas…" : `Ce qui compte pour ${mots.votre}…`}
+            className="w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 py-3 text-[17px] leading-relaxed text-[#1A1A1A] placeholder:text-[#8A857E] focus:border-[#1A1A1A] focus:outline-none"
+          />
+        </section>
+      ) : null}
 
       {/* Toujours sous le pouce, au-dessus des onglets : l'état de l'enregistrement, et le bouton qui valide. */}
       <div className="pointer-events-none fixed inset-x-0 bottom-[calc(3.9rem+env(safe-area-inset-bottom))] z-20 px-4 pb-2">
         <div className="mx-auto flex max-w-xl flex-col items-center gap-1.5">
-          {/* Ce qui manque pour valider se dit ICI, à côté du bouton : pas en bas d'une page qu'il ne voit pas. */}
           {validation.message ? (
             <div className="pointer-events-auto w-full drop-shadow-[0_4px_14px_rgba(26,26,26,0.16)]">
               <Annonce ton={validation.message.ton}>{validation.message.texte}</Annonce>
@@ -406,7 +440,7 @@ export function EtapeProjet({ etat, client, onEtat, onSuite }: { etat: Etat; cli
           ) : (
             <Enregistrement etat={enregistrement} className="text-center drop-shadow-[0_2px_8px_rgba(26,26,26,0.12)]" />
           )}
-          {precise ? (
+          {cochees.length ? (
             <BoutonPrincipal onClick={() => void valider()} disabled={validation.occupe} className="pointer-events-auto shadow-[0_8px_24px_rgba(26,26,26,0.18)]">
               {validation.occupe ? "Validation…" : "Valider mon projet"}
             </BoutonPrincipal>

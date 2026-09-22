@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 import DevisForm from "@/components/DevisForm";
+import { chargerPrestations } from "@/lib/prestations";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE } from "@/lib/offre";
@@ -43,7 +44,8 @@ const etapes = [
   { num: "3", title: "Vous recevez votre devis", desc: `Détaillé, gratuit, ${DELAI_REPONSE}. Vous décidez ensuite.` },
 ];
 
-export default function DevisPage() {
+export default async function DevisPage() {
+  const familles = await chargerPrestations();
   return (
     <main className="bg-noir min-h-screen">
       <BreadcrumbSchema
@@ -104,7 +106,7 @@ export default function DevisPage() {
               <ScrollReveal direction="up">
                 <h2 className="font-display text-2xl font-bold mb-6">Décrivez votre projet</h2>
               </ScrollReveal>
-              <DevisForm source="coverswap.fr/devis" submitLabel="Recevoir mon devis gratuit" />
+              <DevisForm source="coverswap.fr/devis" submitLabel="Recevoir mon devis gratuit" familles={familles} />
             </div>
 
             {/* Sidebar */}

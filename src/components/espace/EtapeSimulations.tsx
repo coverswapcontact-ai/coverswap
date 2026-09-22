@@ -61,6 +61,8 @@ function ecrireLocal(cle: string, valeur: unknown) {
 
 export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller }: { etat: Etat; client: Client; jeton: string; onEtat: (etat: Etat) => void; recharger: () => Promise<Etat | null>; aller: (vue: Vue) => void }) {
   const apercu = Boolean(client.apercu);
+  // Ce qui se garde dans le téléphone pour CE projet (simulations suivies, choix après un échec) : une clé par projet.
+  const cleProjet = etat.code ? `${jeton.split("-")[0]}~${etat.code}` : jeton;
   const sims = etat.simulations;
   const creation = etat.creation ?? null;
   const noms = useMemo(() => nommer(sims), [sims]);
@@ -95,13 +97,13 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
 
   /* ── Suivi des simulations en préparation ─────────────────────────── */
   const [suivies, setSuivies] = useState<{ id: string; le: string }[]>(() => {
-    const locales = lireLocal<{ id: string; le: string }[]>(cleSuivi(jeton), []);
+    const locales = lireLocal<{ id: string; le: string }[]>(cleSuivi(cleProjet), []);
     const serveur = creation?.enCours ?? [];
     return [...serveur, ...locales.filter((l) => !serveur.some((s) => s.id === l.id))];
   });
   const [horsLigne, setHorsLigne] = useState(false);
   const [maintenant, setMaintenant] = useState(() => Date.now());
-  useEffect(() => ecrireLocal(cleSuivi(jeton), suivies), [jeton, suivies]);
+  useEffect(() => ecrireLocal(cleSuivi(cleProjet), suivies), [cleProjet, suivies]);
   // Une simulation lancée ailleurs (autre onglet, autre visite) : suivie ici aussi.
   const enCoursServeur = creation?.enCours;
   useEffect(() => {
@@ -328,7 +330,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             key={passage}
             etat={etat}
             client={client}
-            jeton={jeton}
+            jeton={cleProjet}
             onEtat={onEtat}
             favoris={favoris}
             onFavori={basculerFavori}

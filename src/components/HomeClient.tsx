@@ -15,7 +15,8 @@ import { NB_REFERENCES } from "@/lib/offre";
    SIMULATION — accès direct au simulateur depuis la home
    (étape 1 : choix projet → étape 2 : upload photo → redirect vers /simulation)
 ══════════════════════════════════════════════════════════════════ */
-export function SimulationSection() {
+/** `libelles` : les noms des familles de prestations (fichier unique du CRM) pour les pièces du simulateur. */
+export function SimulationSection({ libelles = {} }: { libelles?: Record<string, { label: string; description: string }> }) {
   const router = useRouter();
   const [projectId, setProjectId] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -152,8 +153,8 @@ export function SimulationSection() {
                       className="group text-left p-3 sm:p-4 rounded-2xl border border-white/10 bg-white/3 hover:border-rouge hover:bg-rouge/5 hover:scale-[1.02] transition-all duration-200"
                     >
                       <div className="text-2xl sm:text-3xl mb-1.5">{p.icon}</div>
-                      <div className="font-bold text-white text-sm sm:text-base leading-tight">{p.label}</div>
-                      <div className="text-[11px] sm:text-xs text-gris-400 mt-0.5 leading-snug line-clamp-2">{p.description}</div>
+                      <div className="font-bold text-white text-sm sm:text-base leading-tight">{libelles[p.id]?.label ?? p.label}</div>
+                      <div className="text-[11px] sm:text-xs text-gris-400 mt-0.5 leading-snug line-clamp-2">{libelles[p.id]?.description ?? p.description}</div>
                     </button>
                   ))}
                 </div>
@@ -187,7 +188,7 @@ export function SimulationSection() {
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <span className="inline-flex items-center gap-1.5 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 text-rouge text-[11px] font-bold uppercase tracking-widest">
                     <span>{currentProject?.icon}</span>
-                    {currentProject?.label}
+                    {currentProject ? (libelles[currentProject.id]?.label ?? currentProject.label) : null}
                   </span>
                   <button
                     type="button"
@@ -246,7 +247,7 @@ export function SimulationSection() {
                 <div className="flex items-center justify-center gap-2">
                   <span className="inline-flex items-center gap-1.5 bg-rouge/15 border border-rouge/30 rounded-full px-3 py-1 text-rouge text-[11px] font-bold uppercase tracking-widest">
                     <span>{currentProject?.icon}</span>
-                    {currentProject?.label}
+                    {currentProject ? (libelles[currentProject.id]?.label ?? currentProject.label) : null}
                   </span>
                   <span className="text-gris-500 text-[11px] uppercase tracking-widest">
                     Étape 3 / 3 · Textures

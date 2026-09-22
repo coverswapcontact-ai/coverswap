@@ -170,7 +170,7 @@ export function EtapePaiement({ etat, client, onApres }: { etat: Etat; client: C
           {[
             { titre: date ? `Rendez-vous le ${dateLongue(date)}` : "CoverSwap vous appelle pour fixer la date", texte: date ? "C'est noté de notre côté. Une question d'ici là\u00a0: appelez-nous." : "Dans les jours qui viennent, pour choisir ensemble un jour qui vous arrange.", fait: Boolean(date) },
             { titre: "Avant notre passage", texte: "Videz les meubles que l'on recouvre et dégagez le plan de travail. Pas besoin de démonter quoi que ce soit\u00a0: nous nous en occupons.", fait: false },
-            { titre: "Le jour J", texte: "Une cuisine se pose en général en une journée\u00a0; nous vous confirmons la durée en fixant la date. Pas de séchage, pas de gravats\u00a0: la pièce est utilisable le soir même.", fait: false },
+            { titre: "Le jour J", texte: "Une cuisine ou une salle de bain se pose en général en une journée\u00a0; nous vous confirmons la durée en fixant la date. Pas de séchage, pas de gravats\u00a0: la pièce est utilisable le soir même.", fait: false },
             { titre: "Après", texte: "Un nettoyage courant suffit à l'entretien. Le solde se règle à la fin du chantier.", fait: false },
           ].map((etape, i) => (
             <li key={etape.titre} className="flex gap-3">
@@ -235,7 +235,7 @@ export function ApresChantier({ etat, client, onEtat }: { etat: Etat; client: Cl
 
   return (
     <div className="space-y-5">
-      <EnteteEtape titre={!etat.typeProjet || etat.typeProjet === "CUISINE" ? "Votre nouvelle cuisine" : "Le résultat"} phrase="Merci de nous avoir fait confiance. Voici les photos du résultat." />
+      <EnteteEtape titre={etat.familles?.length === 1 && etat.familles[0] === "CUISINE" ? "Votre nouvelle cuisine" : etat.familles?.length === 1 && etat.familles[0] === "SDB" ? "Votre nouvelle salle de bain" : "Le résultat"} phrase="Merci de nous avoir fait confiance. Voici les photos du résultat." />
       {photos.length > 0 ? (
         <ul className="grid grid-cols-2 gap-2">
           {photos.map((p) => (

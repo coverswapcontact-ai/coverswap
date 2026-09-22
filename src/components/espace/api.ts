@@ -8,8 +8,30 @@ export type ZoneTeinte = { zone: string; libelle: string; ref: string; nom: stri
 export type EtapeEspace = "PHOTOS" | "PROJET" | "SIMULATIONS" | "ATTENTE_SIMULATION" | "ATTENTE_DEVIS" | "DEVIS" | "ACOMPTE" | "CHANTIER" | "TERMINE";
 export type CleProgression = "PHOTOS" | "PROJET" | "SIMULATIONS" | "DEVIS" | "ACOMPTE";
 
-/** Le projet (v3) : zones, taille, un mot. Goûts et délai des versions précédentes : gardés tels quels, plus demandés. */
+/** Une famille de prestations (cuisine, salle de bain, mobilier, professionnel) : fichier unique du CRM. */
+export type IdFamille = "CUISINE" | "SDB" | "MEUBLES" | "PRO";
+/** Ce que le client a coché : `{ CUISINE: ["facades-hautes", …], SDB: [] }`. */
+export type SelectionPrestations = Partial<Record<IdFamille, string[]>>;
+export type TailleProjet = { repere: string | null; valeur: number | null };
+
+export type QuestionTaille = { titre: string; aide: string; unite: "m" | "portes"; min: number; max: number; pas: number; depart: number; reperes: { id: string; libelle: string; aide: string; valeur: number }[]; requise: boolean };
+export type PrisePhoto = { titre: string; aide: string; cadre?: "ensemble" | "hauts" | "bas" | "plan" | "detail" };
+export type FamillePublique = {
+  id: IdFamille;
+  libelle: string;
+  aide: string;
+  mots: { nom: string; votre: string; de: string };
+  projetSimulateur: string;
+  sousParties: { id: string; libelle: string; aide: string }[];
+  taille: QuestionTaille;
+  photos: PrisePhoto[];
+};
+export type Prestations = { version: 1; familles: FamillePublique[] };
+
+/** Le projet (mission 5) : ses familles et sous-parties, la taille par famille, un mot. Les champs d'avant restent lus. */
 export type ProjetClient = {
+  familles?: SelectionPrestations;
+  tailles?: Partial<Record<IdFamille, TailleProjet>>;
   zones: string[];
   styles: string[];
   propositions: boolean;
@@ -23,7 +45,7 @@ export type ProjetClient = {
 export type SourceSimulation = "SITE" | "CRM" | "CLIENT";
 
 /** Les simulations qu'il crée lui-même : ce qu'il lui reste, ce qui tourne, et si le service répond. */
-export type Piece = { piece: string; libelle: string; aide: string; zones: { zone: string; libelle: string }[] };
+export type Piece = { piece: string; libelle: string; aide: string; zones: { zone: string; libelle: string }[]; cochees?: string[]; duProjet?: boolean };
 
 export type Creation = {
   gratuites: number;
@@ -81,6 +103,15 @@ export type Choix =
 export type Etat = {
   version?: 2;
   apercu?: boolean;
+  /** Mission 5 : ce projet dans l'espace permanent du client. */
+  code?: string;
+  nomProjet?: string;
+  fige?: "TERMINE" | "NON_REALISE" | null;
+  familles?: IdFamille[];
+  famillesSuggerees?: IdFamille[];
+  /** « votre salle de bain » quand la famille est connue, « votre projet » sinon. */
+  mots?: { nom: string; votre: string; de: string };
+  projetModifiable?: { ok: boolean; raison: string | null };
   prenom: string;
   nom: string;
   ville: string;
@@ -134,6 +165,37 @@ export type Etat = {
   expireLe: string;
 };
 
+/** Un projet sur l'accueil « Mes projets ». */
+export type ProjetCarte = {
+  code: string;
+  nom: string;
+  familles: { id: IdFamille; libelle: string }[];
+  pastille: "A_VOUS" | "COVERSWAP" | "EN_COURS" | "TERMINE" | "NON_REALISE";
+  libellePastille: string;
+  prochaine: string | null;
+  fige: "TERMINE" | "NON_REALISE" | null;
+  depuis: string;
+};
+
+export type DocumentClient = { id: string; type: "DEVIS" | "FACTURE" | "AVOIR"; numero: string; le: string; montant: number; statut: string; projet: string; pdf: string | null };
+
+/** L'espace du client, au-dessus de ses projets : ses projets, ses documents, ses favoris, la confirmation. */
+export type Compte = {
+  version: 3;
+  prenom: string;
+  confirmation: { requise: boolean } | null;
+  projets: ProjetCarte[];
+  projetCourant: string | null;
+  nouveauProjet: { possible: boolean; enCours: number; limite: number; demandeLe: string | null };
+  documents: DocumentClient[];
+  favoris: string[];
+  prestations: Prestations;
+  marque: { nom: string; telephone: string; telephoneLien: string; email: string | null };
+};
+
+/** Ce que rend l'API : le projet affiché (ou aucun : l'accueil « Mes projets »), et l'espace entier. */
+export type Reponse = { espace: Etat | null; compte?: Compte };
+
 /** Le numéro à appeler, au nom de CoverSwap (un état gardé d'avant la v3 n'a que `contact`). */
 export const marqueDe = (etat: Etat) => etat.marque ?? { nom: "CoverSwap", telephone: etat.contact.telephone, telephoneLien: etat.contact.telephoneLien };
 
@@ -164,8 +226,15 @@ export type Client = {
   envoyerJson: <T>(chemin: string, methode: "POST" | "PUT", corps: unknown) => Promise<T>;
 };
 
-export function creerClient(racine: string, apercu: string | null, surReseau: (enLigne: boolean) => void): Client {
-  const url = (chemin: string) => `${racine}${chemin}${apercu ? `${chemin.includes("?") ? "&" : "?"}apercu=${encodeURIComponent(apercu)}` : ""}`;
+/**
+ * `projet` : le code du projet affiché ; chaque appel le porte (`?projet=`), le
+ * CRM vérifie qu'il est bien un projet de ce client. Sans lui : l'espace entier.
+ */
+export function creerClient(racine: string, apercu: string | null, surReseau: (enLigne: boolean) => void, projet: string | null = null): Client {
+  const url = (chemin: string) => {
+    const parametres = [projet ? `projet=${encodeURIComponent(projet)}` : null, apercu ? `apercu=${encodeURIComponent(apercu)}` : null].filter(Boolean).join("&");
+    return `${racine}${chemin}${parametres ? `${chemin.includes("?") ? "&" : "?"}${parametres}` : ""}`;
+  };
   const appeler = async <T,>(chemin: string, init?: RequestInit): Promise<T> => {
     let reponse: Response;
     try {
@@ -223,16 +292,15 @@ export const euros = (montant: number) => montant.toLocaleString("fr-FR", { styl
 export const dateLongue = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
 export const dateCourte = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 
-/** Le projet, dit à la manière du client : « votre cuisine ». */
-export function nomDuProjet(typeProjet: string): { le: string; votre: string; projet: string } {
-  switch (typeProjet) {
-    case "SDB":
-      return { le: "la salle de bain", votre: "votre salle de bain", projet: "votre projet de salle de bain" };
-    case "MEUBLES":
-      return { le: "vos meubles", votre: "vos meubles", projet: "votre projet pour vos meubles" };
-    case "PRO":
-      return { le: "votre local", votre: "votre local", projet: "votre projet pour votre local" };
-    default:
-      return { le: "la cuisine", votre: "votre cuisine", projet: "votre projet de cuisine" };
-  }
+/**
+ * Les mots de l'écran, dits à la manière du client : « votre salle de bain »
+ * quand sa famille est connue, « votre projet » sinon — jamais « votre cuisine »
+ * par défaut. Viennent du CRM (fichier des prestations) ; un état gardé d'avant
+ * les familles retombe sur « votre projet ».
+ */
+export function motsDe(etat: Pick<Etat, "mots">): { nom: string; votre: string; de: string } {
+  return etat.mots ?? { nom: "projet", votre: "votre projet", de: "de votre projet" };
 }
+
+/** Les familles du projet : cochées, sinon devinées de sa demande. */
+export const famillesDe = (etat: Pick<Etat, "familles" | "famillesSuggerees">): IdFamille[] => (etat.familles?.length ? etat.familles : (etat.famillesSuggerees ?? []));

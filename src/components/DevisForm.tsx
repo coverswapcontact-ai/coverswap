@@ -11,14 +11,7 @@ import { acquisitionPourEnvoi } from "@/lib/utm";
 import { envoyerEvenement } from "@/lib/evenements-site";
 
 import { DELAI_REPONSE } from "@/lib/offre";
-const projectTypes = [
-  "Cuisine",
-  "Salle de bain",
-  "Meubles",
-  "Comptoir / accueil pro",
-  "Bureau / espace de travail",
-  "Autre",
-];
+import { FAMILLES_REPLI, type FamillePrestation } from "@/lib/prestations";
 
 const MAX_PHOTOS = 4;
 
@@ -69,10 +62,13 @@ export default function DevisForm({
   source,
   reference,
   submitLabel = "Envoyer ma demande",
+  familles = FAMILLES_REPLI,
 }: {
   source: string;
   reference?: string;
   submitLabel?: string;
+  /** Les prestations de CoverSwap (fichier unique du CRM) ; un repli sinon. */
+  familles?: Pick<FamillePrestation, "id" | "libelle" | "aide">[];
 }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -242,9 +238,10 @@ export default function DevisForm({
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50 transition-colors appearance-none"
             >
               <option value="" className="bg-noir">Sélectionnez...</option>
-              {projectTypes.map((t) => (
-                <option key={t} value={t} className="bg-noir">{t}</option>
+              {familles.map((f) => (
+                <option key={f.id} value={f.libelle} className="bg-noir">{f.libelle} ({f.aide.charAt(0).toLowerCase() + f.aide.slice(1)})</option>
               ))}
+              <option value="Autre" className="bg-noir">Autre</option>
             </select>
           </div>
         </div>

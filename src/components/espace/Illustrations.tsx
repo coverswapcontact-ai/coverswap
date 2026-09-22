@@ -1,8 +1,9 @@
 /**
  * Dessins au trait de l'espace client : une cuisine vue de face (pour dire
- * quoi photographier et ce que l'on recouvre) et des plans vus de dessus (pour
- * estimer la longueur de meubles). Un seul dessin, des zones qui s'allument :
- * le client reconnaît sa cuisine, pas un schéma technique.
+ * quoi photographier et ce que l'on recouvre), une salle de bain, du mobilier,
+ * un local professionnel (les quatre familles de prestations), et des plans vus
+ * de dessus (pour estimer la longueur de meubles). Le client reconnaît sa pièce,
+ * pas un schéma technique.
  */
 
 const TRAIT = "#1A1A1A";
@@ -68,6 +69,88 @@ export function CuisineDeFace({ allume = [], cadre, className }: { allume?: stri
       {c ? <rect x={c.x} y={c.y} width={c.w} height={c.h} rx="2.5" stroke={ROUGE} strokeWidth="1.6" strokeDasharray="4 3" /> : null}
     </svg>
   );
+}
+
+/** Salle de bain de face : miroir, meuble vasque, carrelage. Même trait que la cuisine. */
+export function SalleDeBainDeFace({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
+      {/* Carrelage du mur */}
+      {[0, 1, 2, 3].map((l) => (
+        <line key={`l${l}`} x1="10" y1={14 + l * 12} x2="110" y2={14 + l * 12} stroke="#DDD9D2" strokeWidth="0.8" />
+      ))}
+      {[0, 1, 2, 3, 4, 5, 6].map((c) => (
+        <line key={`c${c}`} x1={10 + c * 16.6} y1="8" x2={10 + c * 16.6} y2="52" stroke="#DDD9D2" strokeWidth="0.8" />
+      ))}
+      {/* Miroir */}
+      <rect x="40" y="12" width="40" height="26" rx="3" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="47" y1="30" x2="55" y2="20" stroke="#CFCBC4" strokeWidth="1" />
+      {/* Plan vasque et vasque */}
+      <rect x="30" y="52" width="60" height="4" rx="0.6" fill="#D9D5CE" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M50 52 q10 -6 20 0" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M60 46 v-4 h4" stroke={TRAIT} strokeWidth="1.1" />
+      {/* Meuble vasque */}
+      <rect x="32" y="56" width="27" height="26" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      <rect x="61" y="56" width="27" height="26" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="54" y1="62" x2="54" y2="68" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="66" y1="62" x2="66" y2="68" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="8" y1="86" x2="112" y2="86" stroke="#9C978F" strokeWidth="1" />
+    </svg>
+  );
+}
+
+/** Dressing et meuble TV de face. */
+export function MobilierDeFace({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
+      {/* Dressing : trois portes */}
+      {[10, 27, 44].map((x) => (
+        <g key={x}>
+          <rect x={x} y="8" width="17" height="76" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+          <line x1={x + (x === 27 ? 3 : 14)} y1="42" x2={x + (x === 27 ? 3 : 14)} y2="50" stroke={TRAIT} strokeWidth="1.1" />
+        </g>
+      ))}
+      {/* Écran et meuble TV */}
+      <rect x="72" y="36" width="38" height="22" rx="1.5" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      <rect x="68" y="66" width="46" height="18" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="91" y1="66" x2="91" y2="84" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="85" y1="75" x2="88" y2="75" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="94" y1="75" x2="97" y2="75" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="6" y1="86" x2="114" y2="86" stroke="#9C978F" strokeWidth="1" />
+    </svg>
+  );
+}
+
+/** Comptoir d'accueil et rangements d'un local professionnel. */
+export function ProfessionnelDeFace({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
+      {/* Rangements muraux */}
+      {[10, 30].map((x) => (
+        <rect key={x} x={x} y="10" width="18" height="30" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      ))}
+      <line x1="25" y1="22" x2="25" y2="28" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="33" y1="22" x2="33" y2="28" stroke={TRAIT} strokeWidth="1.1" />
+      {/* Écran sur le comptoir */}
+      <rect x="70" y="30" width="18" height="12" rx="1" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="79" y1="42" x2="79" y2="46" stroke={TRAIT} strokeWidth="1.1" />
+      {/* Comptoir : plateau et façade */}
+      <rect x="44" y="46" width="70" height="4" rx="0.6" fill="#D9D5CE" stroke={TRAIT} strokeWidth="1.1" />
+      <rect x="46" y="50" width="66" height="34" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="62" y1="54" x2="62" y2="80" stroke="#CFCBC4" strokeWidth="1" />
+      <line x1="79" y1="54" x2="79" y2="80" stroke="#CFCBC4" strokeWidth="1" />
+      <line x1="96" y1="54" x2="96" y2="80" stroke="#CFCBC4" strokeWidth="1" />
+      <line x1="6" y1="86" x2="114" y2="86" stroke="#9C978F" strokeWidth="1" />
+    </svg>
+  );
+}
+
+/** Le dessin d'une famille de prestations (cartes de l'onglet Projet, du nouveau projet). */
+export function DessinFamille({ famille, className }: { famille: string; className?: string }) {
+  if (famille === "SDB") return <SalleDeBainDeFace className={className} />;
+  if (famille === "MEUBLES") return <MobilierDeFace className={className} />;
+  if (famille === "PRO") return <ProfessionnelDeFace className={className} />;
+  return <CuisineDeFace className={className} />;
 }
 
 /** Plans vus de dessus, pour estimer la longueur de meubles. */
