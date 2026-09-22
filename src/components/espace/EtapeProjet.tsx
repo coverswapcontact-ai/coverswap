@@ -70,9 +70,16 @@ function libelleTaille(f: FamillePublique, t: TailleProjet | undefined): string 
   return [repere?.libelle, valeur].filter(Boolean).join(" · ") || null;
 }
 
-export function EtapeProjet({ etat, client, prestations, onEtat, onSuite }: { etat: Etat; client: Client; prestations: Prestations | undefined; onEtat: (etat: Etat) => void; onSuite: () => void }) {
+export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevis }: { etat: Etat; client: Client; prestations: Prestations | undefined; onEtat: (etat: Etat) => void; onSuite: () => void; onDevis?: () => void }) {
   const familles = useMemo(() => prestations?.familles ?? [], [prestations]);
   const initial = useMemo(() => prerempli(etat, prestations), [etat, prestations]);
+  // Ce qui est déjà à lui en tête (sa salle de bain), les autres familles ensuite ; l'ordre ne bouge plus pendant qu'il coche.
+  const [ordre] = useState<IdFamille[]>(() => {
+    const siennes = famillesCochees(initial.saisie.familles);
+    return [...siennes, ...ORDRE.filter((id) => !siennes.includes(id))];
+  });
+  const famillesOrdonnees = useMemo(() => ordre.map((id) => familles.find((f) => f.id === id)).filter((f): f is FamillePublique => Boolean(f)), [ordre, familles]);
+  const nbSiennes = famillesCochees(initial.saisie.familles).length;
   const [saisie, setSaisie] = useState<Saisie>(initial.saisie);
   const [enregistrement, setEnregistrement] = useState<EtatEnregistrement>({ etat: "" });
   const [modifie, setModifie] = useState(false);
@@ -293,9 +300,15 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite }: { et
       <div className="space-y-5">
         <EnteteEtape titre="Votre projet" phrase={etat.projetModifiable?.raison ?? "Votre projet est arrêté."} />
         <Carte className="space-y-4">{cochees.length ? resume : <p className="text-[16px] text-[#3F3B36]">Votre projet a été précisé avec CoverSwap, au téléphone.</p>}</Carte>
-        <BoutonPrincipal onClick={onSuite}>
-          Voir la suite <span aria-hidden>→</span>
-        </BoutonPrincipal>
+        {etat.devis && onDevis ? (
+          <BoutonPrincipal onClick={onDevis}>
+            Voir mon devis <span aria-hidden>→</span>
+          </BoutonPrincipal>
+        ) : (
+          <BoutonPrincipal onClick={onSuite}>
+            Voir la suite <span aria-hidden>→</span>
+          </BoutonPrincipal>
+        )}
       </div>
     );
   }
@@ -337,10 +350,12 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite }: { et
           Ce que vous voulez rénover
         </h2>
         <ul className="space-y-2.5">
-          {familles.map((f) => {
+          {famillesOrdonnees.map((f, i) => {
             const coche = f.id in saisie.familles;
             return (
-              <li key={f.id} id={`famille-${f.id}`} className={cx("overflow-hidden rounded-2xl border-2 bg-white", coche ? "border-[#1A1A1A]" : "border-[#E2DFD9]")}>
+              <li key={f.id} id={`famille-${f.id}`} className={cx(i === nbSiennes && nbSiennes > 0 && "!mt-6")}>
+                {i === nbSiennes && nbSiennes > 0 ? <p className="mb-2 px-1 text-[15.5px] font-medium text-[#5F5A53]">Autre chose à rénover&nbsp;?</p> : null}
+                <div className={cx("overflow-hidden rounded-2xl border-2 bg-white", coche ? "border-[#1A1A1A]" : "border-[#E2DFD9]")}>
                 <button type="button" role="checkbox" aria-checked={coche} onClick={() => basculerFamille(f.id)} className={cx("flex w-full items-center gap-3 p-3 text-left active:bg-[#F6F5F2]", FOCUS)}>
                   <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
                   <span className="min-w-0 flex-1">
@@ -362,6 +377,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite }: { et
                     </div>
                   </div>
                 ) : null}
+                </div>
               </li>
             );
           })}

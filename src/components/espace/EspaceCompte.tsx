@@ -94,8 +94,9 @@ function CarteProjet({ projet, onOuvrir }: { projet: ProjetCarte; onOuvrir: () =
       <button type="button" onClick={onOuvrir} className={cx("flex w-full items-center gap-3 rounded-[22px] border border-[#E6E3DD] bg-white p-3.5 text-left shadow-[0_1px_2px_rgba(26,26,26,0.04)] active:bg-[#F6F5F2]", FOCUS)}>
         <DessinFamille famille={famille} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[18px] leading-snug font-semibold text-[#1A1A1A]">{projet.nom}</span>
-          {projet.familles.length > 1 || (projet.familles.length === 1 && projet.familles[0].libelle !== projet.nom) ? <span className="block truncate text-[14.5px] text-[#5F5A53]">{projet.familles.map((f) => f.libelle).join(", ")}</span> : null}
+          <span className="block line-clamp-2 text-[18px] leading-snug font-semibold text-[#1A1A1A]">{projet.nom}</span>
+          {/* Ses familles, quand son nom ne les dit pas déjà (« La salle de bain du haut » : oui ; « Cuisine et mobilier » : non). */}
+          {projet.familles.length && !projet.familles.every((f) => projet.nom.toLowerCase().includes(f.libelle.toLowerCase())) ? <span className="block truncate text-[14.5px] text-[#5F5A53]">{projet.familles.map((f) => f.libelle).join(", ")}</span> : null}
           <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className={cx("rounded-full px-2.5 py-0.5 text-[13.5px] font-semibold", TONS_PASTILLE[projet.pastille])}>{projet.libellePastille}</span>
             {projet.prochaine ? <span className="text-[14.5px] text-[#3F3B36]">{projet.prochaine}</span> : null}

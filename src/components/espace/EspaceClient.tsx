@@ -1,15 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { creerClient, dateCourte, ErreurEspace, euros, marqueDe, motsDe, type CleProgression, type Compte, type Etat, type Reponse } from "./api";
+import { creerClient, dateCourte, ErreurEspace, euros, famillesDe, marqueDe, MESSAGE_APERCU, motsDe, type CleProgression, type Client, type Compte, type Etat, type IdFamille, type Prestations, type Reponse } from "./api";
 import { DevisEnPreparation, EtapeDevis } from "./EtapeDevis";
 import { ApresChantier, EtapePaiement } from "./EtapePaiement";
 import { EtapePhotos } from "./EtapePhotos";
 import { EtapeProjet } from "./EtapeProjet";
 import { EtapeSimulations } from "./EtapeSimulations";
 import { CataloguePage, Contact, EcranConfirmation, MesDocuments, MesProjets, NouveauProjet, ProjetConsultation } from "./EspaceCompte";
-import { IconeAppareil, IconeCadenas, IconeCoche, IconeDevis, IconePaiement, IconeProjet, IconeSimulation, IconeTelephone, Logo } from "./Illustrations";
-import { BoutonPrincipal, FOCUS, Verrou, cx } from "./ui";
+import { DessinFamille, IconeAppareil, IconeCadenas, IconeCoche, IconeDevis, IconePaiement, IconeProjet, IconeSimulation, IconeTelephone, Logo } from "./Illustrations";
+import { Annonce, BoutonPrincipal, FOCUS, Verrou, cx } from "./ui";
 
 /**
  * L'espace du client, sur son téléphone (mission 5 : permanent, multi-projets).
@@ -231,7 +231,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
   else {
     const onglet = (cle: CleProgression) => etat.etapes.find((e) => e.cle === cle);
     if (vue === "photos") contenu = <EtapePhotos etat={etat} client={client} jeton={jeton} prestations={compte?.prestations} onEtat={appliquerEtat} onSuite={() => aller("projet")} />;
-    else if (vue === "projet") contenu = <EtapeProjet etat={etat} client={client} prestations={compte?.prestations} onEtat={appliquerEtat} onSuite={() => aller("simulations")} />;
+    else if (vue === "projet") contenu = <EtapeProjet etat={etat} client={client} prestations={compte?.prestations} onEtat={appliquerEtat} onSuite={() => aller("simulations")} onDevis={() => aller("devis")} />;
     else if (vue === "simulations") contenu = <EtapeSimulations etat={etat} client={client} jeton={jeton} onEtat={appliquerEtat} recharger={() => charger()} aller={aller} />;
     else if (vue === "devis") {
       const verrou = onglet("DEVIS");
@@ -244,6 +244,9 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
       if (verrou?.verrouillee) contenu = <Verrou titre="Paiement" raison={verrou.raison ?? "Le paiement s'ouvre après votre accord sur le devis."} action={etat.devis ? { libelle: "Voir mon devis", onClick: () => aller("devis") } : null} />;
       else contenu = <EtapePaiement etat={etat} client={client} onApres={etat.etape === "TERMINE" ? () => aller("apres") : undefined} />;
     } else if (vue === "apres") contenu = <ApresChantier etat={etat} client={client} onEtat={appliquerEtat} />;
+    else if (famillesDe(etat).length === 0 && etat.etape === "PHOTOS" && compte)
+      // Venu d'une publicité, sans rien dire de sa pièce : d'abord ce qu'il veut rénover (un toucher), puis les photos.
+      contenu = <ChoixFamille etat={etat} client={client} prestations={compte.prestations} onEtat={appliquerEtat} onSuite={() => aller("photos")} />;
     else contenu = <AccueilProjet etat={etat} aller={aller} plusieurs={plusieursProjets} onNouveau={() => aller("nouveau")} />;
   }
 
@@ -356,6 +359,55 @@ function BarreOnglets({ etat, vue, aller }: { etat: Etat; vue: Vue; aller: (vue:
         })}
       </ul>
     </nav>
+  );
+}
+
+/* ── Première question, quand on ne sait rien de sa pièce ─────────── */
+
+function ChoixFamille({ etat, client, prestations, onEtat, onSuite }: { etat: Etat; client: Client; prestations: Prestations; onEtat: (etat: Etat) => void; onSuite: () => void }) {
+  const [occupe, setOccupe] = useState<IdFamille | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  async function choisir(id: IdFamille) {
+    if (client.apercu) return setMessage(MESSAGE_APERCU);
+    setOccupe(id);
+    setMessage(null);
+    try {
+      const r = await client.envoyerJson<{ espace?: Etat }>("/projet", "PUT", { familles: { [id]: [] }, precisions: etat.monProjet?.precisions ?? "" });
+      if (r.espace) onEtat(r.espace);
+      onSuite();
+    } catch (e) {
+      setMessage(e instanceof ErreurEspace && e.status === 0 ? "Pas de réseau : touchez à nouveau dès son retour." : e instanceof Error ? e.message : "Réessayez dans un instant.");
+    } finally {
+      setOccupe(null);
+    }
+  }
+
+  return (
+    <section aria-labelledby="titre-choix-famille" className="space-y-5 py-4">
+      <div>
+        <p className="text-[17px] text-[#5F5A53]">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</p>
+        <h1 id="titre-choix-famille" className="mt-1.5 font-display text-[30px] leading-[1.13] font-semibold tracking-tight text-balance text-[#1A1A1A]">
+          Qu&apos;est-ce que vous voulez rénover&nbsp;?
+        </h1>
+        <p className="mt-2 text-[16.5px] text-[#4F4A44]">Touchez votre pièce. Vous pourrez en ajouter une autre ensuite.</p>
+      </div>
+      <ul className="space-y-2.5">
+        {prestations.familles.map((f) => (
+          <li key={f.id}>
+            <button type="button" onClick={() => void choisir(f.id)} disabled={occupe !== null} className={cx("flex w-full items-center gap-3 rounded-2xl border-2 border-[#E2DFD9] bg-white p-3 text-left active:bg-[#F6F5F2] disabled:opacity-60", FOCUS)}>
+              <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[18px] leading-snug font-semibold text-[#1A1A1A]">{occupe === f.id ? "Un instant…" : f.libelle}</span>
+                <span className="mt-0.5 block text-[14.5px] leading-snug text-[#5F5A53]">{f.aide}</span>
+              </span>
+              <span aria-hidden className="text-[22px] text-[#8A857E]">›</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {message ? <Annonce ton="erreur">{message}</Annonce> : null}
+    </section>
   );
 }
 
