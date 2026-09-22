@@ -7,6 +7,7 @@ import { ApresChantier, EtapePaiement } from "./EtapePaiement";
 import { EtapePhotos } from "./EtapePhotos";
 import { EtapeProjet } from "./EtapeProjet";
 import { EtapeSimulations } from "./EtapeSimulations";
+import { MesCoordonnees, PastilleCoordonnees } from "./Coordonnees";
 import { CataloguePage, Contact, EcranConfirmation, MesDocuments, MesProjets, NouveauProjet, ProjetConsultation } from "./EspaceCompte";
 import { DessinFamille, IconeAppareil, IconeCadenas, IconeCoche, IconeDevis, IconePaiement, IconeProjet, IconeSimulation, IconeTelephone, Logo } from "./Illustrations";
 import { Annonce, BoutonPrincipal, FOCUS, Verrou, cx } from "./ui";
@@ -24,10 +25,10 @@ import { Annonce, BoutonPrincipal, FOCUS, Verrou, cx } from "./ui";
  * revenir : son dernier état est gardé dans le téléphone.
  */
 
-type VueProjet = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres";
+type VueProjet = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres" | "coordonnees";
 type VueCompte = "projets" | "catalogue" | "documents" | "contact" | "nouveau";
 type Vue = VueProjet | VueCompte;
-const VUES_PROJET: VueProjet[] = ["photos", "projet", "simulations", "devis", "paiement", "apres"];
+const VUES_PROJET: VueProjet[] = ["photos", "projet", "simulations", "devis", "paiement", "apres", "coordonnees"];
 const VUES_COMPTE: VueCompte[] = ["projets", "catalogue", "documents", "contact", "nouveau"];
 /** Anciennes adresses (espace v2) : « #acompte » mène au paiement. */
 const ALIAS: Record<string, Vue> = { acompte: "paiement" };
@@ -235,7 +236,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
     else if (vue === "simulations") contenu = <EtapeSimulations etat={etat} client={client} jeton={jeton} onEtat={appliquerEtat} recharger={() => charger()} aller={aller} />;
     else if (vue === "devis") {
       const verrou = onglet("DEVIS");
-      if (etat.devis) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} />;
+      if (etat.devis) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} onCoordonnees={() => aller("coordonnees")} />;
       else if (verrou?.verrouillee)
         contenu = <Verrou titre="Votre devis" raison={verrou.raison ?? "Validez une simulation pour recevoir votre devis."} action={{ libelle: etat.simulations.length ? "Voir mes simulations" : "Créer ma simulation", onClick: () => aller("simulations") }} />;
       else contenu = <DevisEnPreparation etat={etat} client={client} onSimulations={() => aller("simulations")} />;
@@ -244,6 +245,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
       if (verrou?.verrouillee) contenu = <Verrou titre="Paiement" raison={verrou.raison ?? "Le paiement s'ouvre après votre accord sur le devis."} action={etat.devis ? { libelle: "Voir mon devis", onClick: () => aller("devis") } : null} />;
       else contenu = <EtapePaiement etat={etat} client={client} onApres={etat.etape === "TERMINE" ? () => aller("apres") : undefined} />;
     } else if (vue === "apres") contenu = <ApresChantier etat={etat} client={client} onEtat={appliquerEtat} />;
+    else if (vue === "coordonnees") contenu = <MesCoordonnees key={etat.code ?? "projet"} etat={etat} client={client} onEtat={appliquerEtat} onRetour={() => aller("accueil")} />;
     else if (famillesDe(etat).length === 0 && etat.etape === "PHOTOS" && compte)
       // Venu d'une publicité, sans rien dire de sa pièce : d'abord ce qu'il veut rénover (un toucher), puis les photos.
       contenu = <ChoixFamille etat={etat} client={client} prestations={compte.prestations} onEtat={appliquerEtat} onSuite={() => aller("photos")} />;
@@ -275,10 +277,12 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
         {/* Dans un projet : son nom, et le chemin discret vers tous ses projets. */}
         {!confirmation && etat && vue !== "projets" ? (
           <div className="mx-auto flex max-w-xl items-center gap-2 px-4 pb-1.5">
-            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] items-center gap-1 rounded-lg px-1 text-[15px] font-medium text-[#4F4A44] active:bg-[#ECEAE5]", FOCUS)}>
+            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] shrink-0 items-center gap-1 rounded-lg px-1 text-[15px] font-medium whitespace-nowrap text-[#4F4A44] active:bg-[#ECEAE5]", FOCUS)}>
               <span aria-hidden className="text-[19px] leading-none">‹</span> Mes projets
             </button>
             {(VUES_COMPTE as string[]).includes(vue) ? null : <span className="min-w-0 truncate text-[15px] font-semibold text-[#1A1A1A]">· {etat.nomProjet ?? etat.projet}</span>}
+            {/* Ses coordonnées, visibles dans tout le projet : orange tant qu'il manque quelque chose, vert ensuite. */}
+            {!fige && !(VUES_COMPTE as string[]).includes(vue) ? <PastilleCoordonnees etat={etat} actif={vue === "coordonnees"} onOuvrir={() => aller("coordonnees")} /> : null}
           </div>
         ) : null}
         {!confirmation && !etat && vue !== "projets" && (VUES_COMPTE as string[]).includes(vue) ? (
@@ -427,6 +431,17 @@ function AccueilProjet({ etat, aller, plusieurs, onNouveau }: { etat: Etat; alle
       <BoutonPrincipal className="mt-7" onClick={() => aller(pas.vue)}>
         {pas.bouton}
       </BoutonPrincipal>
+      {/* « Vérifiez vos coordonnées » : bien visible, jamais sur le chemin (il continue sans). */}
+      {!etat.coordonnees.completes ? (
+        <button type="button" onClick={() => aller("coordonnees")} className={cx("mt-4 flex w-full items-center gap-3 rounded-2xl border border-[#F0C98A] bg-[#FFF8EC] px-4 py-3 text-left active:bg-[#FBEFD9]", FOCUS)}>
+          <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#E08A00]" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[16px] font-semibold text-[#1A1A1A]">Vérifiez vos coordonnées</span>
+            <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{(etat.coordonnees.manque ?? []).length ? `Il manque ${(etat.coordonnees.manque ?? []).join(", ")}.` : "Pour votre devis et votre facture."}</span>
+          </span>
+          <span aria-hidden className="text-[22px] text-[#8A857E]">›</span>
+        </button>
+      ) : null}
       {!plusieurs ? (
         <button type="button" onClick={onNouveau} className={cx("mt-4 min-h-[44px] self-center px-2 text-[15px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4", FOCUS)}>
           Un autre projet&nbsp;? Nouveau projet

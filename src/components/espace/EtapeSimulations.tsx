@@ -1,5 +1,6 @@
 "use client";
 
+import { RappelCoordonnees } from "./Coordonnees";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { dateCourte, ErreurEspace, type Client, type Etat, type SimulationClient } from "./api";
 import { AvantApres } from "./AvantApres";
@@ -22,7 +23,7 @@ import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, En
  *    simulations », où elle arrive.
  */
 
-type Vue = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres";
+type Vue = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres" | "coordonnees";
 type Option = { simulationId: string; nom: string; ref: string; nomTeinte: string; libelle: string };
 
 const cleZone = (z: { zone: string; libelle: string }) => z.zone || z.libelle;
@@ -354,6 +355,8 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
       <EnteteEtape titre="Mes simulations" phrase={phrase} />
       {sousOnglets}
       {message ? <Annonce ton={message.ton}>{message.texte}</Annonce> : null}
+      {/* Simulation validée : le devis se prépare, c'est le moment de vérifier ses coordonnées (jamais exigé). */}
+      {etat.choix && !etat.devis ? <RappelCoordonnees etat={etat} moment="simulation" onOuvrir={() => aller("coordonnees")} /> : null}
 
       {suivies.length > 0 ? (
         <Carte className="space-y-3 border-[#1A1A1A]/15">

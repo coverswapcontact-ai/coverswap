@@ -130,7 +130,8 @@ export type Etat = {
   propositionDemandeeLe: string | null;
   propositionMessage?: string | null;
   choix: Choix | null;
-  coordonnees: { nom: string; adresse: string; codePostal: string; ville: string; email: string | null; completes: boolean };
+  /** « Vérifiez vos coordonnées » : les siennes (prénom, nom, e-mail, téléphone) et l'adresse de ce projet. */
+  coordonnees: { nom: string; prenom?: string; nomFamille?: string; telephone?: string; adresse: string; codePostal: string; ville: string; email: string | null; completes: boolean; manque?: string[] };
   devis: {
     id: string;
     numero: string;

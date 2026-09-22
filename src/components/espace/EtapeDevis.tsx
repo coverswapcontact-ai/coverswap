@@ -1,5 +1,6 @@
 "use client";
 
+import { RappelCoordonnees } from "./Coordonnees";
 import { useEffect, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "./AvantApres";
@@ -19,7 +20,7 @@ type Adresse = { libelle: string; adresse: string; codePostal: string; ville: st
 const UNITES: Record<string, string> = { ml: "m", jour: "jour", forfait: "forfait" };
 const quantite = (q: number, unite: string) => (unite === "forfait" ? "Forfait" : `${String(Math.round(q * 100) / 100).replace(".", ",")} ${UNITES[unite] ?? unite}${unite === "jour" && q > 1 ? "s" : ""}`);
 
-export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void }) {
+export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void; onCoordonnees?: () => void }) {
   const devis = etat.devis!;
   const apercu = Boolean(client.apercu);
   const [coord, setCoord] = useState({ nom: etat.coordonnees.nom || "", adresse: etat.coordonnees.adresse, codePostal: etat.coordonnees.codePostal, ville: etat.coordonnees.ville, email: etat.coordonnees.email ?? "" });
@@ -101,6 +102,7 @@ export function EtapeDevis({ etat, client, onEtat, onSuite }: { etat: Etat; clie
   return (
     <div className="space-y-5">
       <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-nous."} />
+      {!devis.accepte && onCoordonnees ? <RappelCoordonnees etat={etat} moment="devis" onOuvrir={onCoordonnees} /> : null}
 
       <Carte className="space-y-4">
         <div>
