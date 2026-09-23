@@ -181,6 +181,8 @@ export type ProjetCarte = {
 export type DocumentClient = { id: string; type: "DEVIS" | "FACTURE" | "AVOIR"; numero: string; le: string; montant: number; statut: string; projet: string; pdf: string | null };
 
 /** L'espace du client, au-dessus de ses projets : ses projets, ses documents, ses favoris, la confirmation. */
+export type MessageClient = { id: string; le: string; auteur: "CLIENT" | "COVERSWAP"; texte: string; projet: string | null; vue: boolean };
+
 export type Compte = {
   version: 3;
   prenom: string;
@@ -190,6 +192,9 @@ export type Compte = {
   nouveauProjet: { possible: boolean; enCours: number; limite: number; demandeLe: string | null };
   documents: DocumentClient[];
   favoris: string[];
+  /** Mission 10 : ses échanges avec CoverSwap (tous projets), du plus ancien au plus récent. */
+  messages?: MessageClient[];
+  reponsesNonVues?: number;
   prestations: Prestations;
   marque: { nom: string; telephone: string; telephoneLien: string; email: string | null };
 };

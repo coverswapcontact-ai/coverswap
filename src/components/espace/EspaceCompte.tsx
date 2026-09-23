@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { dateCourte, ErreurEspace, euros, MESSAGE_APERCU, type Client, type Compte, type Etat, type IdFamille, type ProjetCarte, type Reponse } from "./api";
+import { useEffect, useState } from "react";
+import { dateCourte, ErreurEspace, euros, MESSAGE_APERCU, type Client, type Compte, type Etat, type IdFamille, type MessageClient, type ProjetCarte, type Reponse } from "./api";
 import { CatalogueTeintes, vignette } from "./CatalogueTeintes";
 import { AvantApres } from "./AvantApres";
 import { DessinFamille, IconeCoeur, IconeDevis, IconePlus, IconeTelephone } from "./Illustrations";
@@ -151,7 +151,7 @@ export function MesProjets({ compte, onOuvrir, onNouveau, onCatalogue, onDocumen
         {[
           { libelle: "Catalogue", aide: "Toutes les teintes", onClick: onCatalogue, icone: <IconeCoeur taille={22} /> },
           { libelle: "Documents", aide: compte.documents.length ? `${compte.documents.length} document${compte.documents.length > 1 ? "s" : ""}` : "Devis, factures", onClick: onDocuments, icone: <IconeDevis taille={22} /> },
-          { libelle: "Contact", aide: "Appeler, écrire", onClick: onContact, icone: <IconeTelephone taille={22} /> },
+          { libelle: "Contact", aide: compte.reponsesNonVues ? `${compte.reponsesNonVues} réponse${compte.reponsesNonVues > 1 ? "s" : ""} à lire` : "Appeler, écrire", onClick: onContact, icone: <IconeTelephone taille={22} /> },
         ].map((e) => (
           <button key={e.libelle} type="button" onClick={e.onClick} className={cx("flex min-h-[96px] flex-col items-center justify-center gap-1.5 rounded-2xl border border-[#E6E3DD] bg-white px-2 text-center active:bg-[#F6F5F2]", FOCUS)}>
             <span className="text-[#CC0000]" aria-hidden>
@@ -329,6 +329,14 @@ export function Contact({ compte, client }: { compte: Compte; client: Client }) 
   const [texte, setTexte] = useState("");
   const [etat, setEtat] = useState<{ ton: "erreur" | "succes" | "info"; texte: string } | null>(null);
   const [occupe, setOccupe] = useState(false);
+  const [envoyes, setEnvoyes] = useState<MessageClient[]>([]);
+  const messages = [...(compte.messages ?? []), ...envoyes];
+
+  // Il ouvre Contact : les réponses de CoverSwap sont vues (jamais en aperçu).
+  useEffect(() => {
+    if (client.apercu || !compte.reponsesNonVues) return;
+    void client.envoyerJson("/messages/vus", "POST", {}).catch(() => undefined);
+  }, [client, compte.reponsesNonVues]);
 
   async function envoyer() {
     if (client.apercu) return setEtat({ ton: "info", texte: MESSAGE_APERCU });
@@ -336,8 +344,9 @@ export function Contact({ compte, client }: { compte: Compte; client: Client }) 
     setOccupe(true);
     try {
       await client.envoyerJson("/message", "POST", { texte });
+      setEnvoyes((liste) => [...liste, { id: `local-${Date.now()}`, le: new Date().toISOString(), auteur: "CLIENT", texte: texte.trim(), projet: null, vue: true }]);
       setTexte("");
-      setEtat({ ton: "succes", texte: "Message envoyé : CoverSwap vous répond vite, par téléphone ou par e-mail." });
+      setEtat({ ton: "succes", texte: "Message envoyé : CoverSwap vous répond vite, ici, par téléphone ou par e-mail." });
     } catch (e) {
       setEtat({ ton: "erreur", texte: e instanceof ErreurEspace && e.status === 0 ? "Pas de réseau : votre message n'est pas parti. Réessayez dans un moment." : e instanceof Error ? e.message : "Réessayez dans un instant." });
     } finally {
@@ -351,6 +360,25 @@ export function Contact({ compte, client }: { compte: Compte; client: Client }) 
       <a href={`tel:${compte.marque.telephoneLien}`} className={cx("flex min-h-[64px] items-center justify-center gap-2.5 rounded-2xl bg-[#CC0000] px-5 text-[18px] font-semibold text-white active:bg-[#A80000]", FOCUS)}>
         <IconeTelephone taille={20} /> Appeler · {compte.marque.telephone}
       </a>
+      {messages.length ? (
+        <section aria-labelledby="titre-echanges" className="space-y-2">
+          <h2 id="titre-echanges" className="px-1">
+            <Surtitre>Vos échanges</Surtitre>
+          </h2>
+          <ol className="space-y-2">
+            {messages.map((m) => (
+              <li key={m.id} className={cx("max-w-[92%] rounded-[20px] px-4 py-3", m.auteur === "COVERSWAP" ? "mr-auto border border-[#E6E3DD] bg-white" : "ml-auto bg-[#F1EFEA]")}>
+                <p className="text-[13px] text-[#6B665F]">
+                  {m.auteur === "COVERSWAP" ? "CoverSwap" : "Vous"} · {dateCourte(m.le)}
+                  {m.projet ? ` · ${m.projet}` : ""}
+                  {m.auteur === "COVERSWAP" && !m.vue ? <span className="ml-1.5 rounded-full bg-[#FDECEC] px-2 py-0.5 text-[12px] font-semibold text-[#9E1A1A]">Nouveau</span> : null}
+                </p>
+                <p className="mt-1 whitespace-pre-line text-[16.5px] leading-relaxed text-[#1A1A1A]">{m.texte}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
       <Carte className="space-y-3">
         <label htmlFor="message-coverswap" className="block">
           <span className="block text-[18px] font-semibold text-[#1A1A1A]">Écrire à CoverSwap</span>
