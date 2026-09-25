@@ -500,10 +500,22 @@ export function ProjetConsultation({ etat, client }: { etat: Etat; client: Clien
       ) : null}
       {etat.devis ? (
         <Carte className="space-y-1.5">
-          <Surtitre>Le devis</Surtitre>
-          <p className="text-[17px] font-semibold text-[#1A1A1A]">
-            Devis {etat.devis.numero} · <span className="tabular-nums">{euros(etat.devis.total)}</span>
-          </p>
+          <Surtitre>{(etat.devisProposes?.length ?? 0) > 1 && !etat.devis.accepte ? "Les devis proposés" : "Le devis"}</Surtitre>
+          {(etat.devisProposes?.length ?? 0) > 1 && !etat.devis.accepte ? (
+            <ul className="space-y-1">
+              {etat.devisProposes!.map((d) => (
+                <li key={d.id} className="text-[16px] font-semibold text-[#1A1A1A]">
+                  Devis {d.numero}
+                  {d.libelle ? <span className="font-normal text-[#5F5A53]"> · {d.libelle}</span> : null} · <span className="tabular-nums">{euros(d.total)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-[17px] font-semibold text-[#1A1A1A]">
+              Devis {etat.devis.numero}
+              {etat.devis.libelle ? <span className="font-normal text-[#5F5A53]"> · {etat.devis.libelle}</span> : null} · <span className="tabular-nums">{euros(etat.devis.total)}</span>
+            </p>
+          )}
           {etat.devis.accepte ? <p className="text-[15px] text-[#1F6B45]">Signé le {dateCourte(etat.devis.accepte.le)}</p> : null}
           {etat.devis.pdf ? (
             <a href={client.url(`/${etat.devis.pdf}`)} target="_blank" rel="noopener noreferrer" className="inline-block pt-1 text-[15.5px] font-semibold text-[#CC0000] underline underline-offset-4">

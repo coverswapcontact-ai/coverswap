@@ -236,7 +236,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
     else if (vue === "simulations") contenu = <EtapeSimulations etat={etat} client={client} jeton={jeton} onEtat={appliquerEtat} recharger={() => charger()} aller={aller} />;
     else if (vue === "devis") {
       const verrou = onglet("DEVIS");
-      if (etat.devis) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} onCoordonnees={() => aller("coordonnees")} />;
+      if (etat.devis || etat.devisProposes?.length) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} onCoordonnees={() => aller("coordonnees")} />;
       else if (verrou?.verrouillee)
         contenu = <Verrou titre="Votre devis" raison={verrou.raison ?? "Validez une simulation pour recevoir votre devis."} action={{ libelle: etat.simulations.length ? "Voir mes simulations" : "Créer ma simulation", onClick: () => aller("simulations") }} />;
       else contenu = <DevisEnPreparation etat={etat} client={client} onSimulations={() => aller("simulations")} />;
@@ -476,6 +476,7 @@ function prochainPas(etat: Etat): Pas {
     case "ATTENTE_DEVIS":
       return { phrase: "Simulation validée : CoverSwap prépare votre devis.", bouton: "Revoir ma simulation", vue: "simulations" };
     case "DEVIS":
+      if ((etat.devisProposes?.length ?? 0) > 1 && !etat.devis?.accepte) return { phrase: `${etat.devisProposes!.length} devis vous sont proposés : choisissez celui qui vous convient.`, bouton: "Voir mes devis", vue: "devis" };
       return { phrase: etat.devis ? `Votre devis est prêt : ${euros(etat.devis.total)}.` : "Votre devis est prêt.", bouton: "Voir mon devis", vue: "devis" };
     case "ACOMPTE":
       return { phrase: "C'est signé ! Il reste l'acompte, qui réserve votre date.", bouton: "Voir le paiement", vue: "paiement" };

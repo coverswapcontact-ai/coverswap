@@ -1,7 +1,7 @@
 "use client";
 
 import { RappelCoordonnees } from "./Coordonnees";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "./AvantApres";
 import { Signature, type SignatureRef } from "./Signature";
@@ -21,7 +21,11 @@ const UNITES: Record<string, string> = { ml: "m", jour: "jour", forfait: "forfai
 const quantite = (q: number, unite: string) => (unite === "forfait" ? "Forfait" : `${String(Math.round(q * 100) / 100).replace(".", ",")} ${UNITES[unite] ?? unite}${unite === "jour" && q > 1 ? "s" : ""}`);
 
 export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void; onCoordonnees?: () => void }) {
-  const devis = etat.devis!;
+  // Mission 11 : plusieurs devis proposés → il en choisit un, côte à côte ; une fois l'accord donné, seul le devis signé reste.
+  const proposes = useMemo(() => (etat.devis?.accepte ? [etat.devis] : etat.devisProposes?.length ? etat.devisProposes : etat.devis ? [etat.devis] : []), [etat.devis, etat.devisProposes]);
+  const plusieurs = proposes.length > 1;
+  const [choisiId, setChoisiId] = useState<string | null>(plusieurs ? null : (proposes[0]?.id ?? null));
+  const devis = proposes.find((d) => d.id === choisiId) ?? (plusieurs ? null : (proposes[0] ?? null));
   const apercu = Boolean(client.apercu);
   const [coord, setCoord] = useState({ nom: etat.coordonnees.nom || "", adresse: etat.coordonnees.adresse, codePostal: etat.coordonnees.codePostal, ville: etat.coordonnees.ville, email: etat.coordonnees.email ?? "" });
   const [nom, setNom] = useState(etat.coordonnees.nom || "");
@@ -35,9 +39,9 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
 
   // Il a ouvert son devis : compté une fois par visite (Lucas sait qu'il le lit, et combien de fois).
   useEffect(() => {
-    if (!apercu) void client.envoyerJson(`/devis/${devis.id}/consultation`, "POST", {}).catch(() => undefined);
+    if (!apercu && devis) void client.envoyerJson(`/devis/${devis.id}/consultation`, "POST", {}).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [devis.id]);
+  }, [devis?.id]);
 
   function chercherAdresse(saisie: string) {
     setCoord((c) => ({ ...c, adresse: saisie }));
@@ -68,6 +72,7 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
   }
 
   async function donnerAccord() {
+    if (!devis) return;
     setOccupe(true);
     setProbleme(null);
     try {
@@ -99,14 +104,50 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
   ].filter((m): m is string => m !== null);
   const resteAFaire = manques.length > 1 ? `${manques.slice(0, -1).join(", ")} et ${manques[manques.length - 1]}` : manques[0];
 
+  // Les devis proposés, côte à côte : libellé et montant ; un toucher ouvre le détail et l'accord.
+  const choix = plusieurs ? (
+    <Carte className="space-y-3">
+      <div>
+        <Surtitre ton="rouge">{proposes.length} devis vous sont proposés</Surtitre>
+        <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">Comparez, puis donnez votre accord sur celui qui vous convient. Un seul sera retenu.</p>
+      </div>
+      <ul className="grid grid-cols-2 gap-2.5">
+        {proposes.map((d) => {
+          const actif = d.id === devis?.id;
+          return (
+            <li key={d.id}>
+              <button type="button" aria-pressed={actif} onClick={() => setChoisiId(d.id)} className={cx("flex min-h-[124px] w-full flex-col justify-between rounded-2xl border-2 p-3 text-left", actif ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9] bg-white active:bg-[#F2F0EC]")}>
+                <span className="block text-[13px] text-[#6B665F]">Devis n° {d.numero}</span>
+                <span className="mt-1 block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{d.libelle || d.objet}</span>
+                <span className="mt-2 block font-display text-[22px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{euros(d.total)}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {!devis ? <p className="text-center text-[14px] text-[#6B665F]">Touchez un devis pour voir son détail.</p> : null}
+    </Carte>
+  ) : null;
+
+  if (!devis) {
+    return (
+      <div className="space-y-5">
+        <EnteteEtape titre="Vos devis" phrase={"Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-nous."} />
+        {onCoordonnees ? <RappelCoordonnees etat={etat} moment="devis" onOuvrir={onCoordonnees} /> : null}
+        {choix}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
-      <EnteteEtape titre="Votre devis" phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-nous."} />
+      <EnteteEtape titre={plusieurs ? "Vos devis" : "Votre devis"} phrase={devis.accepte ? `Accepté le ${dateCourte(devis.accepte.le)}. Merci\u00a0!` : "Tout est là, lisible ici. Prenez votre temps\u00a0: une question, appelez-nous."} />
       {!devis.accepte && onCoordonnees ? <RappelCoordonnees etat={etat} moment="devis" onOuvrir={onCoordonnees} /> : null}
+      {choix}
 
       <Carte className="space-y-4">
         <div>
-          <Surtitre>Devis n° {devis.numero}</Surtitre>
+          <Surtitre>Devis n° {devis.numero}{devis.libelle ? ` · ${devis.libelle}` : ""}</Surtitre>
           <h2 className="mt-1 font-display text-[22px] leading-tight font-semibold text-[#1A1A1A]">{devis.objet}</h2>
           <p className="mt-1 text-[14.5px] text-[#5F5A53]">
             Émis le {dateCourte(devis.emisLe)} · valable jusqu&apos;au {dateCourte(devis.valableJusquau)}
@@ -232,12 +273,13 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
             </label>
           )}
 
-          <button type="button" role="checkbox" aria-checked={accepte} aria-label={`J'accepte le devis n° ${devis.numero} d'un montant de ${euros(devis.total)}. Mon accord vaut signature.`} onClick={() => setAccepte(!accepte)} className={cx("flex w-full items-start gap-3 rounded-2xl border-2 p-4 text-left", accepte ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9]")}>
+          <button type="button" role="checkbox" aria-checked={accepte} aria-label={`J'accepte le devis n° ${devis.numero}${devis.libelle ? ` « ${devis.libelle} »` : ""} d'un montant de ${euros(devis.total)}. Mon accord vaut signature.`} onClick={() => setAccepte(!accepte)} className={cx("flex w-full items-start gap-3 rounded-2xl border-2 p-4 text-left", accepte ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9]")}>
             <span aria-hidden className={cx("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 text-[16px] font-bold", accepte ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#8A857E] bg-white")}>
               {accepte ? "✓" : ""}
             </span>
             <span className="text-[16px] leading-snug text-[#1A1A1A]">
-              J&apos;accepte le devis n° {devis.numero} d&apos;un montant de <strong className="font-semibold">{euros(devis.total)}</strong>. Mon accord vaut signature.
+              J&apos;accepte le devis n° {devis.numero}{devis.libelle ? ` «\u00a0${devis.libelle}\u00a0»` : ""} d&apos;un montant de <strong className="font-semibold">{euros(devis.total)}</strong>. Mon accord vaut signature.
+              {plusieurs ? " Les autres devis proposés ne seront pas retenus." : ""}
             </span>
           </button>
 

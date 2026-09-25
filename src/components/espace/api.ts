@@ -100,6 +100,28 @@ export type Choix =
   | { mode: "UNE"; simulationId: string; commentaire: string | null; le: string }
   | { mode: "COMPOSITE"; zones: (ZoneTeinte & { simulationId: string })[]; commentaire: string | null; le: string };
 
+export type Devis = {
+  id: string;
+  numero: string;
+  /** Libellé de la variante (« façades seules »), quand il y en a un. */
+  libelle?: string | null;
+  objet: string;
+  lignes: LigneDevis[];
+  total: number;
+  acompte: number;
+  acomptePct: number | null;
+  solde: number;
+  conditions: string[];
+  mentionTva: string;
+  emisLe: string;
+  valableJusquau: string;
+  /** ESPACE : bon pour accord donné ici (retirable tant que rien n'est engagé) ; CRM : signé hors de l'espace. */
+  accepte: { le: string; nom: string; source?: "ESPACE" | "CRM"; retirable?: boolean } | null;
+  /** Devis émis avant le CRM : pas de détail ligne à ligne. */
+  repris?: boolean;
+  pdf: string | null;
+};
+
 export type Etat = {
   version?: 2;
   apercu?: boolean;
@@ -132,25 +154,9 @@ export type Etat = {
   choix: Choix | null;
   /** « Vérifiez vos coordonnées » : les siennes (prénom, nom, e-mail, téléphone) et l'adresse de ce projet. */
   coordonnees: { nom: string; prenom?: string; nomFamille?: string; telephone?: string; adresse: string; codePostal: string; ville: string; email: string | null; completes: boolean; manque?: string[] };
-  devis: {
-    id: string;
-    numero: string;
-    objet: string;
-    lignes: LigneDevis[];
-    total: number;
-    acompte: number;
-    acomptePct: number | null;
-    solde: number;
-    conditions: string[];
-    mentionTva: string;
-    emisLe: string;
-    valableJusquau: string;
-    /** ESPACE : bon pour accord donné ici (retirable tant que rien n'est engagé) ; CRM : signé hors de l'espace. */
-    accepte: { le: string; nom: string; source?: "ESPACE" | "CRM"; retirable?: boolean } | null;
-    /** Devis émis avant le CRM : pas de détail ligne à ligne. */
-    repris?: boolean;
-    pdf: string | null;
-  } | null;
+  devis: Devis | null;
+  /** Mission 11 : les devis proposés visibles (plusieurs → le client en choisit un) ; l'accepté y est toujours. */
+  devisProposes?: Devis[];
   paiement?: Paiement | null;
   acompte: { montant: number; recu: number; complet: boolean } | null;
   virement: { titulaire: string; iban: string; bic: string; reference: string } | null;
