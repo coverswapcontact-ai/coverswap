@@ -42,3 +42,13 @@ next-env.d.ts
 
 # sorties des scripts de test du simulateur
 /.simulation-tests/
+
+# bases, exports et secrets : jamais dans le dépôt (26/09/2026)
+*.db
+*.db.gz
+*.db-journal
+*.sqlite
+*.sqlite3
+/exports/
+.env*
+!.env.example
