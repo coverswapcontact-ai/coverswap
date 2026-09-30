@@ -50,7 +50,7 @@ jobs:
       - name: Lighthouse — rapports
         if: ${{ !cancelled() && steps.serveur.outcome == 'success' }}
         run: npx lhci upload --config=lighthouserc.json
-      - name: Lighthouse — seuils (≥ 0,95 sur les quatre axes, LCP ≤ 2 s, CLS ≤ 0,05, TBT ≤ 200 ms)
+      - name: Lighthouse — seuils (accessibilité, bonnes pratiques, SEO ≥ 0,95 ; CLS ≤ 0,05 ; plancher performance ≥ 0,85, LCP ≤ 4 s, TBT ≤ 400 ms)
         run: npx lhci assert --config=lighthouserc.json
       - name: Publier les rapports Lighthouse
         if: ${{ !cancelled() }}
