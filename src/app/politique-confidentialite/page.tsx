@@ -4,6 +4,7 @@ import { SITE } from "@/lib/constants";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
+import OppositionMesure from "@/components/OppositionMesure";
 
 export const metadata: Metadata = {
   ...metadonneesPage({
@@ -16,9 +17,9 @@ export const metadata: Metadata = {
 
 const MISE_A_JOUR = "30 septembre 2026";
 
-function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
+function Section({ titre, id, children }: { titre: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-3">
+    <section id={id} className="scroll-mt-24 space-y-3">
       <h2 className="titre-2 text-encre">{titre}</h2>
       {children}
     </section>
@@ -89,9 +90,15 @@ export default function PolitiqueConfidentialite() {
                     <td className="py-2">Intérêt légitime (sécurité)</td>
                   </tr>
                   <tr className="border-b border-trait">
-                    <td className="py-2 pr-4">Pages vues et étapes du simulateur, avec un identifiant de visite tiré au hasard et la provenance de la visite (sans cookie, sans nom ni coordonnées)</td>
-                    <td className="py-2 pr-4">Compter les visites et voir où le parcours s&apos;arrête, pour améliorer le site</td>
-                    <td className="py-2">Intérêt légitime (mesure de fréquentation)</td>
+                    <td className="py-2 pr-4">
+                      Pages vues et étapes du simulateur, avec la provenance de la visite (site d&apos;où vous venez, campagne) et le fuseau horaire
+                      de votre navigateur (sans cookie, sans nom ni coordonnées)
+                    </td>
+                    <td className="py-2 pr-4">
+                      Mesurer l&apos;audience du site pour notre seul compte : compter les visites, voir d&apos;où elles viennent et où le parcours
+                      s&apos;arrête, pour améliorer le site
+                    </td>
+                    <td className="py-2">Intérêt légitime (mesure d&apos;audience, exemptée de consentement ; vous pouvez vous y opposer)</td>
                   </tr>
                   <tr>
                     <td className="py-2 pr-4">
@@ -158,10 +165,13 @@ export default function PolitiqueConfidentialite() {
               <li>Devis et factures : 10 ans (obligation comptable), l&apos;identité y restant lisible pendant cette durée.</li>
               <li>Accord aux e-mails commerciaux : jusqu&apos;à son retrait, puis conservé comme preuve 3 ans.</li>
               <li>Adresse IP liée à une demande : 12 mois.</li>
-              <li>Identifiant de visite sur votre appareil : le temps de l&apos;onglet ouvert (et, si vous utilisez le simulateur, avec votre parcours).</li>
               <li>
-                Pages vues et étapes du simulateur dans notre outil de gestion (identifiant de visite, page, provenance) : gardées sans durée
-                maximale fixée à ce jour.
+                Identifiant de parcours sur votre appareil : le temps de l&apos;onglet ouvert ; si vous utilisez le simulateur, 7 jours au plus
+                depuis le début de votre parcours, jamais prolongés, puis effacé avec votre photo et vos choix.
+              </li>
+              <li>
+                Pages vues et étapes du simulateur dans notre outil de gestion (page, provenance, visiteur du jour, type d&apos;appareil, pays) :
+                25 mois, puis supprimées.
               </li>
             </ul>
           </Section>
@@ -184,15 +194,48 @@ export default function PolitiqueConfidentialite() {
             </p>
           </Section>
 
+          <Section titre="Mesure d'audience" id="mesure-audience">
+            <p>
+              Nous mesurons l&apos;audience du site nous-mêmes, pour notre seul compte, sans cookie ni outil tiers ; pour compter les
+              visites, rien n&apos;est gardé sur votre appareil. Cette mesure est exemptée de consentement (recommandations de la CNIL) : elle ne
+              sert qu&apos;à produire des statistiques anonymes et aucune de ses données ne quitte notre outil de gestion.
+            </p>
+            <p>
+              À chaque page vue et à chaque étape du simulateur, votre navigateur envoie à notre outil de gestion : la page, le site
+              d&apos;où vous venez (son nom seulement, par exemple « google.com »), la campagne qui vous a amené s&apos;il y en a une, le
+              fuseau horaire de votre navigateur, et l&apos;identifiant de parcours de l&apos;onglet, qui relie les étapes du simulateur entre
+              elles.
+            </p>
+            <p>
+              Notre outil de gestion en tire, à la réception : un visiteur du jour, empreinte calculée à partir de votre adresse IP tronquée
+              et de votre navigateur, mélangés à une valeur aléatoire renouvelée et détruite chaque jour, qui compte une visite sans vous
+              reconnaître d&apos;un jour à l&apos;autre ; le type d&apos;appareil (téléphone, tablette ou ordinateur) ; le pays, déduit du
+              fuseau horaire, sans géolocalisation. Votre adresse IP et le détail de votre navigateur ne sont jamais conservés. Ces
+              statistiques sont gardées 25 mois.
+            </p>
+            <p>
+              Si vous nous envoyez une demande, sa provenance (site d&apos;où vous venez, campagne, page d&apos;arrivée) y est jointe pour
+              savoir comment vous nous avez connus : cela relève du suivi de votre demande.
+            </p>
+            <p>
+              Vous pouvez vous opposer à cette mesure : ce bouton retient votre refus dans le stockage local de votre navigateur (rien
+              d&apos;autre, et rien n&apos;est envoyé), et plus aucune page vue ni étape n&apos;est alors transmise depuis ce navigateur. Le
+              signal Global Privacy Control, s&apos;il est activé dans votre navigateur, vaut le même refus.
+            </p>
+            <OppositionMesure />
+          </Section>
+
           <Section titre="Cookies et stockage sur votre appareil">
             <p>
               Le site ne dépose aucun cookie de mesure d&apos;audience ni de publicité et ne charge aucun traceur tiers : il n&apos;y a donc
-              pas de bandeau cookies. Pour compter ses visites, il garde dans l&apos;onglet un identifiant de visite tiré au hasard et la
-              provenance de la visite, envoyés avec les pages vues à notre outil de gestion.
+              pas de bandeau cookies. L&apos;onglet garde, jusqu&apos;à sa fermeture, la provenance de votre arrivée et un identifiant de
+              parcours tiré au hasard, qui relie les étapes du simulateur entre elles et à votre éventuelle demande.
             </p>
             <p>
               Le simulateur garde votre photo, vos choix et vos rendus dans le stockage de votre navigateur (IndexedDB), pour que vous
-              retrouviez votre parcours. Vos matières favorites (simulateur et page Matières) restent dans son stockage local.
+              retrouviez votre parcours : 7 jours au plus, puis tout est effacé et un nouveau parcours commence.
+              Vos matières favorites (simulateur et page Matières) restent dans son stockage local, comme votre refus de la mesure
+              d&apos;audience si vous l&apos;avez exprimé.
             </p>
             <p>
               Votre photo part vers notre outil de gestion dès que vous la choisissez : il y repère les surfaces de la pièce, et la convertit

@@ -1,5 +1,6 @@
+import { mesureRefuseeIci } from "@/lib/opposition-mesure";
 import { obtenirParcoursId } from "@/lib/parcours";
-import { lireOrigine, sourceCourte } from "@/lib/utm";
+import { lireOrigine, sourceCourte, utmDetailles, type Origine, type UtmDetailles } from "@/lib/utm";
 
 /**
  * Événements de parcours : envoyés au CRM (audience et entonnoir par source et
@@ -10,6 +11,16 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
  *
  * Envoi en `text/plain` : une requête « simple », sans pré-vol CORS — un
  * sendBeacon en JSON serait silencieusement abandonné par le navigateur.
+ *
+ * Mission 17 (partie B) : mesure d'audience exemptée de consentement (CNIL),
+ * sans cookie ni identifiant stable. Chaque événement porte en plus l'hôte du
+ * site référent, le fuseau horaire du navigateur, les quatre utm et la seule
+ * présence d'un `gclid` ; RIEN d'autre (ni écran, ni langue, ni identifiant
+ * nouveau). Le CRM en déduit seul, à la réception, le visiteur du jour (empreinte
+ * au sel quotidien détruit, IP et navigateur jamais gardés), la classe
+ * d'appareil (en-tête User-Agent) et le pays (depuis le fuseau). Rien ne part
+ * si la personne s'y oppose (bouton « Ne pas compter mes visites » ou signal
+ * Global Privacy Control : `lib/opposition-mesure.ts`).
  */
 /** Mission 15 (partie 4) : l'entonnoir du simulateur = PIECE_CHOISIE → PHOTO_CHARGEE → GENERATION_LANCEE → RESULTAT_VU → DEVIS_DEMANDE (mêmes noms côté CRM). */
 /** Mission 16 (partie 3) : `WHATSAPP_CLIQUE`, le bouton « Écrire sur WhatsApp » (liste blanche du CRM d'abord). */
@@ -28,24 +39,68 @@ export function urlEvenements(simulateUrl: string | undefined, sansEvenements: s
 
 const URL_EVENEMENTS = urlEvenements(process.env.NEXT_PUBLIC_SIMULATE_URL, process.env.NEXT_PUBLIC_SANS_EVENEMENTS);
 
-export function envoyerEvenement(type: EvenementSite, meta: Record<string, string | number | boolean | undefined> = {}): void {
-  if (typeof window === "undefined" || !URL_EVENEMENTS) return;
-  const origine = lireOrigine();
-  const corps = JSON.stringify({
-    parcoursId: obtenirParcoursId(),
+type Meta = Record<string, string | number | boolean | undefined>;
+
+export type CorpsEvenement = {
+  parcoursId: string;
+  type: EvenementSite;
+  page: string;
+  /** La source courte (utm_source[/medium] ou hôte référent), comme avant la mission 17 : les familles du CRM la lisent. */
+  source: string | null;
+  campagne: string | null;
+  referent: string | null;
+  fuseau: string | null;
+  utm: UtmDetailles;
+  gclid: boolean;
+  meta: Meta | null;
+};
+
+/** Pur : le corps envoyé au CRM (testé par evenements-site.test.ts). */
+export function corpsEvenement(type: EvenementSite, meta: Meta, contexte: { parcoursId: string; page: string; origine: Origine; fuseau: string | null }): CorpsEvenement {
+  const { origine } = contexte;
+  return {
+    parcoursId: contexte.parcoursId,
     type,
-    page: window.location.pathname,
+    page: contexte.page,
     source: sourceCourte(origine) ?? null,
     campagne: origine.campagne,
+    referent: origine.referent,
+    fuseau: contexte.fuseau,
+    utm: utmDetailles(origine),
+    gclid: origine.gclid,
     meta: Object.keys(meta).length ? meta : null,
-  });
+  };
+}
+
+/** Le fuseau horaire du navigateur (« Europe/Paris ») ; le CRM en déduit un pays, sans géolocalisation. */
+export function fuseauHoraire(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Envoie un événement à `url` ; rend false quand rien ne part (côté serveur, adresse vide, mesure refusée).
+ * Séparé de `envoyerEvenement` pour être testé avec une adresse (celle du site vient d'une variable de build).
+ */
+export function envoyerVers(url: string, type: EvenementSite, meta: Meta = {}): boolean {
+  if (typeof window === "undefined" || !url) return false;
+  if (mesureRefuseeIci()) return false;
+  const corps = JSON.stringify(corpsEvenement(type, meta, { parcoursId: obtenirParcoursId(), page: window.location.pathname, origine: lireOrigine(), fuseau: fuseauHoraire() }));
   try {
     if (navigator.sendBeacon && type !== "PAGE_VUE") {
       // Beacon : part même si la page se ferme (demande de devis, échec)
-      if (navigator.sendBeacon(URL_EVENEMENTS, new Blob([corps], { type: "text/plain" }))) return;
+      if (navigator.sendBeacon(url, new Blob([corps], { type: "text/plain" }))) return true;
     }
-    fetch(URL_EVENEMENTS, { method: "POST", headers: { "Content-Type": "text/plain" }, body: corps, keepalive: true }).catch(() => undefined);
+    fetch(url, { method: "POST", headers: { "Content-Type": "text/plain" }, body: corps, keepalive: true }).catch(() => undefined);
   } catch {
     /* jamais bloquant */
   }
+  return true;
+}
+
+export function envoyerEvenement(type: EvenementSite, meta: Meta = {}): void {
+  envoyerVers(URL_EVENEMENTS, type, meta);
 }
