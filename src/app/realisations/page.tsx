@@ -119,7 +119,7 @@ export default async function PageRealisations() {
       )}
 
       {avis.length > 0 ? (
-        <Section large titre="Avis clients" fond="fond-2">
+        <Section large differee titre="Avis clients" fond="fond-2">
           <div className="grid gap-5 md:grid-cols-3">
             {avis.map((p) => (
               <CarteAvis key={p.id} p={p} />
@@ -129,7 +129,7 @@ export default async function PageRealisations() {
       ) : null}
 
       {/* Les cinq pièces → les pages par pièce ; les textes de l'ancien index /prestations. */}
-      <Section large fond={avis.length > 0 ? "fond" : "fond-2"} titre="Ce que nous recouvrons" intro="Un film adhésif Cover Styl' posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace.">
+      <Section large differee fond={avis.length > 0 ? "fond" : "fond-2"} titre="Ce que nous recouvrons" intro="Un film adhésif Cover Styl' posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace.">
         <CartesPieces pieces={pieces} liens={liens} photos={PHOTOS_PIECES} nom="Les pièces que nous recouvrons" />
         <div className="texte-2 mt-8 max-w-2xl space-y-3">
           <p>

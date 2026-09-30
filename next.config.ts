@@ -4,12 +4,12 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   images: {
-    // Aucune optimisation à la volée : le quota d'images du plan Vercel Hobby
-    // était épuisé (HTTP 402, catalogue vide). Les échantillons Cover Styl' (S3)
-    // sont déjà petits ; les images du site sont produites en local aux bonnes
-    // tailles et formats (AVIF, WebP, JPEG) par scripts/preparer-images.mjs
-    // (`npm run images`, composant `Photo`), les fonds des guides par
-    // scripts/importer-fonds.mjs ; tout est servi tel quel par srcset.
+    // Aucune optimisation à la volée, et c'est voulu (mission 16, partie 6) : le quota d'images du plan Vercel Hobby
+    // était épuisé (HTTP 402, catalogue vide), et chaque image optimisée à la demande coûte une fonction et un délai.
+    // Les échantillons Cover Styl' (S3) sont déjà petits ; les images du site sont produites en local, UNE fois, aux
+    // bonnes tailles et formats (AVIF, WebP, JPEG ; 480 / 960 / 1600) par scripts/preparer-images.mjs (`npm run
+    // images`, composant `Photo`), les fonds des guides par scripts/importer-fonds.mjs ; les photos publiées par le
+    // CRM sont réduites par le CRM (`?l=`). Tout est servi tel quel par srcset, en cache immuable (headers() plus bas).
     unoptimized: true,
     // Qualités autorisées (requis à partir de Next 16)
     qualities: [60, 75, 80, 85, 90],
@@ -52,7 +52,14 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
+    // Mission 16 (partie 6) : les images préparées et les polices → un an en cache, immuable. Un original remplacé
+    // garde son nom de fichier, mais chaque adresse d'image préparée porte l'empreinte de son original (`?v=`,
+    // `sourcesPhoto` de src/lib/images-preparees.ts) : une image refaite change d'adresse. Les polices de next/font
+    // sont servies par /_next/static (déjà immuables) ; /fonts/* couvre une police posée à la main dans public/fonts.
+    const IMMUABLE = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
     return [
+      { source: "/images/prep/:path*", headers: IMMUABLE },
+      { source: "/fonts/:path*", headers: IMMUABLE },
       {
         source: "/:path*",
         headers: [

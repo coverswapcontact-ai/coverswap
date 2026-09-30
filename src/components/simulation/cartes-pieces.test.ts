@@ -39,7 +39,7 @@ describe("CartesPieces avec photos", () => {
     const [cuisine, sdb, ...autres] = boutons(html);
     assert.match(cuisine, /<picture>/);
     assert.match(cuisine, /aspect-ratio:\s*1 \/ 1/);
-    assert.match(cuisine, /srcSet="[^"]*\.avif 480w|srcset="[^"]*\.avif 480w/i);
+    assert.match(cuisine, /srcSet="[^"]*\.avif(\?v=[0-9a-f]+)? 480w|srcset="[^"]*\.avif(\?v=[0-9a-f]+)? 480w/i);
     assert.match(cuisine, />Ambiance</);
     assert.match(cuisine, /alt=""/);
     assert.ok(!cuisine.includes("<svg"), "la carte avec photo n'a plus son dessin");

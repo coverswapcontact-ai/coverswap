@@ -55,7 +55,7 @@ export default function PageCommentCaMarche() {
       <CommentCaMarche titre="De la photo à la pose" note={NOTE_ETAPES} />
 
       {/* ── 3. Le prix ── */}
-      <Section id="prix" large fond="fond-2" titre="Le prix" intro={PRIX_MESURE}>
+      <Section id="prix" large differee fond="fond-2" titre="Le prix" intro={PRIX_MESURE}>
         <div className="grid gap-8 md:grid-cols-2 md:gap-12">
           <div className="texte-2 space-y-4">
             <p>{PRIX_REGLE}</p>
@@ -86,7 +86,7 @@ export default function PageCommentCaMarche() {
       </Section>
 
       {/* ── 4. Vos questions : les objections, puis la FAQ générale (repliée) ── */}
-      <Section id="objections" titre="Vos questions">
+      <Section id="objections" differee titre="Vos questions">
         <dl className="border-t border-trait">
           {OBJECTIONS.map((o) => (
             <div key={o.sujet} className="border-b border-trait py-5">
@@ -102,7 +102,7 @@ export default function PageCommentCaMarche() {
       </Section>
 
       {/* ── 5. Le devis en ligne (textes de l'ancienne /devis) ── */}
-      <Section large id="devis" fond="fond-2" titre={TITRE_DEVIS_EN_LIGNE} intro={INTRO_DEVIS_EN_LIGNE}>
+      <Section large differee id="devis" fond="fond-2" titre={TITRE_DEVIS_EN_LIGNE} intro={INTRO_DEVIS_EN_LIGNE}>
         <EtapesPrestation etapes={ETAPES_DEVIS_EN_LIGNE} />
         <CartesAtouts atouts={AVANTAGES_DEVIS_EN_LIGNE} className="mt-6" />
         <div className="mt-8">
@@ -113,7 +113,7 @@ export default function PageCommentCaMarche() {
       </Section>
 
       {/* ── 6. Pour aller plus loin : les guides, les vitrages ── */}
-      <Section id="guides" titre="Pour aller plus loin" intro={INTRO_GUIDES}>
+      <Section id="guides" differee titre="Pour aller plus loin" intro={INTRO_GUIDES}>
         <ul className="border-t border-trait">
           {articles.map((article) => (
             <li key={article.slug} className="border-b border-trait">
@@ -135,7 +135,7 @@ export default function PageCommentCaMarche() {
       </Section>
 
       {/* ── 7. Dernier appel ── */}
-      <Section titre="Voyez votre pièce transformée avant de décider" intro="Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis." fond="fond-2">
+      <Section differee titre="Voyez votre pièce transformée avant de décider" intro="Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis." fond="fond-2">
         <Lien href="/simulateur?projet=cuisine">Simuler ma cuisine</Lien>
       </Section>
     </div>

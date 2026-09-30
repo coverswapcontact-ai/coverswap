@@ -76,7 +76,7 @@ export default function PagePro() {
       </Section>
 
       {/* ── En détail : les textes de l'ancienne page « Covering pour professionnels », repris tels quels ── */}
-      <Section large fond="fond-2" titre="Le covering pour les professionnels, en détail">
+      <Section large differee fond="fond-2" titre="Le covering pour les professionnels, en détail">
         <div className="texte max-w-3xl space-y-5 text-encre-2">
           {[PRO.accroche, ...PRO.intro].map((para) => (
             <p key={para}>{para}</p>

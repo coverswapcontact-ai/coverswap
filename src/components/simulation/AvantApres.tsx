@@ -59,7 +59,8 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
   const reserve = ratio ? { aspectRatio: ratio } : undefined;
   // Avec un rapport réservé, l'image « après » remplit le cadre comme l'« avant » ; sinon elle le dimensionne.
   const classesApres = ratio ? "absolute inset-0 h-full w-full object-cover" : "block w-full";
-  const chargementApres = priorite ? ({ loading: "eager" } as const) : ({ loading: "lazy" } as const);
+  // L'« après » recouvre l'« avant » : c'est lui que Lighthouse retient comme LCP — priorité haute aussi.
+  const chargementApres = priorite ? ({ loading: "eager", fetchPriority: "high" } as const) : ({ loading: "lazy" } as const);
   const chargementAvant = priorite ? ({ loading: "eager", fetchPriority: "high" } as const) : ({ loading: "lazy" } as const);
   const pastille = etiquette ? <Etiquette className="pointer-events-none absolute bottom-3 left-3">{etiquette}</Etiquette> : null;
 

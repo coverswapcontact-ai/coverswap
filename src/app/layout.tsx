@@ -4,14 +4,11 @@ import { Suspense } from "react";
 import "./globals.css";
 import EnteteSite from "@/components/EnteteSite";
 import PiedDePage from "@/components/PiedDePage";
-import CookieBanner from "@/components/CookieBanner";
-import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
 import HorsEspaceClient from "@/components/HorsEspaceClient";
 import HorsSimulateur from "@/components/HorsSimulateur";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
-import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 const inter = Inter({
@@ -93,19 +90,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="bg-fond font-sans text-encre antialiased">
-        {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans mesure d'audience ni habillage commercial. */}
+        {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans suivi de parcours ni habillage commercial. */}
+        {/* Mission 16 (partie 6) : aucun script tiers ni cookie de mesure (GTM, GA4, pixel Meta, Clarity et Vercel Analytics retirés,
+            plus de bandeau cookies). La seule mesure est première partie et sans cookie : SuiviParcours → CRM. */}
         <HorsEspaceClient>
-          {/* GTM noscript fallback */}
-          {process.env.NEXT_PUBLIC_GTM_ID && (
-            <noscript>
-              <iframe
-                src={`https://www.googletagmanager.com/ns.html?id=${process.env.NEXT_PUBLIC_GTM_ID}`}
-                height="0"
-                width="0"
-                style={{ display: "none", visibility: "hidden" }}
-              />
-            </noscript>
-          )}
           <LocalBusinessSchema />
           <OrganizationSchema />
           <Suspense fallback={null}>
@@ -122,9 +110,6 @@ export default function RootLayout({
         <main id="main-content">{children}</main>
         <HorsEspaceClient>
           <PiedDePage />
-          <CookieBanner />
-          <Analytics />
-          <VercelAnalytics />
         </HorsEspaceClient>
       </body>
     </html>

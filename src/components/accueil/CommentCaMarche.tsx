@@ -36,7 +36,7 @@ export function etapesCommentCaMarche(manifeste: ManifesteImages = MANIFESTE_IMA
 /** `note` (mission 16, partie 5) : une ligne sous les étapes, avant le bouton (la page « Comment ça marche »). */
 export function CommentCaMarche({ depuis, idBouton, fond = "fond", titre = "Comment ça marche", note }: { depuis?: DepuisAccueil; idBouton?: string; fond?: "fond" | "fond-2"; titre?: string; note?: string }) {
   return (
-    <Section id="comment-ca-marche" large fond={fond} titre={titre}>
+    <Section id="comment-ca-marche" large differee fond={fond} titre={titre}>
       <ol className="grid gap-8 md:grid-cols-3 md:gap-6">
         {etapesCommentCaMarche().map((etape, i) => (
           <li key={etape.titre}>

@@ -15,7 +15,7 @@ import { urlVignette } from "@/lib/simulateur/generation-client";
 export function MatieresAccueil() {
   const vedettes = matieresVedettes();
   return (
-    <Section id="matieres" large fond="fond-2" surtitre="Matières" titre="Choisissez votre finition" intro={`${NB_REFERENCES} films Cover Styl' : bois, pierre, béton, métal, couleurs unies.`}>
+    <Section id="matieres" large differee fond="fond-2" surtitre="Matières" titre="Choisissez votre finition" intro={`${NB_REFERENCES} films Cover Styl' : bois, pierre, béton, métal, couleurs unies.`}>
       <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 md:gap-x-6">
         {vedettes.map((v) => (
           <li key={v.ref}>

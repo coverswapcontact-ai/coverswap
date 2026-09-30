@@ -1,13 +1,13 @@
 import Link from "next/link";
-import BoutonCookies from "./BoutonCookies";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { LIENS_PIED } from "@/lib/navigation";
 
 /**
  * Le pied de page (mission 16) : trois rangées, en texte, sans icône ni
  * bande de couleur. (1) une question ? le téléphone et l'e-mail (depuis
- * `lib/entreprise`, jamais en dur) ; (2) les liens ; (3) la ligne légale et
- * « Gérer les cookies » (tant que le bandeau existe). Les adresses viennent de
+ * `lib/entreprise`, jamais en dur) ; (2) les liens ; (3) la ligne légale
+ * (mission 16, partie 6 : plus de bandeau cookies, donc plus de « Gérer les
+ * cookies » : le site n'en dépose aucun de mesure). Les adresses viennent de
  * `lib/navigation` (les mêmes que l'en-tête et le menu). Composant serveur.
  */
 const RESEAUX = [
@@ -62,7 +62,6 @@ export default function PiedDePage() {
           <Link href="/cgv" className={LIEN}>
             CGV
           </Link>
-          <BoutonCookies className={`${LIEN} text-left`} />
         </div>
       </div>
     </footer>

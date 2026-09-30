@@ -7,9 +7,9 @@ import { lienWhatsApp, MESSAGE_WHATSAPP_DEVIS } from "@/lib/whatsapp";
 /**
  * « Écrire sur WhatsApp » (mission 16, partie 3) : le bouton SECONDAIRE du
  * dernier appel. Le message prérempli est court et ne porte aucune donnée
- * personnelle ; le clic est compté (`WHATSAPP_CLIQUE`, sans cookie, et
- * `whatsapp_clicked` dans le dataLayer). Rien n'est envoyé à la place de la
- * personne : WhatsApp s'ouvre, elle écrit.
+ * personnelle ; le clic est compté (`WHATSAPP_CLIQUE`, sans cookie, vers le
+ * CRM). Rien n'est envoyé à la place de la personne : WhatsApp s'ouvre, elle
+ * écrit. Client : le clic est compté.
  */
 export function BoutonWhatsApp({ depuis, message = MESSAGE_WHATSAPP_DEVIS }: { depuis: string; message?: string }) {
   return (

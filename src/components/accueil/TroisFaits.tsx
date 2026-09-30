@@ -18,7 +18,7 @@ export const TROIS_FAITS: readonly { titre: string; texte: string }[] = [
 
 export function TroisFaits() {
   return (
-    <Section large>
+    <Section large differee>
       <p className="texte max-w-2xl text-encre">{PHRASE_COVERING}</p>
       <dl className="mt-8 grid gap-6 md:mt-10 md:grid-cols-3 md:gap-10">
         {TROIS_FAITS.map((fait) => (

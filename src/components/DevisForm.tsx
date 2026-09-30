@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Bouton } from "@/components/simulation/Bouton";
 import { CHAMP } from "@/app/simulateur/_components/Formulaires";
-import { track } from "@/lib/analytics";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import CaseConsentement from "./CaseConsentement";
 import { ChampPhotos } from "./ChampPhotos";
@@ -91,12 +90,6 @@ export default function DevisForm({
       } else {
         envoyerEvenement(source.includes("devis") ? "DEVIS_DEMANDE" : "CONTACT_ENVOYE", { formulaire: source, photos: photos.length });
         setSent(true);
-        track("devis_form_submitted", {
-          type_projet: payload.type_projet || "non_renseigne",
-          has_reference: payload.reference || reference ? true : false,
-          photos_count: photos.length,
-          source,
-        });
         form.reset();
         setPhotos([]);
         setConsentement(false);

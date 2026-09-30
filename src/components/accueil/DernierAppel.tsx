@@ -10,7 +10,7 @@ import { ANCRES_ACCUEIL, TITRE_ACCUEIL, lienSimulerCuisine } from "./sections";
  */
 export function DernierAppel() {
   return (
-    <Section id={ANCRES_ACCUEIL.dernierAppel} fond="fond-2" titre={TITRE_ACCUEIL}>
+    <Section id={ANCRES_ACCUEIL.dernierAppel} differee fond="fond-2" titre={TITRE_ACCUEIL}>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Lien href={lienSimulerCuisine("accueil-final")}>Simuler ma cuisine</Lien>
         <BoutonWhatsApp depuis="accueil-final" />

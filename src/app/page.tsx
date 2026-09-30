@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Fragment, type ReactNode } from "react";
+import { preload } from "react-dom";
 import { CommentCaMarche } from "@/components/accueil/CommentCaMarche";
 import { Confiance } from "@/components/accueil/Confiance";
 import { DernierAppel } from "@/components/accueil/DernierAppel";
-import { choisirEtudes, choisirOuverture } from "@/components/accueil/etudes";
+import { choisirEtudes, choisirOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import { MatieresAccueil } from "@/components/accueil/MatieresAccueil";
 import { Ouverture } from "@/components/accueil/Ouverture";
 import { RealisationsAccueil } from "@/components/accueil/RealisationsAccueil";
@@ -36,9 +37,13 @@ export default async function PageAccueil() {
   const [zones, { realisations }] = await Promise.all([chargerZonesSimulateur(), chargerPublications()]);
   // Mission 15 (partie 4) : les cinq cartes du module de simulation sont celles du simulateur (pièces et zones du CRM).
   const pieces = zones.pieces.map((piece) => ({ id: piece.id, libelle: piece.libelle, description: piece.zones.map((z) => z.libelle).join(", ") }));
+  const ouverture = choisirOuverture(realisations);
+  // Mission 16 (partie 6) : l'image « avant » de l'ouverture est le LCP — préchargée ici, sur l'accueil seulement
+  // (`<link rel="preload" as="image" imagesrcset imagesizes type fetchpriority="high">` dans le <head>).
+  for (const prechargement of prechargementsOuverture(ouverture)) preload(prechargement.href, prechargement.options);
 
   const sections: Record<IdSectionAccueil, ReactNode> = {
-    ouverture: <Ouverture choix={choisirOuverture(realisations)} />,
+    ouverture: <Ouverture choix={ouverture} />,
     essayer: <SimulationSection pieces={pieces} />,
     faits: <TroisFaits />,
     matieres: <MatieresAccueil />,

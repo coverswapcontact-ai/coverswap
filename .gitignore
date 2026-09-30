@@ -52,3 +52,9 @@ next-env.d.ts
 /exports/
 .env*
 !.env.example
+
+# intégration continue (mission 16, partie 6) : rapports Lighthouse CI et captures, publiés en artefacts, jamais commités
+/.lighthouseci/
+/lhci/
+/captures/
+/captures-precedentes/

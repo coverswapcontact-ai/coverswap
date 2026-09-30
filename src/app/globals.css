@@ -131,14 +131,12 @@
   }
 }
 
-/* Anciennes classes de mise en page, réécrites sur les jetons (mission 16) : une section = l'espace
-   vertical --espace-5 et la gouttière 16 / 24 px ; le conteneur = max-w-6xl. */
-@utility section-padding {
-  @apply px-4 py-[var(--espace-5)] md:px-6;
-}
-
-@utility container-custom {
-  @apply mx-auto max-w-6xl;
+/* Mission 16 (partie 6) : une section sous la ligne de flottaison n'est mise en page et peinte qu'à l'approche
+   (rendu initial, INP) ; `auto` garde sa dernière hauteur réelle. Jamais sur une section qui contient un élément
+   fixe ou collant (le bouton collé, la barre des familles) : `Section differee`. */
+@utility sous-la-ligne {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 640px;
 }
 
 /* ═══════════════════════════════════════════════════════════

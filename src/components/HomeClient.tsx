@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
 import { CartesPieces, type PieceCarte } from "@/components/simulation/CartesPieces";
 import { Section } from "@/components/simulation/Section";
-import { track } from "@/lib/analytics";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { envoyerEvenement } from "@/lib/evenements-site";
 import { DELAI_RENDU } from "@/lib/offre";
@@ -53,7 +52,6 @@ export function SimulationSection({ pieces }: { pieces: PieceCarte[] }) {
         setPreview({ dataUrl: prete.dataUrl, largeur: prete.largeur, hauteur: prete.hauteur });
       }
       setEnCoursAilleurs(false);
-      track("simulation_photo_uploaded", { source: "home", size_kb: poidsKo });
       envoyerEvenement("PHOTO_CHARGEE", { depuis: "accueil", poids_ko: poidsKo });
     } catch (e: unknown) {
       setError(messageErreurPhoto(e instanceof Error ? e.message : "illisible"));
@@ -64,7 +62,6 @@ export function SimulationSection({ pieces }: { pieces: PieceCarte[] }) {
 
   const handleContinue = useCallback(() => {
     if (!preview || !projectId) return;
-    track("cta_clicked", { cta: "home_simulation_continue" });
     // Le simulateur FUSIONNE avec sa mémoire (parcours, rendus gardés) ; seules la photo et la pièce changent.
     // Pendant une génération, la photo et la pièce du travail en cours restent : on ne part pas en silence, on le dit,
     // et la photo reste ici (« Voir la simulation en cours » mène à l'attente ; on revient la reprendre ensuite).
@@ -82,7 +79,6 @@ export function SimulationSection({ pieces }: { pieces: PieceCarte[] }) {
 
   const handleSelectProject = (id: string) => {
     setProjectId(id);
-    track("cta_clicked", { cta: "home_project_selected", project: id });
     envoyerEvenement("PIECE_CHOISIE", { projet: id, depuis: "accueil" });
   };
 

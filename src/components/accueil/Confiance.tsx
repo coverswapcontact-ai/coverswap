@@ -62,6 +62,7 @@ export function ContenuConfiance({ avis }: { avis: BlocAvis | null }) {
     <Section
       id="confiance"
       large
+      differee
       surtitre={avis ? "Note Google" : undefined}
       titre={avis ? `${formaterNote(avis.note)} sur 5` : undefined}
       intro={avis ? `D'après ${avis.nombre.toLocaleString("fr-FR")} avis Google.` : undefined}

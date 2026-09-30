@@ -1,6 +1,6 @@
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
 import { ALT_PIECES, PHOTOS_PIECES } from "@/lib/images-pieces";
-import { sourcesPhoto, type ManifesteImages, type SourcesImage, type SourcesPhoto } from "@/lib/images-preparees";
+import { sourcesPhoto, type ManifesteImages, type SourcesImage, type SourcesPhoto, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { DUREE_POSE_TEXTE, fourchette } from "@/lib/offre";
 import { sourcesPhotoCrm, type Publication } from "@/lib/publications";
@@ -32,6 +32,9 @@ export const RATIO_REALISATION = "3 / 2";
 /** Les textes de l'image de l'ouverture : l'« après » est lu en premier (il vient d'abord dans le document) et seul en plein écran. */
 export const ALT_OUVERTURE = "Cuisine simulée après la pose : façades noir mat, plan de travail effet travertin";
 export const ALT_AVANT_OUVERTURE = "La même cuisine avant la pose";
+
+/** L'attribut `sizes` de l'image de l'ouverture : le même pour le `<picture>` et pour son préchargement. */
+export const TAILLES_OUVERTURE = "(min-width: 1152px) 672px, (min-width: 768px) 58vw, 100vw";
 
 export type ChoixOuverture = {
   type: "realisation" | "simulation";
@@ -77,6 +80,47 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
     altAvant: ALT_AVANT_OUVERTURE,
     preparees: { avant, apres },
   };
+}
+
+/**
+ * Mission 16 (partie 6) : le préchargement de l'image « avant » de l'ouverture (le LCP), pour `ReactDOM.preload` sur
+ * `/` seulement. Il vise EXACTEMENT ce que le `<picture>` choisira : le `srcset` AVIF (préparé) — ou, pour une
+ * réalisation du CRM, les WebP réduits (`?l=`) —, les mêmes `sizes`, `type` (un navigateur qui ne lit pas le format
+ * ignore le préchargement au lieu de télécharger deux fois), `fetchPriority="high"` et `no-referrer` comme l'`<img>`.
+ * `href` : l'entrée du `srcset` la plus proche de 960 px (repli des navigateurs sans `imagesrcset`). `null` sans image.
+ */
+export type PrechargementImage = { href: string; options: { as: "image"; imageSrcSet?: string; imageSizes?: string; type?: string; media?: string; fetchPriority: "high"; referrerPolicy: "no-referrer" } };
+
+/** L'adresse de l'entrée d'un `srcset` dont la largeur est la plus grande ≤ 960 px (sinon la plus petite). */
+export function adresseMoyenne(srcset: string): string {
+  const entrees = srcset
+    .split(",")
+    .map((e) => e.trim().split(/\s+/))
+    .filter((e) => e[0])
+    .map(([adresse, largeur]) => ({ adresse, largeur: Number.parseInt(largeur ?? "", 10) || 0 }))
+    .sort((a, b) => a.largeur - b.largeur);
+  const moyennes = entrees.filter((e) => e.largeur <= 960);
+  return (moyennes.length ? moyennes[moyennes.length - 1] : entrees[0])?.adresse ?? "";
+}
+
+/**
+ * Les préchargements de l'« avant » de l'ouverture : un seul quand la série tient sous 960 px, sinon deux, chacun
+ * avec son `media` — le téléphone reçoit la série plafonnée (comme les sources du `<picture>`), l'écran large la
+ * série entière. Jamais deux téléchargements de la même image.
+ */
+export function prechargementsOuverture(choix: ChoixOuverture | null, tailles: string = TAILLES_OUVERTURE): PrechargementImage[] {
+  if (!choix) return [];
+  const sources = choix.preparees.avant;
+  const commun = { as: "image", fetchPriority: "high", referrerPolicy: "no-referrer" } as const;
+  const format = sources.avif ? { srcset: sources.avif, type: "image/avif" } : sources.webp ? { srcset: sources.webp, type: "image/webp" } : sources.jpg ? { srcset: sources.jpg, type: undefined } : null;
+  if (!format) return [{ href: sources.src, options: commun }];
+  const options = (srcset: string, media?: string) => ({ ...commun, imageSrcSet: srcset, imageSizes: tailles, ...(format.type ? { type: format.type } : {}), ...(media ? { media } : {}) });
+  const plafonne = plafonnerSrcset(format.srcset);
+  if (plafonne === format.srcset) return [{ href: adresseMoyenne(format.srcset) || sources.src, options: options(format.srcset) }];
+  return [
+    { href: adresseMoyenne(plafonne) || sources.src, options: options(plafonne, MEDIA_TELEPHONE) },
+    { href: adresseMoyenne(format.srcset) || sources.src, options: options(format.srcset, MEDIA_ECRAN_LARGE) },
+  ];
 }
 
 /* ── Réalisations ─────────────────────────────────────────────────── */

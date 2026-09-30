@@ -39,7 +39,7 @@ export function CarteSimulee({ etude, tailles = TAILLES_CARTE }: { etude: EtudeS
 
 export function RealisationsAccueil({ choix }: { choix: ChoixEtudes }) {
   return (
-    <Section id="realisations" large titre={choix.titre} intro={choix.mode === "simulees" ? "Des exemples simulés et les prix habituels par projet. Les photos de nos chantiers arrivent." : undefined}>
+    <Section id="realisations" large differee titre={choix.titre} intro={choix.mode === "simulees" ? "Des exemples simulés et les prix habituels par projet. Les photos de nos chantiers arrivent." : undefined}>
       <div className="grid gap-5 md:grid-cols-3">
         {choix.mode === "reelles" ? choix.etudes.map((e) => <CarteRealisation key={e.id} etude={e} tailles={TAILLES_CARTE} />) : choix.etudes.map((e) => <CarteSimulee key={e.id} etude={e} />)}
       </div>

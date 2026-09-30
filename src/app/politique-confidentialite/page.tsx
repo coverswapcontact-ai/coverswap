@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const MISE_A_JOUR = "22 septembre 2026";
+const MISE_A_JOUR = "30 septembre 2026";
 
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
@@ -28,14 +28,12 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 const SOUS_TRAITANTS: { nom: string; role: string; lieu: string }[] = [
   { nom: "Vercel Inc.", role: "hébergement du site et exécution des formulaires", lieu: "États-Unis (données servies depuis l'Europe)" },
   { nom: "Railway Corp.", role: "hébergement de notre outil de gestion des demandes (fiches, photos, simulations)", lieu: "centre de données dans l'Union européenne" },
-  { nom: "OpenAI, L.L.C.", role: "génération du rendu du simulateur à partir de votre photo", lieu: "États-Unis" },
+  { nom: "OpenAI, L.L.C.", role: "analyse de votre photo (surfaces de la pièce) et génération du rendu du simulateur", lieu: "États-Unis" },
   { nom: "Anthropic, PBC", role: "aide à la rédaction de nos réponses à vos e-mails (seules les informations utiles à la réponse lui sont transmises)", lieu: "États-Unis" },
   { nom: "Google Ireland Ltd (Gmail, Google Drive)", role: "notre messagerie (vos e-mails et nos réponses) et la copie de sauvegarde de vos documents", lieu: "Irlande / États-Unis" },
   { nom: "Resend, Inc.", role: "envoi des e-mails de notification et de secours", lieu: "États-Unis" },
-  { nom: "Google Ireland Ltd (Tag Manager, Analytics)", role: "mesure d'audience, avec votre accord", lieu: "Irlande / États-Unis" },
-  { nom: "Meta Platforms Ireland Ltd (pixel)", role: "mesure des campagnes publicitaires, avec votre accord, lorsqu'il est activé", lieu: "Irlande / États-Unis" },
-  { nom: "Microsoft Ireland (Clarity)", role: "analyse d'usage anonymisée, avec votre accord, lorsqu'elle est activée", lieu: "Irlande / États-Unis" },
-  { nom: "Cloudflare, Inc. (Turnstile)", role: "protection des formulaires contre les robots", lieu: "États-Unis" },
+  { nom: "Meta Platforms Ireland Ltd", role: "mesure de nos publicités Facebook et Instagram : quand votre demande avance, notre outil de gestion lui transmet l'étape franchie et son montant, rattachés à votre demande par vos coordonnées sous forme hachée (voir le tableau ci-dessus). Aucun traceur Meta sur le site", lieu: "Irlande / États-Unis" },
+  { nom: "Cloudflare, Inc. (Turnstile)", role: "protection du simulateur et des formulaires contre les robots", lieu: "États-Unis" },
 ];
 
 export default function PolitiqueConfidentialite() {
@@ -90,10 +88,19 @@ export default function PolitiqueConfidentialite() {
                     <td className="py-2 pr-4">Limiter les envois automatisés et protéger les formulaires</td>
                     <td className="py-2">Intérêt légitime (sécurité)</td>
                   </tr>
+                  <tr className="border-b border-trait">
+                    <td className="py-2 pr-4">Pages vues et étapes du simulateur, avec un identifiant de visite tiré au hasard et la provenance de la visite (sans cookie, sans nom ni coordonnées)</td>
+                    <td className="py-2 pr-4">Compter les visites et voir où le parcours s&apos;arrête, pour améliorer le site</td>
+                    <td className="py-2">Intérêt légitime (mesure de fréquentation)</td>
+                  </tr>
                   <tr>
-                    <td className="py-2 pr-4">Données de navigation (cookies de mesure d&apos;audience et de publicité)</td>
-                    <td className="py-2 pr-4">Comprendre l&apos;usage du site et mesurer nos campagnes</td>
-                    <td className="py-2">Consentement (bandeau cookies)</td>
+                    <td className="py-2 pr-4">
+                      Quand votre demande avance (devis envoyé, signé, réglé ou sans suite) : l&apos;étape, le montant, et votre e-mail, téléphone,
+                      nom, ville et code postal sous forme hachée (illisibles en clair) ; si votre demande vient d&apos;un formulaire Facebook ou
+                      Instagram, son identifiant Meta
+                    </td>
+                    <td className="py-2 pr-4">Mesurer l&apos;efficacité de nos publicités : transmis à Meta par notre outil de gestion, jamais par le site</td>
+                    <td className="py-2">Intérêt légitime (mesure de nos campagnes)</td>
                   </tr>
                 </tbody>
               </table>
@@ -109,7 +116,8 @@ export default function PolitiqueConfidentialite() {
             <p>
               Les photos que vous nous confiez montrent votre domicile ou vos locaux. Elles sont stockées dans notre outil de gestion, accessible
               uniquement avec un identifiant et un mot de passe, et ne sont jamais publiées ni transmises à des tiers autres que les
-              prestataires techniques listés ci-dessous. Pour le simulateur, votre photo est transmise à OpenAI le temps de produire le rendu ;
+              prestataires techniques listés ci-dessous. Pour le simulateur, votre photo est transmise à OpenAI le temps de l&apos;analyser et
+              de produire le rendu ;
               selon les conditions de son API, OpenAI n&apos;utilise pas ces images pour entraîner ses modèles.
             </p>
           </Section>
@@ -150,7 +158,11 @@ export default function PolitiqueConfidentialite() {
               <li>Devis et factures : 10 ans (obligation comptable), l&apos;identité y restant lisible pendant cette durée.</li>
               <li>Accord aux e-mails commerciaux : jusqu&apos;à son retrait, puis conservé comme preuve 3 ans.</li>
               <li>Adresse IP liée à une demande : 12 mois.</li>
-              <li>Cookies : 13 mois au plus ; votre choix est conservé 6 mois.</li>
+              <li>Identifiant de visite sur votre appareil : le temps de l&apos;onglet ouvert (et, si vous utilisez le simulateur, avec votre parcours).</li>
+              <li>
+                Pages vues et étapes du simulateur dans notre outil de gestion (identifiant de visite, page, provenance) : gardées sans durée
+                maximale fixée à ce jour.
+              </li>
             </ul>
           </Section>
 
@@ -172,13 +184,23 @@ export default function PolitiqueConfidentialite() {
             </p>
           </Section>
 
-          <Section titre="Cookies et traceurs">
+          <Section titre="Cookies et stockage sur votre appareil">
             <p>
-              À votre arrivée, seuls les cookies strictement nécessaires au fonctionnement du site sont déposés (mémorisation de votre choix,
-              protection anti-robot). Les traceurs de mesure d&apos;audience (Google Tag Manager / Analytics) et de publicité (pixel Meta,
-              Microsoft Clarity lorsqu&apos;ils sont activés) ne sont déposés qu&apos;après votre accord dans le bandeau, catégorie par catégorie.
-              Refuser n&apos;a aucune conséquence sur l&apos;usage du site. Vous pouvez revenir sur votre choix depuis le lien « Gérer les cookies »
-              en bas de chaque page.
+              Le site ne dépose aucun cookie de mesure d&apos;audience ni de publicité et ne charge aucun traceur tiers : il n&apos;y a donc
+              pas de bandeau cookies. Pour compter ses visites, il garde dans l&apos;onglet un identifiant de visite tiré au hasard et la
+              provenance de la visite, envoyés avec les pages vues à notre outil de gestion.
+            </p>
+            <p>
+              Le simulateur garde votre photo, vos choix et vos rendus dans le stockage de votre navigateur (IndexedDB), pour que vous
+              retrouviez votre parcours. Vos matières favorites (simulateur et page Matières) restent dans son stockage local.
+            </p>
+            <p>
+              Votre photo part vers notre outil de gestion dès que vous la choisissez : il y repère les surfaces de la pièce, et la convertit
+              si votre téléphone l&apos;a enregistrée en HEIC. Vos choix de matières partent quand vous lancez une simulation ou envoyez une demande.
+            </p>
+            <p>
+              Cloudflare Turnstile ne sert qu&apos;à protéger le simulateur et nos formulaires des robots. Il est chargé au premier geste dans
+              un formulaire, et aux étapes du simulateur qui s&apos;adressent à notre serveur (choix des matières, résultat).
             </p>
           </Section>
 

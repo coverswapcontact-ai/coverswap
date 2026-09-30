@@ -6,7 +6,6 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import revetements from "@/data/revetements.json";
 import { ORDRE_AVIS, blocAvis, formaterNote, lienHttps } from "@/lib/avis-google";
-import { VERS_DATALAYER } from "@/lib/evenements-site";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import type { ManifesteImages } from "@/lib/images-preparees";
 import { lignePrixDuree, versEtudeReelle } from "@/lib/etude-de-cas";
@@ -106,9 +105,13 @@ describe("1. Ouverture", () => {
     const html = rendre(createElement(Ouverture, { choix }));
     assert.match(html, /<h1 id="titre-accueil" class="titre-1[^"]*">Votre cuisine, transformée en une journée\.<\/h1>/);
     assert.ok(html.includes(LIGNE_ACCUEIL));
-    assert.match(html, /<source type="image\/avif" srcSet="\/images\/prep\/ouverture-cuisine-avant-480\.avif 480w/);
-    assert.equal(compter(html, 'fetchPriority="high"'), 1, "une seule image prioritaire : l'« avant »");
-    assert.match(html, /<img src="\/images\/prep\/ouverture-cuisine-avant-960\.jpg"[^>]*fetchPriority="high"/);
+    // Mission 16 (partie 6) : l'adresse porte l'empreinte de l'original (`?v=`, cache immuable d'un an).
+    const v = MANIFESTE_IMAGES["ouverture-cuisine-avant"].empreinte;
+    assert.ok(v && /^[0-9a-f]{12}$/.test(v));
+    assert.ok(html.includes(`<source type="image/avif" srcSet="/images/prep/ouverture-cuisine-avant-480.avif?v=${v} 480w`));
+    // Les deux images de l'ouverture en priorité haute (l'« après », qui recouvre l'« avant », est le LCP).
+    assert.equal(compter(html, 'fetchPriority="high"'), 2, "les deux images de l'ouverture, et elles seules");
+    assert.match(html, new RegExp(`<img src="/images/prep/ouverture-cuisine-avant-960\\.jpg\\?v=${v}"[^>]*fetchPriority="high"`));
     assert.ok(!/loading="lazy"/.test(html), "rien de différé au premier écran");
     assert.match(html, />Simulation<\/span>/);
     assert.match(html, /max-md:hidden[^"]*">Plein écran/, "sur téléphone, seul « Comparer »");
@@ -147,7 +150,7 @@ describe("1. Ouverture", () => {
     // Le LCP n'est pas la photo entière du CRM : WebP réduits en srcset, sizes, une seule image prioritaire.
     assert.match(html, /<source type="image\/webp" srcSet="https:\/\/crm\.example\.test\/api\/site\/photos\/b\/avant\?l=480 480w, [^"]*\?l=960 960w, [^"]*\?l=1600 1600w" sizes="\(min-width: 1152px\) 672px/);
     assert.match(html, /<img src="https:\/\/crm\.example\.test\/api\/site\/photos\/b\/avant"[^>]*fetchPriority="high"/);
-    assert.equal(compter(html, 'fetchPriority="high"'), 1);
+    assert.equal(compter(html, 'fetchPriority="high"'), 2);
     assert.ok(!/loading="lazy"/.test(html));
   });
 
@@ -426,14 +429,15 @@ describe("8. Dernier appel", () => {
     assert.match(html, /id="dernier-appel"/);
   });
 
-  test("WhatsApp : message court prérempli sans donnée personnelle, clic compté (WHATSAPP_CLIQUE → whatsapp_clicked)", () => {
+  test("WhatsApp : message court prérempli sans donnée personnelle, clic compté (WHATSAPP_CLIQUE, vers le CRM seulement)", () => {
     assert.equal(MESSAGE_WHATSAPP_DEVIS, "Bonjour, je souhaite un devis pour ma cuisine.");
     assert.equal(lienWhatsApp(), "https://wa.me/33670352869?text=Bonjour%2C%20je%20souhaite%20un%20devis%20pour%20ma%20cuisine.");
     const html = rendre(createElement(BoutonWhatsApp, { depuis: "accueil-final" }));
     assert.ok(html.includes(`href="${lienWhatsApp().replaceAll("&", "&amp;")}"`));
     assert.match(html, /target="_blank"/);
     assert.match(html, /rel="noopener noreferrer"/);
-    assert.equal(VERS_DATALAYER.WHATSAPP_CLIQUE, "whatsapp_clicked");
+    // Mission 16 (partie 6) : plus de dataLayer (GTM retiré) ; le clic ne part qu'au CRM.
+    assert.doesNotMatch(lire("src/lib/evenements-site.ts"), /dataLayer|VERS_DATALAYER|@\/lib\/analytics/);
     assert.match(lire("src/components/accueil/BoutonWhatsApp.tsx"), /envoyerEvenement\("WHATSAPP_CLIQUE", \{ depuis \}\)/);
   });
 });

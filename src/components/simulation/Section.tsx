@@ -6,6 +6,9 @@ import { useId, type ReactNode } from "react";
  * partir de 768), espace vertical `--espace-5` (64 px, 96 px à partir de
  * 768), fond `fond` ou `fond-2`. Le titre est un h2 `titre-2`, l'intro un
  * `texte-2` de trois lignes au plus. Composant serveur.
+ *
+ * Mission 16 (partie 6) : `differee` pose `sous-la-ligne` (`content-visibility: auto`) — pour une section sous la
+ * ligne de flottaison, sans élément fixe ni collant (les feuilles et le plein écran passent par un portail).
  */
 export type ProprietesSection = {
   id?: string;
@@ -14,15 +17,17 @@ export type ProprietesSection = {
   intro?: ReactNode;
   large?: boolean;
   fond?: "fond" | "fond-2";
+  /** Sous la ligne de flottaison : rendue à l'approche (`content-visibility: auto`). */
+  differee?: boolean;
   className?: string;
   children?: ReactNode;
 };
 
-export function Section({ id, surtitre, titre, intro, large = false, fond = "fond", className, children }: ProprietesSection) {
+export function Section({ id, surtitre, titre, intro, large = false, fond = "fond", differee = false, className, children }: ProprietesSection) {
   const idTitre = useId();
   const aUnEnTete = !!(surtitre || titre || intro);
   return (
-    <section id={id} aria-labelledby={titre ? idTitre : undefined} className={`${fond === "fond-2" ? "bg-fond-2" : "bg-fond"} px-4 py-[var(--espace-5)] md:px-6${className ? ` ${className}` : ""}`}>
+    <section id={id} aria-labelledby={titre ? idTitre : undefined} className={`${fond === "fond-2" ? "bg-fond-2" : "bg-fond"} px-4 py-[var(--espace-5)] md:px-6${differee ? " sous-la-ligne" : ""}${className ? ` ${className}` : ""}`}>
       <div className={`mx-auto w-full ${large ? "max-w-6xl" : "max-w-3xl"}`}>
         {aUnEnTete ? (
           <div className={`max-w-3xl${children ? " mb-8 md:mb-10" : ""}`}>

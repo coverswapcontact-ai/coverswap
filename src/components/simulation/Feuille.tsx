@@ -13,7 +13,7 @@ import { apresHistorique, entrerFeuille } from "./historique-feuilles";
  *    `overflow: hidden` ne suffit pas) ; la barre de défilement d'ordinateur
  *    est compensée (rien ne se décale) ; une seule feuille verrouille, la
  *    dernière fermée libère ;
- *  - z-index au-dessus de tout ce que le site pose (en-tête 50, cookies 50) ;
+ *  - z-index au-dessus de tout ce que le site pose (en-tête 50, bouton collé 40) ;
  *  - Échap ferme la feuille du dessus, glisser vers le bas depuis le haut du
  *    contenu aussi, et le geste retour du téléphone (historique).
  */

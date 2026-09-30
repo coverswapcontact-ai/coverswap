@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { CuisineDeFace, MobilierDeFace, MursDeFace, ProfessionnelDeFace, SalleDeBainDeFace } from "@/components/espace/Illustrations";
 import { photoDePiece, type PieceId } from "@/lib/images-pieces";
@@ -27,6 +25,11 @@ import { Photo } from "./Photo";
  * simulateur : 3, le premier rang sur ordinateur, le premier et un peu du
  * second sur téléphone) ; les autres, et l'accueil (module sous l'ouverture),
  * en `lazy`.
+ *
+ * Mission 16 (partie 6) : sans état, donc sans « use client » — rendu serveur quand la page est serveur (les cartes
+ * en liens de `/realisations` n'envoient aucun JavaScript), rendu dans le paquet client quand un composant client
+ * l'importe (simulateur, module d'accueil, espace : inchangés). Un bouton sans `onChoisir` n'a pas de gestionnaire
+ * (une fonction ne passe pas du serveur au navigateur).
  */
 export type PieceCarte = { id: string; libelle: string; description: string };
 
@@ -80,7 +83,7 @@ export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce",
             {contenu}
           </Link>
         ) : (
-          <button key={p.id} type="button" aria-pressed={choisie} onClick={() => onChoisir?.(p.id)} className={classes}>
+          <button key={p.id} type="button" aria-pressed={choisie} onClick={onChoisir ? () => onChoisir(p.id) : undefined} className={classes}>
             {contenu}
           </button>
         );

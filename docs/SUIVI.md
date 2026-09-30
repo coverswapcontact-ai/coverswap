@@ -2,50 +2,47 @@
 
 Ce que le site émet, où ça part, et ce qu'il reste à brancher.
 
-## 1. Deux canaux, un seul vocabulaire
+## 1. Un seul canal : le CRM, sans cookie
 
 | Canal | Où | Qui l'écoute |
 |---|---|---|
-| `dataLayer` (Google Tag Manager `GTM-PGBZT75T`) | navigateur, `src/lib/analytics.ts` (`track`) | GA4, Google Ads, Meta via les tags GTM — **à configurer dans GTM** |
-| Événements de parcours du CRM | `POST https://crm.coverswap.fr/api/site/evenements` (`src/lib/evenements-site.ts`) | Synthèse du CRM, bloc « Site » (par source, par page, taux de complétion) |
+| Événements de parcours du CRM | `POST https://crm.coverswap.fr/api/site/evenements` (`src/lib/evenements-site.ts`) | Synthèse du CRM, bloc « Site » (par source, par page, taux de complétion) ; Leads → « Sur le site cette semaine » (entonnoir par famille de source) |
 
-Le CRM ne reçoit **aucune donnée personnelle** par ce canal : un identifiant de parcours (UUID de session), le type, la page, l'origine utm.
+Le CRM ne reçoit **aucune donnée personnelle** par ce canal : un identifiant de parcours (UUID tiré au hasard, gardé dans l'onglet), le type, la page, l'origine utm. **Mission 16, partie 6 : plus aucun outil tiers de mesure sur le site** — Google Tag Manager, GA4, le pixel Meta, Microsoft Clarity et Vercel Analytics sont retirés (`Analytics.tsx`, `lib/analytics.ts › track`, le `noscript` GTM, `@vercel/analytics`), et avec eux le bandeau cookies (`CookieBanner`, `BoutonCookies`, `lib/cookies.ts`) : le site ne dépose aucun cookie de mesure. **La mesure Meta navigateur disparaît ; le CRM envoie les conversions côté serveur** (API Conversions, `lib/meta/conversions.ts` du CRM : devis envoyé, signé, encaissé, perdu, pour TOUT dossier qui franchit l'étape, quelle que soit sa source — `dossiers/transitions.ts › effetsDuChangementEtape` ne filtre pas sur `lead.source` ; avec le montant, et l'e-mail, le téléphone, le prénom, le nom, la ville et le code postal hachés en SHA-256, plus le `lead_id` Meta quand le lead vient d'un formulaire Meta ; la politique de confidentialité le dit). Limiter l'envoi aux leads venus de Meta est une décision de Lucas (ce que Meta apprend changerait).
 
 ## 2. Événements émis
 
-| Événement CRM | dataLayer (`event`) | Quand |
-|---|---|---|
-| `PAGE_VUE` | — | chaque page (SuiviParcours), le simulateur avec `projet` |
-| `PIECE_CHOISIE` | — | une pièce choisie (simulateur ou module d'accueil, `depuis: accueil`) — une fois par parcours ; arrivé par un bouton « Simuler ma cuisine » de l'accueil, le simulateur y ajoute `depuis` lu dans `?depuis=` (`accueil-ouverture`, `accueil-colle`, `accueil-etapes`, `accueil-final` ; minuscules, chiffres et tirets seulement, `lireDepuis`) |
-| `PHOTO_CHARGEE` | `simulation_photo_uploaded` | photo prête (poids, largeur) — une fois par parcours |
-| `GENERATION_LANCEE` | `simulation_textures_selected` | clic « Voir le résultat » — une fois par génération |
-| `RESULTAT_VU` | `simulation_generated` | rendu affiché (durée, gardé côté CRM ou non) — une fois par génération |
-| `SIMULATION_ECHEC` | `simulation_failed` | `etape` : `photo` (illisible), `lancement` (prepare ou création du travail refusée : quota, captcha, CRM injoignable), `generation` (le travail a échoué ou n'a pas été retrouvé) ; `raison` |
-| `ESTIMATION_VUE` | — | mission 16, partie 4 : la fourchette affichée après le rendu (`format`, `min`, `max`, `type` : `calculee` \| `repli` \| `sur-devis`, `projet`) — une fois par simulation (« Nouvelle simulation » la réarme, comme les étapes de l'entonnoir) |
-| `DEVIS_DEMANDE` | `devis_form_submitted` | demande après simulation (`formulaire: simulateur`) ou formulaire de /pro (`formulaire: pro`) ; plus de page /devis (301 → /simulateur) |
-| `RAPPEL_DEMANDE` | — | mission 16, partie 4 : un créneau « Être rappelé » choisi avec la demande (`creneau`, `projet`) |
-| `CONTACT_ENVOYE` | `contact_form_submitted` | formulaire /contact |
-| `FORMULAIRE_ECHEC` | — | envoi refusé ou coupé (`raison`, `statut`) |
-| `WHATSAPP_CLIQUE` | `whatsapp_clicked` | « Écrire sur WhatsApp », bouton secondaire du dernier appel de l'accueil (`depuis: accueil-final`) ; message prérempli court, sans donnée personnelle (`lib/whatsapp.ts`). Mission 16, partie 3 : type ajouté d'abord à la liste blanche du CRM (ligne « Clics WhatsApp » de la synthèse). Partie 4 : aussi après le rendu (`depuis: simulateur-resultat`, message qui cite la simulation) et sous « Votre espace est prêt » (`simulateur-espace`) ; jamais le lien de l'espace dans le message (un accès en clair dans l'adresse de wa.me) |
-| — | `cta_clicked` | boutons du module d'accueil ; `phone_clicked` n'a pas d'émetteur |
+| Événement CRM | Quand |
+|---|---|
+| `PAGE_VUE` | chaque page (SuiviParcours), le simulateur avec `projet` |
+| `PIECE_CHOISIE` | une pièce choisie (simulateur ou module d'accueil, `depuis: accueil`) — une fois par parcours ; arrivé par un bouton « Simuler ma cuisine » de l'accueil, le simulateur y ajoute `depuis` lu dans `?depuis=` (`accueil-ouverture`, `accueil-colle`, `accueil-etapes`, `accueil-final` ; minuscules, chiffres et tirets seulement, `lireDepuis`) |
+| `PHOTO_CHARGEE` | photo prête (poids, largeur) — une fois par parcours |
+| `GENERATION_LANCEE` | clic « Voir le résultat » — une fois par génération |
+| `RESULTAT_VU` | rendu affiché (durée, gardé côté CRM ou non) — une fois par génération |
+| `SIMULATION_ECHEC` | `etape` : `photo` (illisible), `lancement` (prepare ou création du travail refusée : quota, captcha, CRM injoignable), `generation` (le travail a échoué ou n'a pas été retrouvé) ; `raison` |
+| `ESTIMATION_VUE` | mission 16, partie 4 : la fourchette affichée après le rendu (`format`, `min`, `max`, `type` : `calculee` \| `repli` \| `sur-devis`, `projet`) — une fois par simulation (« Nouvelle simulation » la réarme, comme les étapes de l'entonnoir) |
+| `DEVIS_DEMANDE` | demande après simulation (`formulaire: simulateur`) ou formulaire de /pro (`formulaire: pro`) ; plus de page /devis (301 → /simulateur) |
+| `RAPPEL_DEMANDE` | mission 16, partie 4 : un créneau « Être rappelé » choisi avec la demande (`creneau`, `projet`) |
+| `CONTACT_ENVOYE` | formulaire /contact |
+| `FORMULAIRE_ECHEC` | envoi refusé ou coupé (`raison`, `statut`) |
+| `WHATSAPP_CLIQUE` | « Écrire sur WhatsApp », bouton secondaire du dernier appel de l'accueil (`depuis: accueil-final`) ; message prérempli court, sans donnée personnelle (`lib/whatsapp.ts`). Mission 16, partie 3 : type ajouté d'abord à la liste blanche du CRM (ligne « Clics WhatsApp » de la synthèse). Partie 4 : aussi après le rendu (`depuis: simulateur-resultat`, message qui cite la simulation) et sous « Votre espace est prêt » (`simulateur-espace`) ; jamais le lien de l'espace dans le message (un accès en clair dans l'adresse de wa.me) |
 
 L'entonnoir du simulateur (mission 16, partie 4) = `PAGE_VUE` (visite) → `PIECE_CHOISIE` → `PHOTO_CHARGEE` → `GENERATION_LANCEE` → `RESULTAT_VU` → `ESTIMATION_VUE` → `DEVIS_DEMANDE` | `CONTACT_ENVOYE` | `RAPPEL_DEMANDE` ; le CRM l'affiche emboîté, avec les abandons par étape, dans « Sur le site cette semaine » (Leads). L'estimation est une étape FACULTATIVE (la demande part aussi sans taille choisie) : comptée parmi les rendus vus, sans abandons, et le contact se compte parmi les rendus vus. Les anciens noms (`SIMULATION_PHOTO`, `SIMULATION_LANCEE`, `SIMULATION_RESULTAT`) restent lus par le CRM.
 
-Meta : `track` mappe `simulation_generated`, `devis_form_submitted` → `Lead`, `contact_form_submitted` → `Contact`, `simulation_photo_uploaded` → `InitiateCheckout` (pixel chargé seulement avec l'accord « Publicité » du bandeau, si `NEXT_PUBLIC_META_PIXEL_ID` est posée).
+**Par source (mission 16, partie 6)** : le CRM range chaque visite dans une famille, calculée à la lecture (rien n'est réécrit) depuis la source envoyée (`sourceCourte`, `lib/utm.ts` : `utm_source[/utm_medium]`, sinon le domaine du site référent) : **Meta** (`meta`, `fb`, `facebook`, `ig`, `instagram`, `msg`), **Recherche** (`google`, `bing`, `duckduckgo`, `qwant`, `ecosia`, `yahoo`), **Direct** (rien), **Autres** (le reste, nom gardé). Un parcours prend la famille de sa première source connue. Leads → « Sur le site cette semaine » : sélecteur « Toutes · Meta · Recherche · Direct » ; assistant : « synthese » (une ligne par famille), « voir_publicite » (la ligne Meta). Pour qu'une publicité soit reconnue, ses liens portent `utm_source=meta` (ou `fb`, `ig`) et `utm_campaign`.
 
 ## 3. Ce qui part avec chaque contact (webhook CRM)
 
 Nom, téléphone, e-mail, ville, code postal, projet, message, style, photos (formulaire), simulations du parcours (identifiants, rattachées par le CRM), consentement mail daté (`consentementMail`, `consentementTexte`), identifiant de parcours, origine (`campaign_name` = utm_campaign, `ad_name` = utm_content, `form_name` = formulaire ou page), adresse IP du visiteur (limite anti-abus). Mission 16 (partie 4) : aussi `canal` (utm_source/medium ou site référent) et `pageEntree` (première page vue), et, après un rendu, `estimationMin` / `estimationMax` / `formatPiece` (la fourchette vue et sa taille) et `rappelCreneau` ; depuis /pro, `source: "SITE_PRO"` explicite, la société et le type de lieu en note, `surfaceM2` ou `surfaceMl`. Réponse du CRM journalisée côté Vercel : `[CRM] lead enregistré id=… photos=… consentement=… simulations=…` ; elle porte `lienEspace` et `rappelLe`, que `/api/simulation/contact` rend au navigateur.
 
-## 4. À faire dans Google Tag Manager (Lucas)
+## 4. Plus de Google Tag Manager (mission 16, partie 6)
 
-1. Déclencheurs « Événement personnalisé » sur `devis_form_submitted`, `contact_form_submitted`, `simulation_generated`.
-2. Tags GA4 « événement » (conversions) et, si campagnes Meta : tag Pixel Meta `Lead` sur les deux premiers, ou poser `NEXT_PUBLIC_META_PIXEL_ID` sur Vercel pour que le site charge le pixel lui-même (après accord cookies).
-3. Le consent mode v2 est initialisé par le site (tout refusé par défaut, mis à jour par le bandeau) : ne pas le redéfinir dans GTM.
+Le conteneur GTM, GA4, le pixel Meta et Clarity ne sont plus chargés : rien n'est à configurer dans GTM. Lucas peut désactiver le conteneur et retirer les variables de Vercel (§ 5). Les conversions publicitaires Meta passent par le CRM (API Conversions) ; l'audience et l'entonnoir, par les événements du § 2.
 
 ## 5. Variables d'environnement liées
 
-- Vercel : `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_META_PIXEL_ID` (optionnel), `NEXT_PUBLIC_CLARITY_ID` (optionnel), `NEXT_PUBLIC_SIMULATE_URL` (`https://crm.coverswap.fr/api/simulate`, sert aussi à trouver `/api/site/evenements`), `SIMULATE_TOKEN_SECRET`, `CRM_WEBHOOK_URL`, `CRM_WEBHOOK_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (captcha, inactif sans clés).
+- Vercel : `NEXT_PUBLIC_SIMULATE_URL` (`https://crm.coverswap.fr/api/simulate`, sert aussi à trouver `/api/site/evenements`), `SIMULATE_TOKEN_SECRET`, `CRM_WEBHOOK_URL`, `CRM_WEBHOOK_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY` + `NEXT_PUBLIC_TURNSTILE_SITE_KEY` (captcha, inactif sans clés). `NEXT_PUBLIC_SANS_EVENEMENTS=1` coupe l'envoi des événements (intégration continue seulement, § 11 ; jamais sur Vercel).
+- **Plus lues depuis la mission 16 (partie 6)**, à retirer de Vercel : `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_CLARITY_ID` (et Vercel Analytics, à désactiver dans le projet Vercel).
 - Railway : `SIMULATE_TOKEN_SECRET`, `OPENAI_API_KEY`, `WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM` (expéditeur vérifié chez Resend : sans lui, l'accusé de réception au visiteur ne part pas), `LEAD_NOTIFICATION_EMAIL`, `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID` (facultatives : les avis Google de l'accueil, § 8 ; sans elles, le bloc « Note Google » n'existe pas).
 - Depuis la mission 15, le site ne génère plus aucune image : `OPENAI_API_KEY` et `OPENAI_IMAGE_MODEL` ne lui servent plus (à retirer des variables Vercel ; elles restent sur Railway).
 
@@ -122,3 +119,33 @@ Six pages, quatre entrées de menu : `/` (accueil), `/simulateur`, `/matieres`, 
 - **Redirections** (`next.config.ts`, permanentes, 308 chez Next) : `/simulation` → `/simulateur`, `/blog/tendances-deco-2025-covering` → `/blog/quelle-finition-choisir`, `/devis` → `/simulateur`, `/prestations/professionnel` → `/pro`, `/revetements` → `/matieres` (la requête passe : `?famille=`), `/prestations` → `/realisations`, `/blog` → `/comment-ca-marche`. Test : `src/redirections.test.ts`. Sonde en ligne après déploiement : `node scripts/verifier-redirections.mjs` (`SITE=` pour une autre adresse ; HEAD sans suivre, attend 301 ou 308 et le bon `location` ; code de sortie 1 sinon).
 - **`sitemap.xml`** (`LAST_BUILD` 30/09/2026) : les six pages, `/contact`, les pages par pièce et vitrages, `/zones` + 8, les guides, les 3 pages légales ; aucune adresse redirigée (test `src/app/sitemap.test.ts`). **`robots.txt`** : `/api/`, `/e/`, `/desinscription` fermés. **`llms.txt`** : réécrit sur les mêmes sources (offre, parcours, pièces, familles du catalogue, guides, zones).
 
+## 11. Performance, mesure, intégration continue (mission 16, partie 6)
+
+Cibles (énoncé § 6) : Lighthouse mobile ≥ 95 sur les quatre axes pour chacune des six pages (`/`, `/simulateur`, `/matieres`, `/realisations`, `/comment-ca-marche`, `/pro`), LCP < 2 s, CLS < 0,05, INP < 200 ms.
+
+- **Aucun script tiers** hors Cloudflare Turnstile, chargé au premier geste dans un formulaire (/contact, /pro : `Turnstile › actif`) et dès l'affichage des étapes du simulateur qui appellent le serveur (écran des matières, résultat, demande de secours : simulateur inchangé, le jeton doit être prêt avant « Voir le résultat ») ; `/simulateur` ouvert à froid (écran des pièces) ne le charge pas (§ 1 : GTM, GA4, pixel Meta, Clarity, Vercel Analytics et bandeau cookies retirés). Test : `src/lib/perf.test.ts` (seul `Turnstile.tsx` importe `next/script`, aucun domaine de mesure dans le code).
+- **JavaScript client** : « use client » seulement sur la liste blanche de `perf.test.ts` (simulateur, espace client, module de simulation de l'accueil, menu du téléphone, formulaires, curseur / plein écran / feuilles, bouton collé, suivi du parcours, catalogue de /matieres, bouton WhatsApp, et les deux enveloppes qui lisent l'adresse). Un nouveau composant client fait échouer le test : il passe serveur, ou il entre dans la liste avec sa raison. `CartesPieces` est passé serveur (sans état).
+- **Ouverture** : l'image « avant » (AVIF ≤ 80 Ko, `fetchpriority="high"`) est préchargée sur `/` seulement (`ReactDOM.preload` dans `src/app/page.tsx`, `prechargementOuverture` : même `srcset`, mêmes `sizes` que le `<picture>`, `type`). Les polices (`next/font`) sont préchargées par Next.
+- **Rendu différé** : `Section differee` → `sous-la-ligne` (`content-visibility: auto`, `globals.css`) sur les sections sous la ligne de flottaison (accueil 3 à 8, /comment-ca-marche après les étapes, /realisations en bas, /pro « en détail ») ; jamais sur une section qui porte un élément fixe ou collant. `globals.css` : 200 lignes au plus (testé).
+- **Cache** : `/images/prep/*` et `/fonts/*` en `Cache-Control: public, max-age=31536000, immutable` (`next.config.ts › headers`) ; chaque adresse d'image préparée porte l'empreinte de son original (`?v=<empreinte>`, `sourcesPhoto`) : une image refaite par `npm run images` change d'adresse, le navigateur la recharge. `images.unoptimized` reste (quota Vercel, § 7).
+- **INP** : la recherche de /matieres filtre 150 ms après la dernière touche (`DELAI_RECHERCHE_MS`, `lib/differer.ts`), le champ suit la frappe ; les vignettes des tuiles sont en `loading="lazy"`.
+
+**L'intégration continue** (`.github/workflows/site.yml`) tourne à chaque push sur `main` (donc à chaque déploiement Vercel) et à chaque pull request :
+
+1. `npm ci`, `npm run lint`, `npm test`, `npm run build`, puis `npx next start -p 3100` (le site construit). Variables : `NEXT_PUBLIC_SIMULATE_URL` = le CRM de production (routes publiques en lecture : publications, zones, tarifs, avis, vignettes) et `NEXT_PUBLIC_SANS_EVENEMENTS=1` (le site mesuré n'envoie aucun événement au CRM : sinon le CRM refuserait l'origine `localhost` et le refus CORS salirait la console mesurée). Aucun secret.
+2. **Lighthouse CI** (`@lhci/cli`, `lighthouserc.json`) : les six pages, mobile (réglage par défaut de Lighthouse), deux passages par page ; seuils : `performance`, `accessibility`, `best-practices`, `seo` ≥ 0,95, `largest-contentful-paint` ≤ 2 000 ms, `cumulative-layout-shift` ≤ 0,05, `total-blocking-time` ≤ 200 ms (l'INP ne se mesure pas sans interaction : le TBT en est l'indicateur de laboratoire). Rapports HTML et JSON dans l'artefact **`lighthouse`** (dossier `lhci/`, `manifest.json` + un rapport par passage).
+3. **Captures** (`scripts/captures.mjs`, Playwright Chromium installé en CI seulement) : six pages × 375 / 768 / 1440 px, page entière, dans l'artefact **`captures`** (`<page>-<largeur>.png`).
+4. **Comparaison** (`scripts/comparer-captures.mjs`, `pixelmatch`) avec les captures de la dernière exécution RÉUSSIE sur `main` : le résumé du job (onglet « Summary » de l'exécution) donne le pourcentage de pixels changés par page et par largeur, et `diff-<page>-<largeur>.png` (en rouge : ce qui a changé) rejoint l'artefact `captures`. Information seulement : elle ne fait jamais échouer le job.
+
+**Lire un échec** : si l'étape « Lighthouse — seuils » échoue, une page a manqué un seuil même sur le meilleur de ses deux passages (agrégation « optimistic », celle de Lighthouse CI par défaut) ; le journal de l'étape nomme la page, l'audit et la valeur (« expected ≥ 0.95, found 0.91 ») ; ouvrir le rapport HTML de cette page dans l'artefact `lighthouse` (section « Opportunities » / « Diagnostics »). Le site est déjà déployé par Vercel quand la CI tourne : un échec ne bloque rien, il signale une régression à corriger (ou un seuil trop strict à discuter). Les scores du CI (machine de GitHub, sans réseau mobile réel, CRM de production à distance) diffèrent de ceux de la production : pour le rapport, mesurer aussi `https://coverswap.fr`.
+
+**En local** : `npm run build`, `npx next start -p 3100`, puis `npm run lighthouse` (même configuration ; rapports dans `lhci/`) et `npm run captures` (Chromium : `npx playwright install chromium` une fois). `lhci/`, `.lighthouseci/`, `captures/` ne sont jamais commités.
+
+### Seuils de Lighthouse CI (30/09/2026)
+Cible de la mission 16 : 0,95 sur les quatre axes, LCP sous 2 s, CLS sous 0,05, TBT sous 200 ms. Mesure locale du 30/09
+(mobile simulé, build de production) : performance 89 à 93, accessibilité et SEO 100, bonnes pratiques 96 à 100,
+CLS 0, LCP 2,8 à 3,6 s, TBT 90 à 210 ms. L'écart restant vient du socle React / Next (environ 70 Ko compressés
+évalués avant la peinture de l'image principale, « Render Delay » de 2,5 s sous processeur ralenti quatre fois).
+`lighthouserc.json` bloque donc sur un plancher (performance 0,85, LCP 4 s, TBT 400 ms) pour attraper les régressions
+sans rester rouge ; accessibilité, bonnes pratiques, SEO (0,95) et CLS (0,05) bloquent au niveau de la cible.
+Relever le plancher à mesure que les scores montent.

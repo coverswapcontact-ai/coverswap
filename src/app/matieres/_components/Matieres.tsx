@@ -11,7 +11,8 @@ import { PleinEcran } from "@/components/simulation/PleinEcran";
 import { GRILLE_TUILES_GRANDES, SqueletteTuiles } from "@/components/simulation/Squelette";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { libelleFamille } from "@/lib/familles-matieres";
-import { MATIERES_PAR_PAGE, chargerCatalogue, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, type ChoixFamille, type FiltreMatieres, type Matiere } from "@/lib/matieres";
+import { differer } from "@/lib/differer";
+import { DELAI_RECHERCHE_MS, MATIERES_PAR_PAGE, chargerCatalogue, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, type ChoixFamille, type FiltreMatieres, type Matiere } from "@/lib/matieres";
 import { urlEchantillon, urlVignette } from "@/lib/simulateur/generation-client";
 
 /**
@@ -69,7 +70,23 @@ export function Matieres({ premieres, familles }: { premieres: Matiere[]; famill
   const adresse = lireAdresseMatieres(rechercheAdresse, catalogue);
   const [filtreChoisi, setFiltreChoisi] = useState<FiltreMatieres | null>(null);
   const filtre = filtreChoisi ?? adresse.famille;
+  // Mission 16 (partie 6) : `saisie` suit la frappe, `recherche` (le filtre des 497 matières) 150 ms après la dernière touche.
+  const [saisie, setSaisie] = useState("");
   const [recherche, setRecherche] = useState("");
+  const [rechercheDifferee] = useState(() => differer(setRecherche, DELAI_RECHERCHE_MS));
+  useEffect(() => () => rechercheDifferee.annuler(), [rechercheDifferee]);
+  const saisir = (valeur: string) => {
+    setSaisie(valeur);
+    rechercheDifferee.appeler(valeur);
+  };
+  // « Effacer » disparaît avec la saisie : le focus revient dans le champ, pas sur la page.
+  const champRecherche = useRef<HTMLInputElement>(null);
+  const effacer = () => {
+    rechercheDifferee.annuler();
+    setSaisie("");
+    setRecherche("");
+    champRecherche.current?.focus();
+  };
   const [limite, setLimite] = useState(MATIERES_PAR_PAGE);
   const [agrandie, setAgrandie] = useState<Matiere | null>(null);
 
@@ -132,9 +149,9 @@ export function Matieres({ premieres, familles }: { premieres: Matiere[]; famill
             <IconeLoupe />
           </span>
           {/* type="text" : un champ « search » ajouterait la croix du navigateur à côté de « Effacer la recherche ». */}
-          <input id="recherche-matieres" type="text" inputMode="search" enterKeyHint="search" autoComplete="off" placeholder="Chêne, blanc, marbre, noir mat…" value={recherche} onChange={(e) => setRecherche(e.target.value)} className={cx(CHAMP_RECHERCHE, "pr-12", SOUS_LES_BARRES)} />
-          {recherche ? (
-            <button type="button" onClick={() => setRecherche("")} aria-label="Effacer la recherche" className="absolute top-1/2 right-1 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-encre-2 transition-colors duration-[var(--duree-courte)] hover:text-encre">
+          <input ref={champRecherche} id="recherche-matieres" type="text" inputMode="search" enterKeyHint="search" autoComplete="off" placeholder="Chêne, blanc, marbre, noir mat…" value={saisie} onChange={(e) => saisir(e.target.value)} className={cx(CHAMP_RECHERCHE, "pr-12", SOUS_LES_BARRES)} />
+          {saisie ? (
+            <button type="button" onClick={effacer} aria-label="Effacer la recherche" className="absolute top-1/2 right-1 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-encre-2 transition-colors duration-[var(--duree-courte)] hover:text-encre">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>

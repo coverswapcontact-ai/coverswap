@@ -18,6 +18,9 @@ export type Matiere = { id: string; nom: string; famille: string; categorie: str
 /** Les matières rendues par lot (« Voir plus ») ; le premier lot est rendu par le serveur. */
 export const MATIERES_PAR_PAGE = 30;
 
+/** Mission 16 (partie 6) : le filtrage suit la frappe 150 ms après la dernière touche (INP), le champ tout de suite. */
+export const DELAI_RECHERCHE_MS = 150;
+
 export type FiltreMatieres = "tout" | "favoris" | string;
 
 let catalogueEnMemoire: Matiere[] | null = null;

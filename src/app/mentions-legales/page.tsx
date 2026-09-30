@@ -84,7 +84,7 @@ export default function MentionsLegales() {
               <Link href="/politique-confidentialite" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 politique de confidentialité
               </Link>
-              . Vous pouvez modifier vos choix de cookies à tout moment depuis le lien « Gérer les cookies » en bas de page.
+              . Le site ne dépose aucun cookie de mesure d&apos;audience ni de publicité.
             </p>
           </Section>
 

@@ -1,11 +1,12 @@
-import { track, type TrackEvent } from "@/lib/analytics";
 import { obtenirParcoursId } from "@/lib/parcours";
 import { lireOrigine, sourceCourte } from "@/lib/utm";
 
 /**
  * Événements de parcours : envoyés au CRM (audience et entonnoir par source et
- * par page, sans donnée personnelle) et poussés dans le dataLayer pour Google
- * Tag Manager / Meta. Jamais bloquant : un échec d'envoi est ignoré.
+ * par page, sans donnée personnelle, sans cookie). Jamais bloquant : un échec
+ * d'envoi est ignoré. Mission 16 (partie 6) : plus rien vers un outil tiers
+ * (GTM, GA4, pixel Meta, Clarity retirés du site) ; les conversions Meta
+ * partent du CRM (API Conversions, côté serveur).
  *
  * Envoi en `text/plain` : une requête « simple », sans pré-vol CORS — un
  * sendBeacon en JSON serait silencieusement abandonné par le navigateur.
@@ -15,23 +16,20 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
 /** Mission 16 (partie 4) : `ESTIMATION_VUE` (la fourchette affichée après le rendu) et `RAPPEL_DEMANDE` (un créneau choisi). */
 export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "ESTIMATION_VUE" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "RAPPEL_DEMANDE" | "FORMULAIRE_ECHEC" | "WHATSAPP_CLIQUE";
 
-export const VERS_DATALAYER: Partial<Record<EvenementSite, TrackEvent>> = {
-  PHOTO_CHARGEE: "simulation_photo_uploaded",
-  GENERATION_LANCEE: "simulation_textures_selected",
-  RESULTAT_VU: "simulation_generated",
-  SIMULATION_ECHEC: "simulation_failed",
-  DEVIS_DEMANDE: "devis_form_submitted",
-  CONTACT_ENVOYE: "contact_form_submitted",
-  WHATSAPP_CLIQUE: "whatsapp_clicked",
-};
+/**
+ * L'adresse des événements du CRM, déduite de `NEXT_PUBLIC_SIMULATE_URL` ; vide (rien n'est envoyé) sans elle, ou
+ * quand `NEXT_PUBLIC_SANS_EVENEMENTS=1` : l'intégration continue (Lighthouse, captures) lit le CRM de production
+ * sans y écrire — le CRM refuserait de toute façon l'origine `localhost`, et le refus CORS salirait la console.
+ */
+export function urlEvenements(simulateUrl: string | undefined, sansEvenements: string | undefined): string {
+  if (sansEvenements === "1") return "";
+  return (simulateUrl || "").replace(/\/api\/simulate\/?$/, "/api/site/evenements");
+}
 
-const URL_EVENEMENTS = (process.env.NEXT_PUBLIC_SIMULATE_URL || "").replace(/\/api\/simulate\/?$/, "/api/site/evenements");
+const URL_EVENEMENTS = urlEvenements(process.env.NEXT_PUBLIC_SIMULATE_URL, process.env.NEXT_PUBLIC_SANS_EVENEMENTS);
 
 export function envoyerEvenement(type: EvenementSite, meta: Record<string, string | number | boolean | undefined> = {}): void {
-  if (typeof window === "undefined") return;
-  const evenementDataLayer = VERS_DATALAYER[type];
-  if (evenementDataLayer) track(evenementDataLayer, meta);
-  if (!URL_EVENEMENTS) return;
+  if (typeof window === "undefined" || !URL_EVENEMENTS) return;
   const origine = lireOrigine();
   const corps = JSON.stringify({
     parcoursId: obtenirParcoursId(),

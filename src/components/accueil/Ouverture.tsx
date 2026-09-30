@@ -1,7 +1,7 @@
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
 import { ANCRES_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, lienSimulerCuisine } from "./sections";
-import type { ChoixOuverture } from "./etudes";
+import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
 
 /**
  * 1. L'ouverture (mission 16, partie 3) : l'écran utile entier (jamais
@@ -16,7 +16,9 @@ import type { ChoixOuverture } from "./etudes";
  * AVIF préparé pour la simulation, WebP réduit par le CRM pour une
  * réalisation). Ce que montre l'image est décidé par `choisirOuverture`
  * (`etudes.ts`) : une réalisation publiée, sinon la simulation étiquetée.
- * Composant serveur (seul le curseur est client).
+ * Composant serveur (seul le curseur est client). Mission 16 (partie 6) : la
+ * page d'accueil précharge l'« avant » (`prechargementOuverture`, même
+ * `srcset`, mêmes `sizes`) ; ce composant, lui, ne précharge rien.
  */
 
 /** Largeur maximale de l'image pour que image + outils (52 px) tiennent dans l'écran utile, marges comprises. */
@@ -49,7 +51,7 @@ export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
               alt={choix.alt}
               altAvant={choix.altAvant}
               ratio={choix.ratio}
-              preparees={{ ...choix.preparees, tailles: "(min-width: 1152px) 672px, (min-width: 768px) 58vw, 100vw" }}
+              preparees={{ ...choix.preparees, tailles: TAILLES_OUVERTURE }}
               priorite
               outilsMobile="comparer"
               etiquette={choix.etiquette}
