@@ -49,8 +49,14 @@ export const FOURCHETTES = {
 /** Pose : une journée pour une cuisine ou une salle de bain courante. */
 export const DUREE_POSE = "1 journée";
 
-/** Simulation : rendu en moins d'une minute. */
-export const DUREE_SIMULATION = "60 secondes";
+/**
+ * Simulation : le rendu arrive « en une à deux minutes » (mission 15 : la
+ * génération est asynchrone, la médiane observée avoisine 1 min 15). Une seule
+ * formulation, reprise par la page du simulateur (titre, description, étapes,
+ * bouton) ; l'écran d'attente, lui, annonce l'estimation calculée.
+ */
+export const DELAI_RENDU = "une à deux minutes";
+export const DUREE_SIMULATION = DELAI_RENDU;
 
 /** Nombre exact de références du catalogue Cover Styl' (compté dans les données). */
 export const NB_REFERENCES = (revetements as unknown[]).length;

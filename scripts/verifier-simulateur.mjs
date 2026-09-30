@@ -3,8 +3,10 @@
  * Vérifie la chaîne du simulateur sur un site en ligne, de bout en bout :
  *   1. /api/simulation/prepare : consigne construite et signée, refus propres
  *      (surfaces incompatibles, référence inconnue, ancien format) ;
- *   2. génération sur le CRM avec une photo d'essai : soit un rendu, soit une
- *      erreur classée et lisible (crédit épuisé, surcharge…) — jamais un échec muet ;
+ *   2. génération sur le CRM avec une photo d'essai, au contrat ASYNCHRONE de la
+ *      mission 15 : POST `asynchrone: true` → 202 { travailId, attenteEstimeeS },
+ *      puis sondage GET ?id=&p= jusqu'à PRETE ou ECHEC — soit un rendu, soit une
+ *      erreur classée et lisible (crédit épuisé, surcharge…), jamais un échec muet ;
  *   3. avec --contact : la demande part au CRM avec la photo quand la génération a échoué.
  *
  *   node scripts/verifier-simulateur.mjs                     (coverswap.fr, étapes 1 et 2)
@@ -26,6 +28,10 @@ const avecContact = process.argv.includes("--contact");
 const racine = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const photo = "data:image/jpeg;base64," + readFileSync(path.join(racine, "public/images/fonds/photo-1722605090433-41d1183a792d-800.jpg")).toString("base64");
 const parcoursId = randomUUID();
+/** Au-delà, le suivi s'arrête : le CRM lui-même lit un travail perdu après 10 min EN_COURS. */
+const SUIVI_MAX_MS = 6 * 60_000;
+const INTERVALLE_SUIVI_MS = 3_000;
+const RAISONS_CLASSEES = ["service-indisponible", "photo-refusee", "surcharge", "delai", "erreur", "interrompue", "stockage", "purgee"];
 let echecs = 0;
 
 const verifier = (ok, libelle, detail = "") => {
@@ -36,6 +42,11 @@ const poster = async (url, corps, entetes = {}) => {
   const rep = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", Origin: SITE, ...entetes }, body: JSON.stringify(corps) });
   return { statut: rep.status, data: await rep.json().catch(() => ({})) };
 };
+const lire = async (url) => {
+  const rep = await fetch(url, { headers: { Origin: SITE }, cache: "no-store" });
+  return { statut: rep.status, data: await rep.json().catch(() => ({})) };
+};
+const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
 
 console.log(`Simulateur de ${SITE} (parcours ${parcoursId})\n1. Préparation`);
 const base = { project_type: "cuisine", parcoursId };
@@ -52,16 +63,47 @@ verifier(ancien.statut === 400 && ancien.data.reason === "version", "ancien form
 
 let raisonEchec = null;
 if (!sansGeneration && prep.statut === 200) {
-  console.log("2. Génération sur le CRM");
+  console.log("2. Génération sur le CRM (travail asynchrone, suivi jusqu'au rendu)");
   const debut = Date.now();
-  const gen = await poster(CRM, { prompt: prep.data.prompt, swatchUrls: prep.data.swatchUrls, sig: prep.data.sig, exp: prep.data.exp, parcoursId, projet: "cuisine", references: [{ zone: "meubles-bas", libelle: "Meubles bas", ref: "AA05", nom: "Honey Oak" }], page: "/simulateur", photo_base64: photo });
-  const duree = `${Math.round((Date.now() - debut) / 1000)} s`;
-  if (gen.statut === 200 && gen.data.image) verifier(true, "rendu généré", `${duree}, simulation gardée : ${gen.data.simulationSiteId ?? "non"}`);
-  else {
-    raisonEchec = gen.data.reason ?? `http-${gen.statut}`;
-    const classee = ["service-indisponible", "photo-refusee", "surcharge", "delai", "erreur", "ip-quota", "global-quota"].includes(raisonEchec);
-    verifier(classee && typeof gen.data.error === "string" && gen.data.error.length > 40, `échec classé et lisible (${raisonEchec}, HTTP ${gen.statut}, ${duree})`, gen.data.error);
-    if (raisonEchec === "service-indisponible") verifier(/coordonnées/.test(gen.data.error) && !/sombre|floue/.test(gen.data.error), "le message ne met pas la photo en cause et propose de laisser ses coordonnées");
+  const duree = () => `${Math.round((Date.now() - debut) / 1000)} s`;
+  const lancement = await poster(CRM, {
+    asynchrone: true,
+    prompt: prep.data.prompt,
+    swatchUrls: prep.data.swatchUrls,
+    sig: prep.data.sig,
+    exp: prep.data.exp,
+    parcoursId,
+    projet: "cuisine",
+    references: [{ zone: "meubles-bas", libelle: "Meubles bas", ref: "AA05", nom: "Honey Oak" }],
+    page: "/simulateur",
+    photo_base64: photo,
+  });
+  if (lancement.statut === 202 && typeof lancement.data.travailId === "string") {
+    verifier(true, "travail créé (202)", `attente annoncée ${lancement.data.attenteEstimeeS ?? "?"} s`);
+    const urlSuivi = `${CRM}?id=${encodeURIComponent(lancement.data.travailId)}&p=${encodeURIComponent(parcoursId)}`;
+    let suivi = await lire(urlSuivi);
+    verifier(suivi.statut === 200 && ["EN_ATTENTE", "EN_COURS", "PRETE", "ECHEC"].includes(suivi.data.statut), "suivi lisible tout de suite", `${suivi.data.statut ?? "?"}, HTTP ${suivi.statut}`);
+    verifier((await lire(`${CRM}?id=${encodeURIComponent(lancement.data.travailId)}&p=${randomUUID()}`)).statut === 404, "un autre parcours ne voit rien (404)");
+    while (suivi.statut === 200 && (suivi.data.statut === "EN_ATTENTE" || suivi.data.statut === "EN_COURS") && Date.now() - debut < SUIVI_MAX_MS) {
+      await attendre(INTERVALLE_SUIVI_MS);
+      suivi = await lire(urlSuivi);
+    }
+    if (suivi.statut === 200 && suivi.data.statut === "PRETE") {
+      verifier(typeof suivi.data.image === "string" && suivi.data.image.startsWith("data:image/"), "rendu généré", `${duree()}, simulation gardée : ${suivi.data.simulationSiteId ?? "non"}`);
+      const image = await fetch(`${CRM}/image?id=${encodeURIComponent(lancement.data.travailId)}&p=${encodeURIComponent(parcoursId)}&quoi=apres`, { headers: { Origin: SITE } });
+      verifier(image.status === 200 && (image.headers.get("content-type") ?? "").startsWith("image/"), "rendu servi par adresse (/api/simulate/image)", image.headers.get("content-type") ?? "");
+    } else if (suivi.statut === 200 && suivi.data.statut === "ECHEC") {
+      raisonEchec = suivi.data.erreur?.raison ?? "erreur";
+      const message = suivi.data.erreur?.message;
+      verifier(RAISONS_CLASSEES.includes(raisonEchec) && typeof message === "string" && message.length > 40, `échec classé et lisible (${raisonEchec}, ${duree()})`, message);
+      if (raisonEchec === "service-indisponible") verifier(/coordonnées/.test(message ?? "") && !/sombre|floue/.test(message ?? ""), "le message ne met pas la photo en cause et propose de laisser ses coordonnées");
+    } else {
+      verifier(false, "suivi du travail", `HTTP ${suivi.statut}, statut ${suivi.data.statut ?? "?"} après ${duree()}`);
+    }
+  } else {
+    raisonEchec = lancement.data.reason ?? `http-${lancement.statut}`;
+    const classee = ["service-indisponible", "ip-quota", "global-quota", "expired", "bad-signature", "internal", "origin"].includes(raisonEchec);
+    verifier(classee && typeof lancement.data.error === "string" && lancement.data.error.length > 20, `refus classé et lisible (${raisonEchec}, HTTP ${lancement.statut}, ${duree()})`, lancement.data.error);
   }
 }
 
@@ -70,7 +112,7 @@ if (avecContact) {
   const contact = await poster(`${SITE}/api/simulation/contact`, {
     name: "AUDIT TEST Simulateur sans rendu", phone: "06 00 00 00 31", email: "audit-test-31@example.com", ville: "Pérols", codePostal: "34470",
     message: "Essai automatique : demande envoyée alors que la génération a échoué. À archiver.",
-    project_type: "cuisine", parcoursId, simulationIds: [], rendusLocaux: [], referenceChoisie: "AA05", references: "Meubles bas : AA05 (Honey Oak)",
+    project_type: "cuisine", parcoursId, simulationIds: [], referenceChoisie: "AA05", references: "Meubles bas : AA05 (Honey Oak)",
     photoAvant: photo, simulationEchouee: raisonEchec ?? "essai", formulaire: "simulateur · essai automatique", consentementMail: false, consentementTexte: "essai",
   });
   verifier(contact.statut === 200 && contact.data.success && contact.data.leadId, "lead créé dans le CRM", `leadId ${contact.data.leadId ?? "?"}${contact.data.viaMail ? " (par mail de secours)" : ""}`);

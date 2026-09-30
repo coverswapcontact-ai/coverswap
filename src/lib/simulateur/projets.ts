@@ -33,7 +33,7 @@ export interface ProjectType {
   uploadHint: string;          // texte affiché à l'étape upload
   uploadTip: string;           // conseil photo
   elements: ProjectElement[];
-  /* ── Champs prompt IA (importés serveur-side dans /api/simulation) ── */
+  /* ── Champs prompt IA (lus côté serveur par /api/simulation/prepare, via lib/simulation-prompt) ── */
   promptRoomType: string;          // "kitchen" | "bathroom" | etc. pour le prompt IA
   promptSurfaceContext: string;    // description des surfaces pour guider l'IA
   promptKeepUntouched: string[];   // liste explicite de ce qui ne doit JAMAIS bouger

@@ -210,6 +210,15 @@ html.js .reveal-scale:not(.revealed) { transform: scale(0.96); }
 }
 
 /* ═══════════════════════════════════════════════════════════
+   SIMULATEUR — écran d'attente (mission 15) : la lueur lente qui parcourt la
+   photo ; coupée par prefers-reduced-motion (motion-reduce:hidden côté composant).
+═══════════════════════════════════════════════════════════ */
+@keyframes lueur-attente {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* ═══════════════════════════════════════════════════════════
    REDUCED MOTION — accessibility
 ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {

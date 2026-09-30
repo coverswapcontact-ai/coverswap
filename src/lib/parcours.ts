@@ -19,6 +19,20 @@ export function obtenirParcoursId(): string {
   }
 }
 
+/**
+ * Mission 15 : le simulateur garde aussi l'identifiant dans sa mémoire locale
+ * (il survit à la fermeture de l'onglet) ; au retour, il le remet ici pour que
+ * les événements et la demande de devis restent sur le même parcours.
+ */
+export function adopterParcoursId(id: string): void {
+  if (typeof window === "undefined" || !/^[0-9a-fA-F-]{16,64}$/.test(id)) return;
+  try {
+    sessionStorage.setItem(CLE, id);
+  } catch {
+    /* sessionStorage bloqué : l'état local suffit */
+  }
+}
+
 /** Côté serveur : un identifiant bien formé ou rien. */
 export function parcoursIdValide(valeur: unknown): string | undefined {
   return typeof valeur === "string" && /^[0-9a-fA-F-]{16,64}$/.test(valeur) ? valeur : undefined;

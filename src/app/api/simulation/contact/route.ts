@@ -7,10 +7,11 @@ import { getProject } from "@/lib/simulateur/projets";
 /**
  * POST /api/simulation/contact — après le résultat du simulateur, la personne
  * laisse ses coordonnées : le lead est créé dans le CRM, ses simulations du
- * parcours (gardées côté CRM) lui sont rattachées, et les rendus faits par le
- * chemin de secours (sans identifiant) partent avec la demande. Si la génération
- * n'a pas abouti, la demande part quand même, avec la photo et les finitions
- * choisies : la simulation sera faite à la main.
+ * parcours (gardées côté CRM, désignées par identifiant et par parcours) lui
+ * sont rattachées. Si la génération n'a pas abouti, la demande part quand même,
+ * avec la photo et les finitions choisies : la simulation sera faite à la main.
+ * Mission 15 : plus de rendu en base64 côté site (le chemin de secours Vercel
+ * n'existe plus).
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -40,10 +41,8 @@ export async function POST(req: NextRequest) {
 
   const { prenom, nom: nomFamille } = splitName(nom);
   const projet = getProject(texte(body.project_type, 40) ?? "cuisine");
+  // Mission 15 : toutes les simulations du parcours, par identifiant — le CRM a les images, plus de base64 ici.
   const simulationIds = Array.isArray(body.simulationIds) ? (body.simulationIds as unknown[]).filter((s): s is string => typeof s === "string" && /^[a-z0-9]{10,40}$/i.test(s)).slice(0, 10) : [];
-  const rendus = Array.isArray(body.rendusLocaux)
-    ? (body.rendusLocaux as { avant?: unknown; apres?: unknown; references?: unknown }[]).filter((r) => typeof r.avant === "string" && typeof r.apres === "string").slice(0, 3)
-    : [];
   const references = texte(body.references, 500);
   // Génération non aboutie (crédit épuisé, panne, photo refusée) : la photo du visiteur part avec sa
   // demande pour que la simulation soit faite à la main. ~6 Mo au plus, image uniquement.
@@ -70,9 +69,6 @@ export async function POST(req: NextRequest) {
           ? `Simulation ${projet.id} : ${references}`
           : `Simulation ${projet.id}`,
       photos: photoAvant && echec ? [photoAvant] : undefined,
-      // Chemin de secours (pas d'identifiant côté CRM) : le dernier rendu part avec la demande.
-      imageBefore: typeof rendus[0]?.avant === "string" ? (rendus[0].avant as string) : undefined,
-      imageAfter: typeof rendus[0]?.apres === "string" ? (rendus[0].apres as string) : undefined,
       campagne: texte(body.campagne, 120),
       publicite: texte(body.publicite, 120),
       formulaire: texte(body.formulaire, 200),

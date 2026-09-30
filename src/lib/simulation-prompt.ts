@@ -1,9 +1,9 @@
 /**
  * Construction de la consigne envoyée au modèle d'image — SOURCE UNIQUE.
  *
- * Utilisée par :
- *  - /api/simulation/prepare (chemin normal : le site prépare et signe, le CRM génère)
- *  - /api/simulation         (repli synchrone sur Vercel)
+ * Utilisée par /api/simulation/prepare seulement : le site prépare et signe la
+ * consigne, le CRM génère (travail asynchrone, mission 15). Plus aucun repli
+ * de génération sur Vercel.
  *
  * Trois étages :
  *  1. la surface (lib/simulateur/surfaces) : ce qui reçoit le film, où il

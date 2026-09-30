@@ -3,20 +3,20 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import Simulateur from "./_components/Simulateur";
 import { chargerPrestations, libellesDuSimulateur } from "@/lib/prestations";
 
 export const metadata: Metadata = {
   title: { absolute: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap" },
-  description: `Envoyez une photo de votre cuisine, salle de bain, meuble ou local, choisissez une finition parmi ${NB_REFERENCES} références Cover Styl', voyez le résultat en moins d'une minute. Coordonnées demandées seulement pour recevoir le rendu et un devis ${DELAI_REPONSE}.`,
+  description: `Envoyez une photo de votre cuisine, salle de bain, meuble ou local, choisissez une finition parmi ${NB_REFERENCES} références Cover Styl', voyez le résultat en ${DELAI_RENDU}. Coordonnées demandées seulement pour recevoir le rendu et un devis ${DELAI_REPONSE}.`,
   alternates: { canonical: `${ENTREPRISE.site}/simulateur` },
 };
 
 const ETAPES = [
   { titre: "Photographier la pièce", texte: "Une photo de face, bien éclairée, de la cuisine, de la salle de bain, du meuble ou du local. Téléphone ou ordinateur." },
   { titre: "Choisir les surfaces et la finition", texte: `Façades, meubles hauts ou bas, plan de travail, crédence, plan vasque, portes de dressing, meuble TV, comptoir… jusqu'à quatre surfaces, et pour chacune une finition parmi ${NB_REFERENCES} références Cover Styl'.` },
-  { titre: "Voir le résultat", texte: "Le rendu s'affiche en avant / après en moins d'une minute. Vos coordonnées ne sont demandées que pour le recevoir avec un devis." },
+  { titre: "Voir le résultat", texte: `Le rendu s'affiche en avant / après en ${DELAI_RENDU} ; vous pouvez quitter la page, la simulation continue. Vos coordonnées ne sont demandées que pour le recevoir avec un devis.` },
 ];
 
 export default async function PageSimulateur() {
@@ -29,7 +29,7 @@ export default async function PageSimulateur() {
       <div className="container-custom px-4 sm:px-6 lg:px-8 pt-28 md:pt-32 pb-20">
         <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Simulateur" }]} />
         <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-3 text-balance">Votre pièce, avec le revêtement de votre choix</h1>
-        <p className="text-gris-300 text-lg max-w-2xl mb-8">Une photo, une finition, un résultat en moins d&apos;une minute. Gratuit, sans inscription : vos coordonnées ne servent qu&apos;à recevoir le rendu et un devis.</p>
+        <p className="text-gris-300 text-lg max-w-2xl mb-8">Une photo, une finition, un résultat en {DELAI_RENDU}. Gratuit, sans inscription : vos coordonnées ne servent qu&apos;à recevoir le rendu et un devis.</p>
         <div className="glass-card p-5 sm:p-8">
           <Simulateur libelles={libelles} />
         </div>

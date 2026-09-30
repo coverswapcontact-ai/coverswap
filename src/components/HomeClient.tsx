@@ -7,7 +7,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { track } from "@/lib/analytics";
 import { PROJECT_TYPES } from "@/lib/simulateur/projets";
 import { preparerPhoto, messageErreurPhoto } from "@/lib/simulateur/photo";
-import { sauvegarderEtat } from "@/lib/simulateur/stockage";
+import { ETAT_VIDE } from "@/lib/simulateur/reprise";
+import { lireEtat, sauvegarderEtat } from "@/lib/simulateur/stockage";
 
 import { NB_REFERENCES } from "@/lib/offre";
 
@@ -40,7 +41,13 @@ export function SimulationSection({ libelles = {} }: { libelles?: Record<string,
   const handleContinue = useCallback(() => {
     if (!preview || !projectId) return;
     track("cta_clicked", { cta: "home_simulation_continue" });
-    void sauvegarderEtat({ projet: projectId, photo: preview, selections: {}, resultat: null, simulationSiteIds: [], rendusLocaux: [], majLe: Date.now() }).finally(() => router.push("/simulateur"));
+    // Mission 15 : l'accueil FUSIONNE avec la mémoire du simulateur (parcours, rendus, travail en cours gardés) ;
+    // seule la photo et la pièce changent. « ?suite=1 » : le simulateur enchaîne sans proposer de reprise.
+    // Pendant une génération, la photo et la pièce restent celles du travail en cours (l'écran d'attente montre la
+    // bonne photo, « Réessayer » garde ses choix) : le simulateur reprend le suivi, la nouvelle photo attendra la fin.
+    void lireEtat()
+      .then((memoire) => (memoire?.travailEnCours ? undefined : sauvegarderEtat({ ...(memoire ?? ETAT_VIDE), projet: projectId, photo: preview, selections: {}, majLe: Date.now() })))
+      .finally(() => router.push("/simulateur?suite=1"));
   }, [preview, projectId, router]);
 
   const handleSelectProject = (id: string) => {

@@ -8,10 +8,12 @@ import { useCallback, useRef, useState } from "react";
  * Au doigt (glisser n'importe où sur l'image), à la souris, au clavier
  * (flèches) ; sans photo « avant », seule la simulation s'affiche.
  */
-export function AvantApres({ apres, avant, alt, className }: { apres: string; avant: string | null; alt: string; className?: string }) {
+/** `ratio` (« 1600 / 1200») : le rapport de l'image, connu d'avance — la place est réservée, rien ne saute quand elle arrive. */
+export function AvantApres({ apres, avant, alt, className, ratio }: { apres: string; avant: string | null; alt: string; className?: string; ratio?: string }) {
   const [position, setPosition] = useState(50);
   const [touche, setTouche] = useState(false);
   const boite = useRef<HTMLDivElement>(null);
+  const reserve = ratio ? { aspectRatio: ratio } : undefined;
 
   const suivre = useCallback((clientX: number) => {
     const rect = boite.current?.getBoundingClientRect();
@@ -21,7 +23,7 @@ export function AvantApres({ apres, avant, alt, className }: { apres: string; av
 
   if (!avant) {
     return (
-      <div className={`overflow-hidden rounded-2xl bg-[#ECEAE5] ${className ?? ""}`}>
+      <div className={`overflow-hidden rounded-2xl bg-[#ECEAE5] ${className ?? ""}`} style={reserve}>
         {/* eslint-disable-next-line @next/next/no-img-element -- image privée servie par le CRM, pas d'optimisation */}
         <img src={apres} alt={alt} className="block w-full" loading="lazy" referrerPolicy="no-referrer" />
       </div>
@@ -32,6 +34,7 @@ export function AvantApres({ apres, avant, alt, className }: { apres: string; av
     <div
       ref={boite}
       className={`relative touch-pan-y overflow-hidden rounded-2xl bg-[#ECEAE5] select-none ${className ?? ""}`}
+      style={reserve}
       onPointerDown={(e) => {
         (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
         setTouche(true);
