@@ -44,8 +44,14 @@ export type ProjetClient = {
 /** SITE : son essai sur coverswap.fr ; CLIENT : créée par lui dans son espace ; CRM : préparée par CoverSwap. */
 export type SourceSimulation = "SITE" | "CRM" | "CLIENT";
 
-/** Les simulations qu'il crée lui-même : ce qu'il lui reste, ce qui tourne, et si le service répond. */
-export type Piece = { piece: string; libelle: string; aide: string; zones: { zone: string; libelle: string }[]; cochees?: string[]; duProjet?: boolean };
+/**
+ * Les simulations qu'il crée lui-même : ce qu'il lui reste, ce qui tourne, et si le service répond.
+ * Mission 15 (partie 5) : les pièces et leurs zones viennent de la source unique du CRM (murs et tablier
+ * de baignoire compris) ; `id` est la pièce du simulateur (cuisine, salle-de-bain…) pour le dessin de la carte.
+ */
+export type Piece = { piece: string; id?: string; libelle: string; aide: string; zones: { zone: string; libelle: string; description?: string }[]; cochees?: string[]; duProjet?: boolean };
+
+export type SimulationEnCours = { id: string; le: string; photoId?: string | null; zones?: ZoneTeinte[] };
 
 export type Creation = {
   gratuites: number;
@@ -54,15 +60,32 @@ export type Creation = {
   faites: number;
   faitesSite?: number;
   restantes: number;
-  enCours: { id: string; le: string }[];
+  enCours: SimulationEnCours[];
+  /** Générées mais gardées en brouillon (contrôle sous le seuil) : CoverSwap les relit, le client attend. */
+  enRelecture?: { id: string; le: string }[];
   demandeesLe: string | null;
   disponible: boolean;
   zones: { zone: string; libelle: string }[];
   zonesProjet: string[];
-  /** Toutes les pièces du simulateur du site ; `piece` : celle de son projet. (Absents d'un état gardé avant le 22/09.) */
+  /** Toutes les pièces du simulateur ; `piece` : celle de son projet. (Absents d'un état gardé avant le 22/09.) */
   piece?: string;
   pieces?: Piece[];
+  /** Limite de zones par simulation (celle du CRM ; 4 à défaut). */
+  zonesMax?: number;
 };
+
+/** `GET /simulations/creation/<id>` : où en est une simulation lancée (même rythme que le site : toutes les 3 s). */
+export type SuiviCreation = {
+  statut: "EN_COURS" | "PRETE" | "ECHEC" | "RELECTURE";
+  etape?: string | null;
+  attenteEstimeeS?: number;
+  simulationId: string | null;
+  message: string | null;
+  raison: string | null;
+};
+
+/** `POST /simulations/analyse` et `GET /simulations/analyse/<empreinte>` : l'analyse de la photo, telle que le site la lit aussi. */
+export type ReponseAnalyse = { empreinte: string; statut: "EN_COURS" | "PRETE" | "SAUTEE" | "ECHEC"; analyse?: { zones_visibles?: Record<string, { visible?: boolean; description?: string }>; qualite_photo?: { verdict?: string; conseil?: string } } | null; raison?: string | null; nouvelle?: boolean };
 
 /** Une ligne de paiement : ce qui est dû, ce qui est payé, quand et comment. */
 export type LignePaiement = { montant: number; statut: "PAYE" | "PARTIEL" | "A_REGLER"; recu: number; payeLe: string | null; moyen: string | null };
@@ -270,6 +293,10 @@ export function creerClient(racine: string, apercu: string | null, surReseau: (e
       apercu ? Promise.reject(new ErreurEspace(MESSAGE_APERCU, 403, "apercu")) : appeler(chemin, { method: methode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) }),
   };
 }
+
+/** La vignette (320 px) et l'échantillon entier d'une teinte, servis par le CRM avec le jeton : l'espace ne parle à aucun tiers. */
+export const vignette = (client: Pick<Client, "url">, ref: string) => client.url(`/echantillons/${encodeURIComponent(ref)}?l=320`);
+export const echantillon = (client: Pick<Client, "url">, ref: string) => client.url(`/echantillons/${encodeURIComponent(ref)}`);
 
 /** Envoi d'une photo avec sa progression (fetch ne la donne pas). */
 export function envoyerPhoto(client: Client, fichier: Blob, nom: string, progression: (part: number) => void): Promise<{ espace?: Etat; refusees?: string[] }> {

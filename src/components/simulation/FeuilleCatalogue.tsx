@@ -10,7 +10,7 @@ import { ZoomImage } from "./ZoomImage";
 
 /**
  * Le catalogue Cover Styl' en feuille (mission 15, partie 4), UN SEUL pour le
- * simulateur du site et, en partie 6, pour l'espace client : recherche en
+ * simulateur du site et, depuis la partie 5, pour l'espace client : recherche en
  * français (16 px, pas de zoom automatique sur iPhone), familles en filtres
  * sobres (des boutons pressés, rien qui promette un clavier d'onglets), tuiles
  * carrées de hauteur fixe, favoris, « voir en grand » avec

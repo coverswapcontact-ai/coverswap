@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { envoyerPhoto, ErreurEspace, famillesDe, MESSAGE_APERCU, motsDe, type Client, type Etat, type Prestations, type PrisePhoto } from "./api";
-import { mettreEnFile, photosEnFile, reduirePhoto, retirerDeLaFile, type PhotoEnFile } from "./file-photos";
+import { COTE_MAX_DOSSIER, reduirePhoto } from "@/lib/simulateur/photo";
+import { mettreEnFile, photosEnFile, retirerDeLaFile, type PhotoEnFile } from "./file-photos";
 import { CuisineDeFace, IconeAppareil, IconeCoche, IconeGalerie } from "./Illustrations";
 import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 
@@ -116,7 +117,7 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
       const cle = `${Date.now()}-${i}-${Math.random().toString(36).slice(2, 7)}`;
       const apercuUrl = URL.createObjectURL(fichier);
       setEnvois((e) => [...e, { cle, apercu: apercuUrl, part: 0, etat: "attente" }]);
-      const { blob, nom } = await reduirePhoto(fichier);
+      const { blob, nom } = await reduirePhoto(fichier, { coteMax: COTE_MAX_DOSSIER });
       const enFile: PhotoEnFile = { cle, jeton: cleFile, blob, nom, ajouteeLe: Date.now() + i };
       await mettreEnFile(enFile);
     }

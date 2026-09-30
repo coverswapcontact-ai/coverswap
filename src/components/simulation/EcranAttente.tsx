@@ -6,7 +6,7 @@ import { Bouton } from "./Bouton";
 
 /**
  * Écran d'attente d'une simulation (mission 15, partie 1 ; jetons du thème
- * clair en partie 4) — partagé avec l'espace client (partie 6) : la photo en
+ * clair en partie 4) — partagé avec l'espace client depuis la partie 5 : la photo en
  * grand, assombrie, une lueur lente qui la parcourt ; les films choisis ;
  * trois étapes nommées, cochées d'après l'étape du travail ; « Lecture de
  * votre photo » complétée par l'analyse quand elle est connue ; un temps
@@ -37,6 +37,8 @@ type Props = {
   onPrevenir?: (demande: DemandePrevenir) => Promise<{ ok: boolean; message?: string }>;
   /** Ce que l'analyse a lu sur la photo (zones vues), sous « Lecture de votre photo ». */
   lecturePhoto?: string | null;
+  /** La phrase « vous pouvez quitter » : celle du site à défaut ; l'espace client dit où revenir. */
+  phraseQuitter?: string;
   /** Contenu montré sous l'échec : la demande « simulation à la main ». */
   children?: ReactNode;
 };
@@ -105,7 +107,9 @@ function FormulairePrevenir({ onPrevenir }: { onPrevenir: NonNullable<Props["onP
   );
 }
 
-export default function EcranAttente({ photo, films, statut, etape, attenteEstimeeS, horsLigne, echec, peutReessayer, attenteReessai, onReessayer, onPrevenir, lecturePhoto, children }: Props) {
+export const PHRASE_QUITTER_SITE = "Vous pouvez quitter cette page : votre simulation continue. Revenez sur le simulateur pour la retrouver.";
+
+export default function EcranAttente({ photo, films, statut, etape, attenteEstimeeS, horsLigne, echec, peutReessayer, attenteReessai, onReessayer, onPrevenir, lecturePhoto, phraseQuitter = PHRASE_QUITTER_SITE, children }: Props) {
   const cochees = etapesCochees(etape, statut);
   const enEchec = statut === "ECHEC" && echec;
   return (
@@ -185,9 +189,7 @@ export default function EcranAttente({ photo, films, statut, etape, attenteEstim
                 );
               })}
             </ol>
-            <p className="rounded-[var(--rayon-sm)] border border-trait bg-white px-3.5 py-3 text-[15px] leading-relaxed text-encre">
-              Vous pouvez quitter cette page : votre simulation continue. Revenez sur le simulateur pour la retrouver.
-            </p>
+            <p className="rounded-[var(--rayon-sm)] border border-trait bg-white px-3.5 py-3 text-[15px] leading-relaxed text-encre">{phraseQuitter}</p>
             {onPrevenir ? <FormulairePrevenir onPrevenir={onPrevenir} /> : null}
           </>
         )}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Bouton } from "@/components/simulation/Bouton";
+import { fichierDuRendu, telechargerFichier } from "@/components/simulation/fichiers";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { urlVignette } from "@/lib/simulateur/generation-client";
 import type { RenduSimulateur } from "@/lib/simulateur/reprise";
@@ -31,28 +32,6 @@ function precharger(url: string): Promise<Dimensions | null> {
     image.onerror = () => resoudre(null);
     image.src = url;
   });
-}
-
-/** Le rendu en fichier : téléchargé, ou partagé (Web Share API avec le fichier), avec repli sur le téléchargement. */
-async function fichierDuRendu(url: string, nom: string): Promise<File | null> {
-  try {
-    const reponse = await fetch(url, { cache: "force-cache" });
-    if (!reponse.ok) return null;
-    const blob = await reponse.blob();
-    return new File([blob], nom, { type: blob.type || "image/jpeg" });
-  } catch {
-    return null;
-  }
-}
-
-function telechargerFichier(fichier: File) {
-  const lien = document.createElement("a");
-  lien.href = URL.createObjectURL(fichier);
-  lien.download = fichier.name;
-  document.body.appendChild(lien);
-  lien.click();
-  lien.remove();
-  window.setTimeout(() => URL.revokeObjectURL(lien.href), 10_000);
 }
 
 type Props = {

@@ -58,31 +58,4 @@ export async function retirerDeLaFile(cle: string): Promise<void> {
   memoire = memoire.filter((p) => p.cle !== cle);
 }
 
-/**
- * Réduit une photo avant l'envoi : 2 000 px de côté au plus, JPEG, environ dix
- * fois moins lourd — passe en 4G faible. Une photo que le navigateur ne sait
- * pas lire (HEIC hors d'un iPhone) part telle quelle : le serveur l'accepte.
- */
-export async function reduirePhoto(fichier: File): Promise<{ blob: Blob; nom: string }> {
-  const nomSansExtension = (fichier.name || "photo").replace(/\.[^.]+$/, "");
-  const heic = /\.(heic|heif)$/i.test(fichier.name) || /hei[cf]/i.test(fichier.type);
-  try {
-    const image = await createImageBitmap(fichier);
-    const echelle = Math.min(1, 2000 / Math.max(image.width, image.height));
-    if (echelle === 1 && fichier.size < 1_200_000 && fichier.type === "image/jpeg") {
-      image.close();
-      return { blob: fichier, nom: fichier.name || `${nomSansExtension}.jpg` };
-    }
-    const toile = document.createElement("canvas");
-    toile.width = Math.round(image.width * echelle);
-    toile.height = Math.round(image.height * echelle);
-    toile.getContext("2d")?.drawImage(image, 0, 0, toile.width, toile.height);
-    image.close();
-    const blob = await new Promise<Blob | null>((ok) => toile.toBlob(ok, "image/jpeg", 0.84));
-    if (blob && blob.size < fichier.size) return { blob, nom: `${nomSansExtension}.jpg` };
-  } catch {
-    // illisible ici : elle part telle quelle
-  }
-  const type = fichier.type || (heic ? "image/heic" : "image/jpeg");
-  return { blob: fichier.type ? fichier : new Blob([fichier], { type }), nom: fichier.name || `${nomSansExtension}.${heic ? "heic" : "jpg"}` };
-}
+// Mission 15 (partie 5) : la réduction de la photo vit dans `@/lib/simulateur/photo` (`reduirePhoto`), commune au site et à l'espace.

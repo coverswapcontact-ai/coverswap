@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { dateCourte, ErreurEspace, euros, MESSAGE_APERCU, type Client, type Compte, type Etat, type IdFamille, type MessageClient, type ProjetCarte, type Reponse } from "./api";
-import { CatalogueTeintes, vignette } from "./CatalogueTeintes";
-import { AvantApres } from "./AvantApres";
+import { AvantApres } from "@/components/simulation/AvantApres";
+import { FeuilleCatalogue } from "@/components/simulation/FeuilleCatalogue";
+import { dateCourte, echantillon, ErreurEspace, euros, MESSAGE_APERCU, vignette, type Client, type Compte, type Etat, type IdFamille, type MessageClient, type ProjetCarte, type Reponse } from "./api";
 import { DessinFamille, IconeCoeur, IconeDevis, IconePlus, IconeTelephone } from "./Illustrations";
 import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx, FOCUS } from "./ui";
 
@@ -425,7 +425,8 @@ export function CataloguePage({ compte, client, favoris, onFavori }: { compte: C
           <p className="mt-2 text-[15.5px] leading-relaxed text-[#5F5A53]">Pas encore de favori. Ouvrez le catalogue et touchez le cœur d&apos;une teinte.</p>
         )}
       </Carte>
-      <CatalogueTeintes ouvert={ouvert} onFermer={() => setOuvert(false)} zone="" consultation choisie={null} favoris={favoris} onFavori={onFavori} client={client} onChoisir={() => setOuvert(false)} />
+      {/* Mission 15 (partie 5) : le catalogue commun au site et à l'espace, en consultation (favoris seulement). */}
+      <FeuilleCatalogue ouverte={ouvert} onFermer={() => setOuvert(false)} zone={{ id: "", libelle: "" }} consultation choisie={null} favoris={favoris} onFavori={onFavori} urlVignette={(ref) => vignette(client, ref)} urlEchantillon={(ref) => echantillon(client, ref)} onChoisir={() => setOuvert(false)} />
       <span className="sr-only">{compte.prenom}</span>
     </div>
   );

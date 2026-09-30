@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { ECRANS, type Ecran } from "@/lib/simulateur/ecrans";
+import { ECRANS } from "@/lib/simulateur/ecrans";
 
 /**
  * Le fil « Pièce · Photo · Matières · Résultat » (mission 15, partie 4) : l'étape
@@ -10,14 +10,17 @@ import { ECRANS, type Ecran } from "@/lib/simulateur/ecrans";
  * génération, le fil DIT pourquoi rien ne bouge : la raison est écrite sous le
  * fil (lisible au toucher et par un lecteur d'écran, pas seulement un
  * `title`) et rattachée aux étapes verrouillées. Hauteur fixe : il ne fait
- * jamais sauter la page.
+ * jamais sauter la page. Mission 15 (partie 5) : les étapes s'injectent —
+ * l'espace client n'en a que trois (le rendu arrive dans « Mes simulations »).
  */
-export function FilEtapes({ courant, atteignable, onAller, verrou }: { courant: Ecran; atteignable: (e: Ecran) => boolean; onAller: (e: Ecran) => void; verrou?: string | null }) {
+export type EtapeFil<E extends number = number> = { numero: E; libelle: string };
+
+export function FilEtapes<E extends number>({ courant, atteignable, onAller, verrou, etapes = ECRANS as unknown as readonly EtapeFil<E>[] }: { courant: E; atteignable: (e: E) => boolean; onAller: (e: E) => void; verrou?: string | null; etapes?: readonly EtapeFil<E>[] }) {
   const idVerrou = useId();
   return (
     <nav aria-label="Étapes de la simulation" className="min-h-[64px]">
       <ol className="flex flex-wrap items-center gap-x-1 gap-y-1 text-[14px]">
-        {ECRANS.map((e, i) => {
+        {etapes.map((e, i) => {
           const courante = e.numero === courant;
           const faite = e.numero < courant;
           const cliquable = !courante && atteignable(e.numero);

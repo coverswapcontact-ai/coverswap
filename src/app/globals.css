@@ -227,7 +227,7 @@ html.js .reveal-scale:not(.revealed) { transform: scale(0.96); }
 
 /* ═══════════════════════════════════════════════════════════
    SIMULATEUR ET ESPACE — thème clair « éditorial » (mission 15)
-   Posé sur /simulateur (et sur /e/[jeton] en partie 6) : fond blanc cassé,
+   Posé sur /simulateur et sur l'onglet Simulations de /e/[jeton] : fond blanc cassé,
    encre noire douce, formulaires en clair, sélection et focus dans l'encre.
 ═══════════════════════════════════════════════════════════ */
 [data-theme="simulation"] {

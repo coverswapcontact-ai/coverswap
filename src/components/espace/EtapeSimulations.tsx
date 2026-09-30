@@ -2,12 +2,18 @@
 
 import { RappelCoordonnees } from "./Coordonnees";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { dateCourte, ErreurEspace, type Client, type Etat, type SimulationClient } from "./api";
-import { AvantApres } from "./AvantApres";
-import { vignette } from "./CatalogueTeintes";
+import { FonduRendu } from "@/components/simulation/FonduRendu";
+import EcranAttente from "@/components/simulation/EcranAttente";
+import { fichierDuRendu, partagerOuTelecharger, telechargerFichier } from "@/components/simulation/fichiers";
+import { filmsChoisis, statutAttente } from "@/lib/espace/creation";
+import { DELAI_RENDU } from "@/lib/offre";
+import { ATTENTE_PAR_DEFAUT_S } from "@/lib/simulateur/reprise";
+import { dateCourte, ErreurEspace, vignette, type Client, type Etat, type SimulationClient, type SimulationEnCours, type ZoneTeinte } from "./api";
 import { CreationSimulation } from "./CreationSimulation";
 import { IconePlus } from "./Illustrations";
+import { cleFavoris, cleSuivi, cleZone, ecrireLocal, lireLocal, nommer, ORIGINE } from "./simulations-outils";
 import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Feuille, FOCUS, Surtitre, cx } from "./ui";
+import { useSuiviCreation } from "./useSuiviCreation";
 
 /**
  * Onglet Simulations, en deux sous-onglets :
@@ -21,44 +27,16 @@ import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, En
  *  - « Créer une simulation » : le simulateur, qui repart toujours de zéro
  *    (CreationSimulation). Une fois lancée, il est ramené dans « Mes
  *    simulations », où elle arrive.
+ * Mission 15 (partie 5) : même écran d'attente que le site (`EcranAttente`,
+ * sondage toutes les 3 s par `useSuiviCreation`), même curseur avant / après
+ * (avec « Comparer », le plein écran, « Télécharger »), « Essayer d'autres
+ * matières » ; une simulation gardée en relecture par CoverSwap est dite.
  */
 
 type Vue = "accueil" | "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres" | "coordonnees";
 type Option = { simulationId: string; nom: string; ref: string; nomTeinte: string; libelle: string };
 
-const cleZone = (z: { zone: string; libelle: string }) => z.zone || z.libelle;
-const ORIGINE: Record<SimulationClient["source"], string> = { SITE: "Sur le site", CLIENT: "Par vous", CRM: "Par CoverSwap" };
-
-/** Des noms que le client reconnaît : « Essai sur le site », « Votre simulation 2 », « Proposition 1 ». */
-function nommer(sims: SimulationClient[]): Map<string, string> {
-  const rangs = { CLIENT: 0, CRM: 0, SITE: 0 };
-  const noms = new Map<string, string>();
-  const plusieursEssais = sims.filter((s) => s.source === "SITE").length > 1;
-  for (const s of [...sims].sort((a, b) => a.le.localeCompare(b.le))) {
-    if (s.source === "SITE") noms.set(s.id, plusieursEssais ? `Essai sur le site ${++rangs.SITE}` : "Essai sur le site");
-    else if (s.source === "CLIENT") noms.set(s.id, `Votre simulation ${++rangs.CLIENT}`);
-    else noms.set(s.id, `Proposition ${++rangs.CRM}`);
-  }
-  return noms;
-}
-
-const cleSuivi = (jeton: string) => `espace-suivi:${jeton.split("-")[0]}`;
-const cleFavoris = (jeton: string) => `espace-favoris:${jeton.split("-")[0]}`;
-function lireLocal<T>(cle: string, defaut: T): T {
-  try {
-    const brut = localStorage.getItem(cle);
-    return brut ? (JSON.parse(brut) as T) : defaut;
-  } catch {
-    return defaut;
-  }
-}
-function ecrireLocal(cle: string, valeur: unknown) {
-  try {
-    localStorage.setItem(cle, JSON.stringify(valeur));
-  } catch {
-    // stockage indisponible
-  }
-}
+const PHRASE_QUITTER_ESPACE = "Vous pouvez quitter cette page : votre simulation continue. Elle vous attendra ici, dans « Mes simulations ».";
 
 export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller }: { etat: Etat; client: Client; jeton: string; onEtat: (etat: Etat) => void; recharger: () => Promise<Etat | null>; aller: (vue: Vue) => void }) {
   const apercu = Boolean(client.apercu);
@@ -69,6 +47,8 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   const noms = useMemo(() => nommer(sims), [sims]);
   const triees = useMemo(() => [...sims].sort((a, b) => b.le.localeCompare(a.le)), [sims]);
   const [ouverte, setOuverte] = useState<string | null>(null);
+  // Le rendu qui vient d'arriver : la photo avant se fond dans l'après à l'ouverture (une fois).
+  const [arrivee, setArrivee] = useState<string | null>(null);
   // Sans simulation encore : on arrive sur « Créer ». Sinon sur sa galerie.
   const [sousOnglet, setSousOnglet] = useState<"mes" | "creer">(() => (sims.length === 0 && (creation?.enCours.length ?? 0) === 0 ? "creer" : "mes"));
   // Le simulateur repart de zéro à chaque passage : remonté (clé) à chaque ouverture du sous-onglet.
@@ -77,6 +57,9 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   const [message, setMessage] = useState<{ ton: "succes" | "erreur" | "info"; texte: string } | null>(null);
   const [erreurVue, setErreurVue] = useState<string | null>(null);
   const [demande, setDemande] = useState<string | null>(null);
+  // « Essayer d'autres matières » : la création repart de ces zones (pièce et teintes), la photo se choisit de nouveau.
+  const [depart, setDepart] = useState<ZoneTeinte[] | null>(null);
+  const [partage, setPartage] = useState<"" | "envoi" | "erreur">("");
 
   /* ── Favoris : gardés dans le téléphone et chez CoverSwap ─────────── */
   const [favoris, setFavoris] = useState<string[]>(() => [...new Set([...(etat.favoris ?? []), ...lireLocal<string[]>(cleFavoris(jeton), [])])]);
@@ -97,13 +80,14 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   );
 
   /* ── Suivi des simulations en préparation ─────────────────────────── */
-  const [suivies, setSuivies] = useState<{ id: string; le: string }[]>(() => {
-    const locales = lireLocal<{ id: string; le: string }[]>(cleSuivi(cleProjet), []);
+  // Ce que le serveur sait (photo, teintes : l'écran d'attente les montre, même sur un autre appareil) + ce que ce téléphone a lancé.
+  const [suivies, setSuivies] = useState<SimulationEnCours[]>(() => {
+    const locales = lireLocal<SimulationEnCours[]>(cleSuivi(cleProjet), []);
     const serveur = creation?.enCours ?? [];
     return [...serveur, ...locales.filter((l) => !serveur.some((s) => s.id === l.id))];
   });
-  const [horsLigne, setHorsLigne] = useState(false);
-  const [maintenant, setMaintenant] = useState(() => Date.now());
+  const [attenteLancee, setAttenteLancee] = useState<number | null>(null);
+  const [relecture, setRelecture] = useState<string | null>(null);
   useEffect(() => ecrireLocal(cleSuivi(cleProjet), suivies), [cleProjet, suivies]);
   // Une simulation lancée ailleurs (autre onglet, autre visite) : suivie ici aussi.
   const enCoursServeur = creation?.enCours;
@@ -120,45 +104,41 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
     return () => window.clearTimeout(t);
   }, [enCoursServeur]);
 
-  useEffect(() => {
-    if (suivies.length === 0) return;
-    let actif = true;
-    const verifier = async () => {
-      for (const suivie of suivies) {
-        try {
-          const suivi = await client.appeler<{ statut: "EN_COURS" | "PRETE" | "ECHEC"; simulationId: string | null; message: string | null; raison: string | null }>(`/simulations/creation/${suivie.id}`);
-          if (!actif) return;
-          setHorsLigne(false);
-          if (suivi.statut === "EN_COURS") continue;
-          setSuivies((avant) => avant.filter((s) => s.id !== suivie.id));
-          if (suivi.statut === "PRETE") {
-            await recharger();
-            setMessage({ ton: "succes", texte: "Votre simulation est prête. La voici !" });
-            setSousOnglet("mes");
-            if (suivi.simulationId) setOuverte(suivi.simulationId);
-          } else {
-            setMessage({ ton: "erreur", texte: suivi.message ?? "Cette simulation n'a pas abouti. Elle ne compte pas\u00a0: vous pouvez la relancer." });
-            void recharger();
-          }
-        } catch (erreur) {
-          if (!actif) return;
-          if (erreur instanceof ErreurEspace && erreur.status === 404) setSuivies((avant) => avant.filter((s) => s.id !== suivie.id));
-          else if (erreur instanceof ErreurEspace && erreur.passager) setHorsLigne(true);
+  // Une seule simulation suivie à la fois (la plus ancienne) : un seul sondage par espace.
+  const suivie = suivies[0] ?? null;
+  const oublier = useCallback((id: string) => setSuivies((avant) => avant.filter((s) => s.id !== id)), []);
+  const suivi = useSuiviCreation(client, suivie, {
+    onPrete: (id, simulationId) => {
+      oublier(id);
+      void recharger().then(() => {
+        setMessage({ ton: "succes", texte: "Votre simulation est prête. La voici !" });
+        setSousOnglet("mes");
+        if (simulationId) {
+          setArrivee(simulationId);
+          setOuverte(simulationId);
         }
-      }
-    };
-    void verifier();
-    const minuterie = window.setInterval(() => void verifier(), 4000);
-    const horloge = window.setInterval(() => setMaintenant(Date.now()), 1000);
-    const surRetour = () => void verifier();
-    window.addEventListener("online", surRetour);
-    return () => {
-      actif = false;
-      window.clearInterval(minuterie);
-      window.clearInterval(horloge);
-      window.removeEventListener("online", surRetour);
-    };
-  }, [suivies, client, recharger]);
+      });
+    },
+    onRelecture: (id, _simulationId, texte) => {
+      oublier(id);
+      setRelecture(texte);
+      void recharger();
+    },
+    onEchec: (id, _raison, texte) => {
+      oublier(id);
+      setMessage({ ton: "erreur", texte });
+      void recharger();
+    },
+    onOubliee: oublier,
+  });
+  // Publiée par CoverSwap (état relu, plus rien en relecture) : le mot « relecture » gardé ici s'efface — dérivé au rendu, sans effet.
+  const relecturesServeur = creation?.enRelecture;
+  const [relecturesVues, setRelecturesVues] = useState(relecturesServeur);
+  if (relecturesVues !== relecturesServeur) {
+    setRelecturesVues(relecturesServeur);
+    if (relecturesServeur && relecturesServeur.length === 0 && relecture !== null) setRelecture(null);
+  }
+  const enRelecture = (relecturesServeur?.length ?? 0) > 0 || relecture !== null;
 
   // Il a regardé : ses simulations ne sont plus « nouvelles » (et CoverSwap sait lesquelles ont été vues).
   useEffect(() => {
@@ -214,15 +194,27 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
       ? "Votre devis est prêt, sur la base de la simulation validée."
       : "Simulation validée\u00a0: CoverSwap prépare votre devis. Vous pouvez encore changer d'avis."
     : sims.length === 0
-      ? "Choisissez vos teintes\u00a0: CoverSwap les applique sur la photo de votre pièce, en une minute environ."
+      ? `Choisissez vos matières : CoverSwap les applique sur la photo de votre pièce, en ${DELAI_RENDU}.`
       : "Touchez une simulation pour la voir en grand, avant et après. Validez celle qui vous plaît\u00a0: votre devis suivra.";
 
-  const ouvrirCreation = () => {
+  const ouvrirCreation = (depuis: ZoneTeinte[] | null = null) => {
     setMessage(null);
+    setDepart(depuis);
     setPassage((n) => n + 1);
     setSousOnglet("creer");
+    setOuverte(null);
     window.scrollTo({ top: 0 });
   };
+
+  /** Le rendu en fichier : téléchargé, ou partagé quand le téléphone le permet. */
+  async function telecharger(s: SimulationClient, nom: string, partager: boolean) {
+    setPartage("envoi");
+    const fichier = await fichierDuRendu(client.url(`/simulations/${s.id}`), `coverswap-${nom.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.jpg`);
+    if (!fichier) return setPartage("erreur");
+    if (partager) await partagerOuTelecharger(fichier, { title: "Ma simulation CoverSwap", text: `${nom}, avec CoverSwap.` });
+    else telechargerFichier(fichier);
+    setPartage("");
+  }
 
   /** Il revient sur sa validation : l'onglet Devis se referme, CoverSwap le sait. */
   async function annulerValidation() {
@@ -288,7 +280,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   const bloc =
     creation && creation.disponible && suivies.length === 0 ? (
       <div className="space-y-2">
-        <BoutonSecondaire onClick={ouvrirCreation}>
+        <BoutonSecondaire onClick={() => ouvrirCreation()}>
           <IconePlus /> {creation.restantes > 0 ? "Créer une autre simulation" : "Demander d'autres simulations"}
         </BoutonSecondaire>
         <p className="text-center text-[14px] text-[#5F5A53]">
@@ -321,8 +313,8 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
 
   if (sousOnglet === "creer") {
     return (
-      <div className="space-y-5">
-        <EnteteEtape titre="Créer une simulation" phrase="Votre photo, vos teintes : CoverSwap les applique sur votre pièce, en une minute environ." />
+      <div className="space-y-5" data-theme="simulation">
+        <EnteteEtape titre="Créer une simulation" phrase="Votre photo, vos matières : CoverSwap les applique sur votre pièce, avec le même moteur que sur coverswap.fr." />
         {sousOnglets}
         {suivies.length > 0 ? (
           <Annonce>Une simulation est déjà en préparation&nbsp;: elle arrive dans «&nbsp;Mes simulations&nbsp;». Attendez-la avant d&apos;en lancer une autre.</Annonce>
@@ -337,8 +329,11 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             onFavori={basculerFavori}
             onDemanderPlus={() => void demanderPlus()}
             demandeEnCours={occupe === "demande"}
-            onLancee={(id) => {
-              setSuivies((avant) => [...avant.filter((s) => s.id !== id), { id, le: new Date().toISOString() }]);
+            depart={depart}
+            onLancee={({ preparationId, photoId, zones, attenteEstimeeS }) => {
+              setSuivies((avant) => [...avant.filter((s) => s.id !== preparationId), { id: preparationId, le: new Date().toISOString(), photoId, zones }]);
+              setAttenteLancee(attenteEstimeeS);
+              setRelecture(null);
               setMessage(null);
               setSousOnglet("mes");
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -351,33 +346,29 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-theme="simulation">
       <EnteteEtape titre="Mes simulations" phrase={phrase} />
       {sousOnglets}
       {message ? <Annonce ton={message.ton}>{message.texte}</Annonce> : null}
       {/* Simulation validée : le devis se prépare, c'est le moment de vérifier ses coordonnées (jamais exigé). */}
       {etat.choix && !etat.devis ? <RappelCoordonnees etat={etat} moment="simulation" onOuvrir={() => aller("coordonnees")} /> : null}
 
-      {suivies.length > 0 ? (
-        <Carte className="space-y-3 border-[#1A1A1A]/15">
-          <div className="flex items-center gap-2">
-            <span aria-hidden className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#CC0000] motion-reduce:animate-none" />
-            <Surtitre ton="rouge">En préparation</Surtitre>
-          </div>
-          <p className="font-display text-[21px] leading-snug font-semibold text-[#1A1A1A]">{suivies.length > 1 ? `${suivies.length} simulations en préparation` : "Votre simulation est en préparation"}</p>
-          <div className="h-2 overflow-hidden rounded-full bg-[#ECEAE5]" role="progressbar" aria-label="Préparation de la simulation" aria-valuetext="En cours">
-            <div
-              className="h-full rounded-full bg-[#CC0000] transition-[width] duration-1000 ease-linear"
-              style={{ width: `${Math.min(92, 8 + ((maintenant - new Date(suivies[0].le).getTime()) / 1000 / 75) * 84)}%` }}
-            />
-          </div>
-          <p className="text-[15px] leading-relaxed text-[#4F4A44]">
-            {horsLigne
-              ? "Pas de réseau\u00a0: votre simulation continue chez CoverSwap. Elle apparaîtra ici dès le retour du réseau."
-              : "Une minute environ. Vous pouvez quitter cette page\u00a0: elle vous attendra ici."}
-          </p>
-        </Carte>
+      {/* L'écran d'attente du site : la photo, les films, les étapes, l'attente en mots ; on peut quitter, elle attendra ici. */}
+      {suivie ? (
+        <EcranAttente
+          photo={suivie.photoId ? client.url(`/photos/${suivie.photoId}`) : null}
+          films={filmsChoisis(suivie.zones ?? [], (ref) => vignette(client, ref))}
+          statut={statutAttente(suivi)}
+          etape={suivi?.etape ?? null}
+          attenteEstimeeS={suivi?.attenteEstimeeS ?? attenteLancee ?? ATTENTE_PAR_DEFAUT_S}
+          horsLigne={suivi?.horsLigne ?? false}
+          echec={null}
+          peutReessayer={false}
+          onReessayer={() => undefined}
+          phraseQuitter={PHRASE_QUITTER_ESPACE}
+        />
       ) : null}
+      {enRelecture ? <Annonce>{relecture ?? "Votre simulation demande une relecture : vous la recevrez dès qu'elle est prête."}</Annonce> : null}
 
       {triees.length > 0 ? (
         <ul className={cx("grid gap-3", triees.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
@@ -402,12 +393,12 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             );
           })}
         </ul>
-      ) : suivies.length === 0 && (etat.simulationsEnPreparation || etat.propositionDemandeeLe) ? (
+      ) : suivies.length === 0 && !enRelecture && (etat.simulationsEnPreparation || etat.propositionDemandeeLe) ? (
         <Annonce>CoverSwap prépare une proposition pour vous&nbsp;: elle apparaîtra ici, et vous serez prévenu par e-mail.</Annonce>
       ) : suivies.length === 0 ? (
         <Carte className="space-y-3 text-center">
           <p className="text-[17px] leading-relaxed text-[#1A1A1A]">Vous n&apos;avez pas encore de simulation.</p>
-          <BoutonPrincipal onClick={ouvrirCreation}>
+          <BoutonPrincipal onClick={() => ouvrirCreation()}>
             <IconePlus /> Créer ma simulation
           </BoutonPrincipal>
         </Carte>
@@ -550,8 +541,22 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
         {simOuverte ? (
           <div className="space-y-4 pt-1">
             {erreurVue ? <Annonce ton="erreur">{erreurVue}</Annonce> : null}
-            <AvantApres apres={client.url(`/simulations/${simOuverte.id}`)} avant={simOuverte.avant ? client.url(`/simulations/${simOuverte.id}/avant`) : null} alt={noms.get(simOuverte.id) ?? "Simulation"} />
+            <FonduRendu cle={simOuverte.id} actif={arrivee === simOuverte.id} apres={client.url(`/simulations/${simOuverte.id}`)} avant={simOuverte.avant ? client.url(`/simulations/${simOuverte.id}/avant`) : null} alt={noms.get(simOuverte.id) ?? "Simulation"} />
             {simOuverte.avant ? <p className="-mt-2 text-center text-[14px] text-[#5F5A53]">Glissez sur l&apos;image pour comparer avant et après.</p> : null}
+            <div className="flex flex-wrap gap-2">
+              <BoutonSecondaire className="w-auto flex-1" disabled={partage === "envoi"} onClick={() => void telecharger(simOuverte, noms.get(simOuverte.id) ?? "simulation", false)}>
+                {partage === "envoi" ? "Préparation…" : "Télécharger"}
+              </BoutonSecondaire>
+              <BoutonSecondaire className="w-auto flex-1" disabled={partage === "envoi"} onClick={() => void telecharger(simOuverte, noms.get(simOuverte.id) ?? "simulation", true)}>
+                Partager
+              </BoutonSecondaire>
+              {creation && creation.disponible && creation.restantes > 0 && suivies.length === 0 ? (
+                <BoutonSecondaire className="w-auto flex-1" onClick={() => ouvrirCreation(simOuverte.zones)}>
+                  Essayer d&apos;autres matières
+                </BoutonSecondaire>
+              ) : null}
+            </div>
+            {partage === "erreur" ? <Annonce ton="erreur">Le rendu n&apos;a pas pu être récupéré : réessayez dans un instant.</Annonce> : null}
             {simOuverte.zones.length > 0 ? (
               <ul className="divide-y divide-[#EEEBE6] rounded-2xl border border-[#E6E3DD] bg-white">
                 {simOuverte.zones.map((z) => (

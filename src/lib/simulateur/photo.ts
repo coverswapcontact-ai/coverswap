@@ -95,6 +95,45 @@ export async function preparerPhoto(file: File): Promise<PhotoPreparee | PhotoAC
   return { dataUrl, largeur, hauteur, poidsKo: poidsKoDe(dataUrl) };
 }
 
+/**
+ * Mission 15 (partie 5) — la même réduction, en FICHIER, pour l'espace client
+ * (la photo part au CRM en multipart, `POST /photos`) : même décodage avec
+ * l'orientation EXIF, même réduction (2 000 px pour une photo de dossier, que
+ * Lucas réutilise à pleine résolution), JPEG. Un JPEG déjà petit part tel
+ * quel ; une photo que le navigateur ne sait pas lire (HEIC hors iPhone) part
+ * telle quelle aussi : le CRM l'accepte. Fusion de l'ancien `reduirePhoto` de
+ * `espace/file-photos.ts` (qui doublait `preparerPhoto`).
+ */
+export const COTE_MAX_DOSSIER = 2000;
+
+export async function reduirePhoto(fichier: File, options: { coteMax?: number; qualite?: number } = {}): Promise<{ blob: Blob; nom: string }> {
+  const coteMax = options.coteMax ?? COTE_MAX;
+  const qualite = options.qualite ?? QUALITE_JPEG;
+  const nomSansExtension = (fichier.name || "photo").replace(/\.[^.]+$/, "");
+  const heic = estHeic(fichier);
+  try {
+    const source = await decoder(fichier);
+    const largeurSource = "naturalWidth" in source ? source.naturalWidth : source.width;
+    const hauteurSource = "naturalHeight" in source ? source.naturalHeight : source.height;
+    if (Math.max(largeurSource, hauteurSource) <= coteMax && fichier.size < 1_200_000 && fichier.type === "image/jpeg") {
+      if ("close" in source) source.close();
+      return { blob: fichier, nom: fichier.name || `${nomSansExtension}.jpg` };
+    }
+    const { largeur, hauteur } = dimensionsReduites(largeurSource, hauteurSource, coteMax);
+    const canvas = document.createElement("canvas");
+    canvas.width = largeur;
+    canvas.height = hauteur;
+    canvas.getContext("2d")?.drawImage(source, 0, 0, largeur, hauteur);
+    if ("close" in source) source.close();
+    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, "image/jpeg", qualite));
+    if (blob && blob.size < fichier.size) return { blob, nom: `${nomSansExtension}.jpg` };
+  } catch {
+    // illisible ici : elle part telle quelle
+  }
+  const type = fichier.type || (heic ? "image/heic" : "image/jpeg");
+  return { blob: fichier.type ? fichier : new Blob([fichier], { type }), nom: fichier.name || `${nomSansExtension}.${heic ? "heic" : "jpg"}` };
+}
+
 export function messageErreurPhoto(code: string): string {
   switch (code) {
     case "trop-lourde":
