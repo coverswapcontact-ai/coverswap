@@ -58,8 +58,13 @@ export type EtatSimulateur = {
   photoLargeur: number | null;
   photoHauteur: number | null;
   selections: Record<string, Selection | null>;
-  /** Copié depuis le sessionStorage : il survit à la fermeture de l'onglet. */
+  /**
+   * Copié depuis le sessionStorage : il survit à la fermeture de l'onglet, mais 7 jours au plus après sa naissance
+   * (`parcoursNeLe`, `DUREE_PARCOURS_MS`) — ce n'est pas un identifiant persistant.
+   */
   parcoursId: string | null;
+  /** Mission 17 (partie B) : naissance du parcours (ms), jamais repoussée ; au-delà de 7 jours, la mémoire repart de zéro. */
+  parcoursNeLe: number;
   travailEnCours: TravailEnCours | null;
   /** Historique du parcours, le plus récent en fin de liste. */
   rendus: RenduSimulateur[];
@@ -73,15 +78,46 @@ export type EtatSimulateur = {
   majLe: number;
 };
 
-export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, ville: null, codePostal: null, refDemandee: null, majLe: 0 };
+export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, parcoursNeLe: 0, travailEnCours: null, rendus: [], analyse: null, ville: null, codePostal: null, refDemandee: null, majLe: 0 };
 
 /** Le rapport CSS (`aspect-ratio`) de la photo, quand ses dimensions sont connues. */
 export function rapportPhoto(etat: Pick<EtatSimulateur, "photoLargeur" | "photoHauteur">): string | null {
   return etat.photoLargeur && etat.photoHauteur && etat.photoLargeur > 0 && etat.photoHauteur > 0 ? `${etat.photoLargeur} / ${etat.photoHauteur}` : null;
 }
 
-/** Au-delà, un parcours n'est plus proposé à la reprise (les rendus du CRM sont purgés à 30 jours). */
-export const REPRISE_MAX_MS = 30 * 24 * 60 * 60 * 1000;
+/**
+ * Mission 17 (partie B) : la durée de vie d'un parcours du simulateur sur l'appareil, comptée depuis sa naissance,
+ * JAMAIS prolongée par l'usage.
+ *
+ * Pourquoi un identifiant survit à l'onglet : c'est le service que la personne demande — retrouver sa photo, ses
+ * choix et ses rendus après un rechargement, une page quittée pendant la génération, ou le lien du mail « simulation
+ * prête » ; le CRM sert les rendus et suit le travail par ce parcours (`?p=`). Pourquoi 7 jours : assez pour
+ * reprendre une simulation en cours ou y revenir dans la semaine, trop court pour servir d'identifiant de mesure.
+ * La mesure d'audience n'en a plus besoin (le CRM compte un visiteur du jour, sans rien garder sur l'appareil).
+ * Au-delà : la mémoire entière est effacée (photo, choix, rendus, identifiant — les rendus et l'analyse sont liés
+ * au parcours côté CRM, les garder sous un parcours neuf casserait leurs adresses) et un nouveau parcours commence.
+ */
+export const DUREE_PARCOURS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Au-delà, un parcours n'est plus proposé à la reprise : la durée de vie du parcours (le CRM garde les rendus 30 jours). */
+export const REPRISE_MAX_MS = DUREE_PARCOURS_MS;
+
+/**
+ * Pure : la mémoire lue d'IndexedDB, ou null si son parcours a expiré (plus de 7 jours depuis sa naissance, ou une
+ * naissance dans le futur : horloge changée). Sans naissance connue (mémoire d'avant la mission 17), la dernière
+ * mise à jour en tient lieu.
+ */
+export function memoireDuParcours(etat: EtatSimulateur | null, maintenant: number = Date.now()): EtatSimulateur | null {
+  if (!etat) return null;
+  const age = maintenant - (etat.parcoursNeLe || etat.majLe);
+  return age >= 0 && age <= DUREE_PARCOURS_MS ? etat : null;
+}
+
+/** Pure : la naissance du parcours retenu au montage — celle de la mémoire si c'est le même parcours, sinon maintenant. */
+export function naissanceDuParcours(memoire: Pick<EtatSimulateur, "parcoursId" | "parcoursNeLe" | "majLe"> | null, parcoursId: string, maintenant: number = Date.now()): number {
+  if (memoire && memoire.parcoursId === parcoursId) return memoire.parcoursNeLe || memoire.majLe || maintenant;
+  return maintenant;
+}
 
 const estObjet = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object";
 const texteOuNull = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
@@ -121,7 +157,7 @@ export function migrerEtat(brut: unknown): EtatSimulateur | null {
   const projet = typeof brut.projet === "string" && brut.projet ? brut.projet : "cuisine";
   const majLe = typeof brut.majLe === "number" ? brut.majLe : 0;
   const photo = texteOuNull(brut.photo);
-  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), majLe };
+  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), parcoursNeLe: typeof brut.parcoursNeLe === "number" && brut.parcoursNeLe > 0 ? brut.parcoursNeLe : majLe, travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), majLe };
   if (brut.version === 2) {
     const t = brut.travailEnCours;
     return {

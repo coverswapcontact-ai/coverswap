@@ -61,6 +61,7 @@ const CLIENTS_ADMIS: Record<string, string> = {
   "src/components/HomeClient.tsx": "le module de simulation de l'accueil (SimulationSection)",
   "src/components/MenuMobile.tsx": "le menu du téléphone",
   "src/components/SuiviParcours.tsx": "les pages vues, sans cookie",
+  "src/components/OppositionMesure.tsx": "« Ne pas compter mes visites » : lit et écrit le refus dans le stockage local (mission 17)",
   "src/components/simulation/AvantApres.tsx": "le curseur avant / après",
   "src/components/simulation/PleinEcran.tsx": "le plein écran",
   "src/components/simulation/ZoomImage.tsx": "le zoom du plein écran",
@@ -166,8 +167,28 @@ describe("scripts tiers et cookies : plus rien hors Turnstile", () => {
     assert.doesNotMatch(meta, /—/, "le « — » sépare nom, rôle et lieu dans la liste");
     assert.doesNotMatch(politique, /si votre demande nous vient d(&apos;|')une publicité/);
     assert.match(politique, /Intérêt légitime \(mesure de nos campagnes\)/);
-    // Les pages vues gardées par le CRM ont leur ligne de durée (aucune purge aujourd'hui : dit tel quel).
+    // Les pages vues gardées par le CRM ont leur ligne de durée : 25 mois (mission 17, purge du CRM).
     assert.match(politique, /Pages vues et étapes du simulateur dans notre outil de gestion/);
+  });
+
+  test("mission 17 : la mesure d'audience exemptée est décrite, bornée, et on peut s'y opposer", () => {
+    const politique = lire("src/app/politique-confidentialite/page.tsx");
+    assert.match(politique, /id="mesure-audience"/);
+    assert.match(politique, /Intérêt légitime \(mesure d&apos;audience, exemptée de consentement/);
+    // Ce qui part, ce que le CRM en fait, combien de temps.
+    for (const mot of ["la page", "fuseau horaire", "campagne", "visiteur du jour", "détruite chaque jour", "Votre adresse IP et le détail de votre navigateur ne sont jamais conservés"]) assert.ok(politique.includes(mot), mot);
+    assert.match(politique, /le pays, déduit du\s+fuseau horaire, sans géolocalisation/);
+    assert.match(politique, /\(page, provenance, visiteur du jour, type d&apos;appareil, pays\) :\s+25 mois, puis supprimées/);
+    assert.doesNotMatch(politique, /sans durée\s+maximale/, "plus de conservation illimitée");
+    assert.doesNotMatch(politique, /identifiant de visite tiré au hasard/, "plus d'identifiant de mesure sur l'appareil");
+    // Le parcours du simulateur n'est plus persistant : 7 jours au plus, jamais prolongés.
+    assert.match(politique, /7 jours au plus/);
+    // L'opposition : le bouton est sur la page ; il envoie un drapeau lu par envoyerEvenement (evenements-site.test.ts).
+    assert.match(politique, /<OppositionMesure \/>/);
+    assert.match(politique, /Global Privacy Control/);
+    const bouton = lire("src/components/OppositionMesure.tsx");
+    assert.match(bouton, />\s*Ne pas compter mes visites\s*</);
+    assert.match(lire("src/lib/evenements-site.ts"), /if \(mesureRefuseeIci\(\)\) return false;/);
   });
 
   test("les événements du parcours ne partent qu'au CRM ; coupés en intégration continue", () => {

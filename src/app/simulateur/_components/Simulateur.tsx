@@ -19,7 +19,7 @@ import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration,
 import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
 import { lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
 import { getProject } from "@/lib/simulateur/projets";
-import { ATTENTE_PAR_DEFAUT_S, ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
+import { ATTENTE_PAR_DEFAUT_S, ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
 import { composantesDe, pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
 import type { TarifsSite } from "@/lib/tarifs-site";
@@ -104,8 +104,10 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil });
       const parcoursId = (decision.ecran === "attente" && decision.parcoursId) || base.parcoursId || obtenirParcoursId() || crypto.randomUUID();
       adopterParcoursId(parcoursId);
+      // Mission 17 (partie B) : la naissance du parcours ne bouge pas tant que c'est le même (7 jours au plus, `lireEtat`).
+      const parcoursNeLe = naissanceDuParcours(memoire, parcoursId);
       // Mission 16 (partie 4) : `?ref=` (depuis /matieres) — la matière est posée à l'écran des matières (`useMatiereDemandee`).
-      const repris: EtatSimulateur = { ...base, projet: projetInitial, parcoursId, selections: memeProjet ? base.selections : {}, refDemandee: lireRefDemandee(parametres.get("ref")) ?? base.refDemandee };
+      const repris: EtatSimulateur = { ...base, projet: projetInitial, parcoursId, parcoursNeLe, selections: memeProjet ? base.selections : {}, refDemandee: lireRefDemandee(parametres.get("ref")) ?? base.refDemandee };
       if (decision.ecran === "attente") {
         repris.travailEnCours = decision.travail;
         setEcran(3);
@@ -354,7 +356,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   const recommencer = async () => {
     await effacerEtat();
     // Même parcours : la ville et le code postal déjà donnés restent (le formulaire ne les redemande pas).
-    setEtat({ ...ETAT_VIDE, projet: etat.projet, parcoursId: etat.parcoursId, ville: etat.ville, codePostal: etat.codePostal });
+    setEtat({ ...ETAT_VIDE, projet: etat.projet, parcoursId: etat.parcoursId, parcoursNeLe: etat.parcoursNeLe, ville: etat.ville, codePostal: etat.codePostal });
     emetteur.current.reinitialiser();
     estimationVue.current = false;
     setPieceChoisie(false);

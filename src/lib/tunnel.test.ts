@@ -115,7 +115,7 @@ describe("la demande de devis du simulateur", () => {
     assert.match(s, /refDemandee: lireRefDemandee\(parametres\.get\("ref"\)\) \?\? base\.refDemandee/);
     assert.match(s, /if \(estimationVue\.current\) return;\s*estimationVue\.current = true;\s*envoyerEvenement\("ESTIMATION_VUE"/);
     assert.match(s, /estimationVue\.current = false;/, "« Nouvelle simulation » réarme (une fois par simulation)");
-    assert.match(s, /setEtat\(\{ \.\.\.ETAT_VIDE, projet: etat\.projet, parcoursId: etat\.parcoursId, ville: etat\.ville, codePostal: etat\.codePostal \}\)/, "« Nouvelle simulation » garde la ville connue");
+    assert.match(s, /setEtat\(\{ \.\.\.ETAT_VIDE, projet: etat\.projet, parcoursId: etat\.parcoursId, parcoursNeLe: etat\.parcoursNeLe, ville: etat\.ville, codePostal: etat\.codePostal \}\)/, "« Nouvelle simulation » garde la ville connue");
     assert.match(s, /if \(extra\?\.rappelCreneau\) envoyerEvenement\("RAPPEL_DEMANDE"/);
     assert.match(s, /lienEspace: typeof data\.lienEspace === "string"/);
     assert.ok(s.split("\n").length < 600, "Simulateur.tsx sous 600 lignes");

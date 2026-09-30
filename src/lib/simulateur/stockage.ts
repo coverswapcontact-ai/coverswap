@@ -10,8 +10,12 @@
  * `parcoursId` est copié ici (le sessionStorage meurt avec l'onglet) et
  * `travailEnCours` permet de reprendre le sondage au retour. L'ancien état
  * (v1) est converti à la lecture (`migrerEtat`, lib/simulateur/reprise).
+ *
+ * Mission 17 (partie B) : le parcours gardé ici n'est pas un identifiant persistant. Il vit 7 jours au plus depuis
+ * sa naissance (`DUREE_PARCOURS_MS`, jamais prolongé) ; au-delà, `lireEtat` efface la mémoire et rend null : un
+ * nouveau parcours commence. Pourquoi il survit à l'onglet : voir `DUREE_PARCOURS_MS` (le service demandé).
  */
-import { migrerEtat, type EtatSimulateur } from "./reprise";
+import { memoireDuParcours, migrerEtat, type EtatSimulateur } from "./reprise";
 
 export type { EtatSimulateur, RenduSimulateur, TravailEnCours } from "./reprise";
 
@@ -34,14 +38,18 @@ function ouvrir(): Promise<IDBDatabase> {
   });
 }
 
+/** La mémoire du simulateur, ou null (vide, illisible, ou parcours expiré : alors effacée). */
 export async function lireEtat(): Promise<EtatSimulateur | null> {
   try {
     const db = await ouvrir();
-    return await new Promise((resolve) => {
+    const lu = await new Promise<EtatSimulateur | null>((resolve) => {
       const req = db.transaction(MAGASIN, "readonly").objectStore(MAGASIN).get(CLE);
       req.onsuccess = () => resolve(migrerEtat(req.result));
       req.onerror = () => resolve(null);
     });
+    const valide = memoireDuParcours(lu);
+    if (lu && !valide) await effacerEtat();
+    return valide;
   } catch {
     return null;
   }
