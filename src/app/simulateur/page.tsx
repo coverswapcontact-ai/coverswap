@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: `${ENTREPRISE.site}/simulateur` },
 };
 
-/** Mission 15 : la page couvre la zone sûre de l'iPhone (bouton collé en bas, feuilles) ; couleur de la barre = le fond du thème clair. */
-export const viewport: Viewport = { themeColor: "#F5F4F1", width: "device-width", initialScale: 1, viewportFit: "cover" };
+/** Mission 15 : la page couvre la zone sûre de l'iPhone (bouton collé en bas, feuilles). La couleur de la barre vient du gabarit (mission 16 : une seule source). */
+export const viewport: Viewport = { viewportFit: "cover" };
 
 /** Les quatre étapes du HowTo et de « Comment ça marche » ; la limite de zones est celle du CRM. */
 const etapesDe = (zonesMax: number) => [

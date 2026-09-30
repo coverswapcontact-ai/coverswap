@@ -16,7 +16,7 @@ const MISE_A_JOUR = "17 septembre 2026";
 function Article({ numero, titre, children }: { numero: number; titre: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-xl font-bold text-white">
+      <h2 className="titre-2 text-encre">
         Article {numero} — {titre}
       </h2>
       {children}
@@ -26,16 +26,16 @@ function Article({ numero, titre, children }: { numero: number; titre: string; c
 
 export default function CGV() {
   return (
-    <div className="min-h-screen pt-28 pb-20">
-      <div className="container-custom max-w-3xl">
-        <h1 className="font-display text-4xl font-bold mb-2">Conditions générales de vente</h1>
-        <p className="text-sm text-gris-500 mb-10">Dernière mise à jour : {MISE_A_JOUR}</p>
+    <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="titre-1 mb-2 text-encre">Conditions générales de vente</h1>
+        <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>
 
-        <div className="space-y-10 text-gris-300 leading-relaxed">
+        <div className="texte space-y-10 text-encre-2">
           <Article numero={1} titre="Objet et champ d'application">
             <p>
               Les présentes conditions régissent les prestations de rénovation intérieure par pose de revêtements adhésifs (films Cover Styl&apos;)
-              réalisées par <strong className="text-white">{SITE.owner}</strong>, entrepreneur individuel exerçant sous le nom CoverSwap
+              réalisées par <strong className="text-encre">{SITE.owner}</strong>, entrepreneur individuel exerçant sous le nom CoverSwap
               (SIRET {SITE.siret}, {SITE.address}), ci-après « le prestataire », au profit de tout client, particulier ou professionnel. Toute
               commande implique l&apos;acceptation sans réserve de ces conditions, remises avec le devis.
             </p>
@@ -46,7 +46,7 @@ export default function CGV() {
               Tout devis est gratuit et sans engagement. Il est établi à partir des informations, photos et, si nécessaire, de la visite sur
               place, et transmis {DELAI_REPONSE} après réception des éléments. Il détaille les surfaces, les références choisies, la fourniture,
               la pose, les éventuels frais de déplacement et le délai prévisionnel d&apos;intervention. Un devis est valable{" "}
-              <strong className="text-white">30 jours</strong> à compter de sa date d&apos;émission.
+              <strong className="text-encre">30 jours</strong> à compter de sa date d&apos;émission.
             </p>
             <p>
               Les rendus du simulateur en ligne sont des illustrations indicatives ; seuls le devis et les échantillons présentés font foi
@@ -57,7 +57,7 @@ export default function CGV() {
           <Article numero={3} titre="Commande">
             <p>
               La commande est ferme à réception du devis daté et signé « bon pour accord » et du versement de l&apos;acompte de{" "}
-              <strong className="text-white">{ACOMPTE_POURCENT} %</strong> du montant total. Les films sont commandés auprès du fabricant après
+              <strong className="text-encre">{ACOMPTE_POURCENT} %</strong> du montant total. Les films sont commandés auprès du fabricant après
               cet acompte ; toute modification de référence après commande peut entraîner un surcoût et un nouveau délai.
             </p>
           </Article>
@@ -96,7 +96,7 @@ export default function CGV() {
           <Article numero={7} titre="Droit de rétractation (consommateurs)">
             <p>
               Lorsque le devis est signé à distance ou hors établissement (à votre domicile, par exemple), vous disposez d&apos;un délai de{" "}
-              <strong className="text-white">14 jours</strong> à compter de la signature pour vous rétracter sans motif, en nous adressant une
+              <strong className="text-encre">14 jours</strong> à compter de la signature pour vous rétracter sans motif, en nous adressant une
               déclaration dénuée d&apos;ambiguïté (courrier ou e-mail à {SITE.email}) ou le formulaire ci-dessous. L&apos;acompte vous est alors
               remboursé sous 14 jours.
             </p>
@@ -106,8 +106,8 @@ export default function CGV() {
               reste dû. Le droit de rétractation ne s&apos;applique pas aux films découpés sur mesure ni aux travaux entièrement exécutés avec votre
               accord exprès avant la fin du délai (art. L. 221-28 du Code de la consommation).
             </p>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-sm">
-              <p className="font-semibold text-white mb-2">Formulaire de rétractation</p>
+            <div className="bg-white border border-trait rounded-[var(--rayon-md)] p-5 text-sm">
+              <p className="font-semibold text-encre mb-2">Formulaire de rétractation</p>
               <p>
                 À l&apos;attention de CoverSwap — {SITE.owner}, {SITE.address}, {SITE.email} : je vous notifie par la présente ma rétractation
                 du contrat portant sur la prestation ci-dessous. Devis n° … signé le … — Nom : … — Adresse : … — Date : … — Signature (si envoi
@@ -118,7 +118,7 @@ export default function CGV() {
 
           <Article numero={8} titre="Garanties">
             <p>
-              Les films Cover Styl&apos; et leur pose sont garantis <strong className="text-white">{GARANTIE_ANS} ans</strong> contre le
+              Les films Cover Styl&apos; et leur pose sont garantis <strong className="text-encre">{GARANTIE_ANS} ans</strong> contre le
               décollement et la décoloration en usage normal ; certaines références haute température bénéficient d&apos;une garantie fabricant
               étendue à {GARANTIE_ETENDUE_ANS} ans, précisée au devis. Sont exclus : les dommages mécaniques (coupures, chocs, objets brûlants
               posés directement), l&apos;usage de produits abrasifs ou solvants, les défauts du support signalés au devis, et toute intervention
@@ -142,7 +142,7 @@ export default function CGV() {
           <Article numero={10} titre="Données personnelles">
             <p>
               Les données nécessaires au devis et à l&apos;intervention sont traitées comme décrit dans notre{" "}
-              <Link href="/politique-confidentialite" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/politique-confidentialite" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 politique de confidentialité
               </Link>
               . Les photos du chantier ne sont jamais publiées sans votre accord écrit.
@@ -153,7 +153,7 @@ export default function CGV() {
             <p>
               En cas de réclamation, écrivez d&apos;abord à {SITE.email}. Sans réponse satisfaisante sous deux mois, un consommateur peut saisir
               gratuitement le médiateur de la consommation indiqué dans nos{" "}
-              <Link href="/mentions-legales" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/mentions-legales" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 mentions légales
               </Link>
               , ou la plateforme européenne de règlement en ligne des litiges. À défaut d&apos;accord amiable, le litige relève des tribunaux

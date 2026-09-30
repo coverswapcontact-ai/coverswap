@@ -28,12 +28,12 @@ function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions }: { ou
   }, [ouvert, onFermer]);
   if (!ouvert || typeof document === "undefined") return null;
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label="Rendu en plein écran" className="fixed inset-0 z-[80] flex flex-col bg-sombre text-white">
+    <div role="dialog" aria-modal="true" aria-label="Rendu en plein écran" className="fixed inset-0 z-[80] flex flex-col bg-sombre text-blanc">
       <div className="flex shrink-0 items-center justify-between gap-2 px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
         {avant ? (
           <div className="flex rounded-[var(--rayon-sm)] border border-white/25 p-0.5" role="group" aria-label="Avant ou après">
             {(["avant", "apres"] as const).map((v) => (
-              <button key={v} type="button" aria-pressed={montre === v} onClick={() => setMontre(v)} className={`min-h-[44px] rounded-[4px] px-4 text-[14px] font-medium transition-colors duration-[var(--duree-courte)] ${montre === v ? "bg-white text-sombre" : "text-white/80"}`}>
+              <button key={v} type="button" aria-pressed={montre === v} onClick={() => setMontre(v)} className={`min-h-[44px] rounded-[4px] px-4 text-[14px] font-medium transition-colors duration-[var(--duree-courte)] ${montre === v ? "bg-white text-sombre" : "text-blanc/80"}`}>
                 {v === "avant" ? "Avant" : "Après"}
               </button>
             ))}
@@ -43,7 +43,7 @@ function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions }: { ou
         )}
         <div className="flex items-center gap-2">
           {actions}
-          <button type="button" onClick={onFermer} aria-label="Fermer le plein écran" className="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-white transition-colors duration-[var(--duree-courte)] active:bg-white/25">
+          <button type="button" onClick={onFermer} aria-label="Fermer le plein écran" className="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-blanc transition-colors duration-[var(--duree-courte)] active:bg-white/25">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>

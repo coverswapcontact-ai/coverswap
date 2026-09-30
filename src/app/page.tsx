@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { preload } from "react-dom";
-import ScrollReveal from "@/components/ScrollReveal";
-import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection } from "@/components/HomeClient";
 import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
 import Realisations from "@/components/Realisations";
-import { FAQSchema } from "@/components/JsonLd";
+import { CommentCaSePasse, QuestionsFrequentes } from "@/components/SectionsCommentCaMarche";
+import { Lien } from "@/components/simulation/Lien";
+import { Section } from "@/components/simulation/Section";
 import { PRESTATIONS } from "@/data/prestations";
-import { FAQ_GENERALE } from "@/data/faq";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_RENDU, DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MAX, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MAX, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 
 export const revalidate = 300;
 
@@ -35,37 +33,23 @@ const TEMOINS: Record<string, { nom: string; ref: string; image: string }> = {
 };
 const COMPTES = (revetements as { famille: string }[]).reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.famille]: (acc[r.famille] ?? 0) + 1 }), {});
 
-function Hero() {
-  // Poster du hero en priorité haute — seulement sur l'accueil (les autres pages, dont l'espace client, ne le chargent plus).
-  preload("/videos/hero-poster.jpg", { as: "image", fetchPriority: "high" });
+const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white";
+const LIEN_SECTION = "inline-flex min-h-[44px] shrink-0 items-center text-[15px] font-medium text-encre underline underline-offset-4";
+
+/** Ouverture provisoire (mission 16, partie 1) : du texte sur le fond clair, un seul bouton ; la partie 3 pose l'image et le curseur avant / après. */
+function Ouverture() {
   return (
-    <section className="relative min-h-[88vh] md:min-h-screen flex items-center overflow-hidden">
-      <HeroVideo />
-      <div className="container-custom relative z-10 px-4 sm:px-6 lg:px-8 py-28 md:py-32">
-        <p className="text-rouge font-bold text-sm uppercase tracking-widest mb-4">Covering adhésif · Montpellier &amp; France</p>
-        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight mb-6 max-w-4xl text-balance">
-          Transformez votre
-          <br />
-          intérieur en{" "}
-          <span className="relative inline-block">
-            <span className="text-rouge">1 journée</span>
-            <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none" aria-hidden>
-              <path d="M2 10C50 2 100 2 150 6C200 10 250 4 298 8" stroke="#CC0000" strokeWidth="3" strokeLinecap="round" />
-            </svg>
-          </span>
-        </h1>
-        <p className="text-gris-200 text-lg md:text-2xl max-w-2xl leading-relaxed mb-8">
+    <section className="bg-fond-2 px-4 py-[var(--espace-5)] md:px-6">
+      <div className="mx-auto max-w-6xl">
+        <p className="surtitre">Covering adhésif · Montpellier &amp; France</p>
+        <h1 className="titre-1 mt-3 max-w-3xl text-encre">Transformez votre intérieur en 1 journée</h1>
+        <p className="texte mt-4 max-w-2xl text-encre-2">
           Cuisine, salle de bain, meubles, locaux professionnels : un film Cover Styl&apos; posé sur vos surfaces existantes. Une journée de pose, réversible, garanti {GARANTIE_ANS} ans.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <Link href="/simulateur" className="btn-primary">
-            Simuler sur ma photo
-          </Link>
-          <Link href="/devis" className="btn-secondary">
-            Demander un devis
-          </Link>
+        <div className="mt-8">
+          <Lien href="/simulateur?projet=cuisine">Simuler ma cuisine</Lien>
         </div>
-        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gris-300">
+        <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-encre-2">
           <li>Devis gratuit {DELAI_REPONSE}</li>
           <li>{PRIX_PLAGE} fourni et posé, selon la pose</li>
           <li>{NB_REFERENCES} finitions Cover Styl&apos;</li>
@@ -82,66 +66,38 @@ function CeQueCaChange() {
     { titre: "Réversible et garanti", texte: `Le film se retire à chaud sans abîmer le support. Pose et films garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration.` },
   ];
   return (
-    <section className="section-padding bg-noir">
-      <div className="container-custom grid md:grid-cols-3 gap-6">
-        {points.map((p, i) => (
-          <ScrollReveal key={p.titre} delay={i * 0.06}>
-            <div className="h-full rounded-2xl border border-white/10 bg-white/[0.03] p-7">
-              <h2 className="font-display text-2xl font-bold mb-3">{p.titre}</h2>
-              <p className="text-gris-400 leading-relaxed">{p.texte}</p>
-            </div>
-          </ScrollReveal>
+    <Section large>
+      <div className="grid gap-5 md:grid-cols-3">
+        {points.map((p) => (
+          <div key={p.titre} className={`${CARTE} h-full p-7`}>
+            <h2 className="mb-3 text-[17px] font-semibold text-encre">{p.titre}</h2>
+            <p className="texte-2">{p.texte}</p>
+          </div>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Prestations() {
   return (
-    <section className="section-padding pt-0 bg-noir">
-      <div className="container-custom">
-        <div className="flex items-end justify-between gap-4 mb-8">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold">Ce que nous recouvrons</h2>
-          <Link href="/prestations" className="text-sm text-gris-400 hover:text-white transition-colors shrink-0">
-            Toutes les prestations →
+    <Section large className="pt-0">
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <h2 className="titre-2 text-encre">Ce que nous recouvrons</h2>
+        <Link href="/prestations" className={LIEN_SECTION}>
+          Toutes les prestations
+        </Link>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {PRESTATIONS.map((p) => (
+          <Link key={p.slug} href={`/prestations/${p.slug}`} className={`${CARTE} p-5 transition-colors duration-[var(--duree-courte)] hover:border-encre`}>
+            <p className="mb-2 text-[17px] font-semibold text-encre">{p.court}</p>
+            <p className="text-[14.5px] leading-relaxed text-encre-2">{p.accroche}</p>
+            <p className="mt-3 text-[13px] text-encre-2">{p.prix.fourchette === "sur devis" ? "Sur devis" : p.prix.fourchette}</p>
           </Link>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {PRESTATIONS.map((p) => (
-            <Link key={p.slug} href={`/prestations/${p.slug}`} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:border-rouge/50 transition-colors">
-              <p className="font-display text-xl font-bold mb-2">{p.court}</p>
-              <p className="text-sm text-gris-400 leading-relaxed">{p.accroche}</p>
-              <p className="text-xs text-gris-500 mt-3">{p.prix.fourchette === "sur devis" ? "Sur devis" : p.prix.fourchette}</p>
-            </Link>
-          ))}
-        </div>
+        ))}
       </div>
-    </section>
-  );
-}
-
-function CommentCaMarche() {
-  const etapes = [
-    { titre: "Une photo", texte: `Vous photographiez la pièce ou le meuble. La simulation montre l'effet d'une finition sur votre propre photo, en ${DELAI_RENDU}.` },
-    { titre: `Un devis ${DELAI_REPONSE}`, texte: "Chiffré au mètre linéaire, finition par finition, déplacement compris dans le devis. Teintes validées sur échantillons." },
-    { titre: "Une journée de pose", texte: "Nettoyage, pose à chaud, finitions vérifiées avec vous. Pas de gravats : vous retrouvez la pièce le soir même." },
-  ];
-  return (
-    <section className="section-padding bg-noir">
-      <div className="container-custom">
-        <h2 className="font-display text-3xl sm:text-4xl font-bold mb-10">Comment ça se passe</h2>
-        <ol className="grid md:grid-cols-3 gap-6">
-          {etapes.map((e, i) => (
-            <li key={e.titre} className="rounded-2xl border border-white/10 bg-white/[0.03] p-7">
-              <span className="font-display text-4xl font-bold text-rouge/60">{i + 1}</span>
-              <h3 className="font-display text-xl font-bold mt-2 mb-2">{e.titre}</h3>
-              <p className="text-gris-400 leading-relaxed">{e.texte}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
+    </Section>
   );
 }
 
@@ -153,127 +109,97 @@ function Tarifs() {
     { projet: FOURCHETTES.pro.libelle, prix: fourchette("pro") },
   ];
   return (
-    <section id="tarifs" className="section-padding pt-0 bg-noir">
-      <div className="container-custom grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
+    <Section id="tarifs" large fond="fond-2">
+      <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.2fr]">
         <div>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">Des prix au mètre linéaire</h2>
-          <p className="text-gris-300 leading-relaxed mb-4">
-            Nous mesurons le film réellement posé et le facturons fourni et posé : <strong className="text-white">{PRIX_PLAGE}</strong>. Le prix ne dépend pas du seul revêtement : il se détermine au devis selon la complexité de la pose — {FACTEURS_PRIX}. De grandes surfaces planes sans découpe se situent vers {PRIX_ML_MIN} €/ml ; une pose complexe monte jusqu&apos;à {PRIX_ML_MAX} €/ml. Ni l&apos;un ni l&apos;autre n&apos;est la règle : c&apos;est le devis, gratuit, qui fixe le chiffre.
+          <h2 className="titre-2 mb-4 text-encre">Des prix au mètre linéaire</h2>
+          <p className="texte mb-4 text-encre-2">
+            Nous mesurons le film réellement posé et le facturons fourni et posé : <strong className="text-encre">{PRIX_PLAGE}</strong>. Le prix ne dépend pas du seul revêtement : il se détermine au devis selon la complexité de la pose — {FACTEURS_PRIX}. De grandes surfaces planes sans découpe se situent vers {PRIX_ML_MIN} €/ml ; une pose complexe monte jusqu&apos;à {PRIX_ML_MAX} €/ml. Ni l&apos;un ni l&apos;autre n&apos;est la règle : c&apos;est le devis, gratuit, qui fixe le chiffre.
           </p>
-          <p className="text-sm text-gris-500 mb-6">{ENTREPRISE.tvaMention}. Devis gratuit, valable 30 jours, acompte de 30 % à la commande.</p>
-          <Link href="/devis" className="btn-primary">
+          <p className="mb-6 text-[14px] text-encre-2">{ENTREPRISE.tvaMention}. Devis gratuit, valable 30 jours, acompte de 30 % à la commande.</p>
+          <Lien href="/devis" variante="secondaire">
             Devis gratuit {DELAI_REPONSE}
-          </Link>
+          </Lien>
         </div>
-        <table className="w-full text-left border-collapse">
+        <table className="w-full border-collapse text-left">
           <caption className="sr-only">Ordres de grandeur par type de projet, fourni et posé</caption>
           <thead>
-            <tr className="text-xs uppercase tracking-widest text-gris-500 border-b border-white/10">
-              <th scope="col" className="py-3 pr-4 font-medium">Projet</th>
-              <th scope="col" className="py-3 font-medium text-right">Ordre de grandeur</th>
+            <tr className="border-b border-trait">
+              <th scope="col" className="surtitre py-3 pr-4 font-medium">
+                Projet
+              </th>
+              <th scope="col" className="surtitre py-3 text-right font-medium">
+                Ordre de grandeur
+              </th>
             </tr>
           </thead>
           <tbody>
             {lignes.map((l) => (
-              <tr key={l.projet} className="border-b border-white/5">
-                <td className="py-4 pr-4 text-gris-300">{l.projet}</td>
-                <td className="py-4 text-right font-display font-bold text-white whitespace-nowrap">{l.prix}</td>
+              <tr key={l.projet} className="border-b border-trait">
+                <td className="py-4 pr-4 text-encre-2">{l.projet}</td>
+                <td className="py-4 text-right font-display font-semibold whitespace-nowrap text-encre">{l.prix}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </section>
+    </Section>
   );
 }
 
 function Catalogue() {
   return (
-    <section className="section-padding bg-noir">
-      <div className="container-custom">
-        <div className="flex items-end justify-between gap-4 mb-8">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold">{NB_REFERENCES} finitions Cover Styl&apos;</h2>
-          <Link href="/revetements" className="text-sm text-gris-400 hover:text-white transition-colors shrink-0">
-            Voir le catalogue →
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
-          {Object.entries(TEMOINS).map(([famille, t]) => (
-            <Link key={famille} href={`/revetements?famille=${famille}`} className="group">
-              <div className="relative aspect-square rounded-xl overflow-hidden border border-white/10 group-hover:border-rouge/50 transition-colors">
-                <Image src={t.image} alt={`${t.nom} — exemple ${t.ref}`} fill sizes="(max-width: 640px) 50vw, 160px" loading="lazy" className="object-cover" />
-              </div>
-              <p className="font-display font-bold mt-2">{t.nom}</p>
-              <p className="text-xs text-gris-500">{COMPTES[famille] ?? 0} références</p>
-            </Link>
-          ))}
-        </div>
+    <Section large>
+      <div className="mb-8 flex items-end justify-between gap-4">
+        <h2 className="titre-2 text-encre">{NB_REFERENCES} finitions Cover Styl&apos;</h2>
+        <Link href="/matieres" className={LIEN_SECTION}>
+          Voir le catalogue
+        </Link>
       </div>
-    </section>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+        {Object.entries(TEMOINS).map(([famille, t]) => (
+          <Link key={famille} href={`/matieres?famille=${famille}`} className="group">
+            <div className="relative aspect-square overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-fond-2 transition-colors duration-[var(--duree-courte)] group-hover:border-encre">
+              <Image src={t.image} alt={`${t.nom} — exemple ${t.ref}`} fill sizes="(max-width: 640px) 50vw, 160px" loading="lazy" className="object-cover" />
+            </div>
+            <p className="mt-2 text-[15px] font-semibold text-encre">{t.nom}</p>
+            <p className="text-[13px] text-encre-2">{COMPTES[famille] ?? 0} références</p>
+          </Link>
+        ))}
+      </div>
+    </Section>
   );
 }
 
 function Zones() {
   return (
-    <section className="section-padding pt-0 bg-noir">
-      <div className="container-custom rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-10">
-        <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">Basés à {ENTREPRISE.adresse.ville}, sur la métropole de Montpellier</h2>
-        <p className="text-gris-400 leading-relaxed mb-5">
-          Interventions courantes dans l&apos;{ENTREPRISE.zone.departement} et les départements voisins ; partout en {ENTREPRISE.zone.etendue}, le déplacement étant écrit dans le devis.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {ZONES.map((z) => (
-            <Link key={z.slug} href={`/zones/${getZoneSlug(z)}`} className="rounded-full border border-white/15 px-4 py-2 text-sm hover:border-rouge hover:text-white transition-colors">
+    <Section large fond="fond-2" titre={`Basés à ${ENTREPRISE.adresse.ville}, sur la métropole de Montpellier`} intro={`Interventions courantes dans l'${ENTREPRISE.zone.departement} et les départements voisins ; partout en ${ENTREPRISE.zone.etendue}, le déplacement étant écrit dans le devis.`}>
+      <ul className="flex flex-wrap gap-2">
+        {ZONES.map((z) => (
+          <li key={z.slug}>
+            <Link href={`/zones/${getZoneSlug(z)}`} className="inline-flex min-h-[44px] items-center rounded-full border border-trait bg-white px-4 text-[14.5px] text-encre transition-colors duration-[var(--duree-courte)] hover:border-encre">
               {z.ville}
             </Link>
-          ))}
-        </div>
-      </div>
-    </section>
+          </li>
+        ))}
+      </ul>
+    </Section>
   );
 }
 
-function FAQ() {
+function DernierAppel() {
   return (
-    <section id="faq" className="section-padding pt-0 bg-noir">
-      <FAQSchema faqs={FAQ_GENERALE} />
-      <div className="container-custom max-w-3xl">
-        <h2 className="font-display text-3xl sm:text-4xl font-bold mb-8">Questions fréquentes</h2>
-        <div className="space-y-3">
-          {FAQ_GENERALE.map((f) => (
-            <details key={f.q} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-              <summary className="flex items-center justify-between gap-4 cursor-pointer font-display font-bold text-lg list-none">
-                {f.q}
-                <span aria-hidden className="text-rouge transition-transform group-open:rotate-45 text-2xl leading-none">+</span>
-              </summary>
-              <p className="text-gris-400 mt-3 leading-relaxed">{f.a}</p>
-            </details>
-          ))}
-        </div>
+    <Section fond="fond-2" titre="Voyez votre pièce transformée avant de décider" intro="Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis.">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Lien href="/simulateur">Simuler sur ma photo</Lien>
+        <Lien href={`tel:${ENTREPRISE.telephoneInternational}`} variante="secondaire">
+          {ENTREPRISE.telephone}
+        </Lien>
       </div>
-    </section>
-  );
-}
-
-function CTAFinal() {
-  return (
-    <section className="section-padding pt-0 bg-noir">
-      <div className="container-custom rounded-3xl bg-rouge/10 border border-rouge/30 p-8 md:p-14 text-center">
-        <h2 className="font-display text-3xl sm:text-5xl font-bold mb-4 text-balance">Voyez votre pièce transformée avant de décider</h2>
-        <p className="text-gris-300 max-w-xl mx-auto mb-8">Une photo suffit. Vos coordonnées ne sont demandées que si vous voulez recevoir le rendu et un devis.</p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/simulateur" className="btn-primary">
-            Simuler sur ma photo
-          </Link>
-          <a href={`tel:${ENTREPRISE.telephoneInternational}`} className="btn-secondary">
-            {ENTREPRISE.telephone}
-          </a>
-        </div>
-        <p className="text-sm text-gris-500 mt-6">
-          Une cuisine complète : {euros(FOURCHETTES.cuisine.min)} à {euros(FOURCHETTES.cuisine.max)} fourni et posé.
-        </p>
-      </div>
-    </section>
+      <p className="mt-6 text-[14px] text-encre-2">
+        Une cuisine complète : {euros(FOURCHETTES.cuisine.min)} à {euros(FOURCHETTES.cuisine.max)} fourni et posé.
+      </p>
+    </Section>
   );
 }
 
@@ -283,17 +209,17 @@ export default async function HomePage() {
   const pieces = zones.pieces.map((piece) => ({ id: piece.id, libelle: piece.libelle, description: piece.zones.map((z) => z.libelle).join(", ") }));
   return (
     <>
-      <Hero />
+      <Ouverture />
       <CeQueCaChange />
       <Prestations />
       <Realisations apercu />
       <SimulationSection pieces={pieces} zonesMax={zones.zonesMax} />
-      <CommentCaMarche />
+      <CommentCaSePasse />
       <Tarifs />
       <Catalogue />
       <Zones />
-      <FAQ />
-      <CTAFinal />
+      <QuestionsFrequentes />
+      <DernierAppel />
     </>
   );
 }

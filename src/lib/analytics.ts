@@ -21,7 +21,7 @@ export type TrackEvent =
   | "devis_form_submitted"          // formulaire devis envoyé
   | "devis_direct_sent"             // devis demandé en 1-clic après simulation
   | "contact_form_submitted"        // formulaire contact envoyé
-  | "whatsapp_clicked"              // clic sur le bouton WhatsApp flottant
+  | "whatsapp_clicked"              // clic sur un bouton WhatsApp (le bouton flottant a été retiré par la mission 16)
   | "phone_clicked"                 // clic sur un lien tel:
   | "email_clicked"                 // clic sur un lien mailto:
   | "simulation_downloaded"          // téléchargement du document projet

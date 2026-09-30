@@ -24,7 +24,7 @@ Le CRM ne reçoit **aucune donnée personnelle** par ce canal : un identifiant d
 | `DEVIS_DEMANDE` | `devis_form_submitted` | formulaire /devis ou demande après simulation |
 | `CONTACT_ENVOYE` | `contact_form_submitted` | formulaire /contact |
 | `FORMULAIRE_ECHEC` | — | envoi refusé ou coupé (`raison`, `statut`) |
-| — | `cta_clicked`, `whatsapp_clicked`, `phone_clicked` | boutons |
+| — | `cta_clicked` | boutons du module d'accueil ; `whatsapp_clicked` n'est plus émis depuis le retrait du bouton WhatsApp flottant (mission 16, partie 1 : WhatsApp revient en bouton secondaire du dernier appel, partie 3), `phone_clicked` n'a pas d'émetteur |
 
 L'entonnoir du simulateur (mission 15, partie 4) = `PIECE_CHOISIE` → `PHOTO_CHARGEE` → `GENERATION_LANCEE` → `RESULTAT_VU` → `DEVIS_DEMANDE` ; le CRM l'affiche emboîté, avec les abandons par étape, dans « Sur le site cette semaine » (Leads). Les anciens noms (`SIMULATION_PHOTO`, `SIMULATION_LANCEE`, `SIMULATION_RESULTAT`) restent lus par le CRM.
 

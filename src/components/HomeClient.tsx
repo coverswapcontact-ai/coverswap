@@ -3,9 +3,9 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ScrollReveal from "@/components/ScrollReveal";
 import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
 import { CartesPieces, type PieceCarte } from "@/components/simulation/CartesPieces";
+import { Section } from "@/components/simulation/Section";
 import { track } from "@/lib/analytics";
 import { envoyerEvenement } from "@/lib/evenements-site";
 import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
@@ -90,150 +90,140 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
   };
 
   return (
-    <section id="simulation" className="relative section-padding bg-noir overflow-hidden">
-      <div className="container-custom relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-12">
-          <ScrollReveal direction="fade">
-            <p className="text-gris-400 font-medium text-xs uppercase tracking-[0.2em] mb-5">Simulation sur votre photo</p>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.1}>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold leading-[1.02] mb-4 md:mb-6 tracking-tight">
-              Votre intérieur.
-              <br />
-              Transformé en {DELAI_RENDU}.
-            </h2>
-          </ScrollReveal>
-          <ScrollReveal direction="up" delay={0.2}>
-            <p className="text-gris-300 text-lg md:text-xl leading-relaxed">
-              Une photo de votre cuisine, salle de bain, meuble ou local, une matière parmi <strong className="text-white">{NB_REFERENCES} références Cover Styl&apos;</strong>, et le rendu sur votre propre photo.
-              <br className="hidden sm:block" />
-              <span className="text-white font-medium">Sans e-mail. Sans téléphone. Gratuit.</span>
-            </p>
-          </ScrollReveal>
-        </div>
-
-        <ScrollReveal direction="scale" delay={0.15}>
-          <div data-theme="simulation" className="mx-auto max-w-3xl rounded-[var(--rayon-md)] border border-trait bg-fond p-4 text-encre sm:p-6">
-            {!projectId ? (
-              <div className="space-y-4">
-                <div>
-                  <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
-                  <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">Quelle pièce transformons-nous ?</h3>
-                </div>
-                <CartesPieces pieces={pieces} valeur={null} onChoisir={handleSelectProject} />
+    <Section
+      id="simulation"
+      large
+      fond="fond-2"
+      surtitre="Simulation sur votre photo"
+      titre={
+        <>
+          Votre intérieur.
+          <br />
+          Transformé en {DELAI_RENDU}.
+        </>
+      }
+      intro={
+        <>
+          Une photo de votre cuisine, salle de bain, meuble ou local, une matière parmi <strong className="text-encre">{NB_REFERENCES} références Cover Styl&apos;</strong>, et le rendu sur votre propre photo.{" "}
+          <span className="font-medium text-encre">Sans e-mail. Sans téléphone. Gratuit.</span>
+        </>
+      }
+    >
+      <div data-theme="simulation" className="max-w-3xl rounded-[var(--rayon-md)] border border-trait bg-fond p-4 text-encre sm:p-6">
+        {!projectId ? (
+          <div className="space-y-4">
+            <div>
+              <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
+              <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">Quelle pièce transformons-nous ?</h3>
+            </div>
+            <CartesPieces pieces={pieces} valeur={null} onChoisir={handleSelectProject} />
+          </div>
+        ) : !preview ? (
+          <div
+            className="space-y-4"
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOver(true);
+            }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragOver(false);
+              const f = e.dataTransfer.files?.[0];
+              if (f) void handleFile(f);
+            }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
+                <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">{projet?.uploadHint}</h3>
+                <p className="mt-1 text-[14.5px] text-encre-2">{projet?.uploadTip}.</p>
               </div>
-            ) : !preview ? (
-              <div
-                className="space-y-4"
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                  const f = e.dataTransfer.files?.[0];
-                  if (f) void handleFile(f);
+              <Bouton variante="discret" onClick={() => setProjectId(null)}>
+                Changer de pièce
+              </Bouton>
+            </div>
+            <div className={`rounded-[var(--rayon-md)] border-2 border-dashed p-3 transition-colors duration-[var(--duree-courte)] sm:p-4 ${dragOver ? "border-encre bg-white" : "border-trait"}`} aria-busy={occupe}>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className={`flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--rayon-sm)] bg-encre text-[16px] font-medium text-blanc transition-colors duration-[var(--duree-courte)] hover:bg-encre-survol ${FOCUS_FICHIER} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+                  {occupe ? "Préparation de la photo…" : "Prendre une photo"}
+                  <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={occupe} onChange={prendre} />
+                </label>
+                <label className={`flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--rayon-sm)] border border-encre bg-white text-[16px] font-medium text-encre transition-colors duration-[var(--duree-courte)] hover:bg-fond-2 ${FOCUS_FICHIER} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+                  Choisir dans mes photos
+                  <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={occupe} onChange={prendre} />
+                </label>
+              </div>
+              <p className="mt-3 text-center text-[13.5px] text-encre-2">JPEG, PNG ou HEIC, 25 Mo au plus. Vous restez anonyme : aucune coordonnée à cette étape.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">
+                {projet?.label} · Photo prête
+              </p>
+              <Bouton
+                variante="discret"
+                onClick={() => {
+                  setPreview(null);
+                  setEnCoursAilleurs(false);
+                  setError("");
                 }}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
-                    <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">{projet?.uploadHint}</h3>
-                    <p className="mt-1 text-[14.5px] text-encre-2">{projet?.uploadTip}.</p>
-                  </div>
-                  <Bouton variante="discret" onClick={() => setProjectId(null)}>
-                    Changer de pièce
-                  </Bouton>
-                </div>
-                <div className={`rounded-[var(--rayon-md)] border-2 border-dashed p-3 transition-colors duration-[var(--duree-courte)] sm:p-4 ${dragOver ? "border-encre bg-white" : "border-trait"}`} aria-busy={occupe}>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <label className={`flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--rayon-sm)] bg-encre text-[16px] font-medium text-white transition-colors duration-[var(--duree-courte)] hover:bg-encre-survol ${FOCUS_FICHIER} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
-                      {occupe ? "Préparation de la photo…" : "Prendre une photo"}
-                      <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={occupe} onChange={prendre} />
-                    </label>
-                    <label className={`flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--rayon-sm)] border border-encre bg-white text-[16px] font-medium text-encre transition-colors duration-[var(--duree-courte)] hover:bg-fond-2 ${FOCUS_FICHIER} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
-                      Choisir dans mes photos
-                      <input type="file" accept="image/*,.heic,.heif" className="sr-only" disabled={occupe} onChange={prendre} />
-                    </label>
-                  </div>
-                  <p className="mt-3 text-center text-[13.5px] text-encre-2">JPEG, PNG ou HEIC, 25 Mo au plus. Vous restez anonyme : aucune coordonnée à cette étape.</p>
-                </div>
+                Reprendre
+              </Bouton>
+            </div>
+            <div className="overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white">
+              {/* eslint-disable-next-line @next/next/no-img-element -- photo du visiteur (mémoire locale), rapport réservé */}
+              <img src={preview.dataUrl} alt="Votre photo" className="mx-auto block max-h-[420px] w-full object-contain bg-fond-2" style={preview.largeur > 0 && preview.hauteur > 0 ? { aspectRatio: `${preview.largeur} / ${preview.hauteur}` } : undefined} />
+            </div>
+            {enCoursAilleurs ? (
+              <div role="status" className="space-y-3 rounded-[var(--rayon-sm)] border border-trait bg-white p-4">
+                <p className="text-[15px] leading-relaxed text-encre">Une simulation est déjà en cours sur cet appareil : nous l&apos;affichons d&apos;abord. Revenez ensuite reprendre cette photo.</p>
+                <Bouton plein onClick={() => router.push("/simulateur")}>
+                  Voir la simulation en cours
+                </Bouton>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">
-                    {projet?.label} · Photo prête
-                  </p>
-                  <Bouton
-                    variante="discret"
-                    onClick={() => {
-                      setPreview(null);
-                      setEnCoursAilleurs(false);
-                      setError("");
-                    }}
-                  >
-                    Reprendre
-                  </Bouton>
-                </div>
-                <div className="overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- photo du visiteur (mémoire locale), rapport réservé */}
-                  <img src={preview.dataUrl} alt="Votre photo" className="mx-auto block max-h-[420px] w-full object-contain bg-fond-2" style={preview.largeur > 0 && preview.hauteur > 0 ? { aspectRatio: `${preview.largeur} / ${preview.hauteur}` } : undefined} />
-                </div>
-                {enCoursAilleurs ? (
-                  <div role="status" className="space-y-3 rounded-[var(--rayon-sm)] border border-trait bg-white p-4">
-                    <p className="text-[15px] leading-relaxed text-encre">Une simulation est déjà en cours sur cet appareil : nous l&apos;affichons d&apos;abord. Revenez ensuite reprendre cette photo.</p>
-                    <Bouton plein onClick={() => router.push("/simulateur")}>
-                      Voir la simulation en cours
-                    </Bouton>
-                  </div>
-                ) : (
-                  <Bouton plein onClick={handleContinue}>
-                    Choisir mes matières
-                  </Bouton>
-                )}
-              </div>
+              <Bouton plein onClick={handleContinue}>
+                Choisir mes matières
+              </Bouton>
             )}
-            {error ? (
-              <p role="alert" className="mt-4 rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
-                {error}
-              </p>
-            ) : null}
           </div>
-        </ScrollReveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-4xl mx-auto mt-10 md:mt-14 mb-8 md:mb-12">
-          {[
-            { num: "01", title: "Photo", desc: "Prenez ou choisissez une photo de votre pièce, de face et bien éclairée." },
-            { num: "02", title: "Matières", desc: `Jusqu'à ${zonesMaxEnLettres(zonesMax)} zones, une matière chacune parmi ${NB_REFERENCES} références Cover Styl'.` },
-            { num: "03", title: "Rendu", desc: `Le rendu sur votre photo en ${DELAI_RENDU}. Vous pouvez quitter la page : la simulation continue.` },
-          ].map((step, i) => (
-            <ScrollReveal key={step.num} direction="up" delay={0.1 + i * 0.08}>
-              <div className="relative glass-card p-6 h-full">
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-gris-400 font-display text-xl font-bold">{step.num}</span>
-                  <span className="font-bold text-lg text-white">{step.title}</span>
-                </div>
-                <p className="text-gris-400 text-sm leading-relaxed">{step.desc}</p>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-
-        <ScrollReveal direction="up" delay={0.25}>
-          <div className="text-center">
-            <p className="text-xs sm:text-sm text-gris-400">Sans e-mail · Sans téléphone · Sans inscription · Gratuit</p>
-            <p className="text-xs text-gris-600 mt-5">
-              Préférez parler à un humain ?{" "}
-              <Link href="/contact" className="text-gris-300 hover:text-white underline underline-offset-4 font-medium">
-                Demandez un devis personnalisé
-              </Link>
-            </p>
-          </div>
-        </ScrollReveal>
+        )}
+        {error ? (
+          <p role="alert" className="mt-4 rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
+            {error}
+          </p>
+        ) : null}
       </div>
-    </section>
+
+      <ol className="mt-10 grid max-w-4xl grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
+        {[
+          { num: "01", title: "Photo", desc: "Prenez ou choisissez une photo de votre pièce, de face et bien éclairée." },
+          { num: "02", title: "Matières", desc: `Jusqu'à ${zonesMaxEnLettres(zonesMax)} zones, une matière chacune parmi ${NB_REFERENCES} références Cover Styl'.` },
+          { num: "03", title: "Rendu", desc: `Le rendu sur votre photo en ${DELAI_RENDU}. Vous pouvez quitter la page : la simulation continue.` },
+        ].map((step) => (
+          <li key={step.num} className="h-full rounded-[var(--rayon-md)] border border-trait bg-white p-6">
+            <p className="mb-1 flex items-baseline gap-2">
+              <span className="font-display text-[17px] font-semibold text-encre-2">{step.num}</span>
+              <span className="text-[17px] font-semibold text-encre">{step.title}</span>
+            </p>
+            <p className="text-[14.5px] leading-relaxed text-encre-2">{step.desc}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-8">
+        <p className="text-[14px] text-encre-2">Sans e-mail · Sans téléphone · Sans inscription · Gratuit</p>
+        <p className="mt-3 text-[14px] text-encre-2">
+          Préférez parler à un humain ?{" "}
+          <Link href="/contact" className="font-medium text-encre underline underline-offset-4">
+            Demandez un devis personnalisé
+          </Link>
+        </p>
+      </div>
+    </Section>
   );
 }

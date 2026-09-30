@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { DELAI_RENDU } from "@/lib/offre";
-import Link from "next/link";
 import { BreadcrumbSchema } from "@/components/JsonLd";
+import { Lien } from "@/components/simulation/Lien";
+import { Section } from "@/components/simulation/Section";
 import BlogClient from "@/components/BlogClient";
 
 export const metadata: Metadata = {
@@ -26,40 +27,24 @@ export const metadata: Metadata = {
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen pt-28 pb-20">
+    <div className="bg-fond">
       <BreadcrumbSchema items={[{ name: "Accueil", url: "https://coverswap.fr" }, { name: "Blog", url: "https://coverswap.fr/blog" }]} />
-      <div className="container-custom">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <span className="text-rouge font-bold text-sm uppercase tracking-widest">
-            Guides
-          </span>
-          <h1 className="font-display text-4xl md:text-6xl font-bold mt-3 mb-4">
-            Les vraies questions, <span className="text-rouge">les vraies réponses</span>
-          </h1>
-          <p className="text-gris-400 max-w-2xl mx-auto text-lg">
+      <section className="px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+        <div className="mx-auto max-w-6xl">
+          <p className="surtitre">Guides</p>
+          <h1 className="titre-1 mt-2 max-w-3xl text-encre">Les vraies questions, les vraies réponses</h1>
+          <p className="texte mt-4 mb-10 max-w-2xl text-encre-2">
             Ce que coûte un covering, combien de temps il tient, comment se passe la pose, quelle finition choisir, comment l&apos;entretenir.
           </p>
-        </div>
 
-        {/* Client island: filters + articles grid */}
-        <BlogClient />
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-20">
-          <div className="glass-card inline-block px-10 py-8">
-            <p className="font-display text-xl font-bold mb-2">
-              Envie de voir le résultat chez vous ?
-            </p>
-            <p className="text-gris-400 mb-6 text-sm">
-              Recevez une simulation gratuite, rendu en {DELAI_RENDU}.
-            </p>
-            <Link href="/simulateur" className="btn-primary">
-              Simuler mon projet
-            </Link>
-          </div>
+          {/* Îlot client : filtres + grille des guides */}
+          <BlogClient />
         </div>
-      </div>
+      </section>
+
+      <Section titre="Envie de voir le résultat chez vous ?" intro={`Recevez une simulation gratuite, rendu en ${DELAI_RENDU}.`} fond="fond-2">
+        <Lien href="/simulateur">Simuler mon projet</Lien>
+      </Section>
     </div>
   );
 }

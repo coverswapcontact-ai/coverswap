@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { apresHistorique, entrerFeuille } from "./historique-feuilles";
 
 /**
  * Feuille plein écran pour le pouce (mission 15, partie 4 : extraite de
@@ -18,32 +20,7 @@ import { createPortal } from "react-dom";
 
 export const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(" ");
 
-/* ── Pile des feuilles et historique du navigateur ───────────────── */
-
-const pileFeuilles: { id: number; fermer: () => void }[] = [];
-const dansHistorique: number[] = [];
-let compteurFeuilles = 0;
-let ecouteRetour = false;
-let synchronisationPrevue = false;
-
-function surRetourNavigateur(evenement: PopStateEvent) {
-  const niveau = Number((evenement.state as { feuille?: number } | null)?.feuille) || 0;
-  while (dansHistorique.length > 0 && dansHistorique[dansHistorique.length - 1] > niveau) dansHistorique.pop();
-  while (pileFeuilles.length > 0 && pileFeuilles[pileFeuilles.length - 1].id > niveau) pileFeuilles.pop()!.fermer();
-}
-
-function synchroniserHistorique() {
-  synchronisationPrevue = false;
-  const haut = pileFeuilles.length > 0 ? pileFeuilles[pileFeuilles.length - 1].id : 0;
-  // Un bouton de la feuille a changé d'onglet : on ne le défait pas.
-  const surNosEntrees = dansHistorique.length > 0 && Number((window.history.state as { feuille?: number } | null)?.feuille) === dansHistorique[dansHistorique.length - 1];
-  let entrees = 0;
-  while (dansHistorique.length > 0 && dansHistorique[dansHistorique.length - 1] > haut) {
-    dansHistorique.pop();
-    entrees++;
-  }
-  if (entrees > 0 && surNosEntrees) window.history.go(-entrees);
-}
+/* ── Historique du navigateur (logique pure : `historique-feuilles.ts`) ── */
 
 /** Lie une feuille (ou tout panneau) au geste retour : ouverte = une entrée d'historique ; retour = fermée. */
 export function useRetourNavigateur(ouverte: boolean, fermer: () => void) {
@@ -53,25 +30,34 @@ export function useRetourNavigateur(ouverte: boolean, fermer: () => void) {
   });
   useEffect(() => {
     if (!ouverte) return;
-    const entree = { id: ++compteurFeuilles, fermer: () => rappel.current() };
-    pileFeuilles.push(entree);
-    dansHistorique.push(entree.id);
-    // L'état de Next est gardé (sinon son routeur recharge la page au retour).
-    window.history.pushState({ ...(window.history.state ?? {}), feuille: entree.id }, "");
-    if (!ecouteRetour) {
-      window.addEventListener("popstate", surRetourNavigateur);
-      ecouteRetour = true;
-    }
-    return () => {
-      const rang = pileFeuilles.indexOf(entree);
-      if (rang < 0) return; // déjà fermée par le geste retour
-      pileFeuilles.splice(rang, 1);
-      if (!synchronisationPrevue) {
-        synchronisationPrevue = true;
-        window.setTimeout(synchroniserHistorique, 0);
-      }
-    };
+    return entrerFeuille(() => rappel.current());
   }, [ouverte]);
+}
+
+/**
+ * Les liens posés dans une feuille (mission 16 : le menu du téléphone, la
+ * fiche d'une matière). Au clic, la feuille se ferme D'ABORD (elle rend son
+ * entrée d'historique et la page retrouve sa position), puis Next navigue,
+ * une fois ce retour fait : partie pendant, la navigation serait abandonnée.
+ * Nouvel onglet, clic du milieu, touche de modification : le navigateur fait
+ * comme d'habitude. Usage : `const aller = useLiensDeFeuille(ouverte, fermer)`
+ * puis `<Link href={h} onClick={aller(h)}>`.
+ */
+export function useLiensDeFeuille(ouverte: boolean, fermer: () => void) {
+  const router = useRouter();
+  const cible = useRef<string | null>(null);
+  useEffect(() => {
+    if (ouverte || cible.current === null) return;
+    const href = cible.current;
+    cible.current = null;
+    apresHistorique(() => router.push(href));
+  }, [ouverte, router]);
+  return (href: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    cible.current = href;
+    fermer();
+  };
 }
 
 /* ── Verrouillage du corps de la page ─────────────────────────────── */
@@ -161,7 +147,7 @@ export function Feuille({ ouverte, onFermer, titre, sousTitre, children, pied, l
 
   if (!ouverte || typeof document === "undefined") return null;
 
-  const fond = sombre ? "bg-sombre text-white" : "bg-fond text-encre";
+  const fond = sombre ? "bg-sombre text-blanc" : "bg-fond text-encre";
   return createPortal(
     <div
       ref={boite}
@@ -198,7 +184,7 @@ export function Feuille({ ouverte, onFermer, titre, sousTitre, children, pied, l
       <div className="mx-auto w-full max-w-xl shrink-0 px-4 pt-2 pb-2">
         <span aria-hidden className={cx("mx-auto mb-2 block h-1 w-10 rounded-full", sombre ? "bg-white/25" : "bg-trait")} />
         <h2 className="font-display text-[22px] leading-tight font-semibold tracking-tight text-balance">{titre}</h2>
-        {sousTitre ? <div className={cx("mt-1 text-[15px] leading-snug", sombre ? "text-white/70" : "text-encre-2")}>{sousTitre}</div> : null}
+        {sousTitre ? <div className={cx("mt-1 text-[15px] leading-snug", sombre ? "text-blanc/70" : "text-encre-2")}>{sousTitre}</div> : null}
       </div>
       {entete ? <div className={cx("shrink-0 border-b", sombre ? "border-white/10" : "border-trait")}>{entete}</div> : null}
       <div ref={defilement} className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -210,7 +196,7 @@ export function Feuille({ ouverte, onFermer, titre, sousTitre, children, pied, l
           <button
             type="button"
             onClick={onFermer}
-            className={cx("flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[var(--rayon-md)] text-[16.5px] font-semibold transition-colors duration-[var(--duree-courte)]", sombre ? "bg-white/12 text-white active:bg-white/20" : "border border-trait bg-white text-encre active:bg-fond-2")}
+            className={cx("flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[var(--rayon-md)] text-[16.5px] font-semibold transition-colors duration-[var(--duree-courte)]", sombre ? "bg-white/12 text-blanc active:bg-white/20" : "border border-trait bg-white text-encre active:bg-fond-2")}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="m6 9 6 6 6-6" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconeCoeur, IconeLoupe } from "@/components/espace/Illustrations";
+import { FAMILLES, libelleFamille } from "@/lib/familles-matieres";
 import { correspondRecherche } from "@/lib/recherche-finitions";
 import { Bouton } from "./Bouton";
 import { Feuille, cx } from "./Feuille";
@@ -22,16 +23,8 @@ import { ZoomImage } from "./ZoomImage";
 export type Teinte = { id: string; nom: string; famille: string; categorie: string; finition: string; image: string; tags: string[] };
 export type ZoneCatalogue = { id: string; libelle: string };
 
-export const FAMILLES = [
-  { id: "bois", libelle: "Bois" },
-  { id: "couleur", libelle: "Couleurs" },
-  { id: "pierre", libelle: "Pierre" },
-  { id: "beton", libelle: "Béton" },
-  { id: "metal", libelle: "Métal" },
-  { id: "textile", libelle: "Textile" },
-  { id: "paillettes", libelle: "Paillettes" },
-];
-export const libelleFamille = (id: string) => FAMILLES.find((f) => f.id === id)?.libelle ?? id;
+// Les familles vivent dans `lib/familles-matieres` (une seule liste pour le simulateur, l'espace et /matieres).
+export { FAMILLES, libelleFamille };
 
 let catalogueEnMemoire: Teinte[] | null = null;
 /** Le catalogue n'est chargé qu'à la première ouverture (il ne pèse rien sur l'ouverture de la page). */
@@ -175,7 +168,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
                           // eslint-disable-next-line @next/next/no-img-element -- vignette servie par le CRM
                           <img src={urlVignette(r.id)} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" className="h-full w-full object-cover" onError={() => setIndisponibles((d) => new Set(d).add(r.id))} />
                         )}
-                        {active ? <span className="absolute bottom-1.5 left-1.5 rounded-[4px] bg-encre px-1.5 py-0.5 text-[11px] font-semibold text-white">Choisie</span> : null}
+                        {active ? <span className="absolute bottom-1.5 left-1.5 rounded-[4px] bg-encre px-1.5 py-0.5 text-[11px] font-semibold text-blanc">Choisie</span> : null}
                       </span>
                       <span className="mt-1 block h-[34px] overflow-hidden text-[13px] leading-[17px] font-medium text-encre">{r.nom}</span>
                     </button>

@@ -14,7 +14,7 @@ const MISE_A_JOUR = "17 septembre 2026";
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-xl font-bold text-white">{titre}</h2>
+      <h2 className="titre-2 text-encre">{titre}</h2>
       {children}
     </section>
   );
@@ -22,15 +22,15 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 
 export default function MentionsLegales() {
   return (
-    <div className="min-h-screen pt-28 pb-20">
-      <div className="container-custom max-w-3xl">
-        <h1 className="font-display text-4xl font-bold mb-2">Mentions légales</h1>
-        <p className="text-sm text-gris-500 mb-10">Dernière mise à jour : {MISE_A_JOUR}</p>
+    <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="titre-1 mb-2 text-encre">Mentions légales</h1>
+        <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>
 
-        <div className="space-y-10 text-gris-300 leading-relaxed">
+        <div className="texte space-y-10 text-encre-2">
           <Section titre="Éditeur du site">
             <p>
-              Le site <strong className="text-white">coverswap.fr</strong> est édité par <strong className="text-white">{SITE.owner}</strong>,
+              Le site <strong className="text-encre">coverswap.fr</strong> est édité par <strong className="text-encre">{SITE.owner}</strong>,
               entrepreneur individuel exerçant sous le nom commercial CoverSwap.
             </p>
             <ul className="list-disc list-inside space-y-1">
@@ -48,14 +48,14 @@ export default function MentionsLegales() {
               Conformément à l&apos;article L. 243-2 du Code des assurances, les coordonnées de l&apos;assureur et la couverture géographique du
               contrat d&apos;assurance professionnelle figurent sur chaque devis et chaque facture.
             </p>
-            <p className="text-sm text-gris-500">[À compléter : nom de l&apos;assureur, numéro de contrat, couverture géographique.]</p>
+            <p className="text-sm text-encre-2">[À compléter : nom de l&apos;assureur, numéro de contrat, couverture géographique.]</p>
           </Section>
 
           <Section titre="Hébergement">
             <p>
-              Le site est hébergé par <strong className="text-white">Vercel Inc.</strong>, 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis
+              Le site est hébergé par <strong className="text-encre">Vercel Inc.</strong>, 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis
               (vercel.com). Les demandes envoyées depuis le site sont traitées par notre outil de gestion, hébergé par{" "}
-              <strong className="text-white">Railway Corp.</strong>, 548 Market St, San Francisco, CA 94104, États-Unis (railway.com), dans un
+              <strong className="text-encre">Railway Corp.</strong>, 548 Market St, San Francisco, CA 94104, États-Unis (railway.com), dans un
               centre de données situé dans l&apos;Union européenne.
             </p>
           </Section>
@@ -75,7 +75,7 @@ export default function MentionsLegales() {
           <Section titre="Données personnelles et cookies">
             <p>
               Le traitement de vos données et l&apos;usage des cookies sont décrits dans notre{" "}
-              <Link href="/politique-confidentialite" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/politique-confidentialite" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 politique de confidentialité
               </Link>
               . Vous pouvez modifier vos choix de cookies à tout moment depuis le lien « Gérer les cookies » en bas de page.
@@ -88,10 +88,10 @@ export default function MentionsLegales() {
               médiateur de la consommation en vue de la résolution amiable d&apos;un litige l&apos;opposant à un professionnel. Après une réclamation
               écrite restée sans réponse satisfaisante sous deux mois, vous pouvez saisir le médiateur désigné ci-dessous.
             </p>
-            <p className="text-sm text-gris-500">[À compléter après adhésion : nom du médiateur, adresse postale et site de saisie en ligne.]</p>
+            <p className="text-sm text-encre-2">[À compléter après adhésion : nom du médiateur, adresse postale et site de saisie en ligne.]</p>
             <p>
               Vous pouvez également utiliser la plateforme européenne de règlement en ligne des litiges :{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-rouge underline hover:text-white transition-colors">
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 ec.europa.eu/consumers/odr
               </a>
               .
@@ -101,7 +101,7 @@ export default function MentionsLegales() {
           <Section titre="Conditions de vente et droit applicable">
             <p>
               Les prestations proposées sont soumises à nos{" "}
-              <Link href="/cgv" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/cgv" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 conditions générales de vente
               </Link>
               . Le site et les présentes mentions sont régis par le droit français.

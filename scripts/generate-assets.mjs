@@ -3,121 +3,62 @@ import { writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+/**
+ * Le logo (512 × 512) et l'image de partage (1200 × 630) du site, en SVG puis
+ * en PNG / JPEG par sharp (sans coût, en local). Mission 16 : le thème clair
+ * du site — fond blanc cassé, encre noire douce, un seul accent — sans ombre
+ * ni dégradé. Les couleurs sont celles des jetons de src/app/globals.css.
+ *   node scripts/generate-assets.mjs
+ */
+const FOND = '#F5F4F1';
+const ENCRE = '#1A1A1A';
+const ENCRE_2 = '#5F5A53';
+const TRAIT = '#D3CFC8';
+const ACCENT = '#CC0000';
+const POLICE_TITRE = "'Space Grotesk', 'Segoe UI', Arial, sans-serif";
+const POLICE_TEXTE = "'Inter', 'Segoe UI', Arial, sans-serif";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');
 
-// ── Logo SVG (512x512) ──
-// Diamond center at (256, 200), side=200 -> diagonal ~283, fits in top area
-// Text "CoverSwap" at y=420
+// ── Logo (512 × 512) : le losange de l'accent et son « C », « CoverSwap » dessous ──
 const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
-  </defs>
-
-  <!-- Rotated red diamond centered at (256, 195) -->
-  <rect x="156" y="95" width="200" height="200" rx="16" ry="16"
-        transform="rotate(45 256 195)"
-        fill="#CC0000" filter="url(#shadow)"/>
-
-  <!-- White C letter centered in diamond -->
-  <text x="256" y="218" text-anchor="middle" dominant-baseline="central"
-        font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif"
-        font-size="170" font-weight="700" fill="white"
-        letter-spacing="-4">C</text>
-
-  <!-- CoverSwap text below diamond -->
-  <text x="256" y="440" text-anchor="middle" dominant-baseline="central"
-        font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif"
-        font-size="60" font-weight="700" fill="#0A0A0A"
-        letter-spacing="-1">CoverSwap</text>
+  <rect width="512" height="512" fill="${FOND}"/>
+  <rect x="166" y="105" width="180" height="180" rx="16" ry="16" transform="rotate(45 256 195)" fill="${ACCENT}"/>
+  <text x="256" y="200" text-anchor="middle" dominant-baseline="central" font-family="${POLICE_TITRE}" font-size="150" font-weight="700" fill="${FOND}">C</text>
+  <text x="256" y="430" text-anchor="middle" dominant-baseline="central" font-family="${POLICE_TITRE}" font-size="64" font-weight="700" letter-spacing="-1"><tspan fill="${ENCRE}">Cover</tspan><tspan fill="${ACCENT}">Swap</tspan></text>
 </svg>`;
 
-// ── OG Image SVG (1200x630) ──
+// ── Image de partage (1200 × 630) : « CoverSwap — Votre cuisine, transformée en une journée. » ──
 const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <radialGradient id="glow" cx="360" cy="260" r="280" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#CC0000" stop-opacity="0.25"/>
-      <stop offset="60%" stop-color="#CC0000" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="#CC0000" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="ogShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
-    </filter>
-    <linearGradient id="topLine" x1="0" y1="0" x2="1200" y2="0">
-      <stop offset="0%" stop-color="#CC0000" stop-opacity="0"/>
-      <stop offset="30%" stop-color="#CC0000" stop-opacity="1"/>
-      <stop offset="70%" stop-color="#CC0000" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#CC0000" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-
-  <!-- Background -->
-  <rect width="1200" height="630" fill="#0A0A0A"/>
-
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="1200" height="3" fill="url(#topLine)"/>
-
-  <!-- Red glow behind logo -->
-  <circle cx="360" cy="260" r="280" fill="url(#glow)"/>
-
-  <!-- Diamond logo -->
-  <rect x="280" y="180" width="140" height="140" rx="12" ry="12"
-        transform="rotate(45 350 250)"
-        fill="#CC0000" filter="url(#ogShadow)"/>
-
-  <!-- White C in diamond -->
-  <text x="350" y="270" text-anchor="middle" dominant-baseline="central"
-        font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif"
-        font-size="120" font-weight="700" fill="white">C</text>
-
-  <!-- CoverSwap title -->
-  <text x="620" y="240" text-anchor="left" dominant-baseline="central"
-        font-family="'Space Grotesk', 'Segoe UI', Arial, sans-serif"
-        font-size="72" font-weight="700" fill="white"
-        letter-spacing="-2">CoverSwap</text>
-
-  <!-- Subtitle -->
-  <text x="622" y="310" text-anchor="left" dominant-baseline="central"
-        font-family="'Inter', 'Segoe UI', Arial, sans-serif"
-        font-size="24" font-weight="400" fill="#999999">Rénovation intérieure par revêtements adhésifs</text>
-
-  <!-- Separator line -->
-  <rect x="620" y="350" width="80" height="2" rx="1" fill="#CC0000"/>
-
-  <!-- Website URL -->
-  <text x="622" y="385" text-anchor="left" dominant-baseline="central"
-        font-family="'Inter', 'Segoe UI', Arial, sans-serif"
-        font-size="20" font-weight="500" fill="#CC0000">coverswap.fr</text>
-
-  <!-- Bottom border -->
-  <rect x="0" y="627" width="1200" height="3" fill="url(#topLine)"/>
+  <rect width="1200" height="630" fill="${FOND}"/>
+  <rect x="96" y="96" width="56" height="56" rx="8" ry="8" transform="rotate(45 124 124)" fill="${ACCENT}"/>
+  <text x="124" y="126" text-anchor="middle" dominant-baseline="central" font-family="${POLICE_TITRE}" font-size="44" font-weight="700" fill="${FOND}">C</text>
+  <text x="190" y="126" dominant-baseline="central" font-family="${POLICE_TITRE}" font-size="44" font-weight="700" letter-spacing="-1"><tspan fill="${ENCRE}">Cover</tspan><tspan fill="${ACCENT}">Swap</tspan></text>
+  <text x="96" y="300" font-family="${POLICE_TITRE}" font-size="76" font-weight="600" letter-spacing="-2" fill="${ENCRE}">Votre cuisine, transformée</text>
+  <text x="96" y="390" font-family="${POLICE_TITRE}" font-size="76" font-weight="600" letter-spacing="-2" fill="${ENCRE}">en une journée.</text>
+  <rect x="96" y="486" width="1008" height="2" fill="${TRAIT}"/>
+  <text x="96" y="540" font-family="${POLICE_TEXTE}" font-size="28" font-weight="400" fill="${ENCRE_2}">Covering adhésif Cover Styl' · Montpellier et France entière</text>
+  <text x="1104" y="540" text-anchor="end" font-family="${POLICE_TEXTE}" font-size="28" font-weight="600" fill="${ENCRE}">coverswap.fr</text>
 </svg>`;
 
-// Save SVGs as fallback
+// Les SVG restent à côté (repli, et source lisible).
 writeFileSync(join(publicDir, 'logo.svg'), logoSvg);
 writeFileSync(join(publicDir, 'og-image.svg'), ogSvg);
-console.log('SVG files written.');
+console.log('SVG écrits.');
 
-// Generate PNG from logo SVG
 try {
-  await sharp(Buffer.from(logoSvg))
-    .resize(512, 512)
-    .png()
-    .toFile(join(publicDir, 'logo.png'));
-  console.log('logo.png created (512x512)');
+  await sharp(Buffer.from(logoSvg)).resize(512, 512).png({ compressionLevel: 9 }).toFile(join(publicDir, 'logo.png'));
+  console.log('logo.png écrit (512 × 512)');
 } catch (e) {
-  console.error('Failed to create logo.png:', e.message);
+  console.error('logo.png impossible :', e.message);
+  process.exitCode = 1;
 }
 
-// Generate JPG from OG SVG
 try {
-  await sharp(Buffer.from(ogSvg))
-    .resize(1200, 630)
-    .jpeg({ quality: 92 })
-    .toFile(join(publicDir, 'og-image.jpg'));
-  console.log('og-image.jpg created (1200x630)');
+  await sharp(Buffer.from(ogSvg)).resize(1200, 630).jpeg({ quality: 88, mozjpeg: true }).toFile(join(publicDir, 'og-image.jpg'));
+  console.log('og-image.jpg écrit (1200 × 630)');
 } catch (e) {
-  console.error('Failed to create og-image.jpg:', e.message);
+  console.error('og-image.jpg impossible :', e.message);
+  process.exitCode = 1;
 }

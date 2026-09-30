@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import Realisations from "@/components/Realisations";
 import { BreadcrumbSchema } from "@/components/JsonLd";
+import { Lien } from "@/components/simulation/Lien";
+import { Section } from "@/components/simulation/Section";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_REPONSE } from "@/lib/offre";
 
@@ -16,30 +17,24 @@ export const revalidate = 300;
 
 export default function PageRealisations() {
   return (
-    <main className="bg-noir min-h-screen">
+    <div className="bg-fond">
       <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Réalisations", url: `${ENTREPRISE.site}/realisations` }]} />
-      <section className="pt-32 pb-10 md:pt-40 px-4 sm:px-6 lg:px-8">
-        <div className="container-custom">
+      <section className="px-4 pt-10 md:px-6 md:pt-14">
+        <div className="mx-auto max-w-6xl">
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Réalisations" }]} />
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-5 max-w-3xl text-balance">Ce que ça donne, chez de vrais clients</h1>
-          <p className="text-gris-300 text-lg max-w-2xl leading-relaxed">Photos prises à la fin des chantiers, publiées avec l&apos;accord des personnes. Pas d&apos;image de catalogue présentée comme une pose.</p>
+          <h1 className="titre-1 max-w-3xl text-encre">Ce que ça donne, chez de vrais clients</h1>
+          <p className="texte mt-4 max-w-2xl text-encre-2">Photos prises à la fin des chantiers, publiées avec l&apos;accord des personnes. Pas d&apos;image de catalogue présentée comme une pose.</p>
         </div>
       </section>
       <Realisations />
-      <section className="section-padding pt-0">
-        <div className="container-custom rounded-3xl bg-rouge/10 border border-rouge/30 p-8 md:p-12 text-center">
-          <h2 className="font-display text-3xl font-bold mb-3">Et chez vous ?</h2>
-          <p className="text-gris-300 max-w-xl mx-auto mb-6">Simulez le rendu sur votre propre photo, ou envoyez vos photos pour un devis {DELAI_REPONSE}.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/simulateur" className="btn-primary">
-              Simuler sur ma photo
-            </Link>
-            <Link href="/devis" className="btn-secondary">
-              Demander un devis
-            </Link>
-          </div>
+      <Section titre="Et chez vous ?" intro={`Simulez le rendu sur votre propre photo, ou envoyez vos photos pour un devis ${DELAI_REPONSE}.`} fond="fond-2">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Lien href="/simulateur">Simuler sur ma photo</Lien>
+          <Lien href="/devis" variante="secondaire">
+            Demander un devis
+          </Lien>
         </div>
-      </section>
-    </main>
+      </Section>
+    </div>
   );
 }

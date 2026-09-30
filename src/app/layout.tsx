@@ -2,10 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import EnteteSite from "@/components/EnteteSite";
+import PiedDePage from "@/components/PiedDePage";
 import CookieBanner from "@/components/CookieBanner";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
@@ -79,8 +78,9 @@ export const metadata: Metadata = {
   },
 };
 
+/** Mission 16 : la couleur de la barre du navigateur = le fond du thème clair (jeton --color-fond), une seule fois pour tout le site. */
 export const viewport: Viewport = {
-  themeColor: "#0A0A0A",
+  themeColor: "#F5F4F1",
   width: "device-width",
   initialScale: 1,
 };
@@ -91,13 +91,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // suppressHydrationWarning : le script ci-dessous ajoute la classe « js » avant l'hydratation (écart attendu, sans effet).
-    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
-      <head>
-        {/* Le contenu est visible sans JavaScript ; cette classe autorise les apparitions douces (ScrollReveal). */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-      </head>
-      <body className="font-sans antialiased">
+    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+      <body className="bg-fond font-sans text-encre antialiased">
         {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans mesure d'audience ni habillage commercial. */}
         <HorsEspaceClient>
           {/* GTM noscript fallback */}
@@ -119,18 +114,15 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <SuiviParcours />
           </Suspense>
-          {/* Mission 15 : le simulateur porte son propre en-tête (retour à l'accueil) et n'a pas de bouton flottant. */}
+          {/* Le simulateur porte la variante compacte de l'en-tête (retour à l'accueil). */}
           <HorsSimulateur>
-            <Header />
+            <EnteteSite />
           </HorsSimulateur>
         </HorsEspaceClient>
         <main id="main-content">{children}</main>
         <HorsEspaceClient>
-          <Footer />
+          <PiedDePage />
           <CookieBanner />
-          <HorsSimulateur>
-            <WhatsAppButton />
-          </HorsSimulateur>
           <Analytics />
           <VercelAnalytics />
         </HorsEspaceClient>

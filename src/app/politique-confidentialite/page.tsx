@@ -15,7 +15,7 @@ const MISE_A_JOUR = "22 septembre 2026";
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
-      <h2 className="font-display text-xl font-bold text-white">{titre}</h2>
+      <h2 className="titre-2 text-encre">{titre}</h2>
       {children}
     </section>
   );
@@ -36,15 +36,15 @@ const SOUS_TRAITANTS: { nom: string; role: string; lieu: string }[] = [
 
 export default function PolitiqueConfidentialite() {
   return (
-    <div className="min-h-screen pt-28 pb-20">
-      <div className="container-custom max-w-3xl">
-        <h1 className="font-display text-4xl font-bold mb-2">Politique de confidentialité</h1>
-        <p className="text-sm text-gris-500 mb-10">Dernière mise à jour : {MISE_A_JOUR}</p>
+    <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="titre-1 mb-2 text-encre">Politique de confidentialité</h1>
+        <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>
 
-        <div className="space-y-10 text-gris-300 leading-relaxed">
+        <div className="texte space-y-10 text-encre-2">
           <Section titre="Qui est responsable de vos données ?">
             <p>
-              Le responsable du traitement est <strong className="text-white">{SITE.owner}</strong>, entrepreneur individuel (CoverSwap),{" "}
+              Le responsable du traitement est <strong className="text-encre">{SITE.owner}</strong>, entrepreneur individuel (CoverSwap),{" "}
               {SITE.address}. Pour toute question sur vos données : {SITE.email} ou {SITE.phone}.
             </p>
           </Section>
@@ -53,34 +53,34 @@ export default function PolitiqueConfidentialite() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="text-left text-gris-400 border-b border-white/10">
+                  <tr className="text-left text-encre-2 border-b border-trait">
                     <th className="py-2 pr-4 font-medium">Données</th>
                     <th className="py-2 pr-4 font-medium">Finalité</th>
                     <th className="py-2 font-medium">Base légale</th>
                   </tr>
                 </thead>
                 <tbody className="align-top">
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-trait">
                     <td className="py-2 pr-4">Nom, téléphone, e-mail, ville, code postal, message</td>
                     <td className="py-2 pr-4">Répondre à votre demande de devis ou de contact, vous rappeler, établir le devis</td>
                     <td className="py-2">Mesures précontractuelles à votre demande</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-trait">
                     <td className="py-2 pr-4">Photos de votre intérieur (formulaire ou simulateur)</td>
                     <td className="py-2 pr-4">Comprendre les surfaces à couvrir, produire le rendu du simulateur, préparer le devis</td>
                     <td className="py-2">Mesures précontractuelles à votre demande</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-trait">
                     <td className="py-2 pr-4">Choix de références, rendu généré, date et heure de la demande</td>
                     <td className="py-2 pr-4">Retrouver votre projet lorsque nous vous rappelons</td>
                     <td className="py-2">Intérêt légitime (suivi de votre demande)</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-trait">
                     <td className="py-2 pr-4">Votre accord pour recevoir nos e-mails (case cochée, texte, date)</td>
                     <td className="py-2 pr-4">Vous envoyer conseils, nouveautés et offres, et prouver votre accord</td>
                     <td className="py-2">Consentement, retirable à tout moment</td>
                   </tr>
-                  <tr className="border-b border-white/5">
+                  <tr className="border-b border-trait">
                     <td className="py-2 pr-4">Adresse IP au moment de l&apos;envoi</td>
                     <td className="py-2 pr-4">Limiter les envois automatisés et protéger les formulaires</td>
                     <td className="py-2">Intérêt légitime (sécurité)</td>
@@ -128,7 +128,7 @@ export default function PolitiqueConfidentialite() {
             <ul className="list-disc list-inside space-y-1 text-sm">
               {SOUS_TRAITANTS.map((s) => (
                 <li key={s.nom}>
-                  <strong className="text-white">{s.nom}</strong> — {s.role} — {s.lieu}
+                  <strong className="text-encre">{s.nom}</strong> — {s.role} — {s.lieu}
                 </li>
               ))}
             </ul>
@@ -160,7 +160,7 @@ export default function PolitiqueConfidentialite() {
             <p>
               Vous pouvez vous désinscrire de nos e-mails par le lien présent en bas de chaque message. Si vous estimez que vos droits ne sont
               pas respectés, vous pouvez introduire une réclamation auprès de la CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 —{" "}
-              <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-rouge underline hover:text-white transition-colors">
+              <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 cnil.fr
               </a>
               ).
@@ -189,11 +189,11 @@ export default function PolitiqueConfidentialite() {
             <p>
               Le site s&apos;adresse à des personnes majeures. Cette politique peut évoluer ; la date en haut de page indique sa dernière version.
               Voir aussi les{" "}
-              <Link href="/mentions-legales" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/mentions-legales" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 mentions légales
               </Link>{" "}
               et les{" "}
-              <Link href="/cgv" className="text-rouge underline hover:text-white transition-colors">
+              <Link href="/cgv" className="text-accent-texte underline underline-offset-4 hover:text-encre">
                 conditions générales de vente
               </Link>
               .

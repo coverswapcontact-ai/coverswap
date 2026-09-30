@@ -19,9 +19,10 @@ export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  * Widget Cloudflare Turnstile (captcha invisible ou quasi). Ne s'affiche que si
  * NEXT_PUBLIC_TURNSTILE_SITE_KEY est définie ; sinon le formulaire reste
  * utilisable (pot de miel + limite côté CRM). `onToken` reçoit le jeton à
- * joindre à l'envoi ; il change à chaque nouvelle vérification.
+ * joindre à l'envoi ; il change à chaque nouvelle vérification. Thème clair
+ * par défaut (mission 16 : tout le site est clair).
  */
-export default function Turnstile({ onToken, action, theme = "dark" }: { onToken: (jeton: string | null) => void; action: string; theme?: "dark" | "light" }) {
+export default function Turnstile({ onToken, action, theme = "light" }: { onToken: (jeton: string | null) => void; action: string; theme?: "dark" | "light" }) {
   const conteneur = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const id = useId();

@@ -1,28 +1,12 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-noir: #1a1a1a;
-  --color-rouge: #cc0000;
-  --color-rouge-hover: #aa0000;
-  --color-rouge-light: #ff1a1a;
-  --color-rouge-texte: #f04545; /* rouge des textes sur fond noir (5:1) ; le rouge des fonds reste #cc0000 */
-
-  --color-gris-100: #f5f5f5;
-  --color-gris-200: #e5e5e5;
-  --color-gris-300: #d4d4d4;
-  --color-gris-400: #a3a3a3;
-  --color-gris-500: #969696; /* 5,6:1 sur le noir du site : lisible en petit texte */
-  --color-gris-600: #525252;
-  --color-gris-700: #404040;
-  --color-gris-800: #262626;
-  --color-gris-900: #171717;
-
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
 
-  /* ── Mission 15 : jetons sémantiques du simulateur et de l'espace client (thème clair « éditorial »).
+  /* ── Le thème du site (mission 15, généralisé par la mission 16) : clair « éditorial ».
      Blanc cassé, noir doux, UNE couleur d'accent ; coins peu arrondis ; deux durées, une courbe.
-     Portée : [data-theme="simulation"] (voir plus bas). Le reste du site ne change pas (mission 16). ── */
+     Toute couleur d'un composant passe par ces jetons (jamais une valeur hexadécimale). ── */
   --color-fond: #f5f4f1;
   --color-fond-2: #eceae5;
   --color-encre: #1a1a1a;
@@ -33,6 +17,7 @@
   --color-accent-texte: #8f1d12; /* le rouge en texte sur le fond clair (7:1) */
   --color-encre-survol: #3f3b36; /* l'encre au survol / à l'appui des boutons principaux */
   --color-sombre: #111110; /* fond des feuilles sombres et du plein écran */
+  --color-blanc: #ffffff; /* le texte posé sur l'encre ou sur le sombre, les cartes */
   --color-ok-fond: #e7f3ec;
   --color-ok-texte: #17563a;
   --rayon-sm: 6px;
@@ -44,53 +29,7 @@
   --espace-2: 0.75rem;
   --espace-3: 1rem;
   --espace-4: 1.5rem;
-  --espace-5: 2.5rem;
-
-  --animate-fade-in: fadeIn 0.6s ease-out forwards;
-  --animate-slide-up: slideUp 0.6s ease-out forwards;
-  --animate-slide-in-left: slideInLeft 0.6s ease-out forwards;
-  --animate-slide-in-right: slideInRight 0.6s ease-out forwards;
-  --animate-count-up: countUp 2s ease-out forwards;
-  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  @keyframes slideUp {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  @keyframes slideInLeft {
-    0% {
-      opacity: 0;
-      transform: translateX(-30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes slideInRight {
-    0% {
-      opacity: 0;
-      transform: translateX(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
+  --espace-5: 4rem; /* l'espace vertical d'une section : 64 px sur mobile, 96 px à partir de 768 px (plus bas) */
 }
 
 /*
@@ -111,172 +50,130 @@
   }
 }
 
-@utility btn-primary {
-  /* ── Bouton principal avec pulse subtil ── */
-  @apply inline-flex items-center justify-center gap-2 bg-rouge text-white font-bold
-           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-rouge-hover
-           active:scale-[0.98] uppercase tracking-wider;
-}
-
-@utility btn-secondary {
-  /* Pause CTA pulse when reduced motion is preferred */
-  @apply inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold
-           px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg transition-all duration-300
-           hover:bg-white hover:text-noir
-           active:scale-[0.98] uppercase tracking-wider;
-}
-
-@utility section-padding {
-  @apply py-14 md:py-24 px-4 sm:px-6 lg:px-8;
-}
-
-@utility container-custom {
-  @apply max-w-7xl mx-auto;
-}
-
-@utility glass-card {
-  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
-}
-
-@utility text-balance {
-  text-wrap: balance;
-}
-
-@layer utilities {
-  /* Le rouge en texte : version plus claire pour le contraste sur fond noir */
-  .text-rouge {
-    color: var(--color-rouge-texte);
-  }
-  /* Focus-visible for accessibility */
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid #cc0000;
-    outline-offset: 2px;
-  }
-}
-
+/* ═══════════════════════════════════════════════════════════
+   TYPOGRAPHIE — deux tailles de titre par page, figées ici (mission 16).
+   --titre-1 : l'ouverture (h1) ; --titre-2 : les h2 de section ; --texte : le corps ;
+   --texte-2 : le texte secondaire ; --surtitre : les seules capitales du site (13 px).
+═══════════════════════════════════════════════════════════ */
 @layer base {
+  :root {
+    --titre-1: 34px;
+    --titre-2: 26px;
+    --texte: 17px;
+    --texte-2: 15px;
+    --surtitre: 13px;
+  }
+  @media (min-width: 48rem) {
+    :root {
+      --titre-1: 48px;
+      --titre-2: 32px;
+      --espace-5: 6rem;
+    }
+  }
+
+  /* Le thème clair est celui de tout le site : html et body (l'élastique de l'iPhone, la barre
+     de défilement du viewport) prennent le fond ; aucun défilement lissé. */
   html {
-    scroll-behavior: smooth;
+    color-scheme: light;
+    scroll-behavior: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-noir text-white;
+    background: var(--color-fond);
+    color: var(--color-encre);
+    font-family: var(--font-sans);
   }
 
   ::selection {
-    @apply bg-rouge text-white;
+    background: var(--color-encre);
+    color: var(--color-fond);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SCROLLBAR
-═══════════════════════════════════════════════════════════ */
-::-webkit-scrollbar        { width: 8px; }
-::-webkit-scrollbar-track  { background: #1a1a1a; }
-::-webkit-scrollbar-thumb  { background: #404040; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #CC0000; }
-
-/* ═══════════════════════════════════════════════════════════
-   SCROLL REVEAL
-═══════════════════════════════════════════════════════════ */
-/* Toujours visible (le texte compte pour le premier rendu) : seul un léger
-   glissement accompagne l'arrivée dans l'écran, quand JavaScript est là. */
-html.js .reveal {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-html.js .reveal-up:not(.revealed)    { transform: translateY(24px); }
-html.js .reveal-left:not(.revealed)  { transform: translateX(-24px); }
-html.js .reveal-right:not(.revealed) { transform: translateX(24px); }
-html.js .reveal-scale:not(.revealed) { transform: scale(0.96); }
-
-/* ═══════════════════════════════════════════════════════════
-   CTA PULSE
-═══════════════════════════════════════════════════════════ */
-@keyframes ctaPulse {
-  0%   { box-shadow: 0 0 0 0   rgba(204, 0, 0, 0.55); }
-  55%  { box-shadow: 0 0 0 12px rgba(204, 0, 0, 0); }
-  100% { box-shadow: 0 0 0 0   rgba(204, 0, 0, 0); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HERO ENTRANCE ANIMATION
-═══════════════════════════════════════════════════════════ */
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(36px); }
-  to   { opacity: 1; transform: translateY(0); }
+@layer components {
+  .titre-1 {
+    font-family: var(--font-display);
+    font-size: var(--titre-1);
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .titre-2 {
+    font-family: var(--font-display);
+    font-size: var(--titre-2);
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .texte {
+    font-size: var(--texte);
+    line-height: 1.6;
+  }
+  .texte-2 {
+    font-size: var(--texte-2);
+    line-height: 1.6;
+    color: var(--color-encre-2);
+  }
+  .surtitre {
+    font-size: var(--surtitre);
+    font-weight: 500;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-encre-2);
+  }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   GLOW BORDER (formulaire)
-═══════════════════════════════════════════════════════════ */
-@keyframes borderGlow {
-  0%, 100% { border-color: rgba(204, 0, 0, 0.3); }
-  50%       { border-color: rgba(204, 0, 0, 0.8); }
+/* Anciennes classes de mise en page, réécrites sur les jetons (mission 16) : une section = l'espace
+   vertical --espace-5 et la gouttière 16 / 24 px ; le conteneur = max-w-6xl. */
+@utility section-padding {
+  @apply px-4 py-[var(--espace-5)] md:px-6;
 }
 
-.glow-border {
-  animation: borderGlow 3s ease-in-out infinite;
+@utility container-custom {
+  @apply mx-auto max-w-6xl;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SIMULATEUR ET ESPACE — thème clair « éditorial » (mission 15)
-   Posé sur /simulateur et sur l'onglet Simulations de /e/[jeton] : fond blanc cassé,
-   encre noire douce, formulaires en clair, sélection et focus dans l'encre.
+   FOCUS ET BARRE DE DÉFILEMENT — l'encre, partout.
+   L'attribut data-theme="simulation" (simulateur, feuilles, espace) reste accepté : il ne change plus rien.
 ═══════════════════════════════════════════════════════════ */
-[data-theme="simulation"] {
-  background: var(--color-fond);
-  color: var(--color-encre);
-  color-scheme: light;
-  font-family: var(--font-sans);
+@layer utilities {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--color-encre);
+    outline-offset: 2px;
+  }
 }
-[data-theme="simulation"] ::selection {
-  background: var(--color-encre);
-  color: var(--color-fond);
+
+::-webkit-scrollbar {
+  width: 8px;
 }
-[data-theme="simulation"] a:focus-visible,
-[data-theme="simulation"] button:focus-visible,
-[data-theme="simulation"] input:focus-visible,
-[data-theme="simulation"] select:focus-visible,
-[data-theme="simulation"] textarea:focus-visible,
-[data-theme="simulation"] [tabindex]:focus-visible {
-  outline: 3px solid var(--color-encre);
-  outline-offset: 2px;
-}
-[data-theme="simulation"] ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: var(--color-fond-2);
 }
-[data-theme="simulation"] ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: var(--color-trait);
+  border-radius: 4px;
 }
-/* Page /simulateur seulement : le seul défilement programmé est le haut de l'étape (pas de lissage global) ;
-   html et body prennent le fond clair (l'élastique de l'iPhone et la barre de défilement du viewport
-   appartiennent à html, hors de la portée [data-theme]) ; la barre déclarée #F5F4F1 y correspond. */
-html:has([data-page="simulateur"]) {
-  scroll-behavior: auto;
-  color-scheme: light;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-encre-2);
 }
-html:has([data-page="simulateur"]) body {
-  background: var(--color-fond);
-  color: var(--color-encre);
-}
-html:has([data-page="simulateur"])::-webkit-scrollbar-track {
-  background: var(--color-fond-2);
-}
-html:has([data-page="simulateur"])::-webkit-scrollbar-thumb {
-  background: var(--color-trait);
-}
+
 /* Aucune animation quand la personne préfère moins de mouvement. */
 @media (prefers-reduced-motion: reduce) {
-  [data-theme="simulation"] *,
-  [data-theme="simulation"] *::before,
-  [data-theme="simulation"] *::after {
+  *,
+  *::before,
+  *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -290,25 +187,4 @@ html:has([data-page="simulateur"])::-webkit-scrollbar-thumb {
 @keyframes lueur-attente {
   0%   { transform: translateX(-100%); }
   100% { transform: translateX(300%); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   REDUCED MOTION — accessibility
-═══════════════════════════════════════════════════════════ */
-@media (prefers-reduced-motion: reduce) {
-  html.js .reveal,
-  html.js .reveal:not(.revealed) {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .glow-border {
-    animation: none;
-  }
-
-  @keyframes slideUpFade {
-    from { opacity: 1; transform: none; }
-    to   { opacity: 1; transform: none; }
-  }
 }

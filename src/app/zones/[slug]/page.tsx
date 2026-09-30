@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ScrollReveal from "@/components/ScrollReveal";
-import TextureBackground from "@/components/TextureBackground";
+import Breadcrumb from "@/components/Breadcrumb";
 import { FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import { Lien } from "@/components/simulation/Lien";
+import { Section } from "@/components/simulation/Section";
+import { ENTREPRISE } from "@/lib/entreprise";
 import { ZONES, getZoneSlug, getZoneBySlug, type Zone } from "@/data/zones";
 import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
 
@@ -154,8 +156,18 @@ export default async function ZonePage({
   const otherZones = ZONES.filter((z) => z.slug !== zone.slug);
   const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
 
+  const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white";
+  const prestationsVille = [
+    { href: "/prestations/cuisine", title: `Covering Cuisine à ${zone.ville}`, desc: "Plans de travail, crédences, façades de meubles. Effet marbre, bois, béton." },
+    { href: "/prestations/salle-de-bain", title: `Covering SDB à ${zone.ville}`, desc: "Carrelage mural, meubles vasque, portes : rénovation sans dépose." },
+    { href: "/prestations/meubles", title: `Covering Meubles à ${zone.ville}`, desc: "Dressing, bibliothèque, commodes : seconde vie à votre mobilier." },
+    { href: "/prestations/professionnel", title: `Covering Pro à ${zone.ville}`, desc: "Bureaux, comptoirs, vitrines : modernisation rapide de vos locaux." },
+    { href: "/prestations/vitrages", title: `Covering Vitrages à ${zone.ville}`, desc: "Films décoratifs, occultants, dépoli sur mesure pour vitres et baies." },
+    { href: "/matieres", title: "Catalogue Cover Styl'", desc: `Parcourez les ${NB_REFERENCES} références : bois, pierre, métal, textile, couleurs unies.` },
+  ];
+
   return (
-    <main className="bg-noir min-h-screen">
+    <div className="bg-fond">
       <ZoneLocalBusinessSchema zone={zone} />
       <FAQSchema faqs={zone.faqLocale.map((f) => ({ q: f.q, a: texteOffre(f.a) }))} />
       <BreadcrumbSchema
@@ -166,347 +178,139 @@ export default async function ZonePage({
         ]}
       />
 
-      {/* ══════════════════ HERO ══════════════════ */}
-      <section className="relative section-padding pt-40 overflow-hidden">
-        <TextureBackground
-          src="/images/fonds/photo-1556909114-f6e7ad7d3136"
-          overlay="rgba(0,0,0,0.82)"
-          fadeTop={false}
-          fadeBottom
-        />
-        <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full bg-rouge/5 blur-[100px]" />
-        <div className="container-custom relative z-20">
-          {/* Breadcrumb UI */}
-          <ScrollReveal direction="fade">
-            <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-sm text-gris-400 mb-8">
-              <Link href="/" className="hover:text-white transition-colors">
-                Accueil
-              </Link>
-              <span className="text-gris-600">/</span>
-              <Link href="/zones" className="hover:text-white transition-colors">
-                Zones d&apos;intervention
-              </Link>
-              <span className="text-gris-600">/</span>
-              <span className="text-white">Covering {zone.ville}</span>
-            </nav>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up">
-            <span className="inline-block text-rouge uppercase tracking-widest text-sm font-bold mb-4">
-              Zone d&apos;intervention · {zone.codePostal.split(" / ")[0]}
-            </span>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold mb-6 tracking-tight max-w-4xl">
-              Covering adhésif à <span className="text-rouge">{zone.ville}</span> — Cuisine, salle de bain, meubles : rénovés en 1 journée
-            </h1>
-            <p className="text-gris-300 text-lg max-w-3xl leading-relaxed mb-10">
-              Vous habitez {zone.ville} et souhaitez moderniser votre cuisine, salle de bain ou vos meubles sans
-              engager de gros travaux&nbsp;? Nous intervenons à {zone.ville} et dans toute la métropole avec le covering
-              adhésif Cover Styl&apos;&nbsp;: pose en 1 journée, {NB_REFERENCES} références au catalogue, garanti 10 ans.
-            </p>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" delay={0.2}>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/simulateur" className="btn-primary">
-                Simuler mon projet ({zone.ville})
-              </Link>
-              <Link href="/contact" className="btn-secondary">
-                Devis gratuit {DELAI_REPONSE}
-              </Link>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" delay={0.3}>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gris-400">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {zone.distanceKm === 0 ? "Basés à Pérols, chez vous" : `Basés à Pérols, à ${zone.distanceKm} km`}
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Devis {DELAI_REPONSE}
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Garanti 10 ans Cover Styl&apos;
-              </div>
-            </div>
-          </ScrollReveal>
+      {/* ══════════════════ OUVERTURE ══════════════════ */}
+      <section className="bg-fond-2 px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+        <div className="mx-auto max-w-6xl">
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention", href: "/zones" }, { label: `Covering ${zone.ville}` }]} />
+          <p className="surtitre">Zone d&apos;intervention · {zone.codePostal.split(" / ")[0]}</p>
+          <h1 className="titre-1 mt-2 max-w-4xl text-encre">Covering adhésif à {zone.ville} — Cuisine, salle de bain, meubles : rénovés en 1 journée</h1>
+          <p className="texte mt-4 mb-8 max-w-3xl text-encre-2">
+            Vous habitez {zone.ville} et souhaitez moderniser votre cuisine, salle de bain ou vos meubles sans
+            engager de gros travaux&nbsp;? Nous intervenons à {zone.ville} et dans toute la métropole avec le covering
+            adhésif Cover Styl&apos;&nbsp;: pose en 1 journée, {NB_REFERENCES} références au catalogue, garanti 10 ans.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Lien href="/simulateur">Simuler mon projet ({zone.ville})</Lien>
+            <Lien href="/contact" variante="secondaire">
+              Devis gratuit {DELAI_REPONSE}
+            </Lien>
+          </div>
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-encre-2">
+            <li>{zone.distanceKm === 0 ? "Basés à Pérols, chez vous" : `Basés à Pérols, à ${zone.distanceKm} km`}</li>
+            <li>Devis {DELAI_REPONSE}</li>
+            <li>Garanti 10 ans Cover Styl&apos;</li>
+          </ul>
         </div>
       </section>
 
       {/* ══════════════════ INTRO + QUARTIERS ══════════════════ */}
-      <section className="section-padding bg-noir">
-        <div className="container-custom max-w-5xl">
-          <ScrollReveal direction="up">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-12">
-              Le covering Cover Styl&apos; à <span className="text-rouge">{zone.ville}</span>
-            </h2>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" delay={0.1}>
-            <div className="text-gris-300 leading-relaxed space-y-5 text-base">
-              {texteOffre(zone.intro).split(/\n+/).filter(Boolean).map((para, idx) => (
-                <p key={idx}>{para}</p>
-              ))}
-            </div>
-          </ScrollReveal>
-
-          {/* Liste quartiers */}
-          <ScrollReveal direction="up" delay={0.2}>
-            <div className="mt-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-              <h3 className="font-display text-xl font-bold mb-4">
-                Quartiers et secteurs couverts à {zone.ville}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {zone.quartiers.map((q) => (
-                  <span
-                    key={q}
-                    className="inline-flex items-center gap-1.5 bg-rouge/10 border border-rouge/30 text-white text-sm rounded-full px-3 py-1.5"
-                  >
-                    <svg className="w-3 h-3 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    </svg>
-                    {q}
-                  </span>
-                ))}
-              </div>
-              <p className="text-gris-500 text-sm mt-4 italic">
-                Votre quartier ne figure pas dans la liste&nbsp;? Nous intervenons sur l&apos;ensemble du territoire
-                de {zone.ville} et de ses communes voisines. Contactez-nous pour confirmer.
-              </p>
-            </div>
-          </ScrollReveal>
+      <Section titre={`Le covering Cover Styl' à ${zone.ville}`}>
+        <div className="texte space-y-5 text-encre-2">
+          {texteOffre(zone.intro)
+            .split(/\n+/)
+            .filter(Boolean)
+            .map((para, idx) => (
+              <p key={idx}>{para}</p>
+            ))}
         </div>
-      </section>
+
+        <div className={`${CARTE} mt-10 p-6 md:p-8`}>
+          <h3 className="mb-4 text-[17px] font-semibold text-encre">Quartiers et secteurs couverts à {zone.ville}</h3>
+          <ul className="flex flex-wrap gap-2">
+            {zone.quartiers.map((q) => (
+              <li key={q} className="rounded-full border border-trait bg-fond px-3 py-1.5 text-[14px] text-encre">
+                {q}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-[14px] text-encre-2">
+            Votre quartier ne figure pas dans la liste&nbsp;? Nous intervenons sur l&apos;ensemble du territoire
+            de {zone.ville} et de ses communes voisines. Contactez-nous pour confirmer.
+          </p>
+        </div>
+      </Section>
 
       {/* ══════════════════ NOS PRESTATIONS DANS LA VILLE ══════════════════ */}
-      <section className="relative section-padding overflow-hidden">
-        <TextureBackground
-          src="/images/fonds/photo-1556909114-f6e7ad7d3136"
-          overlay="rgba(0,0,0,0.85)"
-          fadeTop
-          fadeBottom
-        />
-        <div className="container-custom relative z-20 max-w-5xl">
-          <ScrollReveal direction="up">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-4">
-              Nos prestations covering à <span className="text-rouge">{zone.ville}</span>
-            </h2>
-            <p className="text-gris-400 text-center max-w-2xl mx-auto mb-16">
-              Toute la palette du covering Cover Styl&apos; disponible chez vous, en un seul jour de pose.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                href: "/prestations/cuisine",
-                title: `Covering Cuisine à ${zone.ville}`,
-                icon: "🍳",
-                desc: "Plans de travail, crédences, façades de meubles. Effet marbre, bois, béton.",
-              },
-              {
-                href: "/prestations/salle-de-bain",
-                title: `Covering SDB à ${zone.ville}`,
-                icon: "🛁",
-                desc: "Carrelage mural, meubles vasque, portes : rénovation sans dépose.",
-              },
-              {
-                href: "/prestations/meubles",
-                title: `Covering Meubles à ${zone.ville}`,
-                icon: "🪑",
-                desc: "Dressing, bibliothèque, commodes : seconde vie à votre mobilier.",
-              },
-              {
-                href: "/prestations/professionnel",
-                title: `Covering Pro à ${zone.ville}`,
-                icon: "🏢",
-                desc: "Bureaux, comptoirs, vitrines : modernisation rapide de vos locaux.",
-              },
-              {
-                href: "/prestations/vitrages",
-                title: `Covering Vitrages à ${zone.ville}`,
-                icon: "🪟",
-                desc: "Films décoratifs, occultants, dépoli sur mesure pour vitres et baies.",
-              },
-              {
-                href: "/revetements",
-                title: "Catalogue Cover Styl'",
-                icon: "🎨",
-                desc: `Parcourez les ${NB_REFERENCES} références : bois, pierre, métal, textile, couleurs unies.`,
-              },
-            ].map((p) => (
-              <ScrollReveal key={p.href} direction="up">
-                <Link
-                  href={p.href}
-                  className="block bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-rouge/40 hover:bg-rouge/5 transition-all duration-300 h-full"
-                >
-                  <span className="text-3xl mb-3 block">{p.icon}</span>
-                  <h3 className="font-display text-lg font-bold mb-2 text-white">{p.title}</h3>
-                  <p className="text-gris-400 text-sm leading-relaxed">{p.desc}</p>
-                  <span className="inline-flex items-center gap-1 text-rouge text-sm font-semibold mt-4 group-hover:gap-2 transition-all">
-                    Découvrir
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </span>
-                </Link>
-              </ScrollReveal>
-            ))}
-          </div>
+      <Section large fond="fond-2" titre={`Nos prestations covering à ${zone.ville}`} intro="Toute la palette du covering Cover Styl' disponible chez vous, en un seul jour de pose.">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {prestationsVille.map((p) => (
+            <Link key={p.href} href={p.href} className={`${CARTE} block h-full p-6 transition-colors duration-[var(--duree-courte)] hover:border-encre`}>
+              <h3 className="mb-2 text-[17px] font-semibold text-encre">{p.title}</h3>
+              <p className="texte-2">{p.desc}</p>
+              <span className="mt-4 inline-flex text-[15px] font-medium text-encre underline underline-offset-4">Découvrir</span>
+            </Link>
+          ))}
         </div>
-      </section>
+      </Section>
 
       {/* ══════════════════ POURQUOI COVERSWAP À [VILLE] ══════════════════ */}
-      <section className="section-padding bg-noir">
-        <div className="container-custom max-w-5xl">
-          <ScrollReveal direction="up">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold mb-12">
-              Pourquoi choisir CoverSwap à <span className="text-rouge">{zone.ville}</span>&nbsp;?
-            </h2>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            <ScrollReveal direction="left">
-              <div className="space-y-5">
-                <p className="text-gris-300 leading-relaxed">{texteOffre(zone.pourquoi)}</p>
-                <p className="text-gris-300 leading-relaxed">
-                  <strong className="text-white">Type d&apos;habitat couvert à {zone.ville}&nbsp;:</strong>{" "}
-                  {zone.habitat}.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal direction="right">
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  {
-                    value: `${zone.distanceKm === 0 ? "Sur place" : zone.distanceKm + " km"}`,
-                    label: "depuis Pérols",
-                  },
-                  { value: `${DELAI_REPONSE_COURT}`, label: "pour un devis" },
-                  { value: "1 jour", label: "de pose typique" },
-                  { value: `${GARANTIE}`, label: "garanti Cover Styl'" },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
-                  >
-                    <span className="block font-display text-2xl font-bold text-rouge mb-1">
-                      {stat.value}
-                    </span>
-                    <span className="text-gris-400 text-sm">{stat.label}</span>
-                  </div>
-                ))}
-              </div>
-            </ScrollReveal>
+      <Section large titre={`Pourquoi choisir CoverSwap à ${zone.ville} ?`}>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          <div className="texte space-y-5 text-encre-2">
+            <p>{texteOffre(zone.pourquoi)}</p>
+            <p>
+              <strong className="text-encre">Type d&apos;habitat couvert à {zone.ville}&nbsp;:</strong> {zone.habitat}.
+            </p>
           </div>
+
+          <dl className="grid grid-cols-2 gap-4">
+            {[
+              { value: `${zone.distanceKm === 0 ? "Sur place" : zone.distanceKm + " km"}`, label: "depuis Pérols" },
+              { value: `${DELAI_REPONSE_COURT}`, label: "pour un devis" },
+              { value: "1 jour", label: "de pose typique" },
+              { value: `${GARANTIE}`, label: "garanti Cover Styl'" },
+            ].map((stat) => (
+              <div key={stat.label} className={`${CARTE} flex flex-col-reverse p-6 text-center`}>
+                <dt className="text-[14px] text-encre-2">{stat.label}</dt>
+                <dd className="mb-1 font-display text-[24px] font-semibold text-encre">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-      </section>
+      </Section>
 
       {/* ══════════════════ FAQ LOCALE ══════════════════ */}
-      <section className="relative section-padding overflow-hidden">
-        <TextureBackground
-          src="/images/fonds/photo-1556909114-f6e7ad7d3136"
-          overlay="rgba(0,0,0,0.85)"
-          fadeTop
-          fadeBottom
-        />
-        <div className="container-custom relative z-20 max-w-3xl">
-          <ScrollReveal direction="up">
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-center mb-12">
-              Questions fréquentes &mdash; <span className="text-rouge">{zone.ville}</span>
-            </h2>
-          </ScrollReveal>
-
-          <div className="space-y-4">
-            {zone.faqLocale.map((faq) => (
-              <ScrollReveal key={faq.q} direction="up">
-                <details className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 group cursor-pointer">
-                  <summary className="flex items-center justify-between font-display font-bold text-lg list-none">
-                    {faq.q}
-                    <svg
-                      className="w-5 h-5 text-rouge shrink-0 group-open:rotate-45 transition-transform"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                  </summary>
-                  <p className="text-gris-400 mt-4 leading-relaxed">{texteOffre(faq.a)}</p>
-                </details>
-              </ScrollReveal>
-            ))}
-          </div>
+      <Section fond="fond-2" titre={`Questions fréquentes — ${zone.ville}`}>
+        <div className="space-y-2.5">
+          {zone.faqLocale.map((faq) => (
+            <details key={faq.q} className={`group ${CARTE} p-4`}>
+              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
+                {faq.q}
+                <span aria-hidden className="text-2xl leading-none text-encre-2 transition-transform duration-[var(--duree-courte)] group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="texte-2 mt-3">{texteOffre(faq.a)}</p>
+            </details>
+          ))}
         </div>
-      </section>
+      </Section>
 
       {/* ══════════════════ AUTRES ZONES (maillage interne) ══════════════════ */}
-      <section className="section-padding bg-noir">
-        <div className="container-custom max-w-5xl">
-          <ScrollReveal direction="up">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-center mb-4">
-              Autres zones d&apos;intervention CoverSwap
-            </h2>
-            <p className="text-gris-400 text-center mb-12 text-sm">
-              Nous intervenons aussi dans ces villes proches de {zone.ville} et partout en Hérault &amp; Occitanie.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {otherZones.map((z) => (
-              <Link
-                key={z.slug}
-                href={`/zones/${getZoneSlug(z)}`}
-                className="block bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 hover:border-rouge/40 hover:bg-rouge/5 transition-all text-center"
-              >
-                <span className="block text-white font-medium text-sm">Covering {z.ville}</span>
-                <span className="text-gris-500 text-xs">{z.codePostal.split(" / ")[0]}</span>
-              </Link>
-            ))}
-          </div>
+      <Section large titre="Autres zones d'intervention CoverSwap" intro={`Nous intervenons aussi dans ces villes proches de ${zone.ville} et partout en Hérault & Occitanie.`}>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {otherZones.map((z) => (
+            <Link key={z.slug} href={`/zones/${getZoneSlug(z)}`} className={`${CARTE} block p-4 text-center transition-colors duration-[var(--duree-courte)] hover:border-encre`}>
+              <span className="block text-[15px] font-medium text-encre">Covering {z.ville}</span>
+              <span className="text-[13px] text-encre-2">{z.codePostal.split(" / ")[0]}</span>
+            </Link>
+          ))}
         </div>
-      </section>
+      </Section>
 
-      {/* ══════════════════ CTA FINAL ══════════════════ */}
-      <section className="section-padding bg-noir">
-        <div className="container-custom text-center">
-          <ScrollReveal direction="scale">
-            <div className="bg-white/5 backdrop-blur-sm border border-rouge/20 bg-rouge/5 rounded-2xl p-12 max-w-3xl mx-auto">
-              <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
-                Votre projet covering à <span className="text-rouge">{zone.ville}</span> commence ici
-              </h2>
-              <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Envoyez-nous une photo, recevez un rendu IA en {DELAI_RENDU} et un devis détaillé {DELAI_REPONSE}.
-                Sans engagement, sans visite obligatoire.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/simulateur" className="btn-primary text-lg px-10 py-5">
-                  Simuler mon projet
-                </Link>
-                <a
-                  href="https://wa.me/33670352869"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-secondary text-lg px-10 py-5"
-                >
-                  WhatsApp direct
-                </a>
-              </div>
-            </div>
-          </ScrollReveal>
+      {/* ══════════════════ DERNIER APPEL ══════════════════ */}
+      <Section
+        fond="fond-2"
+        titre={`Votre projet covering à ${zone.ville} commence ici`}
+        intro={`Envoyez-nous une photo, recevez un rendu IA en ${DELAI_RENDU} et un devis détaillé ${DELAI_REPONSE}. Sans engagement, sans visite obligatoire.`}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Lien href="/simulateur">Simuler mon projet</Lien>
+          <Lien href={ENTREPRISE.reseaux.whatsapp} target="_blank" rel="noopener noreferrer" variante="secondaire">
+            WhatsApp direct
+          </Lien>
         </div>
-      </section>
-    </main>
+      </Section>
+    </div>
   );
 }

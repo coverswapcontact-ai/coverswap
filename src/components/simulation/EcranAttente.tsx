@@ -175,7 +175,7 @@ export default function EcranAttente({ photo, films, statut, etape, attenteEstim
                 const courante = !faite && (i === 0 || cochees[i - 1]);
                 return (
                   <li key={e.cle} className="flex gap-3">
-                    <span aria-hidden className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[12px] ${faite ? "border-encre bg-encre text-white" : courante ? "border-encre text-encre" : "border-trait text-encre-2"}`}>
+                    <span aria-hidden className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[12px] ${faite ? "border-encre bg-encre text-blanc" : courante ? "border-encre text-encre" : "border-trait text-encre-2"}`}>
                       {faite ? "✓" : i + 1}
                     </span>
                     <div>

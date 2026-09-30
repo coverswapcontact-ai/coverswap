@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
+import { CHAMP } from "@/app/simulateur/_components/Formulaires";
 import { track } from "@/lib/analytics";
 import { consentementPourEnvoi } from "@/lib/consentement";
 import CaseConsentement from "./CaseConsentement";
@@ -14,6 +16,9 @@ import { DELAI_REPONSE } from "@/lib/offre";
 import { FAMILLES_REPLI, type FamillePrestation } from "@/lib/prestations";
 
 const MAX_PHOTOS = 4;
+/** Mission 16 : les champs clairs du simulateur (`CHAMP`), une étiquette au-dessus. */
+const ETIQUETTE = "mb-1 block text-[14px] font-medium text-encre";
+const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white p-5 sm:p-8";
 
 /**
  * Réduit une image côté client (max ~1300px, JPEG q0.78) et renvoie une
@@ -79,8 +84,14 @@ export default function DevisForm({
   const [jetonCaptcha, setJetonCaptcha] = useState<string | null>(null);
 
   async function handlePhotos(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+    const champ = e.target;
+    await ajouterPhotos(Array.from(champ.files || []));
+    champ.value = ""; // permet de re-sélectionner le même fichier
+  }
+
+  /** Les photos choisies ou déposées sur la zone (jusqu'à 4, réduites avant l'envoi). */
+  async function ajouterPhotos(files: File[]) {
+    if (files.length === 0 || photoBusy) return;
     setPhotoBusy(true);
     try {
       const slots = MAX_PHOTOS - photos.length;
@@ -98,7 +109,6 @@ export default function DevisForm({
       if (encoded.length) setPhotos((prev) => [...prev, ...encoded].slice(0, MAX_PHOTOS));
     } finally {
       setPhotoBusy(false);
-      e.target.value = ""; // permet de re-sélectionner le même fichier
     }
   }
 
@@ -171,95 +181,93 @@ export default function DevisForm({
 
   if (sent) {
     return (
-      <div className="glass-card p-8 md:p-10">
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center">
-            <svg className="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className={CARTE} role="status">
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-ok-fond text-ok-texte">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Demande envoyée !</h2>
-          <p className="text-gris-400 mb-6">
-            Nous vous recontactons avec votre devis {DELAI_REPONSE}.
-          </p>
-          <button onClick={() => setSent(false)} className="btn-secondary text-sm px-6 py-3">
+          <h2 className="titre-2 mb-2 text-encre">Demande envoyée</h2>
+          <p className="texte-2 mb-6">Nous vous recontactons avec votre devis {DELAI_REPONSE}.</p>
+          <Bouton variante="secondaire" onClick={() => setSent(false)}>
             Envoyer une autre demande
-          </button>
+          </Bouton>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="glass-card p-8 md:p-10">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid sm:grid-cols-2 gap-6">
+    <div className={CARTE}>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="devis-nom" className="block text-sm font-medium mb-2">Nom complet *</label>
+            <label htmlFor="devis-nom" className={ETIQUETTE}>Nom complet *</label>
             <input
               id="devis-nom"
               name="nom"
               required
               placeholder="Jean Dupont"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+              className={CHAMP}
             />
           </div>
           <div>
-            <label htmlFor="devis-email" className="block text-sm font-medium mb-2">Email *</label>
+            <label htmlFor="devis-email" className={ETIQUETTE}>Email *</label>
             <input
               id="devis-email"
               name="email"
               type="email"
               required
               placeholder="jean@exemple.fr"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+              className={CHAMP}
             />
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="devis-telephone" className="block text-sm font-medium mb-2">Téléphone *</label>
+            <label htmlFor="devis-telephone" className={ETIQUETTE}>Téléphone *</label>
             <input
               id="devis-telephone"
               name="telephone"
               type="tel"
               required
               placeholder="06 12 34 56 78"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+              className={CHAMP}
             />
           </div>
           <div>
-            <label htmlFor="devis-type" className="block text-sm font-medium mb-2">Type de projet *</label>
+            <label htmlFor="devis-type" className={ETIQUETTE}>Type de projet *</label>
             <select
               id="devis-type"
               name="type_projet"
               required
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-hidden focus:border-rouge/50 transition-colors appearance-none"
+              className={`${CHAMP} appearance-none`}
             >
-              <option value="" className="bg-noir">Sélectionnez...</option>
+              <option value="">Sélectionnez...</option>
               {familles.map((f) => (
-                <option key={f.id} value={f.libelle} className="bg-noir">{f.libelle} ({f.aide.charAt(0).toLowerCase() + f.aide.slice(1)})</option>
+                <option key={f.id} value={f.libelle}>{f.libelle} ({f.aide.charAt(0).toLowerCase() + f.aide.slice(1)})</option>
               ))}
-              <option value="Autre" className="bg-noir">Autre</option>
+              <option value="Autre">Autre</option>
             </select>
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="devis-ville" className="block text-sm font-medium mb-2">Ville du projet *</label>
+            <label htmlFor="devis-ville" className={ETIQUETTE}>Ville du projet *</label>
             <input
               id="devis-ville"
               name="ville"
               required
               autoComplete="address-level2"
               placeholder="Montpellier"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+              className={CHAMP}
             />
           </div>
           <div>
-            <label htmlFor="devis-cp" className="block text-sm font-medium mb-2">Code postal *</label>
+            <label htmlFor="devis-cp" className={ETIQUETTE}>Code postal *</label>
             <input
               id="devis-cp"
               name="code_postal"
@@ -269,26 +277,26 @@ export default function DevisForm({
               title="5 chiffres"
               autoComplete="postal-code"
               placeholder="34000"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+              className={CHAMP}
             />
           </div>
         </div>
 
         {/* Style souhaité */}
         <div>
-          <label htmlFor="devis-style" className="block text-sm font-medium mb-2">Style souhaité</label>
+          <label htmlFor="devis-style" className={ETIQUETTE}>Style souhaité</label>
           <input
             id="devis-style"
             name="style"
             placeholder="ex : Marbre blanc, Bois chêne, Noir mat..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors"
+            className={CHAMP}
           />
         </div>
 
         {reference && (
-          <div className="bg-rouge/10 border border-rouge/30 rounded-lg px-4 py-3">
-            <p className="text-sm text-gris-300">
-              Référence sélectionnée : <span className="font-bold text-white">{reference}</span>
+          <div className="rounded-[var(--rayon-sm)] border border-trait bg-fond px-4 py-3">
+            <p className="text-[14.5px] text-encre-2">
+              Référence sélectionnée : <span className="font-semibold text-encre">{reference}</span>
             </p>
             <input type="hidden" name="reference" value={reference} />
           </div>
@@ -296,36 +304,36 @@ export default function DevisForm({
 
         {/* Message */}
         <div>
-          <label htmlFor="devis-message" className="block text-sm font-medium mb-2">Votre message *</label>
+          <label htmlFor="devis-message" className={ETIQUETTE}>Votre message *</label>
           <textarea
             id="devis-message"
             name="message"
             required
             rows={4}
             placeholder="Décrivez votre projet, vos contraintes, vos envies..."
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-gris-500 focus:outline-hidden focus:border-rouge/50 transition-colors resize-none"
+            className={`${CHAMP} resize-none`}
           />
         </div>
 
         {/* Photos du projet */}
         <div>
-          <label className="block text-sm font-medium mb-2">
-            Photos du projet <span className="text-gris-500 font-normal">(recommandé — accélère votre devis)</span>
-          </label>
+          <p className={ETIQUETTE}>
+            Photos du projet <span className="font-normal text-encre-2">(recommandé — accélère votre devis)</span>
+          </p>
 
           {photos.length > 0 && (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3">
               {photos.map((src, i) => (
-                <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-white/10">
+                <div key={i} className="relative aspect-square overflow-hidden rounded-[var(--rayon-sm)] border border-trait">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={`Photo projet ${i + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removePhoto(i)}
                     aria-label="Retirer la photo"
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rouge"
+                    className="absolute top-1 right-1 flex h-11 w-11 items-center justify-center rounded-full bg-encre/70 text-blanc transition-colors duration-[var(--duree-courte)] hover:bg-encre"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -335,12 +343,20 @@ export default function DevisForm({
           )}
 
           {photos.length < MAX_PHOTOS && (
-            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-rouge/30 transition-colors bg-white/2">
-              <svg className="w-8 h-8 text-gris-500 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <label
+              // Une photo glissée sur la zone est ajoutée (sans cela, le navigateur l'ouvrirait et quitterait la page).
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                void ajouterPhotos(Array.from(e.dataTransfer.files || []));
+              }}
+              className={`flex h-28 w-full cursor-pointer flex-col items-center justify-center rounded-[var(--rayon-sm)] border-2 border-dashed border-trait bg-fond transition-colors duration-[var(--duree-courte)] hover:border-encre ${FOCUS_FICHIER}`}
+            >
+              <svg className="mb-1 h-8 w-8 text-encre-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span className="text-sm text-gris-500">
-                {photoBusy ? "Traitement..." : "Cliquez ou glissez vos photos (jusqu'à 4)"}
+              <span className="text-[14px] text-encre-2">
+                {photoBusy ? "Traitement..." : "Ajoutez vos photos (jusqu'à 4)"}
               </span>
               <input
                 type="file"
@@ -348,7 +364,7 @@ export default function DevisForm({
                 multiple
                 onChange={handlePhotos}
                 disabled={photoBusy}
-                className="hidden"
+                className="sr-only"
               />
             </label>
           )}
@@ -362,25 +378,21 @@ export default function DevisForm({
           <input type="text" id="website" name="website" autoComplete="off" />
         </div>
 
-        <Turnstile action="devis" onToken={setJetonCaptcha} />
+        <Turnstile action="devis" theme="light" onToken={setJetonCaptcha} />
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+          <p role="alert" className="rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
             {error}
-          </div>
+          </p>
         )}
 
-        <button
-          type="submit"
-          disabled={sending || photoBusy}
-          className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {sending ? "Envoi en cours..." : submitLabel}
-        </button>
+        <Bouton type="submit" plein occupe={sending} libelleOccupe="Envoi en cours…" raisonDesactive={photoBusy ? "Photos en préparation…" : null}>
+          {submitLabel}
+        </Bouton>
 
-        <p className="text-xs text-gris-500 text-center mt-3">
+        <p className="text-center text-[13.5px] text-encre-2">
           Vous avez repéré une référence dans notre catalogue ?{" "}
-          <Link href="/revetements" className="text-rouge hover:text-white transition-colors underline">
+          <Link href="/matieres" className="text-encre underline underline-offset-4">
             Parcourir le catalogue Cover Styl&apos;
           </Link>
         </p>

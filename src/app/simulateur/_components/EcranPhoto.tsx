@@ -95,7 +95,7 @@ export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder
 
       <div className={`rounded-[var(--rayon-md)] border-2 border-dashed p-3 transition-colors duration-[var(--duree-courte)] sm:p-4 ${survol ? "border-encre bg-white" : "border-trait"}`} aria-busy={occupe}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className={`${BOUTON_FICHIER} bg-encre text-white hover:bg-encre-survol ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+          <label className={`${BOUTON_FICHIER} bg-encre text-blanc hover:bg-encre-survol ${occupe ? "pointer-events-none opacity-60" : ""}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />
               <circle cx="12" cy="13" r="3" />

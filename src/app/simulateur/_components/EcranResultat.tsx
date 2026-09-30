@@ -179,7 +179,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Vos rendus">
             {avecImage.map((r, i) => (
-              <button key={r.travailId} type="button" aria-pressed={r.travailId === rendu.travailId} onClick={() => onChoisirRendu(r.travailId)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] ${r.travailId === rendu.travailId ? "border-encre bg-encre text-white" : "border-trait bg-white text-encre hover:border-encre"}`}>
+              <button key={r.travailId} type="button" aria-pressed={r.travailId === rendu.travailId} onClick={() => onChoisirRendu(r.travailId)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] ${r.travailId === rendu.travailId ? "border-encre bg-encre text-blanc" : "border-trait bg-white text-encre hover:border-encre"}`}>
                 Rendu {i + 1}
               </button>
             ))}

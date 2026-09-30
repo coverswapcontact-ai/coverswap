@@ -18,6 +18,7 @@ export interface BreadcrumbItem {
  *  - <nav aria-label="Fil d'Ariane">
  *  - Le dernier item est en <span aria-current="page"> (pas un lien)
  *  - Séparateurs visuels par CSS (pas dans le DOM logique)
+ *  - Mission 16 : chaque lien est une cible de 44 px de haut (hors paragraphe)
  */
 export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   if (items.length === 0) return null;
@@ -25,25 +26,25 @@ export default function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
     <nav
       aria-label="Fil d'Ariane"
-      className="flex items-center flex-wrap gap-x-2 gap-y-1 text-sm text-gris-400 mb-8"
+      className="mb-2 flex flex-wrap items-center gap-x-2 text-[14px] text-encre-2"
     >
       {items.map((item, idx) => {
         const isLast = idx === items.length - 1;
         return (
-          <span key={`${item.label}-${idx}`} className="flex items-center gap-2">
+          <span key={`${item.label}-${idx}`} className="flex min-h-[44px] items-center gap-2">
             {item.href && !isLast ? (
               <Link
                 href={item.href}
-                className="hover:text-white transition-colors"
+                className="inline-flex min-h-[44px] items-center transition-colors duration-[var(--duree-courte)] hover:text-encre"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="text-white" aria-current={isLast ? "page" : undefined}>
+              <span className="text-encre" aria-current={isLast ? "page" : undefined}>
                 {item.label}
               </span>
             )}
-            {!isLast && <span className="text-gris-600" aria-hidden="true">/</span>}
+            {!isLast && <span className="text-trait" aria-hidden="true">/</span>}
           </span>
         );
       })}

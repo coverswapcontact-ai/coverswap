@@ -6,14 +6,13 @@ import { TEXTE_CONSENTEMENT_MAIL } from "@/lib/consentement";
 /**
  * Case de consentement aux e-mails commerciaux : distincte de l'envoi du
  * formulaire, jamais pré-cochée, facultative. Sous la case, la mention
- * d'information RGPD obligatoire. `clair` : sur fond clair (simulateur,
- * mission 15), les textes prennent l'encre du thème.
+ * d'information RGPD obligatoire. Mission 16 : le site entier est clair ;
+ * `clair` (simulateur, mission 15) reste accepté et ne change plus rien.
  */
 export default function CaseConsentement({
   id,
   checked,
   onChange,
-  clair = false,
 }: {
   id: string;
   checked: boolean;
@@ -29,15 +28,15 @@ export default function CaseConsentement({
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          className={clair ? "mt-1 h-4 w-4 shrink-0 rounded border-trait accent-[var(--color-encre)]" : "mt-1 h-4 w-4 shrink-0 rounded border-white/30 bg-white/5 accent-rouge"}
+          className="mt-1 h-4 w-4 shrink-0 rounded border-trait accent-[var(--color-encre)]"
         />
-        <span className={clair ? "text-[14px] leading-relaxed text-encre" : "text-sm text-gris-300 leading-relaxed"}>{TEXTE_CONSENTEMENT_MAIL}</span>
+        <span className="text-[14px] leading-relaxed text-encre">{TEXTE_CONSENTEMENT_MAIL}</span>
       </label>
-      <p className={clair ? "text-[13px] leading-relaxed text-encre-2" : "text-xs text-gris-500 leading-relaxed"}>
+      <p className="text-[13px] leading-relaxed text-encre-2">
         Vos coordonnées et vos photos servent uniquement à traiter votre demande (devis, simulation, rappel). Elles sont
         conservées 3 ans et ne sont jamais vendues. Vous pouvez accéder à vos données, les rectifier, les effacer ou vous
         opposer à leur usage en écrivant à contact@coverswap.fr.{" "}
-        <Link href="/politique-confidentialite" className={clair ? "underline hover:text-encre" : "underline hover:text-white transition-colors"}>
+        <Link href="/politique-confidentialite" className="underline hover:text-encre">
           Politique de confidentialité
         </Link>
         .

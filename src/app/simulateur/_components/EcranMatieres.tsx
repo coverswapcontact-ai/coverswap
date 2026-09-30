@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { Bouton } from "@/components/simulation/Bouton";
+import { BoutonColle } from "@/components/simulation/BoutonColle";
+import { RESERVE_BOUTON_COLLE } from "@/components/simulation/reserve-bouton-colle";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { urlVignette } from "@/lib/simulateur/generation-client";
 import { MESSAGE_ANALYSE_SAUTEE, TITRES_VERDICT, zoneNonVisible, type EtatAnalyse, type EtatSimulateur } from "@/lib/simulateur/reprise";
@@ -56,7 +58,7 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
   const conseil = analyse?.statut === "PRETE" && analyse.verdict && analyse.verdict !== "bonne" && !conseilIgnore ? { titre: TITRES_VERDICT[analyse.verdict], texte: analyse.conseil } : null;
 
   return (
-    <section aria-labelledby="etape-matieres" className="space-y-5 pb-28">
+    <section aria-labelledby="etape-matieres" className={`space-y-5 ${RESERVE_BOUTON_COLLE}`}>
       <div className="overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element -- photo du visiteur (mémoire locale), au rapport réel */}
         <img src={photo} alt="Votre photo" className="block w-full bg-fond-2" style={rapport ? { aspectRatio: rapport } : undefined} />
@@ -134,7 +136,7 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
                     disabled={!sel && (nonVisible || bloque)}
                     aria-label={`${sel ? "Modifier" : "Choisir"} la matière : ${zone.libelle}`}
                     onClick={() => onOuvrir(zone.id)}
-                    className={`min-h-[44px] rounded-[var(--rayon-sm)] px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] disabled:cursor-not-allowed disabled:opacity-50 ${sel ? "border border-encre bg-white text-encre hover:bg-fond-2" : "bg-encre text-white hover:bg-encre-survol"}`}
+                    className={`min-h-[44px] rounded-[var(--rayon-sm)] px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] disabled:cursor-not-allowed disabled:opacity-50 ${sel ? "border border-encre bg-white text-encre hover:bg-fond-2" : "bg-encre text-blanc hover:bg-encre-survol"}`}
                   >
                     {sel ? "Modifier" : "Choisir"}
                   </button>
@@ -148,13 +150,11 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
       {captcha}
 
       {/* Le bouton principal, collé en bas, au-dessus de la zone de sécurité. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-trait bg-fond/95 backdrop-blur-sm">
-        <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-          <Bouton plein occupe={occupe} libelleOccupe="Lancement…" raisonDesactive={peutGenerer ? null : raisonBloque} onClick={onGenerer}>
-            Voir le résultat
-          </Bouton>
-        </div>
-      </div>
+      <BoutonColle>
+        <Bouton plein occupe={occupe} libelleOccupe="Lancement…" raisonDesactive={peutGenerer ? null : raisonBloque} onClick={onGenerer}>
+          Voir le résultat
+        </Bouton>
+      </BoutonColle>
     </section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { Etiquette } from "./Etiquette";
 import { PleinEcran } from "./PleinEcran";
 
 /**
@@ -11,13 +12,24 @@ import { PleinEcran } from "./PleinEcran";
  * dessus seulement : ailleurs, la page défile normalement au doigt), à la
  * souris, au clavier (flèches, Début, Fin). « Comparer » alterne entre tout
  * avant et tout après ; « Plein écran » ouvre l'image à pincer.
+ * `altAvant` (mission 16) : le texte de la photo « avant » quand ce n'est pas
+ * celle du visiteur (une réalisation publiée).
+ * `ratio` : le cadre est réservé à ce rapport et les DEUX images le
+ * remplissent recadrées au centre (`object-cover`) ; le simulateur passe le
+ * rapport réel de la photo (rien n'est coupé), une carte de réalisation un
+ * rapport fixe (une photo d'un autre format est recadrée pareil avant et
+ * après, jamais coupée en bas d'un seul côté). Sans `ratio`, l'image « après »
+ * donne sa hauteur naturelle.
+ * Les pastilles « Avant » / « Après » sont l'`Etiquette` commune.
  */
-export function AvantApres({ apres, avant, alt, className, ratio, sansOutils = false }: { apres: string; avant: string | null; alt: string; className?: string; ratio?: string; sansOutils?: boolean }) {
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
   const boite = useRef<HTMLDivElement>(null);
   const reserve = ratio ? { aspectRatio: ratio } : undefined;
+  // Avec un rapport réservé, l'image « après » remplit le cadre comme l'« avant » ; sinon elle le dimensionne.
+  const classesApres = ratio ? "absolute inset-0 h-full w-full object-cover" : "block w-full";
 
   const suivre = useCallback((clientX: number) => {
     const rect = boite.current?.getBoundingClientRect();
@@ -42,9 +54,9 @@ export function AvantApres({ apres, avant, alt, className, ratio, sansOutils = f
   if (!avant) {
     return (
       <div className={className}>
-        <div className="overflow-hidden rounded-[var(--rayon-md)] bg-fond-2" style={reserve}>
+        <div className="relative overflow-hidden rounded-[var(--rayon-md)] bg-fond-2" style={reserve}>
           {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM, pas d'optimisation */}
-          <img src={apres} alt={alt} className="block w-full" loading="lazy" referrerPolicy="no-referrer" />
+          <img src={apres} alt={alt} className={classesApres} loading="lazy" referrerPolicy="no-referrer" />
         </div>
         {outils}
       </div>
@@ -63,19 +75,21 @@ export function AvantApres({ apres, avant, alt, className, ratio, sansOutils = f
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
-        <img src={apres} alt={alt} className="block w-full" draggable={false} loading="lazy" referrerPolicy="no-referrer" />
+        <img src={apres} alt={alt} className={classesApres} draggable={false} loading="lazy" referrerPolicy="no-referrer" />
         {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
         <img
           src={avant}
-          alt="Votre pièce aujourd'hui"
+          alt={altAvant}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)`, transition: glisse ? "none" : "clip-path var(--duree-moyenne) var(--ease)" }}
           draggable={false}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
-        <span className="pointer-events-none absolute top-3 left-3 rounded-[4px] bg-encre/70 px-2 py-1 text-[12.5px] font-medium text-white">Avant</span>
-        <span className="pointer-events-none absolute top-3 right-3 rounded-[4px] bg-white/85 px-2 py-1 text-[12.5px] font-medium text-encre">Après</span>
+        <Etiquette ton="sombre" className="pointer-events-none absolute top-3 left-3">
+          Avant
+        </Etiquette>
+        <Etiquette className="pointer-events-none absolute top-3 right-3">Après</Etiquette>
         <div className="pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_4px_rgba(0,0,0,0.35)]" style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }} />
         <div
           role="slider"

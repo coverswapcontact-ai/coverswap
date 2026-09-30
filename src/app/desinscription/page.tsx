@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import Desinscription from "@/components/Desinscription";
 
 /**
@@ -15,8 +15,6 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
   alternates: { canonical: null },
 };
-
-export const viewport: Viewport = { themeColor: "#F5F4F1", width: "device-width", initialScale: 1 };
 
 export const dynamic = "force-dynamic";
 
