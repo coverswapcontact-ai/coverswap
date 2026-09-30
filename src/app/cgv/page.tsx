@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
+import { BreadcrumbSchema } from "@/components/JsonLd";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { ACOMPTE_POURCENT, DELAI_REPONSE, GARANTIE_ANS, GARANTIE_ETENDUE_ANS } from "@/lib/offre";
 
 export const metadata: Metadata = {
-  title: "Conditions générales de vente",
-  description:
-    "Conditions générales de vente de CoverSwap : devis, commande, prix, exécution, paiement, droit de rétractation, garanties, médiation.",
-  alternates: { canonical: "https://coverswap.fr/cgv" },
+  ...metadonneesPage({
+    titre: "Conditions générales de vente | CoverSwap",
+    description: "Conditions générales de vente de CoverSwap : devis, commande, prix, exécution, paiement, droit de rétractation, garanties, médiation.",
+    chemin: "/cgv",
+  }),
   robots: { index: true, follow: true },
 };
 
@@ -27,6 +31,7 @@ function Article({ numero, titre, children }: { numero: number; titre: string; c
 export default function CGV() {
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Conditions générales de vente", url: `${ENTREPRISE.site}/cgv` }]} />
       <div className="mx-auto max-w-3xl">
         <h1 className="titre-1 mb-2 text-encre">Conditions générales de vente</h1>
         <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>

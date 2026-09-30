@@ -1,5 +1,5 @@
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
-import { PHOTOS_PIECES } from "@/lib/images-pieces";
+import { ALT_PIECES, PHOTOS_PIECES } from "@/lib/images-pieces";
 import { sourcesPhoto, type ManifesteImages, type SourcesImage, type SourcesPhoto } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { DUREE_POSE_TEXTE, fourchette } from "@/lib/offre";
@@ -99,8 +99,16 @@ export type ChoixEtudes = { mode: "reelles"; titre: "Ils l'ont fait"; etudes: Et
 export const ETUDES_MAX = 3;
 
 /** Une étude en image d'ambiance (la photo de la carte de pièce, `lib/images-pieces`), étiquetée « Ambiance ». */
-function etudeAmbiance(id: EtudeSimulee["id"], titre: string, cle: "cuisine" | "sdb" | "meuble", alt: string): EtudeSimulee {
-  return { id, titre, image: { type: "photo", nom: PHOTOS_PIECES[id] }, etiquette: "Ambiance", alt, prix: fourchette(cle), duree: DUREE_POSE_TEXTE };
+function etudeAmbiance(id: EtudeSimulee["id"], titre: string, cle: "cuisine" | "sdb" | "meuble"): EtudeSimulee {
+  return { id, titre, image: { type: "photo", nom: PHOTOS_PIECES[id] }, etiquette: "Ambiance", alt: ALT_PIECES[id], prix: fourchette(cle), duree: DUREE_POSE_TEXTE };
+}
+
+/** La cuisine simulée : le rendu du moteur sur l'image d'ambiance de l'ouverture (avant / après, « Simulation »), si les deux images sont préparées. */
+export function etudeCuisineSimulee(manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudeSimulee | null {
+  const avant = sourcesPhoto(AVANT_OUVERTURE, manifeste);
+  const apres = sourcesPhoto(APRES_OUVERTURE, manifeste);
+  if (!avant || !apres) return null;
+  return { id: "cuisine", titre: "Cuisine", image: { type: "avant-apres", avant: avant.src, apres: apres.src, preparees: { avant, apres } }, etiquette: "Simulation", alt: "Cuisine simulée après la pose", prix: fourchette("cuisine"), duree: DUREE_POSE_TEXTE };
 }
 
 /** Les études de cas de l'accueil : les réalisations publiées si le CRM en a, sinon les trois études simulées. */
@@ -109,15 +117,27 @@ export function choisirEtudes(realisations: readonly Publication[], manifeste: M
   if (publiees.length > 0) return { mode: "reelles", titre: "Ils l'ont fait", etudes: publiees.map(versEtudeReelle) };
 
   // La cuisine : la simulation du moteur de l'ouverture (avant / après) ; à défaut, son image d'ambiance.
-  const avant = sourcesPhoto(AVANT_OUVERTURE, manifeste);
-  const apres = sourcesPhoto(APRES_OUVERTURE, manifeste);
-  const cuisine: EtudeSimulee =
-    avant && apres
-      ? { id: "cuisine", titre: "Cuisine", image: { type: "avant-apres", avant: avant.src, apres: apres.src, preparees: { avant, apres } }, etiquette: "Simulation", alt: "Cuisine simulée après la pose", prix: fourchette("cuisine"), duree: DUREE_POSE_TEXTE }
-      : etudeAmbiance("cuisine", "Cuisine", "cuisine", "Cuisine rénovée au film, image d'ambiance");
+  const cuisine = etudeCuisineSimulee(manifeste) ?? etudeAmbiance("cuisine", "Cuisine", "cuisine");
   return {
     mode: "simulees",
     titre: "Ce que ça donne",
-    etudes: [cuisine, etudeAmbiance("salle-de-bain", "Salle de bain", "sdb", "Salle de bain rénovée au film, image d'ambiance"), etudeAmbiance("meubles", "Meubles", "meuble", "Meubles rénovés au film, image d'ambiance")],
+    etudes: [cuisine, etudeAmbiance("salle-de-bain", "Salle de bain", "sdb"), etudeAmbiance("meubles", "Meubles", "meuble")],
   };
+}
+
+/* ── L'étude de cas d'une page par pièce (mission 16, partie 5) ───────── */
+
+export type EtudePiece = { mode: "reelle"; etude: EtudeReelle } | { mode: "simulee"; etude: EtudeSimulee };
+
+/**
+ * L'étude de cas de la page d'une pièce (`/prestations/<slug>`) : la PREMIÈRE réalisation publiée par le CRM pour ce
+ * type de projet (avec sa photo après) ; sinon, pour la cuisine, la simulation du moteur (« Simulation ») ; sinon
+ * rien — l'image d'ambiance de la pièce est déjà l'ouverture de la page, elle n'est pas montrée deux fois
+ * (emplacement en attente d'une vraie réalisation).
+ */
+export function etudeDeLaPiece(typeProjet: string, pieceId: string | null, realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudePiece | null {
+  const reelle = realisations.find((p) => p.type === "REALISATION" && p.typeProjet === typeProjet && !!p.photoApres);
+  if (reelle) return { mode: "reelle", etude: versEtudeReelle(reelle) };
+  const simulee = pieceId === "cuisine" ? etudeCuisineSimulee(manifeste) : null;
+  return simulee ? { mode: "simulee", etude: simulee } : null;
 }

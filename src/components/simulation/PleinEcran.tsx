@@ -1,23 +1,58 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useRetourNavigateur } from "./Feuille";
+import { liberer, useRetourNavigateur, verrouillerLaPage } from "./Feuille";
 import { ZoomImage } from "./ZoomImage";
 
 /**
  * Plein écran d'un rendu (mission 15, partie 4) : l'image sur fond sombre, à
  * pincer pour zoomer ; « Avant / Après » quand la photo d'origine existe ;
  * fermeture par le bouton (44 px), Échap ou le geste retour.
+ *
+ * Mission 16 (partie 5), options pour la page Matières (« voir en grand » un
+ * échantillon entier), sans effet sur le simulateur qui ne les passe pas :
+ *  - `libelle` : le nom du dialogue (« Rendu en plein écran » par défaut) ;
+ *  - `pied` : un bandeau clair sous l'image (nom, référence, bouton principal),
+ *    au-dessus de la zone sûre du téléphone ;
+ *  - `modale` : un vrai dialogue modal au-dessus d'une longue page — le focus
+ *    va au bouton « Fermer » à l'ouverture, Tab et Maj+Tab restent dans le
+ *    dialogue (le clavier n'atteint pas la page masquée), la page derrière est
+ *    verrouillée comme sous une `Feuille` (ni la molette, ni le doigt sur le
+ *    bandeau ne la font défiler ; la position revient intacte à la fermeture),
+ *    et la molette ne fait que zoomer (`ZoomImage retenirMolette`).
  */
-export function PleinEcran(props: { ouvert: boolean; onFermer: () => void; apres: string; avant: string | null; alt: string; actions?: ReactNode }) {
+type ProprietesPleinEcran = { ouvert: boolean; onFermer: () => void; apres: string; avant: string | null; alt: string; actions?: ReactNode; libelle?: string; pied?: ReactNode; modale?: boolean };
+
+const FOCUSABLES = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Tab et Maj+Tab tournent dans `boite` : du dernier élément on revient au premier, et inversement ; un focus resté dehors y rentre. */
+export function garderLeFocus(e: Pick<KeyboardEvent, "key" | "shiftKey" | "preventDefault">, boite: HTMLElement | null, actif: Element | null): void {
+  if (e.key !== "Tab" || !boite) return;
+  const elements = [...boite.querySelectorAll<HTMLElement>(FOCUSABLES)].filter((el) => el.getClientRects().length > 0);
+  if (elements.length === 0) return;
+  const premier = elements[0];
+  const dernier = elements[elements.length - 1];
+  const dedans = !!actif && boite.contains(actif);
+  if (e.shiftKey && (!dedans || actif === premier)) {
+    e.preventDefault();
+    dernier.focus();
+  } else if (!e.shiftKey && (!dedans || actif === dernier)) {
+    e.preventDefault();
+    premier.focus();
+  }
+}
+
+export function PleinEcran(props: ProprietesPleinEcran) {
   // Remonté à chaque ouverture : l'état « avant / après » repart à « après » sans setState dans un effet.
   return props.ouvert ? <PleinEcranOuvert key={props.apres} {...props} /> : null;
 }
 
-function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions }: { ouvert: boolean; onFermer: () => void; apres: string; avant: string | null; alt: string; actions?: ReactNode }) {
+function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions, libelle = "Rendu en plein écran", pied, modale = false }: ProprietesPleinEcran) {
   useRetourNavigateur(ouvert, onFermer);
   const [montre, setMontre] = useState<"apres" | "avant">("apres");
+  const boite = useRef<HTMLDivElement>(null);
+  const boutonFermer = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!ouvert) return;
     const surTouche = (e: KeyboardEvent) => {
@@ -26,9 +61,21 @@ function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions }: { ou
     window.addEventListener("keydown", surTouche);
     return () => window.removeEventListener("keydown", surTouche);
   }, [ouvert, onFermer]);
+  // Modal : la page verrouillée derrière, le focus au bouton « Fermer », le clavier gardé dedans (rendu à la fermeture).
+  useEffect(() => {
+    if (!modale) return;
+    verrouillerLaPage();
+    boutonFermer.current?.focus({ preventScroll: true });
+    const surTab = (e: KeyboardEvent) => garderLeFocus(e, boite.current, document.activeElement);
+    window.addEventListener("keydown", surTab);
+    return () => {
+      window.removeEventListener("keydown", surTab);
+      liberer();
+    };
+  }, [modale]);
   if (!ouvert || typeof document === "undefined") return null;
   return createPortal(
-    <div role="dialog" aria-modal="true" aria-label="Rendu en plein écran" className="fixed inset-0 z-[80] flex flex-col bg-sombre text-blanc">
+    <div ref={boite} role="dialog" aria-modal="true" aria-label={libelle} className="fixed inset-0 z-[80] flex flex-col bg-sombre text-blanc">
       <div className="flex shrink-0 items-center justify-between gap-2 px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
         {avant ? (
           <div className="flex rounded-[var(--rayon-sm)] border border-white/25 p-0.5" role="group" aria-label="Avant ou après">
@@ -43,16 +90,17 @@ function PleinEcranOuvert({ ouvert, onFermer, apres, avant, alt, actions }: { ou
         )}
         <div className="flex items-center gap-2">
           {actions}
-          <button type="button" onClick={onFermer} aria-label="Fermer le plein écran" className="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-blanc transition-colors duration-[var(--duree-courte)] active:bg-white/25">
+          <button ref={boutonFermer} type="button" onClick={onFermer} aria-label="Fermer le plein écran" className="flex h-11 w-11 items-center justify-center rounded-full bg-white/12 text-blanc transition-colors duration-[var(--duree-courte)] active:bg-white/25">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </button>
         </div>
       </div>
-      <div className="min-h-0 flex-1 pb-[env(safe-area-inset-bottom)]">
-        <ZoomImage src={montre === "avant" && avant ? avant : apres} alt={montre === "avant" ? "Votre pièce aujourd'hui" : alt} className="h-full w-full" />
+      <div className={`min-h-0 flex-1${pied ? "" : " pb-[env(safe-area-inset-bottom)]"}`}>
+        <ZoomImage src={montre === "avant" && avant ? avant : apres} alt={montre === "avant" ? "Votre pièce aujourd'hui" : alt} className="h-full w-full" retenirMolette={modale} />
       </div>
+      {pied ? <div className="shrink-0 bg-fond px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] text-encre">{pied}</div> : null}
     </div>,
     document.body
   );

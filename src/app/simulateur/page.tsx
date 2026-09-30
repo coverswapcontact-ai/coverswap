@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
 import { chargerTarifs } from "@/lib/tarifs-site";
@@ -12,12 +13,14 @@ import Simulateur from "./_components/Simulateur";
 /**
  * Mission 16 (partie 4) : /devis est redirigée ici (301) ; son vocabulaire (« devis covering en ligne, gratuit, sans
  * engagement ») passe dans la description et les mots-clés. Ses textes entiers sont sur /comment-ca-marche.
+ * Partie 5 : métadonnées par `metadonneesPage` (Open Graph propre, description de 160 caractères au plus) ; la phrase
+ * « coordonnées demandées seulement pour recevoir le rendu » reste dans la page (étape 4 du HowTo, FAQ).
  */
+const DESCRIPTION_SIMULATEUR = `Votre pièce avec une matière Cover Styl', sur votre photo, en ${DELAI_RENDU}. Puis un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`;
+
 export const metadata: Metadata = {
-  title: { absolute: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap" },
-  description: `Envoyez une photo de votre cuisine, salle de bain, meuble ou local, choisissez une matière parmi ${NB_REFERENCES} références Cover Styl', voyez le résultat en ${DELAI_RENDU}. Coordonnées demandées seulement pour recevoir le rendu et un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`,
+  ...metadonneesPage({ titre: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap", description: DESCRIPTION_SIMULATEUR, chemin: "/simulateur" }),
   keywords: `simulateur covering, simulation covering cuisine, ${MOTS_CLES_DEVIS_EN_LIGNE}`,
-  alternates: { canonical: `${ENTREPRISE.site}/simulateur` },
 };
 
 /** Mission 15 : la page couvre la zone sûre de l'iPhone (bouton collé en bas, feuilles). La couleur de la barre vient du gabarit (mission 16 : une seule source). */

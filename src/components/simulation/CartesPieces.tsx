@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CuisineDeFace, MobilierDeFace, MursDeFace, ProfessionnelDeFace, SalleDeBainDeFace } from "@/components/espace/Illustrations";
 import { photoDePiece, type PieceId } from "@/lib/images-pieces";
 import { imagePreparee } from "@/lib/images-preparees";
@@ -40,7 +41,13 @@ const DESSINS: Record<string, (p: { className?: string }) => React.ReactElement>
 /** L'attribut `sizes` d'une carte : deux colonnes sur téléphone, trois (≈ 240 px) à partir de 640 px. */
 const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
 
-export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce", photos, photosImmediates = 0 }: { pieces: PieceCarte[]; valeur: string | null; onChoisir: (id: string) => void; nom?: string; photos?: Partial<Record<PieceId, string>>; photosImmediates?: number }) {
+/**
+ * Mission 16 (partie 5) : `liens` (pièce → adresse) fait de chaque carte un LIEN (`/realisations` mène aux pages par
+ * pièce) au lieu d'un bouton de choix ; même dessin, même photo. Une pièce sans adresse garde son bouton.
+ */
+type ProprietesCartesPieces = { pieces: PieceCarte[]; nom?: string; photos?: Partial<Record<PieceId, string>>; photosImmediates?: number } & ({ valeur: string | null; onChoisir: (id: string) => void; liens?: undefined } | { liens: Partial<Record<string, string>>; valeur?: undefined; onChoisir?: undefined });
+
+export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce", photos, photosImmediates = 0, liens }: ProprietesCartesPieces) {
   return (
     <div role="group" aria-label={nom} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {pieces.map((p, rang) => {
@@ -48,14 +55,10 @@ export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce", photos
         const choisie = valeur === p.id;
         const photo = photoDePiece(photos, p.id);
         const avecPhoto = photo !== null && imagePreparee(photo);
-        return (
-          <button
-            key={p.id}
-            type="button"
-            aria-pressed={choisie}
-            onClick={() => onChoisir(p.id)}
-            className={`group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-accent ring-1 ring-accent" : "border-trait hover:border-encre-2"}`}
-          >
+        const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-accent ring-1 ring-accent" : "border-trait hover:border-encre-2"}`;
+        const lien = liens && Object.prototype.hasOwnProperty.call(liens, p.id) ? liens[p.id] : undefined;
+        const contenu = (
+          <>
             {avecPhoto ? (
               <span className="relative block w-full overflow-hidden rounded-[var(--rayon-sm)]">
                 <Photo nom={photo} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
@@ -70,6 +73,15 @@ export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce", photos
             )}
             <span className="mt-2 block text-[15.5px] leading-snug font-semibold text-encre">{p.libelle}</span>
             <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-encre-2">{p.description}</span>
+          </>
+        );
+        return lien ? (
+          <Link key={p.id} href={lien} className={classes}>
+            {contenu}
+          </Link>
+        ) : (
+          <button key={p.id} type="button" aria-pressed={choisie} onClick={() => onChoisir?.(p.id)} className={classes}>
+            {contenu}
           </button>
         );
       })}

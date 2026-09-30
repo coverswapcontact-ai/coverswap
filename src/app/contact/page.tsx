@@ -1,24 +1,18 @@
 import type { Metadata } from "next";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_REPONSE } from "@/lib/offre";
 import FormulaireContact from "./_components/FormulaireContact";
 import { chargerPrestations } from "@/lib/prestations";
 
 export const metadata: Metadata = {
-  title: "Contact — Devis gratuit covering adhésif",
-  description: `Contactez CoverSwap pour un devis gratuit de covering adhésif. Rénovation cuisine, salle de bain, meubles et locaux pro. Réponse ${DELAI_REPONSE}.`,
+  ...metadonneesPage({
+    titre: "Contact — Devis gratuit covering adhésif | CoverSwap",
+    description: `Contactez CoverSwap pour un devis gratuit de covering adhésif. Rénovation cuisine, salle de bain, meubles et locaux pro. Réponse ${DELAI_REPONSE}.`,
+    chemin: "/contact",
+  }),
   keywords: "contact coverswap, devis covering, demande devis rénovation adhésive, covering montpellier contact",
-  alternates: { canonical: "https://coverswap.fr/contact" },
-  openGraph: {
-    title: "Contact CoverSwap — Devis gratuit covering adhésif",
-    description: `Contactez-nous pour un devis gratuit de covering adhésif. Réponse ${DELAI_REPONSE}.`,
-    url: "https://coverswap.fr/contact",
-    siteName: "CoverSwap",
-    locale: "fr_FR",
-    type: "website",
-    images: [{ url: `${ENTREPRISE.site}/og-image.jpg`, width: 1200, height: 630 }],
-  },
 };
 
 /**
@@ -31,7 +25,7 @@ export default async function ContactPage() {
   const lienTexte = "text-encre underline underline-offset-4";
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
-      <BreadcrumbSchema items={[{ name: "Accueil", url: "https://coverswap.fr" }, { name: "Contact", url: "https://coverswap.fr/contact" }]} />
+      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Contact", url: `${ENTREPRISE.site}/contact` }]} />
       <div className="mx-auto max-w-3xl">
         <p className="surtitre">Contact</p>
         <h1 className="titre-1 mt-2 text-encre">Écrivez-nous</h1>

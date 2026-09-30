@@ -318,6 +318,8 @@ describe("/pro et /contact", () => {
     const { metadata: simulateur } = await import("@/app/simulateur/page");
     assert.match(String(simulateur.keywords), /devis covering en ligne, devis covering gratuit/);
     assert.match(String(simulateur.description), /devis covering en ligne, gratuit et sans engagement/);
-    assert.match(String(simulateur.description), /Coordonnées demandées seulement pour recevoir le rendu/);
+    // Partie 5 : description de 160 caractères au plus (`metadonneesPage`) ; la promesse sur les coordonnées reste dans la page (HowTo).
+    assert.ok(String(simulateur.description).length <= 160);
+    assert.match(lire("app/simulateur/page.tsx"), /Vos coordonnées ne sont demandées que pour le recevoir avec un devis/);
   });
 });

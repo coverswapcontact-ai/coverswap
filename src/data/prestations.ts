@@ -13,6 +13,13 @@ export type Prestation = {
   titreSeo: string;
   descriptionSeo: string;
   h1: string;
+  /**
+   * Le titre de l'ouverture de la page par pièce (mission 16, partie 5) : 7 mots au plus. Le `h1` d'avant, quand il
+   * est plus long, reste sur la page (titre de la présentation) : aucun texte référencé n'est perdu.
+   */
+  titreCourt: string;
+  /** Le bouton principal de la page (« Simuler ma cuisine » : la pièce en contexte) ; null sans simulateur. */
+  libelleSimuler: string | null;
   accroche: string;
   intro: string[];
   fond: string;
@@ -41,6 +48,8 @@ export const PRESTATIONS: Prestation[] = [
     titreSeo: "Covering cuisine à Montpellier — rénover sans casser",
     descriptionSeo: `Façades, plan de travail, crédence recouverts d'un film Cover Styl' en une journée. Prix au mètre linéaire, ${fourchette("cuisine")} pour une cuisine complète. Devis ${DELAI_REPONSE}.`,
     h1: "Rénover sa cuisine sans la casser",
+    titreCourt: "Rénover sa cuisine sans la casser",
+    libelleSimuler: "Simuler ma cuisine",
     accroche: "Façades, plan de travail et crédence recouverts d'un film texturé, en une journée, sans démontage ni gravats.",
     intro: [
       "Une cuisine qui fonctionne n'a pas besoin d'être remplacée pour changer de style. Le covering recouvre les surfaces visibles — portes et tiroirs, plan de travail, crédence — d'un film adhésif Cover Styl' posé à chaud, qui imite le bois, la pierre, le béton, le métal ou une couleur mate.",
@@ -82,6 +91,8 @@ export const PRESTATIONS: Prestation[] = [
     titreSeo: "Covering salle de bain à Montpellier — sans casser le carrelage",
     descriptionSeo: `Meuble vasque, murs carrelés, contour de baignoire recouverts d'un film Cover Styl' résistant à l'humidité. ${fourchette("sdb")} selon le projet. Devis ${DELAI_REPONSE}.`,
     h1: "Rénover sa salle de bain sans casser le carrelage",
+    titreCourt: "Une salle de bain rénovée, sans casse",
+    libelleSimuler: "Simuler ma salle de bain",
     accroche: "Meuble vasque, carrelage mural et tablier de baignoire recouverts d'un film résistant à l'humidité, posé en une journée.",
     intro: [
       "Casser un carrelage de salle de bain, c'est plusieurs jours de chantier, de la poussière et une pièce inutilisable. Le covering recouvre le carrelage mural existant, le meuble vasque et le tablier de baignoire d'un film Cover Styl' conçu pour les pièces humides.",
@@ -122,6 +133,8 @@ export const PRESTATIONS: Prestation[] = [
     titreSeo: "Covering meubles à Montpellier — relooker sans poncer ni peindre",
     descriptionSeo: `Commodes, buffets, dressings, meubles TV, têtes de lit recouverts d'un film Cover Styl'. ${fourchette("meuble")} par meuble. Devis ${DELAI_REPONSE}.`,
     h1: "Donner un nouveau style à un meuble, sans poncer ni peindre",
+    titreCourt: "Un meuble relooké, sans poncer ni peindre",
+    libelleSimuler: "Simuler mes meubles",
     accroche: "Commode, buffet, dressing, meuble TV, tête de lit : un film texturé posé sur place, sans odeur ni séchage.",
     intro: [
       "Un meuble solide mais démodé se recouvre en quelques heures. Le film adhésif Cover Styl' épouse les façades, les côtés, les plateaux et les moulures légères, en gardant poignées et charnières.",
@@ -162,6 +175,8 @@ export const PRESTATIONS: Prestation[] = [
     titreSeo: "Covering pour professionnels à Montpellier — hôtels, restaurants, cabinets, cuisinistes",
     descriptionSeo: `Comptoirs, mobilier, portes et murs de locaux professionnels recouverts d'un film Cover Styl', hors heures d'ouverture. Pose en sous-traitance pour cuisinistes et agenceurs. Devis ${DELAI_REPONSE}.`,
     h1: "Rénover un local professionnel sans fermer",
+    titreCourt: "Rénover un local professionnel sans fermer",
+    libelleSimuler: "Simuler mon local",
     accroche: "Hôtels, restaurants, cabinets, commerces : comptoirs, mobilier, portes et murs recouverts hors heures d'ouverture. Pose en sous-traitance pour les cuisinistes et agenceurs.",
     intro: [
       "Fermer un établissement pour rénover coûte plus que la rénovation. Le covering se pose hors heures d'ouverture, sans poussière ni odeur, et l'espace est exploitable dès la fin de la pose.",
@@ -207,6 +222,8 @@ export const PRESTATIONS: Prestation[] = [
     titreSeo: "Films pour vitrages à Montpellier — intimité, décoration, protection solaire",
     descriptionSeo: `Films dépolis, décoratifs et solaires posés sur vos vitrages : intimité sans perdre la lumière, chaleur réduite, verre inchangé. Devis ${DELAI_REPONSE}.`,
     h1: "Habiller un vitrage : intimité, décoration, protection solaire",
+    titreCourt: "Habiller un vitrage, sans changer le verre",
+    libelleSimuler: null,
     accroche: "Film dépoli, décoratif ou solaire posé côté intérieur sur vos vitres, sans changer le vitrage.",
     intro: [
       "Une baie vitrée trop exposée, une cloison vitrée de bureau, une vitrine à masquer : un film adhésif posé côté intérieur règle la question sans remplacer le verre.",
@@ -252,6 +269,16 @@ export const PRESTATIONS: Prestation[] = [
  */
 export function lienPrestation(slug: string): string {
   return slug === "professionnel" ? "/pro" : `/prestations/${slug}`;
+}
+
+/**
+ * L'adresse de la page d'une pièce du simulateur (mission 16, partie 5 : les cartes de pièces de /realisations) : sa
+ * page par pièce (cuisine, salle de bain, meubles), /pro pour un local professionnel ; une pièce sans page (murs et
+ * plafond) mène au simulateur, la pièce choisie.
+ */
+export function lienPiece(pieceId: string): string {
+  const prestation = PRESTATIONS.find((p) => p.simulateur === pieceId);
+  return prestation ? lienPrestation(prestation.slug) : `/simulateur?projet=${encodeURIComponent(pieceId)}`;
 }
 
 export function getPrestation(slug: string): Prestation | undefined {

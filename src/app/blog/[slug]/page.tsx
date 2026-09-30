@@ -1,10 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
-import { fondSrc } from "@/lib/images";
+import { fondSrc, fondSrcSet } from "@/lib/images";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Breadcrumb from "@/components/Breadcrumb";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
 import {
   getArticleBySlug,
@@ -18,14 +20,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
   if (!article) return {};
-  return {
-    title: `${article.title} | Blog CoverSwap`,
-    description: article.excerpt,
-    alternates: {
-      canonical: `https://coverswap.fr/blog/${article.slug}`,
-    },
-  };
+  return metadonneesPage({ titre: `${article.title} | Blog CoverSwap`, description: article.excerpt, chemin: `/blog/${article.slug}` });
 }
+
+/**
+ * Un guide (mission 16, partie 5) : l'adresse reste (hors menu), l'index /blog est redirigé vers « Comment ça
+ * marche », qui liste les guides (`#guides`) : le fil d'Ariane et les retours y mènent.
+ */
+const GUIDES = "/comment-ca-marche#guides";
+
+/**
+ * La largeur du cadre de l'illustration : la page moins les gouttières (16 / 24 px), le cadre de l'article (24 / 40 px
+ * et son trait) et, à partir de 1024 px, la colonne de 320 px et son écart de 48 px ; 702 px au plus.
+ */
+const TAILLES_ILLUSTRATION = "(min-width: 1200px) 702px, (min-width: 1024px) calc(100vw - 498px), (min-width: 768px) calc(100vw - 130px), calc(100vw - 82px)";
 
 export function generateStaticParams() {
   return articles.map((a) => ({ slug: a.slug }));
@@ -46,16 +54,16 @@ export default async function BlogPostPage({ params }: Props) {
         description={article.excerpt}
         datePublished={article.dateIso}
         dateModified={article.dateModifiedIso}
-        image={`https://coverswap.fr${article.image}-1600.jpg`}
-        url={`https://coverswap.fr/blog/${article.slug}`}
+        image={`${ENTREPRISE.site}${fondSrc(article.image, 1600)}`}
+        url={`${ENTREPRISE.site}/blog/${article.slug}`}
       />
       <BreadcrumbSchema
         items={[
-          { name: "Accueil", url: "https://coverswap.fr" },
-          { name: "Blog", url: "https://coverswap.fr/blog" },
+          { name: "Accueil", url: ENTREPRISE.site },
+          { name: "Comment ça marche", url: `${ENTREPRISE.site}/comment-ca-marche` },
           {
             name: article.title,
-            url: `https://coverswap.fr/blog/${article.slug}`,
+            url: `${ENTREPRISE.site}/blog/${article.slug}`,
           },
         ]}
       />
@@ -63,6 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Ouverture */}
       <section className="bg-fond-2 px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
         <div className="mx-auto max-w-3xl">
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche", href: GUIDES }, { label: "Guide" }]} />
           <p className="surtitre">{article.category}</p>
           <h1 className="titre-1 mt-2 text-encre">{article.title}</h1>
           <p className="mt-4 text-[14px] text-encre-2">
@@ -77,8 +86,21 @@ export default async function BlogPostPage({ params }: Props) {
           <article className="max-w-none">
             <div className={`${CARTE} p-6 md:p-10`}>
               <div className="relative mb-8 h-64 w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond-2 md:h-80">
-                {/* Illustration sous le titre de l'article : alt vide (le h1 dit déjà le titre). */}
-                <Image src={fondSrc(article.image, 1600)} alt="" fill sizes="(max-width: 1024px) 100vw, 700px" className="object-cover" />
+                {/*
+                  Illustration sous le titre de l'article : alt vide (le h1 dit déjà le titre). `images.unoptimized` :
+                  next/image ne rendrait que le 1600 px ; le navigateur choisit ici entre 800 et 1600 (`fondSrcSet`) à la
+                  largeur réelle du cadre (hauteur réservée par le cadre). Au premier écran d'un téléphone : priorité haute.
+                */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- fichiers locaux déjà dimensionnés (800 / 1600), servis par srcset */}
+                <img
+                  src={fondSrc(article.image, 800)}
+                  srcSet={fondSrcSet(article.image)}
+                  sizes={TAILLES_ILLUSTRATION}
+                  alt=""
+                  decoding="async"
+                  fetchPriority="high"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
               </div>
 
               <div className="texte space-y-6 text-encre-2">
@@ -107,8 +129,8 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="text-[15px] font-semibold text-encre">Équipe CoverSwap</p>
                 <p className="text-[13px] text-encre-2">Experts en covering adhésif</p>
               </div>
-              <Link href="/blog" className="inline-flex min-h-[44px] items-center text-[15px] text-encre underline underline-offset-4">
-                Retour au blog
+              <Link href="/comment-ca-marche" className="inline-flex min-h-[44px] items-center text-[15px] text-encre underline underline-offset-4">
+                Comment ça marche
               </Link>
             </div>
           </article>
@@ -147,8 +169,8 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
 
         <div className="mt-12 text-center">
-          <Lien href="/blog" variante="secondaire">
-            Voir tous les articles
+          <Lien href={GUIDES} variante="secondaire">
+            Voir tous les guides
           </Lien>
         </div>
       </div>

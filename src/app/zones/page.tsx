@@ -5,23 +5,21 @@ import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ZONES, getZoneSlug } from "@/data/zones";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 
+/**
+ * Zones d'intervention (mission 16, partie 5) : l'index des 8 pages locales, conservé (lien du pied de page et de la
+ * ligne « zone » de l'accueil), thème clair, bouton principal « Simuler ma cuisine » ; la demande pour une autre ville
+ * en secondaire.
+ */
 export const metadata: Metadata = {
-  title: { absolute: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie" },
-  description:
-    "CoverSwap intervient à Montpellier, Pérols, Lattes, Mauguio, Castelnau-le-Lez, Béziers, Nîmes, Sète et dans toute la France. Découvrez nos prestations de covering adhésif Cover Styl' par ville.",
-  keywords:
-    "covering Montpellier, covering Pérols, covering Hérault, covering Occitanie, rénovation cuisine Montpellier, covering adhésif France, zone intervention covering",
-  alternates: { canonical: "https://coverswap.fr/zones" },
-  openGraph: {
-    title: "Zones d'intervention CoverSwap — Hérault, Occitanie, France entière",
-    description:
-      "Covering adhésif premium dans toutes les grandes villes d'Hérault et d'Occitanie. Pose en 1 journée, garantie 10 ans.",
-    url: "https://coverswap.fr/zones",
-    type: "website",
-    siteName: "CoverSwap",
-    locale: "fr_FR",
-  },
+  ...metadonneesPage({
+    titre: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie",
+    description: "CoverSwap intervient à Montpellier, Pérols, Lattes, Mauguio, Castelnau-le-Lez, Béziers, Nîmes, Sète et dans toute la France. Découvrez nos prestations de covering adhésif Cover Styl' par ville.",
+    chemin: "/zones",
+  }),
+  keywords: "covering Montpellier, covering Pérols, covering Hérault, covering Occitanie, rénovation cuisine Montpellier, covering adhésif France, zone intervention covering",
 };
 
 export default function ZonesIndexPage() {
@@ -31,8 +29,8 @@ export default function ZonesIndexPage() {
     <div className="bg-fond">
       <BreadcrumbSchema
         items={[
-          { name: "Accueil", url: "https://coverswap.fr" },
-          { name: "Zones d'intervention", url: "https://coverswap.fr/zones" },
+          { name: "Accueil", url: ENTREPRISE.site },
+          { name: "Zones d'intervention", url: `${ENTREPRISE.site}/zones` },
         ]}
       />
 
@@ -47,6 +45,9 @@ export default function ZonesIndexPage() {
             et nous nous déplaçons partout en Occitanie et en France pour les projets de plus de 15 mètres linéaires.
             Découvrez ci-dessous nos villes d&apos;intervention privilégiées.
           </p>
+          <div className="mt-8">
+            <Lien href="/simulateur?projet=cuisine">Simuler ma cuisine</Lien>
+          </div>
         </div>
       </section>
 
@@ -80,7 +81,9 @@ export default function ZonesIndexPage() {
         intro="Nous nous déplaçons partout en France pour les projets significatifs (à partir de 15 mètres linéaires de covering). Si vous êtes à Lyon, Toulouse, Marseille, Bordeaux, Paris ou ailleurs, contactez-nous : nous trouverons une formule adaptée (déplacement groupé, planning optimisé)."
         fond="fond-2"
       >
-        <Lien href="/contact">Demander un devis pour ma ville</Lien>
+        <Lien href="/contact" variante="secondaire">
+          Demander un devis pour ma ville
+        </Lien>
       </Section>
     </div>
   );

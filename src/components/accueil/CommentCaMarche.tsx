@@ -33,7 +33,8 @@ export function etapesCommentCaMarche(manifeste: ManifesteImages = MANIFESTE_IMA
   ];
 }
 
-export function CommentCaMarche({ depuis, idBouton, fond = "fond", titre = "Comment ça marche" }: { depuis?: DepuisAccueil; idBouton?: string; fond?: "fond" | "fond-2"; titre?: string }) {
+/** `note` (mission 16, partie 5) : une ligne sous les étapes, avant le bouton (la page « Comment ça marche »). */
+export function CommentCaMarche({ depuis, idBouton, fond = "fond", titre = "Comment ça marche", note }: { depuis?: DepuisAccueil; idBouton?: string; fond?: "fond" | "fond-2"; titre?: string; note?: string }) {
   return (
     <Section id="comment-ca-marche" large fond={fond} titre={titre}>
       <ol className="grid gap-8 md:grid-cols-3 md:gap-6">
@@ -48,6 +49,7 @@ export function CommentCaMarche({ depuis, idBouton, fond = "fond", titre = "Comm
           </li>
         ))}
       </ol>
+      {note ? <p className="texte-2 mt-8 max-w-2xl">{note}</p> : null}
       <div id={idBouton} className="mt-8 md:mt-10">
         <Lien href={lienSimulerCuisine(depuis)}>Simuler ma cuisine</Lien>
       </div>

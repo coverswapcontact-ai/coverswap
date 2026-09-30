@@ -14,6 +14,7 @@ import { ServiceSchema } from "@/components/JsonLd";
 import { BoutonColle } from "@/components/simulation/BoutonColle";
 import { Lien } from "@/components/simulation/Lien";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { chargerPublications } from "@/lib/publications";
 import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
 
@@ -28,15 +29,8 @@ import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
  */
 export const revalidate = 300;
 
-const IMAGE_PARTAGE = { url: `${ENTREPRISE.site}/og-image.jpg`, width: 1200, height: 630, alt: TITRE_META_ACCUEIL };
-
-export const metadata: Metadata = {
-  title: { absolute: TITRE_META_ACCUEIL },
-  description: DESCRIPTION_META_ACCUEIL,
-  alternates: { canonical: "/" },
-  openGraph: { title: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, url: ENTREPRISE.site, type: "website", siteName: ENTREPRISE.nom, locale: "fr_FR", images: [IMAGE_PARTAGE] },
-  twitter: { card: "summary_large_image", title: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, images: [IMAGE_PARTAGE.url] },
-};
+/** Mission 16 (partie 5) : les métadonnées de toutes les pages passent par `metadonneesPage` (canonical absolu, Open Graph et carte de partage). */
+export const metadata: Metadata = metadonneesPage({ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "/" });
 
 export default async function PageAccueil() {
   const [zones, { realisations }] = await Promise.all([chargerZonesSimulateur(), chargerPublications()]);

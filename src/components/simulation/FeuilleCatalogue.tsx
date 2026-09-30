@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconeCoeur, IconeLoupe } from "@/components/espace/Illustrations";
 import { FAMILLES, libelleFamille } from "@/lib/familles-matieres";
-import { correspondRecherche } from "@/lib/recherche-finitions";
+import { MATIERES_PAR_PAGE, catalogueEnMemoireSiCharge, chargerCatalogue, filtrerMatieres, messageAucuneMatiere, type Matiere } from "@/lib/matieres";
 import { Bouton } from "./Bouton";
+import { BoutonFavori, CHAMP_RECHERCHE } from "./ElementsCatalogue";
 import { Feuille, cx } from "./Feuille";
 import { SqueletteTuiles } from "./Squelette";
 import { ZoomImage } from "./ZoomImage";
@@ -20,23 +21,21 @@ import { ZoomImage } from "./ZoomImage";
  * Aucun appel réseau ici hors les images : les adresses sont injectées.
  */
 
-export type Teinte = { id: string; nom: string; famille: string; categorie: string; finition: string; image: string; tags: string[] };
+/** Une matière du catalogue (`lib/matieres › Matiere`). */
+export type Teinte = Matiere;
 export type ZoneCatalogue = { id: string; libelle: string };
 
 // Les familles vivent dans `lib/familles-matieres` (une seule liste pour le simulateur, l'espace et /matieres).
 export { FAMILLES, libelleFamille };
 
-let catalogueEnMemoire: Teinte[] | null = null;
-/** Le catalogue n'est chargé qu'à la première ouverture (il ne pèse rien sur l'ouverture de la page). */
-export async function chargerCatalogue(): Promise<Teinte[]> {
-  if (!catalogueEnMemoire) catalogueEnMemoire = (await import("@/data/revetements.json")).default as Teinte[];
-  return catalogueEnMemoire;
-}
+/**
+ * Le catalogue n'est chargé qu'à la première ouverture (il ne pèse rien sur l'ouverture de la page). Mission 16
+ * (partie 5) : le chargement vit dans `lib/matieres` (la page Matières lit la même copie en mémoire) ; réexporté ici.
+ */
+export { chargerCatalogue };
 
-export const PAR_PAGE = 30;
+export const PAR_PAGE = MATIERES_PAR_PAGE;
 type Filtre = "tout" | "favoris" | string;
-
-const CHAMP = "min-h-[48px] w-full rounded-[var(--rayon-sm)] border border-trait bg-white pr-4 pl-11 text-[16px] text-encre placeholder:text-encre-2/70 focus:border-encre focus:outline-none";
 
 export type ProprietesFeuilleCatalogue = {
   ouverte: boolean;
@@ -56,7 +55,7 @@ export type ProprietesFeuilleCatalogue = {
 };
 
 export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], choisie, favoris, onFavori, onChoisir, urlVignette, urlEchantillon, consultation = false }: ProprietesFeuilleCatalogue) {
-  const [catalogue, setCatalogue] = useState<Teinte[] | null>(catalogueEnMemoire);
+  const [catalogue, setCatalogue] = useState<Teinte[] | null>(catalogueEnMemoireSiCharge);
   const [probleme, setProbleme] = useState(false);
   const [recherche, setRecherche] = useState("");
   const [filtre, setFiltre] = useState<Filtre>("tout");
@@ -77,14 +76,8 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
     };
   }, [ouverte, catalogue]);
 
-  const filtrees = useMemo(() => {
-    const q = recherche.trim();
-    return (catalogue ?? []).filter((r) => {
-      if (filtre === "favoris" && !favoris.includes(r.id)) return false;
-      if (filtre !== "tout" && filtre !== "favoris" && r.famille !== filtre) return false;
-      return !q || correspondRecherche(r, q);
-    });
-  }, [catalogue, recherche, filtre, favoris]);
+  // Le filtre de la page Matières (`lib/matieres`) : famille ou favoris, puis la recherche en français.
+  const filtrees = useMemo(() => filtrerMatieres(catalogue ?? [], { filtre, recherche, favoris }), [catalogue, recherche, filtre, favoris]);
 
   // Nouveau filtre, nouvelle recherche : on repart des premiers échantillons.
   const [cleFiltre, setCleFiltre] = useState(`${filtre}|${recherche}`);
@@ -122,7 +115,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
         <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-encre-2">
           <IconeLoupe />
         </span>
-        <input type="search" enterKeyHint="search" value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Chêne, blanc, marbre, noir mat…" className={CHAMP} />
+        <input type="search" enterKeyHint="search" value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Chêne, blanc, marbre, noir mat…" className={cx(CHAMP_RECHERCHE, "pr-4")} />
       </label>
       <div role="group" aria-label="Familles" className="-mx-4 flex gap-1 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {onglets.map((o) => (
@@ -148,11 +141,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
         ) : (
           <div className="pt-3">
             <p className="min-h-[20px] px-1 pb-2 text-[13.5px] text-encre-2" aria-live="polite">
-              {filtrees.length === 0
-                ? filtre === "favoris" && !recherche
-                  ? "Pas encore de favori : touchez le cœur d'un échantillon pour le garder ici."
-                  : "Aucune matière ne correspond. Essayez « bois clair », « blanc » ou « marbre »."
-                : `${filtrees.length} matière${filtrees.length > 1 ? "s" : ""}`}
+              {filtrees.length === 0 ? messageAucuneMatiere(filtre, recherche, "échantillon") : `${filtrees.length} matière${filtrees.length > 1 ? "s" : ""}`}
             </p>
             <ul className="grid grid-cols-3 gap-x-2.5 gap-y-3">
               {visibles.map((r) => {
@@ -172,11 +161,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
                       </span>
                       <span className="mt-1 block h-[34px] overflow-hidden text-[13px] leading-[17px] font-medium text-encre">{r.nom}</span>
                     </button>
-                    <button type="button" aria-pressed={favori} aria-label={favori ? `Retirer ${r.nom} de mes favoris` : `Ajouter ${r.nom} à mes favoris`} onClick={() => onFavori(r.id)} className={cx("absolute top-0 right-0 flex h-11 w-11 items-center justify-center rounded-full", favori ? "text-accent" : "text-encre-2")}>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90">
-                        <IconeCoeur taille={18} plein={favori} />
-                      </span>
-                    </button>
+                    <BoutonFavori nom={r.nom} favori={favori} onBasculer={() => onFavori(r.id)} />
                   </li>
                 );
               })}

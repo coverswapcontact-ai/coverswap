@@ -3,11 +3,31 @@ import { ENTREPRISE } from "@/lib/entreprise";
 
 export type QuestionReponse = { q: string; a: string };
 
+/*
+ * Trois réponses de la FAQ générale sont AUSSI des objections de « Vos
+ * questions » (/comment-ca-marche, `app/comment-ca-marche/contenu.ts`) : les
+ * objections les lisent ici (une seule source), et la FAQ repliée de cette page
+ * ne les répète pas (`FAQ_RESTANTE`).
+ */
+export const FAQ_EAU_CHALEUR: QuestionReponse = {
+  q: "Le covering résiste-t-il à l'eau et à la chaleur ?",
+  a: "Les films Cover Styl' sont conçus pour les cuisines et les salles de bain : ils résistent à l'humidité, aux projections et au nettoyage courant. Pour la chaleur, ils supportent l'usage quotidien d'une cuisine ; à proximité immédiate des plaques de cuisson, nous validons la faisabilité au cas par cas et posons les références prévues pour les hautes températures.",
+};
+export const FAQ_RETRAIT: QuestionReponse = {
+  q: "Peut-on retirer le film sans abîmer le support ?",
+  a: "Oui : le film se retire à chaud, proprement, et le support retrouve son état d'origine. C'est ce qui rend le covering adapté aux locataires et aux logements en gestion locative.",
+};
+export const FAQ_GARANTIE: QuestionReponse = {
+  q: "Quelle garantie ?",
+  a: `La pose et les films sont garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration en usage normal. Les exclusions (chocs, coupures, produits abrasifs) sont écrites dans nos conditions générales de vente.`,
+};
+
 /**
  * Questions fréquentes — vraies réponses, sans promesse invérifiable.
- * Servies sur /comment-ca-marche (#faq) et dans le balisage FAQPage de cette
- * page (`SectionsCommentCaMarche`) ; l'accueil ne les montre plus (mission 16,
- * partie 3).
+ * Servies sur /comment-ca-marche (#faq) : les objections de « Vos questions »
+ * en reprennent trois (ci-dessus), la FAQ repliée montre les autres, et le
+ * balisage FAQPage porte chaque question une fois (mission 16, partie 5) ;
+ * l'accueil ne les montre plus (partie 3).
  */
 export const FAQ_GENERALE: QuestionReponse[] = [
   {
@@ -22,18 +42,9 @@ export const FAQ_GENERALE: QuestionReponse[] = [
     q: "Combien de temps dure la pose ?",
     a: "Une cuisine ou une salle de bain courante se pose en une journée. Un meuble seul prend quelques heures. Pour un projet qui cumule plusieurs pièces, comptez deux jours. La pièce est utilisable le soir même : pas de séchage, pas de gravats.",
   },
-  {
-    q: "Le covering résiste-t-il à l'eau et à la chaleur ?",
-    a: "Les films Cover Styl' sont conçus pour les cuisines et les salles de bain : ils résistent à l'humidité, aux projections et au nettoyage courant. Pour la chaleur, ils supportent l'usage quotidien d'une cuisine ; à proximité immédiate des plaques de cuisson, nous validons la faisabilité au cas par cas et posons les références prévues pour les hautes températures.",
-  },
-  {
-    q: "Peut-on retirer le film sans abîmer le support ?",
-    a: "Oui : le film se retire à chaud, proprement, et le support retrouve son état d'origine. C'est ce qui rend le covering adapté aux locataires et aux logements en gestion locative.",
-  },
-  {
-    q: "Quelle garantie ?",
-    a: `La pose et les films sont garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration en usage normal. Les exclusions (chocs, coupures, produits abrasifs) sont écrites dans nos conditions générales de vente.`,
-  },
+  FAQ_EAU_CHALEUR,
+  FAQ_RETRAIT,
+  FAQ_GARANTIE,
   {
     q: "Où intervenez-vous ?",
     a: `Notre zone principale est ${ENTREPRISE.zone.principale} (${ENTREPRISE.zone.departement}). Nous nous déplaçons sur devis partout en France métropolitaine ; les frais de déplacement éventuels sont écrits dans le devis.`,

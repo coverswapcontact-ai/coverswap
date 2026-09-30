@@ -43,6 +43,12 @@ const nextConfig: NextConfig = {
       // Mission 16 (partie 4) : le devis passe par la simulation (tunnel) ; la page pro devient /pro. Test : src/redirections.test.ts.
       { source: "/devis", destination: "/simulateur", permanent: true },
       { source: "/prestations/professionnel", destination: "/pro", permanent: true },
+      // Mission 16 (partie 5) : le catalogue devient /matieres (`?famille=` et `?ref=` passent tels quels : Next garde la
+      // requête), l'index des prestations mène aux réalisations (les pages par pièce gardent leur adresse), l'index du
+      // blog mène à « Comment ça marche » (les guides gardent la leur). Sonde en ligne : scripts/verifier-redirections.mjs.
+      { source: "/revetements", destination: "/matieres", permanent: true },
+      { source: "/prestations", destination: "/realisations", permanent: true },
+      { source: "/blog", destination: "/comment-ca-marche", permanent: true },
     ];
   },
   async headers() {

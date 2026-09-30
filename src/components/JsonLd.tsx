@@ -1,6 +1,6 @@
 import { ENTREPRISE } from "@/lib/entreprise";
 import { ZONES } from "@/data/zones";
-import { PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
+import { GARANTIE_ANS, PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
 
 /**
  * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
@@ -29,8 +29,7 @@ export const LOCAL_BUSINESS = {
   name: ENTREPRISE.nom,
   legalName: `${ENTREPRISE.dirigeant} — ${ENTREPRISE.nom}`,
   founder: { "@type": "Person", name: ENTREPRISE.dirigeant },
-  description:
-    "Rénovation intérieure par covering adhésif Cover Styl' : cuisines, salles de bain, meubles, locaux professionnels et vitrages. Pose en une journée, film réversible, garanti 10 ans, simulation sur photo. Montpellier, Hérault et France métropolitaine sur devis.",
+  description: `Rénovation intérieure par covering adhésif Cover Styl' : cuisines, salles de bain, meubles, locaux professionnels et vitrages. Pose en une journée, film réversible, garanti ${GARANTIE_ANS} ans, simulation sur photo. Montpellier, Hérault et France métropolitaine sur devis.`,
   url: ENTREPRISE.site,
   telephone: ENTREPRISE.telephoneInternational,
   email: ENTREPRISE.email,
@@ -79,8 +78,10 @@ export function OrganizationSchema() {
 /**
  * `urlOffre` (mission 16, partie 3) : l'adresse de l'offre ; le tunnel commence au simulateur (mission 16, partie 4 :
  * `/devis` y est redirigé), /pro passe son formulaire.
+ * `zone` (mission 16, partie 5) : la zone desservie quand le service est local (une page de ville : la ville) ; le
+ * prestataire reste l'entreprise (`@id`), jamais une seconde fiche `LocalBusiness`.
  */
-export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/simulateur` }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string }) {
+export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/simulateur`, zone }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string; zone?: Record<string, unknown> }) {
   return (
     <Script
       data={{
@@ -91,7 +92,7 @@ export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `
         url,
         serviceType: typeProjet ? `Covering adhésif — ${typeProjet}` : "Rénovation par covering adhésif",
         provider: { "@id": LOCAL_BUSINESS_ID },
-        areaServed: LOCAL_BUSINESS.areaServed,
+        areaServed: zone ?? LOCAL_BUSINESS.areaServed,
         offers: {
           "@type": "Offer",
           priceCurrency: "EUR",

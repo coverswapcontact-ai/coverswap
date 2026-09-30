@@ -18,13 +18,14 @@ import type { ChoixEtudes, EtudeSimulee } from "./etudes";
  */
 const TAILLES_CARTE = "(min-width: 768px) 360px, 100vw";
 
-function CarteSimulee({ etude }: { etude: EtudeSimulee }) {
+/** La carte d'une étude simulée (image étiquetée, fourchette et durée d'`offre.ts`) : aussi rendue par `/realisations` et les pages par pièce (partie 5). */
+export function CarteSimulee({ etude, tailles = TAILLES_CARTE }: { etude: EtudeSimulee; tailles?: string }) {
   return (
     <article className={CLASSE_CARTE_REALISATION}>
       {etude.image.type === "avant-apres" ? (
-        <AvantApres apres={etude.image.apres} avant={etude.image.avant} alt={etude.alt} altAvant={`${etude.titre} avant la pose`} ratio={RATIO_CARTE_REALISATION} preparees={{ ...etude.image.preparees, tailles: TAILLES_CARTE }} sansOutils etiquette={etude.etiquette} />
+        <AvantApres apres={etude.image.apres} avant={etude.image.avant} alt={etude.alt} altAvant={`${etude.titre} avant la pose`} ratio={RATIO_CARTE_REALISATION} preparees={{ ...etude.image.preparees, tailles }} sansOutils etiquette={etude.etiquette} />
       ) : (
-        <Photo nom={etude.image.nom} alt={etude.alt} ratio={RATIO_CARTE_REALISATION} tailles={TAILLES_CARTE} etiquette={etude.etiquette} />
+        <Photo nom={etude.image.nom} alt={etude.alt} ratio={RATIO_CARTE_REALISATION} tailles={tailles} etiquette={etude.etiquette} />
       )}
       <div className="p-5">
         <h3 className="text-[17px] font-semibold text-encre">{etude.titre}</h3>
@@ -38,7 +39,7 @@ function CarteSimulee({ etude }: { etude: EtudeSimulee }) {
 
 export function RealisationsAccueil({ choix }: { choix: ChoixEtudes }) {
   return (
-    <Section id="realisations" large titre={choix.titre} intro={choix.mode === "simulees" ? "Des exemples simulés et les prix constatés par projet. Les photos de nos chantiers arrivent." : undefined}>
+    <Section id="realisations" large titre={choix.titre} intro={choix.mode === "simulees" ? "Des exemples simulés et les prix habituels par projet. Les photos de nos chantiers arrivent." : undefined}>
       <div className="grid gap-5 md:grid-cols-3">
         {choix.mode === "reelles" ? choix.etudes.map((e) => <CarteRealisation key={e.id} etude={e} tailles={TAILLES_CARTE} />) : choix.etudes.map((e) => <CarteSimulee key={e.id} etude={e} />)}
       </div>

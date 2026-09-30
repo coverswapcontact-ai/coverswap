@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
+import { BreadcrumbSchema } from "@/components/JsonLd";
+import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité",
-  description:
-    "Comment CoverSwap collecte, utilise et protège vos données personnelles : demandes de devis, simulations, photos, cookies, sous-traitants, droits RGPD.",
-  alternates: { canonical: "https://coverswap.fr/politique-confidentialite" },
+  ...metadonneesPage({
+    titre: "Politique de confidentialité | CoverSwap",
+    description: "Comment CoverSwap collecte, utilise et protège vos données personnelles : demandes de devis, simulations, photos, cookies, sous-traitants, droits RGPD.",
+    chemin: "/politique-confidentialite",
+  }),
   robots: { index: true, follow: true },
 };
 
@@ -37,6 +41,7 @@ const SOUS_TRAITANTS: { nom: string; role: string; lieu: string }[] = [
 export default function PolitiqueConfidentialite() {
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
+      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Politique de confidentialité", url: `${ENTREPRISE.site}/politique-confidentialite` }]} />
       <div className="mx-auto max-w-3xl">
         <h1 className="titre-1 mb-2 text-encre">Politique de confidentialité</h1>
         <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>

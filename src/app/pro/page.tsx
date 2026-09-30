@@ -9,6 +9,7 @@ import { Photo } from "@/components/simulation/Photo";
 import { Section } from "@/components/simulation/Section";
 import { getPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_REPONSE } from "@/lib/offre";
 import { FormulairePro } from "./_components/FormulairePro";
 import { ANCRE_DEVIS_PRO, ARGUMENTS_PRO, LIGNE_PRO, REFERENCES_PRO, TITRE_PRO } from "./contenu";
@@ -22,14 +23,7 @@ import { ANCRE_DEVIS_PRO, ARGUMENTS_PRO, LIGNE_PRO, REFERENCES_PRO, TITRE_PRO } 
  */
 const PRO = getPrestation("professionnel");
 const URL_PRO = `${ENTREPRISE.site}/pro`;
-export const metadata: Metadata = PRO
-  ? {
-      title: { absolute: `${PRO.titreSeo} | CoverSwap` },
-      description: PRO.descriptionSeo,
-      alternates: { canonical: URL_PRO },
-      openGraph: { title: PRO.titreSeo, description: PRO.descriptionSeo, url: URL_PRO, type: "website", siteName: "CoverSwap", locale: "fr_FR", images: [{ url: `${ENTREPRISE.site}/og-image.jpg`, width: 1200, height: 630 }] },
-    }
-  : {};
+export const metadata: Metadata = PRO ? metadonneesPage({ titre: `${PRO.titreSeo} | CoverSwap`, description: PRO.descriptionSeo, chemin: "/pro" }) : {};
 
 export default function PagePro() {
   if (!PRO) notFound();

@@ -2,12 +2,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
-import { FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
+import { FAQSchema, BreadcrumbSchema, ServiceSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { ZONES, getZoneSlug, getZoneBySlug, type Zone } from "@/data/zones";
-import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
+import { metadonneesPage } from "@/lib/metadonnees";
+import { ZONES, getZoneSlug, getZoneBySlug } from "@/data/zones";
+import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE, DUREE_POSE_TEXTE, GARANTIE, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
+
+/**
+ * Les pages locales (8 villes, mission 16, partie 5) : adresses et textes conservés, thème clair, bouton principal
+ * « Simuler ma cuisine ». Balisage : un `Service` par ville (`areaServed` : la ville ; `provider` : l'entreprise par son
+ * `@id`, déclarée une fois dans le gabarit) — plus de seconde fiche `LocalBusiness` par ville (nom et coordonnées de
+ * centre-ville concurrents de la vraie fiche). Délais, garantie, durée : `offre.ts`.
+ */
 
 /* ──────────────────────────────────────────────────────────────────
    STATIC GENERATION — pré-build des 8 pages au build time
@@ -28,117 +36,15 @@ export async function generateMetadata({
   const zone = getZoneBySlug(slug);
   if (!zone) return {};
 
-  const title = `Covering Adhésif ${zone.ville} — Rénovation Cuisine & Salle de Bain en 1 Jour | CoverSwap`;
-  const description = `Covering adhésif premium à ${zone.ville} (${zone.codePostal.split(" / ")[0]}). Rénovation cuisine, salle de bain, meubles en 1 journée. Pose Cover Styl' garantie 10 ans, devis gratuit ${DELAI_REPONSE}. Prix au mètre linéaire, ${PRIX_PLAGE} selon la complexité de la pose.`;
-  const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
-
   return {
-    title: { absolute: title },
-    description,
+    ...metadonneesPage({
+      titre: `Covering Adhésif ${zone.ville} — Rénovation Cuisine & Salle de Bain en 1 Jour | CoverSwap`,
+      description: `Covering adhésif à ${zone.ville} (${zone.codePostal.split(" / ")[0]}) : cuisine, salle de bain, meubles rénovés en ${DUREE_POSE_TEXTE}. Garantie ${GARANTIE_ANS} ans, devis gratuit ${DELAI_REPONSE}, ${PRIX_PLAGE}.`,
+      chemin: `/zones/${getZoneSlug(zone)}`,
+    }),
     keywords: `covering ${zone.ville}, rénovation cuisine ${zone.ville}, covering adhésif ${zone.ville}, relooking meubles ${zone.ville}, film adhésif ${zone.ville}, Cover Styl ${zone.ville}, covering Hérault, covering Occitanie`,
-    alternates: { canonical: url },
-    openGraph: {
-      title,
-      description,
-      url,
-      type: "website",
-      siteName: "CoverSwap",
-      locale: "fr_FR",
-      images: [
-        {
-          url: "https://coverswap.fr/og-image.jpg",
-          width: 1200,
-          height: 630,
-          alt: `Covering adhésif à ${zone.ville} — CoverSwap`,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["https://coverswap.fr/og-image.jpg"],
-    },
     robots: { index: true, follow: true },
   };
-}
-
-/* ──────────────────────────────────────────────────────────────────
-   JSON-LD — LocalBusiness ciblé sur la ville + Service
-────────────────────────────────────────────────────────────────── */
-function ZoneLocalBusinessSchema({ zone }: { zone: Zone }) {
-  const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": url,
-    name: `CoverSwap — Covering ${zone.ville}`,
-    image: "https://coverswap.fr/og-image.jpg",
-    url,
-    telephone: "+33670352869",
-    email: "contact@coverswap.fr",
-    priceRange: "€€",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "73 rue Simone Veil",
-      addressLocality: "Pérols",
-      postalCode: "34470",
-      addressRegion: "Occitanie",
-      addressCountry: "FR",
-    },
-    areaServed: {
-      "@type": "City",
-      name: zone.ville,
-      containedInPlace: {
-        "@type": "AdministrativeArea",
-        name: "Hérault",
-      },
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: zone.lat,
-      longitude: zone.lng,
-    },
-  };
-
-  const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: `Covering adhésif à ${zone.ville}`,
-    description: `Rénovation par revêtement adhésif Cover Styl' à ${zone.ville} : cuisines, salles de bain, meubles, surfaces professionnelles. Pose en 1 journée, ${NB_REFERENCES} références disponibles.`,
-    url,
-    provider: {
-      "@type": "LocalBusiness",
-      name: "CoverSwap",
-      url: "https://coverswap.fr",
-      telephone: "+33670352869",
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: "73 rue Simone Veil",
-        addressLocality: "Pérols",
-        postalCode: "34470",
-        addressCountry: "FR",
-      },
-    },
-    areaServed: {
-      "@type": "City",
-      name: zone.ville,
-    },
-    serviceType: "Rénovation par covering adhésif",
-  };
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-      />
-    </>
-  );
 }
 
 /* ──────────────────────────────────────────────────────────────────
@@ -154,7 +60,7 @@ export default async function ZonePage({
   if (!zone) notFound();
 
   const otherZones = ZONES.filter((z) => z.slug !== zone.slug);
-  const url = `https://coverswap.fr/zones/${getZoneSlug(zone)}`;
+  const url = `${ENTREPRISE.site}/zones/${getZoneSlug(zone)}`;
 
   const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white";
   const prestationsVille = [
@@ -168,12 +74,17 @@ export default async function ZonePage({
 
   return (
     <div className="bg-fond">
-      <ZoneLocalBusinessSchema zone={zone} />
+      <ServiceSchema
+        name={`Covering adhésif à ${zone.ville}`}
+        description={`Rénovation par revêtement adhésif Cover Styl' à ${zone.ville} : cuisines, salles de bain, meubles, surfaces professionnelles. Pose en ${DUREE_POSE}, ${NB_REFERENCES} références disponibles.`}
+        url={url}
+        zone={{ "@type": "City", name: zone.ville }}
+      />
       <FAQSchema faqs={zone.faqLocale.map((f) => ({ q: f.q, a: texteOffre(f.a) }))} />
       <BreadcrumbSchema
         items={[
-          { name: "Accueil", url: "https://coverswap.fr" },
-          { name: "Zones d'intervention", url: "https://coverswap.fr/zones" },
+          { name: "Accueil", url: ENTREPRISE.site },
+          { name: "Zones d'intervention", url: `${ENTREPRISE.site}/zones` },
           { name: `Covering ${zone.ville}`, url },
         ]}
       />
@@ -183,14 +94,14 @@ export default async function ZonePage({
         <div className="mx-auto max-w-6xl">
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention", href: "/zones" }, { label: `Covering ${zone.ville}` }]} />
           <p className="surtitre">Zone d&apos;intervention · {zone.codePostal.split(" / ")[0]}</p>
-          <h1 className="titre-1 mt-2 max-w-4xl text-encre">Covering adhésif à {zone.ville} — Cuisine, salle de bain, meubles : rénovés en 1 journée</h1>
+          <h1 className="titre-1 mt-2 max-w-4xl text-encre">Covering adhésif à {zone.ville} — Cuisine, salle de bain, meubles : rénovés en {DUREE_POSE}</h1>
           <p className="texte mt-4 mb-8 max-w-3xl text-encre-2">
             Vous habitez {zone.ville} et souhaitez moderniser votre cuisine, salle de bain ou vos meubles sans
             engager de gros travaux&nbsp;? Nous intervenons à {zone.ville} et dans toute la métropole avec le covering
-            adhésif Cover Styl&apos;&nbsp;: pose en 1 journée, {NB_REFERENCES} références au catalogue, garanti 10 ans.
+            adhésif Cover Styl&apos;&nbsp;: pose en {DUREE_POSE}, {NB_REFERENCES} références au catalogue, garanti {GARANTIE}.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Lien href="/simulateur">Simuler mon projet ({zone.ville})</Lien>
+            <Lien href="/simulateur?projet=cuisine">Simuler ma cuisine</Lien>
             <Lien href="/contact" variante="secondaire">
               Devis gratuit {DELAI_REPONSE}
             </Lien>
@@ -198,7 +109,7 @@ export default async function ZonePage({
           <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-encre-2">
             <li>{zone.distanceKm === 0 ? "Basés à Pérols, chez vous" : `Basés à Pérols, à ${zone.distanceKm} km`}</li>
             <li>Devis {DELAI_REPONSE}</li>
-            <li>Garanti 10 ans Cover Styl&apos;</li>
+            <li>Garanti {GARANTIE} Cover Styl&apos;</li>
           </ul>
         </div>
       </section>
@@ -257,7 +168,7 @@ export default async function ZonePage({
             {[
               { value: `${zone.distanceKm === 0 ? "Sur place" : zone.distanceKm + " km"}`, label: "depuis Pérols" },
               { value: `${DELAI_REPONSE_COURT}`, label: "pour un devis" },
-              { value: "1 jour", label: "de pose typique" },
+              { value: DUREE_POSE, label: "de pose typique" },
               { value: `${GARANTIE}`, label: "garanti Cover Styl'" },
             ].map((stat) => (
               <div key={stat.label} className={`${CARTE} flex flex-col-reverse p-6 text-center`}>
@@ -305,7 +216,7 @@ export default async function ZonePage({
         intro={`Envoyez-nous une photo, recevez un rendu IA en ${DELAI_RENDU} et un devis détaillé ${DELAI_REPONSE}. Sans engagement, sans visite obligatoire.`}
       >
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Lien href="/simulateur">Simuler mon projet</Lien>
+          <Lien href="/simulateur?projet=cuisine">Simuler ma cuisine</Lien>
           <Lien href={ENTREPRISE.reseaux.whatsapp} target="_blank" rel="noopener noreferrer" variante="secondaire">
             WhatsApp direct
           </Lien>

@@ -65,7 +65,8 @@ export function useLiensDeFeuille(ouverte: boolean, fermer: () => void) {
 let verrous = 0;
 let restaurer: (() => void) | null = null;
 
-function verrouillerLaPage() {
+/** Verrouille la page derrière un panneau (feuille, plein écran modal) ; chaque appel est rendu par `liberer()`. */
+export function verrouillerLaPage() {
   verrous++;
   if (verrous > 1) return;
   const html = document.documentElement;
@@ -95,7 +96,7 @@ function verrouillerLaPage() {
   };
 }
 
-function liberer() {
+export function liberer() {
   verrous = Math.max(0, verrous - 1);
   if (verrous === 0 && restaurer) {
     restaurer();

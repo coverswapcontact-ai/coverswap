@@ -69,9 +69,9 @@ describe("les huit sections, dans l'ordre", () => {
     assert.ok(DESCRIPTION_META_ACCUEIL.length <= 155, `${DESCRIPTION_META_ACCUEIL.length} caractères`);
     assert.ok(DESCRIPTION_META_ACCUEIL.includes(PRIX_PLAGE));
     assert.ok(DESCRIPTION_META_ACCUEIL.includes("Montpellier"));
+    // Mission 16 (partie 5) : canonical absolu, Open Graph et carte de partage par `metadonneesPage` (testé à part).
     const page = lire("src/app/page.tsx");
-    assert.match(page, /canonical: "\/"/);
-    assert.match(page, /openGraph: \{ title: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, url: ENTREPRISE\.site/);
+    assert.match(page, /metadonneesPage\(\{ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "\/" \}\)/);
   });
 
   test("le titre : 7 mots au plus, la durée d'offre.ts", () => {
@@ -220,12 +220,13 @@ describe("4. Matières", () => {
       assert.equal(referenceDeLAdresse(ref, catalogue)?.famille, v.familleCatalogue, v.ref);
     }
     for (const inconnue of [null, undefined, "", "  ", "ZZZ999"]) assert.equal(referenceDeLAdresse(inconnue, catalogue), null, String(inconnue));
-    const client = lire("src/components/CatalogueClient.tsx");
-    assert.match(client, /get\("ref"\)/);
-    assert.match(client, /const refAdresse = useSyncExternalStore\(ecouterAdresse, refDeLAdresse, aucuneFamille\);/);
-    assert.match(client, /const referenceAdresse = referenceDeLAdresse\(refAdresse, REFERENCES\);/);
-    assert.match(client, /setSelectedRef\(referenceAdresse\)/);
-    assert.match(client, /familleDeLaReference \?\? "tout"/);
+    // Mission 16 (partie 5) : la page Matières est rebâtie (`app/matieres/_components/Matieres.tsx`) ; sa lecture de
+    // l'adresse est la fonction pure `lireAdresseMatieres` (lib/matieres, testée dans matieres.test.ts).
+    const client = lire("src/app/matieres/_components/Matieres.tsx");
+    assert.match(client, /const rechercheAdresse = useSyncExternalStore\(ecouterAdresse, rechercheDeLAdresse, rechercheServeur\);/);
+    assert.match(client, /const adresse = lireAdresseMatieres\(rechercheAdresse, catalogue\);/);
+    assert.match(client, /setAgrandie\(adresse\.ouverte\)/);
+    assert.match(lire("src/lib/matieres.ts"), /referenceDeLAdresse\(parametres\.get\("ref"\), catalogue\)/);
   });
 });
 
@@ -299,8 +300,9 @@ describe("5. Réalisations", () => {
   });
 
   test("une seule carte de réalisation, pour l'accueil et /realisations", () => {
-    const realisations = lire("src/components/Realisations.tsx");
-    assert.match(realisations, /<CarteRealisation key=\{p\.id\} etude=\{versEtudeReelle\(p\)\} avecTexte \/>/);
+    // Mission 16 (partie 5) : `components/Realisations.tsx` est fondu dans la page /realisations.
+    const realisations = lire("src/app/realisations/page.tsx");
+    assert.match(realisations, /<CarteRealisation key=\{p\.id\} etude=\{versEtudeReelle\(p\)\} avecTexte tailles=\{TAILLES_CARTE\} \/>/);
     assert.ok(!/apercu|<AvantApres/.test(realisations), "l'aperçu de l'ancien accueil est parti, la carte n'est plus recopiée");
     assert.match(lire("src/components/accueil/RealisationsAccueil.tsx"), /<CarteRealisation /);
     assert.ok(!/<source type=/.test(lire("src/components/simulation/AvantApres.tsx")) && !/<source type=/.test(lire("src/components/simulation/Photo.tsx")), "un seul <picture> : ImagePreparee");

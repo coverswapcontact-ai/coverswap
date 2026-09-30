@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Une image qu'on pince pour zoomer et qu'on déplace au doigt (ou à la molette
@@ -8,12 +8,18 @@ import { useCallback, useRef, useState } from "react";
  * rendu (mission 15, partie 4). Deux pointeurs = zoom + déplacement ; un
  * pointeur = déplacement ; double toucher = retour à l'échelle 1. Sans
  * dépendance, `touch-action: none` sur la zone seulement.
+ *
+ * `retenirMolette` (mission 16, partie 5 : le plein écran modal de la page
+ * Matières) : la molette (et le pincement du pavé tactile) ne fait QUE zoomer.
+ * React pose « wheel » en écouteur passif, où `preventDefault` ne peut rien :
+ * l'écouteur est alors posé à la main, non passif. Sans l'option, rien ne change
+ * (le catalogue en feuille garde sa molette qui fait aussi défiler).
  */
 type Pointeur = { x: number; y: number };
 
 const ECHELLE_MAX = 5;
 
-export function ZoomImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
+export function ZoomImage({ src, alt, className, retenirMolette = false }: { src: string; alt: string; className?: string; retenirMolette?: boolean }) {
   const [transformation, setTransformation] = useState({ echelle: 1, x: 0, y: 0 });
   const [enMouvement, setEnMouvement] = useState(false);
   const pointeurs = useRef(new Map<number, Pointeur>());
@@ -29,6 +35,18 @@ export function ZoomImage({ src, alt, className }: { src: string; alt: string; c
     const maxY = rect ? (rect.height * (echelle - 1)) / 2 : Infinity;
     return { echelle, x: Math.max(-maxX, Math.min(maxX, t.x)), y: Math.max(-maxY, Math.min(maxY, t.y)) };
   }, []);
+
+  const zoomerALaMolette = useCallback((deltaY: number) => setTransformation((t) => borner({ ...t, echelle: t.echelle * (deltaY < 0 ? 1.15 : 0.87) })), [borner]);
+  useEffect(() => {
+    const zone = cadre.current;
+    if (!retenirMolette || !zone) return;
+    const surMolette = (e: WheelEvent) => {
+      e.preventDefault();
+      zoomerALaMolette(e.deltaY);
+    };
+    zone.addEventListener("wheel", surMolette, { passive: false });
+    return () => zone.removeEventListener("wheel", surMolette);
+  }, [retenirMolette, zoomerALaMolette]);
 
   const geometrie = () => {
     const [a, b] = [...pointeurs.current.values()];
@@ -71,10 +89,14 @@ export function ZoomImage({ src, alt, className }: { src: string; alt: string; c
         repere.current = null;
         if (pointeurs.current.size === 0) setEnMouvement(false);
       }}
-      onWheel={(e) => {
-        e.preventDefault();
-        setTransformation((t) => borner({ ...t, echelle: t.echelle * (e.deltaY < 0 ? 1.15 : 0.87) }));
-      }}
+      onWheel={
+        retenirMolette
+          ? undefined
+          : (e) => {
+              e.preventDefault();
+              zoomerALaMolette(e.deltaY);
+            }
+      }
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM, non optimisée */}
       <img

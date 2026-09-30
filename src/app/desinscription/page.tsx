@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
   referrer: "no-referrer",
   alternates: { canonical: null },
+  openGraph: { title: "Désinscription", description: "Ne plus recevoir les relances par e-mail de CoverSwap." },
 };
 
 export const dynamic = "force-dynamic";
