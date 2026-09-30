@@ -19,7 +19,8 @@ import { Resend } from "resend";
 /* ══════════════════════════════════════════════════════════════════
    TYPES
 ══════════════════════════════════════════════════════════════════ */
-export type CrmSource = "SITE_SIMULATEUR" | "SITE_CONTACT" | "SITE_DEVIS" | "ORGANIQUE";
+/** Mission 16 (partie 4) : `SITE_PRO` (formulaire de /pro) ; `SITE_DEVIS` n'est plus émis (/devis → /simulateur), il reste lu. */
+export type CrmSource = "SITE_SIMULATEUR" | "SITE_CONTACT" | "SITE_DEVIS" | "SITE_PRO" | "ORGANIQUE";
 
 export type CrmTypeProjet = "CUISINE" | "SDB" | "MEUBLES" | "PRO" | "AUTRE";
 
@@ -50,6 +51,20 @@ export interface CrmLeadPayload {
   campagne?: string;
   publicite?: string;
   formulaire?: string;
+  /** Mission 16 (partie 4) : le tunnel. Origine de la visite (utm_source/medium ou site référent) et page d'entrée. */
+  canal?: string;
+  pageEntree?: string;
+  /** La fourchette affichée après le rendu et la taille choisie (« Moyenne · En L, ≈ 5 m »). */
+  estimationMin?: number;
+  estimationMax?: number;
+  formatPiece?: string;
+  /** « ce-soir-18h » | « demain-10h » | « demain-18h » : le CRM date le rappel (heure de Paris). */
+  rappelCreneau?: string;
+  /** Formulaire de /pro : surface approximative, en m² ou en mètres linéaires. */
+  surfaceM2?: number;
+  surfaceMl?: number;
+  /** Le navigateur affichera le lien de l'espace (formulaire après un rendu) : sans lui, le CRM n'ouvre pas l'espace. */
+  afficherLienEspace?: boolean;
   // Consentement aux e-mails commerciaux : case distincte, texte figé horodaté (lib/consentement)
   consentementMail?: boolean;
   consentementTexte?: string;
@@ -71,6 +86,10 @@ export interface CrmResult {
   consentement?: string | null;
   /** Simulations du parcours rattachées à la fiche par le CRM. */
   simulations?: number;
+  /** Mission 16 (partie 4) : le lien de l'espace client ouvert par le CRM (le site l'AFFICHE), null sinon. */
+  lienEspace?: string | null;
+  /** Le rappel daté par le CRM (ISO), s'il en a été demandé un. */
+  rappelLe?: string | null;
   error?: string;
   /** Vrai si, faute de CRM, le contact est parti par mail de secours au gérant. */
   emailFallback?: boolean;
@@ -108,6 +127,10 @@ function formatLeadHtml(payload: Record<string, unknown>, error: string): string
     ["Style souhaité", payload.styleSouhaite],
     ["Message", payload.message],
     ["Notes", payload.notes],
+    ["Rappel demandé", payload.rappelCreneau],
+    ["Estimation vue", payload.estimationMin && payload.estimationMax ? `${payload.estimationMin} à ${payload.estimationMax} € (${payload.formatPiece ?? "taille non choisie"})` : null],
+    ["Surface", payload.surfaceM2 ? `${payload.surfaceM2} m²` : payload.surfaceMl ? `${payload.surfaceMl} ml` : null],
+    ["Arrivée", [payload.canal, payload.pageEntree].filter(Boolean).join(" · ") || null],
   ];
   const tableRows = rows
     .filter(([, v]) => v != null && v !== "")
@@ -201,6 +224,8 @@ async function sendPayload(cleaned: Record<string, unknown>, ipVisiteur?: string
         photos: typeof body?.photos === "number" ? body.photos : undefined,
         consentement: typeof body?.consentement === "string" ? body.consentement : null,
         simulations: typeof body?.simulations === "number" ? body.simulations : undefined,
+        lienEspace: typeof body?.lienEspace === "string" && /^https:\/\//.test(body.lienEspace) ? body.lienEspace : null,
+        rappelLe: typeof body?.rappelLe === "string" ? body.rappelLe : null,
       };
     } catch {
       return { ok: true };
@@ -250,7 +275,7 @@ export async function sendLeadToCRM(payload: CrmLeadPayload, options: { ipVisite
     console.log(
       `[CRM] lead enregistré id=${result.leadId ?? "?"} source=${cleaned.source} tel=${cleaned.telephone}${result.deduped ? " (rattaché à un lead existant)" : ""} photos=${result.photos ?? 0} consentement=${result.consentement ?? "non demandé"}`
     );
-    return { ok: true, leadId: result.leadId, deduped: result.deduped, photos: result.photos, consentement: result.consentement, simulations: result.simulations };
+    return { ok: true, leadId: result.leadId, deduped: result.deduped, photos: result.photos, consentement: result.consentement, simulations: result.simulations, lienEspace: result.lienEspace ?? null, rappelLe: result.rappelLe ?? null };
   }
 
   const lean = { ...cleaned };
@@ -272,6 +297,24 @@ export const MESSAGE_ECHEC_TOTAL =
 /* ══════════════════════════════════════════════════════════════════
    HELPERS — splitName + mapTypeProjet
 ══════════════════════════════════════════════════════════════════ */
+/**
+ * La source CRM d'un formulaire du site. Une source CRM explicite (`SITE_PRO`, `SITE_CONTACT`…) passe telle quelle ;
+ * sinon, d'après le texte : « simulateur / simulation » → `SITE_SIMULATEUR`, « pro » → `SITE_PRO`, « contact » (le
+ * formulaire de /contact : « coverswap.fr/contact ») → `SITE_CONTACT`, « devis » → `SITE_DEVIS` (ancienne page, encore
+ * lue) ; rien ou autre chose → `SITE_CONTACT` (mission 16, partie 4 : /devis n'existe plus, /contact était compté en
+ * `SITE_DEVIS` par erreur).
+ */
+export function resolveSource(raw?: string): CrmSource {
+  const explicites: CrmSource[] = ["SITE_SIMULATEUR", "SITE_CONTACT", "SITE_DEVIS", "SITE_PRO"];
+  if (raw && (explicites as string[]).includes(raw)) return raw as CrmSource;
+  const s = (raw ?? "").toLowerCase();
+  if (s.includes("simulateur") || s.includes("simulation")) return "SITE_SIMULATEUR";
+  if (/(^|[^a-z])pro([^a-z]|$)/.test(s)) return "SITE_PRO";
+  if (s.includes("contact")) return "SITE_CONTACT";
+  if (s.includes("devis")) return "SITE_DEVIS";
+  return "SITE_CONTACT";
+}
+
 export function splitName(fullName: string): { prenom: string; nom: string } {
   const parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return { prenom: "Inconnu", nom: "Inconnu" };

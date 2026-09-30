@@ -161,7 +161,7 @@ export default async function ZonePage({
     { href: "/prestations/cuisine", title: `Covering Cuisine à ${zone.ville}`, desc: "Plans de travail, crédences, façades de meubles. Effet marbre, bois, béton." },
     { href: "/prestations/salle-de-bain", title: `Covering SDB à ${zone.ville}`, desc: "Carrelage mural, meubles vasque, portes : rénovation sans dépose." },
     { href: "/prestations/meubles", title: `Covering Meubles à ${zone.ville}`, desc: "Dressing, bibliothèque, commodes : seconde vie à votre mobilier." },
-    { href: "/prestations/professionnel", title: `Covering Pro à ${zone.ville}`, desc: "Bureaux, comptoirs, vitrines : modernisation rapide de vos locaux." },
+    { href: "/pro", title: `Covering Pro à ${zone.ville}`, desc: "Bureaux, comptoirs, vitrines : modernisation rapide de vos locaux." },
     { href: "/prestations/vitrages", title: `Covering Vitrages à ${zone.ville}`, desc: "Films décoratifs, occultants, dépoli sur mesure pour vitres et baies." },
     { href: "/matieres", title: "Catalogue Cover Styl'", desc: `Parcourez les ${NB_REFERENCES} références : bois, pierre, métal, textile, couleurs unies.` },
   ];

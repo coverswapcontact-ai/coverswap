@@ -12,7 +12,8 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
  */
 /** Mission 15 (partie 4) : l'entonnoir du simulateur = PIECE_CHOISIE → PHOTO_CHARGEE → GENERATION_LANCEE → RESULTAT_VU → DEVIS_DEMANDE (mêmes noms côté CRM). */
 /** Mission 16 (partie 3) : `WHATSAPP_CLIQUE`, le bouton « Écrire sur WhatsApp » (liste blanche du CRM d'abord). */
-export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC" | "WHATSAPP_CLIQUE";
+/** Mission 16 (partie 4) : `ESTIMATION_VUE` (la fourchette affichée après le rendu) et `RAPPEL_DEMANDE` (un créneau choisi). */
+export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "ESTIMATION_VUE" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "RAPPEL_DEMANDE" | "FORMULAIRE_ECHEC" | "WHATSAPP_CLIQUE";
 
 export const VERS_DATALAYER: Partial<Record<EvenementSite, TrackEvent>> = {
   PHOTO_CHARGEE: "simulation_photo_uploaded",

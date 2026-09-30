@@ -30,7 +30,7 @@ export default function PageRealisations() {
       <Section titre="Et chez vous ?" intro={`Simulez le rendu sur votre propre photo, ou envoyez vos photos pour un devis ${DELAI_REPONSE}.`} fond="fond-2">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Lien href="/simulateur">Simuler sur ma photo</Lien>
-          <Lien href="/devis" variante="secondaire">
+          <Lien href="/contact" variante="secondaire">
             Demander un devis
           </Lien>
         </div>

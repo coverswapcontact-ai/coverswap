@@ -6,7 +6,7 @@ import { DELAI_RENDU } from "@/lib/offre";
 /** Mission 15 (partie 1) — fonctions pures de la reprise du simulateur (aucun réseau, aucune génération). */
 
 const PHOTO = "data:image/jpeg;base64,AAAA";
-const etatV2 = (extra: Partial<EtatSimulateur> = {}): EtatSimulateur => ({ projet: "cuisine", photo: PHOTO, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: "aaaaaaaa-1500-4000-8000-000000000001", travailEnCours: null, rendus: [], analyse: null, majLe: Date.now() - 60_000, ...extra });
+const etatV2 = (extra: Partial<EtatSimulateur> = {}): EtatSimulateur => ({ projet: "cuisine", photo: PHOTO, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: "aaaaaaaa-1500-4000-8000-000000000001", travailEnCours: null, rendus: [], analyse: null, ville: null, codePostal: null, refDemandee: null, majLe: Date.now() - 60_000, ...extra });
 
 describe("migration de l'état v1 → v2", () => {
   test("l'ancien état repart sans image : identifiants gardés dans rendus, résultat et rendusLocaux abandonnés", () => {
@@ -26,7 +26,7 @@ describe("migration de l'état v1 → v2", () => {
     assert.equal(etat?.rendus[0].urlApres, "https://crm/api/simulate/image?id=x");
     assert.equal(migrerEtat(null), null);
     assert.equal(migrerEtat("n'importe quoi"), null);
-    assert.deepEqual(migrerEtat({}), { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, majLe: 0 });
+    assert.deepEqual(migrerEtat({}), { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, ville: null, codePostal: null, refDemandee: null, majLe: 0 });
   });
 
   test("les dimensions de la photo sont gardées (rapport réservé à l'écran) ; sans estimation du CRM, l'attente par défaut est celle de la promesse du site", () => {

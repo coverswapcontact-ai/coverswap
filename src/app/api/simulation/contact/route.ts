@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, type CrmTypeProjet } from "@/lib/crm";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
-import { parcoursIdValide } from "@/lib/parcours";
 import { getProject } from "@/lib/simulateur/projets";
+import { validerContactSimulation } from "./validation";
 
 /**
  * POST /api/simulation/contact — après le résultat du simulateur, la personne
@@ -12,13 +12,17 @@ import { getProject } from "@/lib/simulateur/projets";
  * avec la photo et les finitions choisies : la simulation sera faite à la main.
  * Mission 15 : plus de rendu en base64 côté site (le chemin de secours Vercel
  * n'existe plus).
+ *
+ * Mission 16 (partie 4) : prénom et téléphone suffisent (e-mail facultatif) ;
+ * partent aussi la fourchette vue et sa taille, le créneau de rappel choisi,
+ * l'origine de la visite et la page d'entrée (`validation.ts`). La réponse porte
+ * `lienEspace` — l'espace que le CRM vient d'ouvrir, que le navigateur AFFICHE :
+ * le site n'envoie rien — et `rappelLe`, le rappel daté par le CRM. Le CRM n'ouvre
+ * l'espace que si la demande porte `afficherLienEspace` (formulaire après un rendu ;
+ * jamais la demande après un échec, dont l'écran ne montre pas de lien).
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
-
-function texte(v: unknown, max: number): string | undefined {
-  return typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
-}
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
@@ -30,54 +34,56 @@ export async function POST(req: NextRequest) {
   }
   if (body.website) return NextResponse.json({ success: true });
 
-  const nom = texte(body.name, 120);
-  const telephone = texte(body.phone, 30);
-  const email = texte(body.email, 200);
-  if (!nom || !telephone || !email) return NextResponse.json({ error: "Nom, téléphone et e-mail sont nécessaires pour vous envoyer le devis." }, { status: 400 });
-  if (telephone.replace(/\D/g, "").length < 9) return NextResponse.json({ error: "Numéro de téléphone incomplet." }, { status: 400 });
+  const validation = validerContactSimulation(body);
+  if (!validation.ok) return NextResponse.json({ error: validation.erreur }, { status: 400 });
+  const c = validation.contact;
 
   const captcha = await verifierTurnstile(body.turnstileToken, ip);
   if (!captcha.ok) return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
 
-  const { prenom, nom: nomFamille } = splitName(nom);
-  const projet = getProject(texte(body.project_type, 40) ?? "cuisine");
-  // Mission 15 : toutes les simulations du parcours, par identifiant — le CRM a les images, plus de base64 ici.
-  const simulationIds = Array.isArray(body.simulationIds) ? (body.simulationIds as unknown[]).filter((s): s is string => typeof s === "string" && /^[a-z0-9]{10,40}$/i.test(s)).slice(0, 10) : [];
-  const references = texte(body.references, 500);
-  // Génération non aboutie (crédit épuisé, panne, photo refusée) : la photo du visiteur part avec sa
-  // demande pour que la simulation soit faite à la main. ~6 Mo au plus, image uniquement.
-  const echec = texte(body.simulationEchouee, 60);
-  const photoAvant = typeof body.photoAvant === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(body.photoAvant) && body.photoAvant.length < 8_000_000 ? body.photoAvant : undefined;
+  // Un seul mot (le prénom) : le CRM le prend aussi pour nom.
+  const { prenom, nom: nomFamille } = splitName(c.nom);
+  const projet = getProject(c.projet ?? "cuisine");
 
   const resultat = await sendLeadToCRM(
     {
       prenom,
       nom: nomFamille,
-      telephone,
-      email,
-      ville: texte(body.ville, 120),
-      codePostal: texte(body.codePostal, 12),
+      telephone: c.telephone,
+      email: c.email,
+      ville: c.ville,
+      codePostal: c.codePostal,
       source: "SITE_SIMULATEUR",
       typeProjet: projet.crmTypeProjet as CrmTypeProjet,
-      referenceChoisie: texte(body.referenceChoisie, 80),
-      message: texte(body.message, 4000),
-      parcoursId: parcoursIdValide(body.parcoursId),
-      simulationIds,
-      notes: echec
-        ? `SIMULATION À RÉALISER À LA MAIN — la génération n'a pas abouti sur le site (${echec}). Projet ${projet.id}${references ? ` : ${references}` : ""}. ${photoAvant ? "Photo du visiteur jointe." : "Photo non transmise."}`
-        : references
-          ? `Simulation ${projet.id} : ${references}`
+      referenceChoisie: c.referenceChoisie,
+      message: typeof body.message === "string" ? body.message.trim().slice(0, 4000) || undefined : undefined,
+      parcoursId: c.parcoursId,
+      simulationIds: c.simulationIds,
+      notes: c.echec
+        ? `SIMULATION À RÉALISER À LA MAIN — la génération n'a pas abouti sur le site (${c.echec}). Projet ${projet.id}${c.references ? ` : ${c.references}` : ""}. ${c.photoAvant ? "Photo du visiteur jointe." : "Photo non transmise."}`
+        : c.references
+          ? `Simulation ${projet.id} : ${c.references}`
           : `Simulation ${projet.id}`,
-      photos: photoAvant && echec ? [photoAvant] : undefined,
-      campagne: texte(body.campagne, 120),
-      publicite: texte(body.publicite, 120),
-      formulaire: texte(body.formulaire, 200),
-      ...(typeof body.consentementMail === "boolean" ? { consentementMail: body.consentementMail, consentementTexte: texte(body.consentementTexte, 1000) } : {}),
+      // Génération non aboutie (crédit épuisé, panne, photo refusée) : la photo du visiteur part avec sa demande. ~6 Mo au plus.
+      photos: c.photoAvant && c.echec ? [c.photoAvant] : undefined,
+      campagne: c.campagne,
+      publicite: c.publicite,
+      formulaire: c.formulaire,
+      canal: c.canal,
+      pageEntree: c.pageEntree,
+      estimationMin: c.estimationMin,
+      estimationMax: c.estimationMax,
+      formatPiece: c.formatPiece,
+      rappelCreneau: c.rappelCreneau,
+      afficherLienEspace: c.afficherLienEspace,
+      ...(c.consentementMail !== undefined ? { consentementMail: c.consentementMail, consentementTexte: c.consentementTexte } : {}),
     },
     { ipVisiteur: ip }
   );
 
-  if (resultat.ok) return NextResponse.json({ success: true, leadId: resultat.leadId ?? null, simulations: resultat.simulations ?? 0, photos: resultat.photos ?? 0, consentement: resultat.consentement ?? null });
-  if (resultat.emailFallback) return NextResponse.json({ success: true, leadId: null, viaMail: true });
+  if (resultat.ok) {
+    return NextResponse.json({ success: true, leadId: resultat.leadId ?? null, simulations: resultat.simulations ?? 0, photos: resultat.photos ?? 0, consentement: resultat.consentement ?? null, lienEspace: resultat.lienEspace ?? null, rappelLe: resultat.rappelLe ?? null });
+  }
+  if (resultat.emailFallback) return NextResponse.json({ success: true, leadId: null, viaMail: true, lienEspace: null, rappelLe: null });
   return NextResponse.json({ error: MESSAGE_ECHEC_TOTAL, reason: resultat.error }, { status: 502 });
 }

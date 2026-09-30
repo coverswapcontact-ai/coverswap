@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { articles } from '@/data/blog-articles';
 import { ZONES, getZoneSlug } from '@/data/zones';
-import { PRESTATIONS } from '@/data/prestations';
+import { PRESTATIONS, lienPrestation } from '@/data/prestations';
 
 /**
  * Sitemap dynamique CoverSwap.
@@ -20,7 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 1 },
     { url: `${baseUrl}/simulateur`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/devis`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
+    // Mission 16 (partie 4) : /devis → 301 /simulateur (retirée) ; /pro remplace /prestations/professionnel.
+    { url: `${baseUrl}/pro`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/zones`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/realisations`, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${baseUrl}/prestations`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
@@ -36,8 +37,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * Pages locales (zones) — priorité haute (0.9) car forte intention de
    * recherche locale. Google les remontera en SERP local.
    */
-  const prestationPages: MetadataRoute.Sitemap = PRESTATIONS.map((p) => ({
-    url: `${baseUrl}/prestations/${p.slug}`,
+  const prestationPages: MetadataRoute.Sitemap = PRESTATIONS.filter((p) => p.slug !== 'professionnel').map((p) => ({
+    url: `${baseUrl}${lienPrestation(p.slug)}`,
     lastModified: LAST_BUILD,
     changeFrequency: 'monthly' as const,
     priority: 0.8,

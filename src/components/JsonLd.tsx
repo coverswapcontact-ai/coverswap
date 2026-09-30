@@ -76,8 +76,11 @@ export function OrganizationSchema() {
   );
 }
 
-/** `urlOffre` (mission 16, partie 3) : l'adresse de l'offre ; l'accueil passe `/simulateur` (le tunnel commence là). */
-export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/devis` }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string }) {
+/**
+ * `urlOffre` (mission 16, partie 3) : l'adresse de l'offre ; le tunnel commence au simulateur (mission 16, partie 4 :
+ * `/devis` y est redirigé), /pro passe son formulaire.
+ */
+export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/simulateur` }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string }) {
   return (
     <Script
       data={{

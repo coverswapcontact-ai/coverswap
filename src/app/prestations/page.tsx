@@ -4,7 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
-import { PRESTATIONS } from "@/data/prestations";
+import { PRESTATIONS, lienPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_REPONSE, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
 
@@ -31,7 +31,7 @@ export default function PagePrestations() {
       <Section large>
         <div className="grid gap-5 md:grid-cols-2">
           {PRESTATIONS.map((p) => (
-            <Link key={p.slug} href={`/prestations/${p.slug}`} className="group rounded-[var(--rayon-md)] border border-trait bg-white p-7 transition-colors duration-[var(--duree-courte)] hover:border-encre">
+            <Link key={p.slug} href={lienPrestation(p.slug)} className="group rounded-[var(--rayon-md)] border border-trait bg-white p-7 transition-colors duration-[var(--duree-courte)] hover:border-encre">
               <p className="surtitre mb-2">{p.court}</p>
               <h2 className="titre-2 mb-3 text-encre">{p.h1}</h2>
               <p className="texte-2 mb-4">{p.accroche}</p>
@@ -44,7 +44,7 @@ export default function PagePrestations() {
       </Section>
 
       <Section titre="Un doute sur ce qui est possible chez vous ?" intro={`Envoyez des photos : nous vous disons ce qui se recouvre, ce qui ne se recouvre pas, et à quel prix, ${DELAI_REPONSE}.`} fond="fond-2">
-        <Lien href="/devis">Envoyer mes photos</Lien>
+        <Lien href="/contact">Envoyer mes photos</Lien>
       </Section>
     </div>
   );

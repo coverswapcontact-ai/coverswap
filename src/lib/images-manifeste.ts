@@ -13,6 +13,7 @@ import type { ManifesteImages } from "./images-preparees";
 export const MANIFESTE_IMAGES: ManifesteImages = {
   "etape-photo": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "0d983799eaf0" },
   "etape-pose": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "0306da50565b" },
+  "etape-simulation": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "4c219eac90ca" },
   "meubles-armoire": { largeur: 1024, hauteur: 1536, largeurs: [480, 960, 1024], empreinte: "92adbbe00c49" },
   "mur-salon": { largeur: 1024, hauteur: 904, largeurs: [480, 960, 1024], empreinte: "44b83f181c49" },
   "ouverture-cuisine-apres": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "e5261882c715" },

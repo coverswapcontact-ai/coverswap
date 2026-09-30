@@ -65,10 +65,15 @@ export type EtatSimulateur = {
   rendus: RenduSimulateur[];
   /** L'analyse de la photo courante (partie 4) ; null tant qu'elle n'est pas demandée. */
   analyse: EtatAnalyse | null;
+  /** Mission 16 (partie 4) : ville et code postal déjà donnés dans ce parcours — le formulaire ne les redemande pas. */
+  ville: string | null;
+  codePostal: string | null;
+  /** Mission 16 (partie 4) : la matière demandée par l'adresse (`?ref=`, depuis /matieres), posée à l'écran des matières. */
+  refDemandee: string | null;
   majLe: number;
 };
 
-export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, majLe: 0 };
+export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, ville: null, codePostal: null, refDemandee: null, majLe: 0 };
 
 /** Le rapport CSS (`aspect-ratio`) de la photo, quand ses dimensions sont connues. */
 export function rapportPhoto(etat: Pick<EtatSimulateur, "photoLargeur" | "photoHauteur">): string | null {
@@ -116,7 +121,7 @@ export function migrerEtat(brut: unknown): EtatSimulateur | null {
   const projet = typeof brut.projet === "string" && brut.projet ? brut.projet : "cuisine";
   const majLe = typeof brut.majLe === "number" ? brut.majLe : 0;
   const photo = texteOuNull(brut.photo);
-  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), majLe };
+  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), majLe };
   if (brut.version === 2) {
     const t = brut.travailEnCours;
     return {

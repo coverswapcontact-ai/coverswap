@@ -21,8 +21,13 @@ export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  * utilisable (pot de miel + limite côté CRM). `onToken` reçoit le jeton à
  * joindre à l'envoi ; il change à chaque nouvelle vérification. Thème clair
  * par défaut (mission 16 : tout le site est clair).
+ *
+ * `actif` (mission 16, partie 4) : tant qu'il est faux, rien ne se charge — ni
+ * le script de Cloudflare, ni le widget — et la place reste réservée (pas de
+ * décalage). Un formulaire le passe à vrai au premier geste dans ses champs :
+ * le script tiers ne pèse pas sur la page de qui ne remplit rien.
  */
-export default function Turnstile({ onToken, action, theme = "light" }: { onToken: (jeton: string | null) => void; action: string; theme?: "dark" | "light" }) {
+export default function Turnstile({ onToken, action, theme = "light", actif = true }: { onToken: (jeton: string | null) => void; action: string; theme?: "dark" | "light"; actif?: boolean }) {
   const conteneur = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const id = useId();
@@ -32,7 +37,7 @@ export default function Turnstile({ onToken, action, theme = "light" }: { onToke
   }, [onToken]);
 
   useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) return;
+    if (!TURNSTILE_SITE_KEY || !actif) return;
     let annule = false;
     const rendre = () => {
       if (annule || !conteneur.current || !window.turnstile || widgetId.current) return;
@@ -56,9 +61,10 @@ export default function Turnstile({ onToken, action, theme = "light" }: { onToke
         widgetId.current = null;
       }
     };
-  }, [action, theme]);
+  }, [action, theme, actif]);
 
   if (!TURNSTILE_SITE_KEY) return null;
+  if (!actif) return <div className="min-h-[65px]" aria-hidden />;
 
   return (
     <>

@@ -246,6 +246,14 @@ export const PRESTATIONS: Prestation[] = [
   },
 ];
 
+/**
+ * L'adresse d'une prestation (mission 16, partie 4) : la page professionnelle est devenue /pro
+ * (`/prestations/professionnel` → 301) ; les autres gardent leur adresse.
+ */
+export function lienPrestation(slug: string): string {
+  return slug === "professionnel" ? "/pro" : `/prestations/${slug}`;
+}
+
 export function getPrestation(slug: string): Prestation | undefined {
   return PRESTATIONS.find((p) => p.slug === slug);
 }

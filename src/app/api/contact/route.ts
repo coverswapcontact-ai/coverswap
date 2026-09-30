@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, mapTypeProjet, type CrmSource } from "@/lib/crm";
+import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, mapTypeProjet, resolveSource } from "@/lib/crm";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 import { parcoursIdValide } from "@/lib/parcours";
 
@@ -52,18 +52,13 @@ function isRateLimited(ip: string): boolean {
   return entry.count > RATE_LIMIT_MAX;
 }
 
-/* ──────────────────────────────────────────────────────────────────
-   SOURCE ROUTING
-   Le client peut passer un champ `source` libre (ex: "coverswap.fr/contact",
-   "coverswap.fr/simulation", "site_devis") — on le mappe vers l'enum CRM.
-────────────────────────────────────────────────────────────────── */
-function resolveSource(raw?: string): CrmSource {
-  if (!raw) return "SITE_DEVIS";
-  const s = raw.toLowerCase();
-  if (s.includes("simulateur") || s.includes("simulation")) return "SITE_SIMULATEUR";
-  if (s.includes("devis") || s.includes("/contact")) return "SITE_DEVIS";
-  if (s.includes("contact")) return "SITE_CONTACT";
-  return "SITE_DEVIS";
+/* La source CRM vient de `resolveSource` (lib/crm) : « coverswap.fr/contact » → SITE_CONTACT, `SITE_PRO` explicite
+   pour le formulaire de /pro (mission 16, partie 4). */
+
+/** Un nombre positif raisonnable (surface du formulaire pro), sinon rien. */
+function nombrePositif(valeur: unknown): number | undefined {
+  const n = typeof valeur === "number" ? valeur : typeof valeur === "string" ? Number(valeur.replace(",", ".")) : Number.NaN;
+  return Number.isFinite(n) && n > 0 && n <= 100_000 ? Math.round(n * 10) / 10 : undefined;
 }
 
 
@@ -136,7 +131,7 @@ export async function POST(req: NextRequest) {
   /* ── Normalisation payload CRM ── */
   const { prenom, nom } = splitName(name);
   const source = resolveSource(typeof body.source === "string" ? body.source : undefined);
-  const typeProjet = mapTypeProjet(typeof body.type_projet === "string" ? body.type_projet : undefined);
+  const typeProjet = source === "SITE_PRO" ? "PRO" : mapTypeProjet(typeof body.type_projet === "string" ? body.type_projet : undefined);
 
   /* ── Photos du projet (data URL, réduites côté client) : jusqu'à 4, en champ dédié ── */
   const photos = Array.isArray(body.photos)
@@ -144,7 +139,9 @@ export async function POST(req: NextRequest) {
     : [];
 
   const texte = (valeur: unknown, max: number) => (typeof valeur === "string" && valeur.trim() ? valeur.trim().slice(0, max) : undefined);
-  const notes = body.reference ? `Réf catalogue : ${body.reference}` : undefined;
+  // Formulaire de /pro : société et type de lieu en note, surface en m² ou en mètres linéaires (le CRM la range).
+  const surface = source === "SITE_PRO" ? nombrePositif(body.surface) : undefined;
+  const notes = [body.reference ? `Réf catalogue : ${body.reference}` : null, texte(body.societe, 120) ? `Société : ${texte(body.societe, 120)}` : null, texte(body.typeLieu, 40) ? `Lieu : ${texte(body.typeLieu, 40)}` : null].filter(Boolean).join(" · ") || undefined;
 
   /* ── Envoi au CRM, ATTENDU : sur Vercel, répondre avant la fin du fetch le tue ── */
   const resultat = await sendLeadToCRM(
@@ -165,6 +162,9 @@ export async function POST(req: NextRequest) {
       campagne: texte(body.campagne, 120),
       publicite: texte(body.publicite, 120),
       formulaire: texte(body.formulaire, 200) ?? source,
+      canal: texte(body.canal, 60),
+      pageEntree: texte(body.pageEntree, 200),
+      ...(surface ? (body.surfaceUnite === "ml" ? { surfaceMl: surface } : { surfaceM2: surface }) : {}),
       notes,
       ...consentementDepuis(body),
     },

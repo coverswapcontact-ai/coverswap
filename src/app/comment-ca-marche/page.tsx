@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema } from "@/components/JsonLd";
+import { CartesAtouts, EtapesPrestation } from "@/components/BlocsPrestation";
 import { CommentCaSePasse, QuestionsFrequentes } from "@/components/SectionsCommentCaMarche";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { articles } from "@/data/blog-articles";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_RENDU, DELAI_REPONSE, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
+import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, LIEN_DEVIS_EN_LIGNE, MOTS_CLES_DEVIS_EN_LIGNE, TITRE_DEVIS_EN_LIGNE } from "./devis-en-ligne";
 
 /**
  * « Comment ça marche » (mission 16, partie 1) : page de transition. Elle rend
@@ -15,6 +17,9 @@ import { DELAI_RENDU, DELAI_REPONSE, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offr
  * l'accueil, telles quelles, sur le thème clair, puis les liens vers les
  * guides (« Pour aller plus loin » : ils n'ont plus d'entrée au menu ni au
  * pied). La partie 5 la réécrit (procédé, prix, objections).
+ *
+ * Mission 16, partie 4 : la section « Votre devis covering en ligne, gratuit » reprend les textes de l'ancienne page
+ * /devis (redirigée vers le simulateur) et l'ancien titre de /contact (`devis-en-ligne.ts`) : aucun texte perdu.
  */
 const URL_PAGE = `${ENTREPRISE.site}/comment-ca-marche`;
 const TITRE = "Comment ça marche — covering adhésif, de la photo à la pose | CoverSwap";
@@ -23,6 +28,7 @@ const DESCRIPTION = `Une photo et une simulation en ${DELAI_RENDU}, un devis ${D
 export const metadata: Metadata = {
   title: { absolute: TITRE },
   description: DESCRIPTION,
+  keywords: MOTS_CLES_DEVIS_EN_LIGNE,
   alternates: { canonical: URL_PAGE },
   openGraph: { title: TITRE, description: DESCRIPTION, url: URL_PAGE, type: "website", siteName: "CoverSwap", locale: "fr_FR", images: [{ url: `${ENTREPRISE.site}/og-image.jpg`, width: 1200, height: 630 }] },
 };
@@ -44,8 +50,17 @@ export default function PageCommentCaMarche() {
         </div>
       </section>
       <CommentCaSePasse />
-      <QuestionsFrequentes fond="fond-2" />
-      <Section titre="Pour aller plus loin">
+      <Section large id="devis" fond="fond-2" titre={TITRE_DEVIS_EN_LIGNE} intro={INTRO_DEVIS_EN_LIGNE}>
+        <EtapesPrestation etapes={ETAPES_DEVIS_EN_LIGNE} />
+        <CartesAtouts atouts={AVANTAGES_DEVIS_EN_LIGNE} className="mt-6" />
+        <div className="mt-8">
+          <Lien href="/contact" variante="secondaire">
+            {LIEN_DEVIS_EN_LIGNE}
+          </Lien>
+        </div>
+      </Section>
+      <QuestionsFrequentes />
+      <Section titre="Pour aller plus loin" fond="fond-2">
         <ul className="border-t border-trait">
           {articles.map((article) => (
             <li key={article.slug} className="border-b border-trait">

@@ -6,8 +6,9 @@ import { ENTREPRISE } from "@/lib/entreprise";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/** Mission 16 (partie 4) : « professionnel » n'est plus générée — `/prestations/professionnel` est redirigée vers /pro (next.config.ts). */
 export function generateStaticParams() {
-  return PRESTATIONS.map((p) => ({ slug: p.slug }));
+  return PRESTATIONS.filter((p) => p.slug !== "professionnel").map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

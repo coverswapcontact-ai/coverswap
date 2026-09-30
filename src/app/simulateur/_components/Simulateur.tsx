@@ -9,17 +9,22 @@ import Turnstile, { TURNSTILE_SITE_KEY, reinitialiserTurnstile } from "@/compone
 import { consentementPourEnvoi } from "@/lib/consentement";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { envoyerEvenement } from "@/lib/evenements-site";
-import { DELAI_REPONSE } from "@/lib/offre";
+import { DELAI_REPONSE } from "@/lib/offre-legere";
 import { adopterParcoursId, obtenirParcoursId } from "@/lib/parcours";
+import { phraseRappel, rappelDuCreneau } from "@/lib/rappel";
+import { corpsDemandeSimulation, type ExtraDemande } from "@/lib/simulateur/demande";
 import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/lib/simulateur/ecrans";
 import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
 import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, urlEchantillon, urlVignette, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
 import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
+import { lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
 import { getProject } from "@/lib/simulateur/projets";
 import { ATTENTE_PAR_DEFAUT_S, ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
 import { composantesDe, pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
+import type { TarifsSite } from "@/lib/tarifs-site";
 import { acquisitionPourEnvoi, lireOrigine, sourceCourte } from "@/lib/utm";
+import { DemandeApresRendu, type DemandeEnvoyee } from "./DemandeApresRendu";
 import { EcranMatieres } from "./EcranMatieres";
 import { EcranPhoto } from "./EcranPhoto";
 import { EcranPiece } from "./EcranPiece";
@@ -27,6 +32,7 @@ import EcranResultat from "./EcranResultat";
 import { ChampsContact, FORMULAIRE_VIDE, type Formulaire } from "./Formulaires";
 import { useAnalyse } from "./useAnalyse";
 import { useFavoris } from "./useFavoris";
+import { useMatiereDemandee } from "./useMatiereDemandee";
 import { useSondage } from "./useSondage";
 
 /* ─────────────────────────────────────────────────────────────────
@@ -41,7 +47,8 @@ import { useSondage } from "./useSondage";
 type Selections = EtatSimulateur["selections"];
 type Echec = { message: string; raison: string };
 
-export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
+/** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. */
+export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null }) {
   const [charge, setCharge] = useState(false);
   const [ecran, setEcran] = useState<Ecran>(1);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
@@ -58,7 +65,7 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
   const [occupe, setOccupe] = useState<"photo" | "lancement" | "envoi" | null>(null);
   const [jetonCaptcha, setJetonCaptcha] = useState<string | null>(null);
   const [formulaire, setFormulaire] = useState<Formulaire>(FORMULAIRE_VIDE);
-  const [envoye, setEnvoye] = useState<{ leadId: string | null; simulations: number } | null>(null);
+  const [envoye, setEnvoye] = useState<(DemandeEnvoyee & { leadId: string | null }) | null>(null);
   const [renduAffiche, setRenduAffiche] = useState<string | null>(null);
   const [fondu, setFondu] = useState(false);
   const { favoris, charger: chargerFavoris, basculer: basculerFavori } = useFavoris();
@@ -68,6 +75,8 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
   const emetteur = useRef<Emetteur>(creerEmetteur((type, meta) => envoyerEvenement(type, meta)));
   /** Mission 16 (partie 3) : le bouton qui a amené ici (`?depuis=accueil-ouverture`…), repris dans le meta de PIECE_CHOISIE. */
   const depuisLien = useRef<string | null>(null);
+  /** Mission 16 (partie 4) : ESTIMATION_VUE part une fois par simulation — « Nouvelle simulation » la réarme, comme les étapes de l'entonnoir (`emetteur.reinitialiser`). */
+  const estimationVue = useRef(false);
 
   const projet = useMemo(() => getProject(etat.projet), [etat.projet]);
   const piece = useMemo(() => pieceDe(zones, etat.projet), [zones, etat.projet]);
@@ -95,7 +104,8 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
       const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil });
       const parcoursId = (decision.ecran === "attente" && decision.parcoursId) || base.parcoursId || obtenirParcoursId() || crypto.randomUUID();
       adopterParcoursId(parcoursId);
-      const repris: EtatSimulateur = { ...base, projet: projetInitial, parcoursId, selections: memeProjet ? base.selections : {} };
+      // Mission 16 (partie 4) : `?ref=` (depuis /matieres) — la matière est posée à l'écran des matières (`useMatiereDemandee`).
+      const repris: EtatSimulateur = { ...base, projet: projetInitial, parcoursId, selections: memeProjet ? base.selections : {}, refDemandee: lireRefDemandee(parametres.get("ref")) ?? base.refDemandee };
       if (decision.ecran === "attente") {
         repris.travailEnCours = decision.travail;
         setEcran(3);
@@ -226,6 +236,7 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
   };
 
   /* ── Écran 3 : les matières ── */
+  useMatiereDemandee(ecran === 3 && !!etat.photo && !enAttente && !echecGeneration, etat, piece, mettreAJour);
   const selectionsActives = piece.zones.map((z) => ({ zone: z, sel: etat.selections[z.id] ?? null })).filter((x) => x.sel);
   const films: FilmChoisi[] = selectionsActives.map(({ zone, sel }) => ({ zone: zone.id, libelle: zone.libelle, nom: sel!.nom, image: urlVignette(sel!.ref) }));
   const raisonBloque = selectionsActives.length === 0 ? "Choisissez au moins une matière" : captchaActif && !jetonCaptcha ? "Vérification anti-robot en cours…" : null;
@@ -295,40 +306,41 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
   /* ── Écran 4 : demande de devis (ou, après un échec, « simulation à la main ») ── */
   const rendu = etat.rendus.find((r) => r.travailId === renduAffiche) ?? etat.rendus[etat.rendus.length - 1] ?? null;
   const references = () => selectionsActives.map(({ zone, sel }) => ({ zone: zone.id, libelle: zone.libelle, ref: sel!.ref, nom: sel!.nom }));
-  const envoyer = async (e: React.FormEvent, depuisEchec = false) => {
-    e.preventDefault();
+  const envoyer = async (e: React.FormEvent | null, depuisEchec = false, extra?: ExtraDemande) => {
+    e?.preventDefault();
     if (depuisEchec ? !etat.photo : !rendu) return;
     // Après un échec, la demande décrit les choix COURANTS et part avec la photo — jamais les références d'un rendu précédent.
     const refs = !depuisEchec && rendu?.references.length ? rendu.references : references();
     setErreur(null);
     setOccupe("envoi");
     try {
-      const res = await fetch("/api/simulation/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formulaire,
-          project_type: projet.id,
-          parcoursId: etat.parcoursId,
-          // Toutes les simulations du parcours : le CRM les a, avec leurs images.
-          simulationIds: etat.rendus.map((r) => r.simulationSiteId).filter((id): id is string => !!id),
-          referenceChoisie: refs[0]?.ref,
-          references: refs.map((r) => `${r.libelle} : ${r.ref} (${r.nom})`).join(" | "),
-          ...(depuisEchec ? { photoAvant: etat.photo, simulationEchouee: echecGeneration?.raison ?? "inconnue" } : {}),
-          turnstileToken: jetonCaptcha,
-          ...acquisitionPourEnvoi(),
-          formulaire: `simulateur · ${window.location.pathname}`,
-          ...consentementPourEnvoi(formulaire.consentement, "simulateur"),
-        }),
+      const corps = corpsDemandeSimulation({
+        formulaire,
+        connus: { ville: etat.ville, codePostal: etat.codePostal },
+        projet: projet.id,
+        parcoursId: etat.parcoursId,
+        simulationIds: etat.rendus.map((r) => r.simulationSiteId).filter((id): id is string => !!id),
+        references: refs,
+        echec: depuisEchec && etat.photo ? { photo: etat.photo, raison: echecGeneration?.raison ?? "inconnue" } : null,
+        jetonCaptcha,
+        acquisition: acquisitionPourEnvoi(),
+        consentement: consentementPourEnvoi(formulaire.consentement, "simulateur"),
+        page: window.location.pathname,
+        extra,
       });
+      const res = await fetch("/api/simulation/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corps) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setErreur(data.error || "Envoi impossible pour le moment. Votre photo et vos choix sont conservés : réessayez.");
         envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "simulateur", statut: res.status, raison: data.reason });
         return;
       }
-      setEnvoye({ leadId: data.leadId ?? null, simulations: data.simulations ?? 0 });
+      // Le rappel daté par le CRM (sinon le même calcul ici) ; la ville connue ne sera plus redemandée.
+      const rappel = typeof data.rappelLe === "string" ? new Date(data.rappelLe) : extra?.rappelCreneau ? rappelDuCreneau(extra.rappelCreneau, new Date()) : null;
+      setEnvoye({ leadId: data.leadId ?? null, lienEspace: typeof data.lienEspace === "string" ? data.lienEspace : null, phraseRappel: rappel && !Number.isNaN(rappel.getTime()) ? phraseRappel(rappel, new Date()) : null });
+      if (corps.ville && corps.codePostal) mettreAJour({ ville: String(corps.ville), codePostal: String(corps.codePostal) });
       envoyerEvenement("DEVIS_DEMANDE", { formulaire: "simulateur", projet: projet.id, simulations: etat.rendus.length, sans_rendu: depuisEchec });
+      if (extra?.rappelCreneau) envoyerEvenement("RAPPEL_DEMANDE", { creneau: extra.rappelCreneau, projet: projet.id });
     } catch {
       setErreur("Connexion interrompue. Votre photo et vos choix sont conservés : réessayez.");
       envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "simulateur", raison: "reseau" });
@@ -341,8 +353,10 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
 
   const recommencer = async () => {
     await effacerEtat();
-    setEtat({ ...ETAT_VIDE, projet: etat.projet, parcoursId: etat.parcoursId });
+    // Même parcours : la ville et le code postal déjà donnés restent (le formulaire ne les redemande pas).
+    setEtat({ ...ETAT_VIDE, projet: etat.projet, parcoursId: etat.parcoursId, ville: etat.ville, codePostal: etat.codePostal });
     emetteur.current.reinitialiser();
+    estimationVue.current = false;
     setPieceChoisie(false);
     setBandeau(null);
     setRenduAffiche(null);
@@ -383,7 +397,7 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
         <h3 className="font-display text-[18px] font-semibold text-encre">Recevoir ma simulation et un devis par e-mail</h3>
         <p className="text-[14.5px] leading-relaxed text-encre-2">Nous faisons la simulation pour vous à partir de cette photo et de vos choix. Devis gratuit {DELAI_REPONSE}, sans engagement.</p>
       </div>
-      <ChampsContact prefixe="echec" formulaire={formulaire} onChange={setFormulaire} />
+      <ChampsContact prefixe="echec" formulaire={formulaire} onChange={setFormulaire} avecVille={!(etat.ville && etat.codePostal)} emailRequis />
       <Bouton type="submit" plein occupe={occupe === "envoi"} libelleOccupe="Envoi…">
         Envoyer ma photo et recevoir ma simulation
       </Bouton>
@@ -536,41 +550,24 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
 
         {ecran === 4 && rendu ? (
           <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres}>
-            {envoye ? (
-              <div className="rounded-[var(--rayon-md)] bg-ok-fond p-5 text-ok-texte">
-                <h3 className="font-display text-[19px] font-semibold">Demande bien reçue</h3>
-                <p className="mt-1.5 text-[15px] leading-relaxed">
-                  Vous recevez votre devis {DELAI_REPONSE} par e-mail, avec ce rendu. Besoin de nous joindre avant ? {ENTREPRISE.telephone}.
-                </p>
-                <div className="mt-4">
-                  <Bouton variante="secondaire" onClick={() => void recommencer()}>
-                    Nouvelle simulation
-                  </Bouton>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={(e) => void envoyer(e)} className="space-y-4 rounded-[var(--rayon-md)] border border-trait bg-white p-4 sm:p-5">
-                <div>
-                  <h3 className="font-display text-[20px] font-semibold text-encre">Recevoir ce rendu et un devis</h3>
-                  <p className="text-[14.5px] leading-relaxed text-encre-2">Devis gratuit {DELAI_REPONSE}, sans engagement. Toutes vos simulations de la session sont jointes.</p>
-                </div>
-                <ChampsContact prefixe="sim" formulaire={formulaire} onChange={setFormulaire} />
-                <Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />
-                <Bouton type="submit" plein occupe={occupe === "envoi"} libelleOccupe="Envoi…">
-                  Recevoir mon devis
-                </Bouton>
-                <p className="text-[14px] text-encre-2">
-                  Vous préférez échanger ?{" "}
-                  <a href={ENTREPRISE.reseaux.whatsapp} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-encre">
-                    WhatsApp
-                  </a>
-                  {" · "}
-                  <a href={`tel:${ENTREPRISE.telephone.replace(/\s/g, "")}`} className="underline underline-offset-4 hover:text-encre">
-                    {ENTREPRISE.telephone}
-                  </a>
-                </p>
-              </form>
-            )}
+            <DemandeApresRendu
+              projet={projet.id}
+              rendu={rendu}
+              tarifs={tarifs}
+              formulaire={formulaire}
+              onFormulaire={setFormulaire}
+              avecVille={!(etat.ville && etat.codePostal)}
+              occupe={occupe === "envoi"}
+              envoye={envoye}
+              onEnvoyer={(extra) => void envoyer(null, false, extra)}
+              onEstimationVue={(meta) => {
+                if (estimationVue.current) return;
+                estimationVue.current = true;
+                envoyerEvenement("ESTIMATION_VUE", { ...meta, projet: projet.id });
+              }}
+              captcha={<Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />}
+              onRecommencer={() => void recommencer()}
+            />
           </EcranResultat>
         ) : null}
       </div>

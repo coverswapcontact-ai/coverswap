@@ -4,12 +4,19 @@ import { FAQ_SIMULATEUR } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
+import { chargerTarifs } from "@/lib/tarifs-site";
+import { MOTS_CLES_DEVIS_EN_LIGNE } from "../comment-ca-marche/devis-en-ligne";
 import { EnteteSimulateur } from "./_components/EnteteSimulateur";
 import Simulateur from "./_components/Simulateur";
 
+/**
+ * Mission 16 (partie 4) : /devis est redirigée ici (301) ; son vocabulaire (« devis covering en ligne, gratuit, sans
+ * engagement ») passe dans la description et les mots-clés. Ses textes entiers sont sur /comment-ca-marche.
+ */
 export const metadata: Metadata = {
   title: { absolute: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap" },
-  description: `Envoyez une photo de votre cuisine, salle de bain, meuble ou local, choisissez une matière parmi ${NB_REFERENCES} références Cover Styl', voyez le résultat en ${DELAI_RENDU}. Coordonnées demandées seulement pour recevoir le rendu et un devis ${DELAI_REPONSE}.`,
+  description: `Envoyez une photo de votre cuisine, salle de bain, meuble ou local, choisissez une matière parmi ${NB_REFERENCES} références Cover Styl', voyez le résultat en ${DELAI_RENDU}. Coordonnées demandées seulement pour recevoir le rendu et un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`,
+  keywords: `simulateur covering, simulation covering cuisine, ${MOTS_CLES_DEVIS_EN_LIGNE}`,
   alternates: { canonical: `${ENTREPRISE.site}/simulateur` },
 };
 
@@ -25,7 +32,8 @@ const etapesDe = (zonesMax: number) => [
 ];
 
 export default async function PageSimulateur() {
-  const zones = await chargerZonesSimulateur();
+  // Mission 16 (partie 4) : les tarifs publics du CRM pour l'estimation après le rendu (une heure en cache ; null → fourchettes).
+  const [zones, tarifs] = await Promise.all([chargerZonesSimulateur(), chargerTarifs()]);
   const ETAPES = etapesDe(zones.zonesMax);
   return (
     <div data-theme="simulation" data-page="simulateur" className="min-h-[100dvh] bg-fond text-encre">
@@ -35,7 +43,7 @@ export default async function PageSimulateur() {
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
-        <Simulateur zones={zones} />
+        <Simulateur zones={zones} tarifs={tarifs} />
         <section className="mt-16 max-w-2xl border-t border-trait pt-10">
           <h2 className="font-display text-[22px] font-semibold">Comment ça marche</h2>
           <ol className="mt-5 space-y-4">

@@ -1,5 +1,5 @@
 import { ENTREPRISE } from "@/lib/entreprise";
-import { PRESTATIONS } from "@/data/prestations";
+import { PRESTATIONS, lienPrestation } from "@/data/prestations";
 import { articles } from "@/data/blog-articles";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
@@ -33,7 +33,7 @@ export function GET() {
     "",
     "## Prestations",
     "",
-    ...PRESTATIONS.map((p) => `- [${p.nom}](${s}/prestations/${p.slug}) : ${p.accroche}`),
+    ...PRESTATIONS.map((p) => `- [${p.nom}](${s}${lienPrestation(p.slug)}) : ${p.accroche}`),
     "",
     "## Guides",
     "",
@@ -45,7 +45,7 @@ export function GET() {
     "",
     "## Autres pages",
     "",
-    `- [Devis gratuit](${s}/devis)`,
+    `- [Devis gratuit, sur votre photo](${s}/simulateur) · [Devis pour les professionnels](${s}/pro) · [Contact](${s}/contact)`,
     `- [Réalisations et avis](${s}/realisations)`,
     `- [Catalogue Cover Styl'](${s}/revetements)`,
     `- [Questions fréquentes](${s}/comment-ca-marche#faq)`,

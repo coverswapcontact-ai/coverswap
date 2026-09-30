@@ -40,6 +40,9 @@ const nextConfig: NextConfig = {
       { source: "/simulation", destination: "/simulateur", permanent: true },
       // Ancien article daté ; son sujet vit dans un guide sans date.
       { source: "/blog/tendances-deco-2025-covering", destination: "/blog/quelle-finition-choisir", permanent: true },
+      // Mission 16 (partie 4) : le devis passe par la simulation (tunnel) ; la page pro devient /pro. Test : src/redirections.test.ts.
+      { source: "/devis", destination: "/simulateur", permanent: true },
+      { source: "/prestations/professionnel", destination: "/pro", permanent: true },
     ];
   },
   async headers() {

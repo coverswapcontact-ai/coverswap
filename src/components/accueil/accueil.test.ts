@@ -318,7 +318,8 @@ describe("6. Comment ça marche", () => {
     assert.deepEqual(sans.map((e) => e.titre), ["Vous photographiez", "Vous voyez le rendu", `Nous posons, en ${DUREE_POSE_TEXTE}`]);
     assert.ok(sans.every((e) => !/estimation|prix/i.test(`${e.titre} ${e.texte}`)));
     assert.deepEqual([avec[1].titre, avec[1].texte.includes("une estimation du prix")], ["Vous voyez le rendu et l'estimation", true]);
-    assert.ok(!/estimation/i.test(rendre(createElement(CommentCaMarche, {}))), "l'accueil d'aujourd'hui (sans capture) ne l'annonce pas");
+    // Depuis la partie 4, la capture `etape-simulation` est préparée (manifeste) : l'accueil annonce l'estimation.
+    assert.ok(/estimation/i.test(rendre(createElement(CommentCaMarche, {}))), "la capture est préparée : l'accueil annonce l'estimation");
   });
 
   test("un bouton principal « Simuler ma cuisine », ancré pour le bouton collé", () => {

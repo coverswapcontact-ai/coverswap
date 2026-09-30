@@ -1,20 +1,26 @@
 import Link from "next/link";
 import Breadcrumb, { type BreadcrumbItem } from "@/components/Breadcrumb";
+import { CartesAtouts, CartesSurfaces, EtapesPrestation, PhraseTarif, QuestionsPrestation } from "@/components/BlocsPrestation";
 import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
-import { PRESTATIONS, type Prestation } from "@/data/prestations";
+import { PRESTATIONS, lienPrestation, type Prestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_REPONSE, FACTEURS_PRIX, GARANTIE_ANS, PRIX_PLAGE } from "@/lib/offre";
+import { DELAI_REPONSE, GARANTIE_ANS } from "@/lib/offre";
 
 /**
- * Le contenu d'une page de prestation (mission 16 : extrait de
- * `/prestations/[slug]` pour être rendu tel quel par `/pro`, thème clair).
+ * Le contenu d'une page de prestation (`/prestations/[slug]`, thème clair).
  * Les textes et le balisage (Service, FAQ, HowTo, fil d'Ariane) sont ceux
- * de `data/prestations.ts` : rien n'est réécrit ici.
- *  - `lienDevis` : où mène « Demander un devis » (`/devis` ; `/contact` sur `/pro`) ;
- *  - `devisPrincipal` : le devis est le bouton principal (`/pro`, ou pas de
+ * de `data/prestations.ts` : rien n'est réécrit ici. Les blocs (surfaces,
+ * atouts, déroulement, tarif, FAQ) sont ceux de `BlocsPrestation`, que /pro
+ * rend aussi (mission 16, partie 4 : un seul dessin).
+ *  - `lienDevis` : où mène « Demander un devis » (`/contact` ; mission 16, partie 4 : `/devis` est redirigé vers
+ *    le simulateur) ;
+ *  - `devisPrincipal` : le devis est le bouton principal (ou pas de
  *    simulation pour cette pièce) ; sinon c'est « Simuler sur ma photo ».
+ * L'offre du balisage `Service` suit le bouton principal de la page : le
+ * simulateur de la pièce, ou le formulaire de devis (vitrages : pas de
+ * simulateur).
  */
 export type ProprietesContenuPrestation = {
   p: Prestation;
@@ -25,9 +31,7 @@ export type ProprietesContenuPrestation = {
   devisPrincipal?: boolean;
 };
 
-const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white";
-
-export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = "/devis", devisPrincipal = false }: ProprietesContenuPrestation) {
+export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = "/contact", devisPrincipal = false }: ProprietesContenuPrestation) {
   const autres = PRESTATIONS.filter((a) => a.slug !== p.slug);
   const lienSimulation = p.simulateur ? `/simulateur?projet=${p.simulateur}` : null;
   const devisEnPremier = devisPrincipal || !lienSimulation;
@@ -56,7 +60,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
 
   return (
     <div className="bg-fond">
-      <ServiceSchema name={p.nom} description={p.descriptionSeo} url={url} typeProjet={p.court} />
+      <ServiceSchema name={p.nom} description={p.descriptionSeo} url={url} typeProjet={p.court} urlOffre={`${ENTREPRISE.site}${devisEnPremier || !lienSimulation ? lienDevis : lienSimulation}`} />
       <FAQSchema faqs={p.faq} />
       <HowToSchema name={`${p.nom} : comment ça se passe`} description={p.accroche} etapes={p.deroulement} />
       <BreadcrumbSchema items={filSchema} />
@@ -86,41 +90,17 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
 
       {/* ── Surfaces ── */}
       <Section large titre="Ce que nous recouvrons" className="pt-0">
-        <div className="grid gap-5 sm:grid-cols-2">
-          {p.surfaces.map((s) => (
-            <article key={s.titre} className={`${CARTE} h-full p-6`}>
-              <h3 className="mb-2 text-[17px] font-semibold text-encre">{s.titre}</h3>
-              <p className="texte-2">{s.texte}</p>
-            </article>
-          ))}
-        </div>
+        <CartesSurfaces surfaces={p.surfaces} />
       </Section>
 
       {/* ── Atouts ── */}
       <section className="px-4 md:px-6">
-        <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-4 lg:grid-cols-4">
-          {p.atouts.map((a) => (
-            <li key={a.titre} className={`${CARTE} p-5`}>
-              <p className="mb-1 text-[16px] font-semibold text-encre">{a.titre}</p>
-              <p className="text-[14px] leading-relaxed text-encre-2">{a.texte}</p>
-            </li>
-          ))}
-        </ul>
+        <CartesAtouts atouts={p.atouts} className="mx-auto max-w-6xl" />
       </section>
 
       {/* ── Déroulement ── */}
       <Section large titre="Comment ça se passe">
-        <ol className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {p.deroulement.map((e, i) => (
-            <li key={e.titre} className={`${CARTE} p-6`}>
-              <span aria-hidden className="flex h-8 w-8 items-center justify-center rounded-full border border-encre font-display text-[14px] font-semibold text-encre">
-                {i + 1}
-              </span>
-              <h3 className="mt-3 mb-2 text-[17px] font-semibold text-encre">{e.titre}</h3>
-              <p className="text-[14.5px] leading-relaxed text-encre-2">{e.texte}</p>
-            </li>
-          ))}
-        </ol>
+        <EtapesPrestation etapes={p.deroulement} />
       </Section>
 
       {/* ── Prix ── */}
@@ -129,9 +109,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
           <div>
             <h2 className="titre-2 mb-4 text-encre">Combien ça coûte</h2>
             <p className="texte max-w-2xl text-encre-2">{p.prix.texte}</p>
-            <p className="mt-4 text-[14px] text-encre-2">
-              Tarif au mètre linéaire de film posé, fourni et posé : {PRIX_PLAGE}, déterminé au devis selon {FACTEURS_PRIX}. {ENTREPRISE.tvaMention}.
-            </p>
+            <PhraseTarif className="mt-4" />
           </div>
           <div className="md:text-right">
             <p className="surtitre">{p.prix.fourchette === "sur devis" ? "Prix" : "Ordre de grandeur"}</p>
@@ -145,19 +123,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
 
       {/* ── FAQ ── */}
       <Section titre="Questions fréquentes">
-        <div className="space-y-2.5">
-          {p.faq.map((f) => (
-            <details key={f.q} className={`group ${CARTE} p-4`}>
-              <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
-                {f.q}
-                <span aria-hidden className="text-2xl leading-none text-encre-2 transition-transform duration-[var(--duree-courte)] group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="texte-2 mt-3">{f.a}</p>
-            </details>
-          ))}
-        </div>
+        <QuestionsPrestation faq={p.faq} />
       </Section>
 
       {/* ── Autres prestations ── */}
@@ -165,7 +131,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
         <h2 className="mb-4 text-[17px] font-semibold text-encre">Nos autres prestations</h2>
         <div className="flex flex-wrap gap-3">
           {autres.map((a) => (
-            <Link key={a.slug} href={`/prestations/${a.slug}`} className="inline-flex min-h-[44px] items-center rounded-full border border-trait bg-white px-5 text-[15px] text-encre transition-colors duration-[var(--duree-courte)] hover:border-encre">
+            <Link key={a.slug} href={lienPrestation(a.slug)} className="inline-flex min-h-[44px] items-center rounded-full border border-trait bg-white px-5 text-[15px] text-encre transition-colors duration-[var(--duree-courte)] hover:border-encre">
               {a.nom}
             </Link>
           ))}
