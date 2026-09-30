@@ -145,11 +145,41 @@ export function ProfessionnelDeFace({ className }: { className?: string }) {
   );
 }
 
+/** Murs et plafond de face (mission 15, partie 4) : un mur principal avec un cadre, un pan de retour, le plafond et sa suspension, un fauteuil devant. */
+export function MursDeFace({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
+      {/* Plafond et sa ligne */}
+      <path d="M8 6 h104" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M8 6 L14 14 h92 L112 6" stroke="#CFCBC4" strokeWidth="0.9" />
+      <line x1="14" y1="14" x2="106" y2="14" stroke={TRAIT} strokeWidth="1.1" />
+      {/* Suspension */}
+      <line x1="60" y1="14" x2="60" y2="26" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M52 32 h16 l-3 -6 h-10 z" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      {/* Mur principal, mur de retour à droite */}
+      <rect x="14" y="14" width="74" height="66" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M88 14 L106 14 L106 80 L88 80 Z" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
+      {/* Cadre au mur, interrupteur */}
+      <rect x="28" y="28" width="22" height="16" rx="0.8" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M31 41 l6 -7 l5 5 l4 -3 l4 5" stroke="#CFCBC4" strokeWidth="1" />
+      <rect x="76" y="46" width="5" height="5" rx="0.6" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1" />
+      {/* Plinthe et sol */}
+      <line x1="14" y1="80" x2="106" y2="80" stroke="#9C978F" strokeWidth="1" />
+      <line x1="8" y1="86" x2="112" y2="86" stroke="#9C978F" strokeWidth="1" />
+      {/* Fauteuil devant le mur */}
+      <path d="M40 80 v-16 q0 -4 4 -4 h20 q4 0 4 4 v16" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+      <rect x="36" y="66" width="8" height="14" rx="1.5" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+      <rect x="64" y="66" width="8" height="14" rx="1.5" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+    </svg>
+  );
+}
+
 /** Le dessin d'une famille de prestations (cartes de l'onglet Projet, du nouveau projet). */
 export function DessinFamille({ famille, className }: { famille: string; className?: string }) {
   if (famille === "SDB") return <SalleDeBainDeFace className={className} />;
   if (famille === "MEUBLES") return <MobilierDeFace className={className} />;
   if (famille === "PRO") return <ProfessionnelDeFace className={className} />;
+  if (famille === "MURS") return <MursDeFace className={className} />;
   return <CuisineDeFace className={className} />;
 }
 

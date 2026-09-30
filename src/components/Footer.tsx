@@ -4,7 +4,7 @@ import Link from "next/link";
 import BoutonCookies from "./BoutonCookies";
 import { ZONES, getZoneSlug } from "@/data/zones";
 
-import { DELAI_REPONSE } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE } from "@/lib/offre";
 export default function Footer() {
   return (
     <footer className="bg-noir border-t border-white/10">
@@ -18,7 +18,7 @@ export default function Footer() {
             Prêt à transformer votre intérieur ?
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
-            Simulation IA gratuite en 60 secondes ou devis classique {DELAI_REPONSE}. Sans engagement.
+            Simulation IA gratuite, rendu en {DELAI_RENDU}, ou devis classique {DELAI_REPONSE}. Sans engagement.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

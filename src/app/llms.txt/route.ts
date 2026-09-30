@@ -2,7 +2,7 @@ import { ENTREPRISE } from "@/lib/entreprise";
 import { PRESTATIONS } from "@/data/prestations";
 import { articles } from "@/data/blog-articles";
 import { ZONES, getZoneSlug } from "@/data/zones";
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
 
 /**
  * /llms.txt — la fiche de l'entreprise pour les moteurs génératifs : ce que
@@ -28,7 +28,7 @@ export function GET() {
     `- Délais : devis gratuit ${DELAI_REPONSE} ; pose en une journée pour une cuisine ou une salle de bain courante ; pièce utilisable le soir même.`,
     `- Garantie : ${GARANTIE_ANS} ans sur les films et la pose (décollement, décoloration en usage normal).`,
     `- Matériaux : films Cover Styl', ${NB_REFERENCES} références (bois, pierre, béton, couleurs unies, métal, textile, paillettes), résistants à l'humidité et au nettoyage courant ; retrait à chaud sans trace.`,
-    `- Simulateur : rendu sur la photo du visiteur en moins d'une minute, gratuit, sans inscription : ${s}/simulateur`,
+    `- Simulateur : rendu sur la photo du visiteur en ${DELAI_RENDU}, gratuit, sans inscription : ${s}/simulateur`,
     `- Contact : ${ENTREPRISE.telephone}, ${ENTREPRISE.email}, ${ENTREPRISE.horaires.jours} ${ENTREPRISE.horaires.heures}.`,
     "",
     "## Prestations",

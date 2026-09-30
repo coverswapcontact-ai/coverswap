@@ -1,4 +1,4 @@
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
 import { ENTREPRISE } from "@/lib/entreprise";
 
 export type QuestionReponse = { q: string; a: string };
@@ -38,7 +38,7 @@ export const FAQ_GENERALE: QuestionReponse[] = [
   },
   {
     q: "Comment fonctionne le simulateur ?",
-    a: "Vous envoyez une photo de votre pièce, vous choisissez un revêtement du catalogue Cover Styl' pour chaque surface, et une intelligence artificielle applique ce revêtement sur votre photo en moins d'une minute. Le rendu est une illustration : le devis et les échantillons font foi pour les teintes exactes.",
+    a: `Vous envoyez une photo de votre pièce, vous choisissez un revêtement du catalogue Cover Styl' pour chaque surface, et une intelligence artificielle applique ce revêtement sur votre photo en ${DELAI_RENDU}. Le rendu est une illustration : le devis et les échantillons font foi pour les teintes exactes.`,
   },
 ];
 

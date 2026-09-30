@@ -5,7 +5,7 @@ import DevisForm from "@/components/DevisForm";
 import { chargerPrestations } from "@/lib/prestations";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 
-import { DELAI_REPONSE } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE } from "@/lib/offre";
 export const metadata: Metadata = {
   title: { absolute: `Devis Covering en Ligne Gratuit — Réponse ${DELAI_REPONSE} | CoverSwap` },
   description:
@@ -160,7 +160,7 @@ export default async function DevisPage() {
                   Envie de <strong className="text-white">visualiser</strong> le rendu avant de vous décider ?
                 </p>
                 <Link href="/simulateur" className="btn-secondary text-sm px-6 py-3 w-full">
-                  Simuler mon projet en 60 s
+                  Simuler mon projet ({DELAI_RENDU})
                 </Link>
               </div>
             </div>

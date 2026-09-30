@@ -36,7 +36,3 @@ export async function chargerPrestations(): Promise<FamillePrestation[]> {
   }
 }
 
-/** Nom et description des projets du simulateur qui sont des familles (les autres gardent les leurs). */
-export function libellesDuSimulateur(familles: FamillePrestation[]): Record<string, { label: string; description: string }> {
-  return Object.fromEntries(familles.map((f) => [f.projetSimulateur, { label: f.libelle, description: f.aide }]));
-}

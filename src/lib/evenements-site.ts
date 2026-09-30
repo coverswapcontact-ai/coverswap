@@ -10,12 +10,13 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
  * Envoi en `text/plain` : une requête « simple », sans pré-vol CORS — un
  * sendBeacon en JSON serait silencieusement abandonné par le navigateur.
  */
-export type EvenementSite = "PAGE_VUE" | "SIMULATION_PHOTO" | "SIMULATION_LANCEE" | "SIMULATION_RESULTAT" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC";
+/** Mission 15 (partie 4) : l'entonnoir du simulateur = PIECE_CHOISIE → PHOTO_CHARGEE → GENERATION_LANCEE → RESULTAT_VU → DEVIS_DEMANDE (mêmes noms côté CRM). */
+export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC";
 
 const VERS_DATALAYER: Partial<Record<EvenementSite, TrackEvent>> = {
-  SIMULATION_PHOTO: "simulation_photo_uploaded",
-  SIMULATION_LANCEE: "simulation_textures_selected",
-  SIMULATION_RESULTAT: "simulation_generated",
+  PHOTO_CHARGEE: "simulation_photo_uploaded",
+  GENERATION_LANCEE: "simulation_textures_selected",
+  RESULTAT_VU: "simulation_generated",
   SIMULATION_ECHEC: "simulation_failed",
   DEVIS_DEMANDE: "devis_form_submitted",
   CONTACT_ENVOYE: "contact_form_submitted",

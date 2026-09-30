@@ -1,4 +1,4 @@
-import { DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
 
 /**
  * Guides : les vraies questions que les gens posent avant un covering, avec
@@ -89,7 +89,7 @@ export const articles: BlogArticle[] = [
       sections: [
         {
           title: "1. Vos photos, ou une simulation",
-          text: "Tout commence par des photos de la pièce ou du meuble, prises de face, bien éclairées. Le simulateur du site applique la finition de votre choix sur votre propre photo en moins d'une minute ; c'est un aperçu, pas un engagement sur la teinte exacte.",
+          text: `Tout commence par des photos de la pièce ou du meuble, prises de face, bien éclairées. Le simulateur du site applique la finition de votre choix sur votre propre photo en ${DELAI_RENDU} ; c'est un aperçu, pas un engagement sur la teinte exacte.`,
         },
         {
           title: `2. Le devis, ${DELAI_REPONSE}`,

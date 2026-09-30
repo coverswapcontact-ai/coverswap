@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import TextureBackground from "@/components/TextureBackground";
 import { ArticleSchema, BreadcrumbSchema } from "@/components/JsonLd";
-import { NB_REFERENCES } from "@/lib/offre";
+import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
 import {
   getArticleBySlug,
   getRelatedArticles,
@@ -217,8 +217,7 @@ export default async function BlogPostPage({ params }: Props) {
                 Envie de tester ?
               </h3>
               <p className="text-sm text-gris-400 mb-5">
-                Simulez gratuitement le rendu chez vous en 60
-                secondes.
+                Simulez gratuitement le rendu chez vous, en {DELAI_RENDU}.
               </p>
               <Link
                 href="/simulateur"

@@ -21,7 +21,7 @@ export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
  * utilisable (pot de miel + limite côté CRM). `onToken` reçoit le jeton à
  * joindre à l'envoi ; il change à chaque nouvelle vérification.
  */
-export default function Turnstile({ onToken, action }: { onToken: (jeton: string | null) => void; action: string }) {
+export default function Turnstile({ onToken, action, theme = "dark" }: { onToken: (jeton: string | null) => void; action: string; theme?: "dark" | "light" }) {
   const conteneur = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const id = useId();
@@ -38,7 +38,7 @@ export default function Turnstile({ onToken, action }: { onToken: (jeton: string
       widgetId.current = window.turnstile.render(conteneur.current, {
         sitekey: TURNSTILE_SITE_KEY,
         action,
-        theme: "dark",
+        theme,
         language: "fr",
         callback: (jeton: string) => onTokenRef.current(jeton),
         "expired-callback": () => onTokenRef.current(null),
@@ -55,7 +55,7 @@ export default function Turnstile({ onToken, action }: { onToken: (jeton: string
         widgetId.current = null;
       }
     };
-  }, [action]);
+  }, [action, theme]);
 
   if (!TURNSTILE_SITE_KEY) return null;
 

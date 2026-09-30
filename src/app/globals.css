@@ -20,6 +20,32 @@
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), system-ui, sans-serif;
 
+  /* ── Mission 15 : jetons sémantiques du simulateur et de l'espace client (thème clair « éditorial »).
+     Blanc cassé, noir doux, UNE couleur d'accent ; coins peu arrondis ; deux durées, une courbe.
+     Portée : [data-theme="simulation"] (voir plus bas). Le reste du site ne change pas (mission 16). ── */
+  --color-fond: #f5f4f1;
+  --color-fond-2: #eceae5;
+  --color-encre: #1a1a1a;
+  --color-encre-2: #5f5a53;
+  --color-trait: #d3cfc8;
+  --color-accent: #cc0000;
+  --color-accent-fond: #fbe9e7;
+  --color-accent-texte: #8f1d12; /* le rouge en texte sur le fond clair (7:1) */
+  --color-encre-survol: #3f3b36; /* l'encre au survol / à l'appui des boutons principaux */
+  --color-sombre: #111110; /* fond des feuilles sombres et du plein écran */
+  --color-ok-fond: #e7f3ec;
+  --color-ok-texte: #17563a;
+  --rayon-sm: 6px;
+  --rayon-md: 10px;
+  --duree-courte: 150ms;
+  --duree-moyenne: 250ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --espace-1: 0.5rem;
+  --espace-2: 0.75rem;
+  --espace-3: 1rem;
+  --espace-4: 1.5rem;
+  --espace-5: 2.5rem;
+
   --animate-fade-in: fadeIn 0.6s ease-out forwards;
   --animate-slide-up: slideUp 0.6s ease-out forwards;
   --animate-slide-in-left: slideInLeft 0.6s ease-out forwards;
@@ -200,13 +226,61 @@ html.js .reveal-scale:not(.revealed) { transform: scale(0.96); }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BEFORE/AFTER SLIDER
+   SIMULATEUR ET ESPACE — thème clair « éditorial » (mission 15)
+   Posé sur /simulateur (et sur /e/[jeton] en partie 6) : fond blanc cassé,
+   encre noire douce, formulaires en clair, sélection et focus dans l'encre.
 ═══════════════════════════════════════════════════════════ */
-.before-after-slider {
-  position: relative;
-  overflow: hidden;
-  cursor: ew-resize;
-  user-select: none;
+[data-theme="simulation"] {
+  background: var(--color-fond);
+  color: var(--color-encre);
+  color-scheme: light;
+  font-family: var(--font-sans);
+}
+[data-theme="simulation"] ::selection {
+  background: var(--color-encre);
+  color: var(--color-fond);
+}
+[data-theme="simulation"] a:focus-visible,
+[data-theme="simulation"] button:focus-visible,
+[data-theme="simulation"] input:focus-visible,
+[data-theme="simulation"] select:focus-visible,
+[data-theme="simulation"] textarea:focus-visible,
+[data-theme="simulation"] [tabindex]:focus-visible {
+  outline: 3px solid var(--color-encre);
+  outline-offset: 2px;
+}
+[data-theme="simulation"] ::-webkit-scrollbar-track {
+  background: var(--color-fond-2);
+}
+[data-theme="simulation"] ::-webkit-scrollbar-thumb {
+  background: var(--color-trait);
+}
+/* Page /simulateur seulement : le seul défilement programmé est le haut de l'étape (pas de lissage global) ;
+   html et body prennent le fond clair (l'élastique de l'iPhone et la barre de défilement du viewport
+   appartiennent à html, hors de la portée [data-theme]) ; la barre déclarée #F5F4F1 y correspond. */
+html:has([data-page="simulateur"]) {
+  scroll-behavior: auto;
+  color-scheme: light;
+}
+html:has([data-page="simulateur"]) body {
+  background: var(--color-fond);
+  color: var(--color-encre);
+}
+html:has([data-page="simulateur"])::-webkit-scrollbar-track {
+  background: var(--color-fond-2);
+}
+html:has([data-page="simulateur"])::-webkit-scrollbar-thumb {
+  background: var(--color-trait);
+}
+/* Aucune animation quand la personne préfère moins de mouvement. */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="simulation"] *,
+  [data-theme="simulation"] *::before,
+  [data-theme="simulation"] *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -5,7 +5,7 @@ import { preload } from "react-dom";
 import ScrollReveal from "@/components/ScrollReveal";
 import HeroVideo from "@/components/HeroVideo";
 import { SimulationSection } from "@/components/HomeClient";
-import { chargerPrestations, libellesDuSimulateur } from "@/lib/prestations";
+import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
 import Realisations from "@/components/Realisations";
 import { FAQSchema } from "@/components/JsonLd";
 import { PRESTATIONS } from "@/data/prestations";
@@ -13,7 +13,7 @@ import { FAQ_GENERALE } from "@/data/faq";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MAX, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_ML_MAX, PRIX_ML_MIN, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 
 export const revalidate = 300;
 
@@ -123,7 +123,7 @@ function Prestations() {
 
 function CommentCaMarche() {
   const etapes = [
-    { titre: "Une photo", texte: "Vous photographiez la pièce ou le meuble. La simulation montre l'effet d'une finition sur votre propre photo, en moins d'une minute." },
+    { titre: "Une photo", texte: `Vous photographiez la pièce ou le meuble. La simulation montre l'effet d'une finition sur votre propre photo, en ${DELAI_RENDU}.` },
     { titre: `Un devis ${DELAI_REPONSE}`, texte: "Chiffré au mètre linéaire, finition par finition, déplacement compris dans le devis. Teintes validées sur échantillons." },
     { titre: "Une journée de pose", texte: "Nettoyage, pose à chaud, finitions vérifiées avec vous. Pas de gravats : vous retrouvez la pièce le soir même." },
   ];
@@ -278,14 +278,16 @@ function CTAFinal() {
 }
 
 export default async function HomePage() {
-  const libelles = libellesDuSimulateur(await chargerPrestations());
+  const zones = await chargerZonesSimulateur();
+  // Mission 15 (partie 4) : les cinq cartes du module de simulation sont celles du simulateur (pièces et zones du CRM).
+  const pieces = zones.pieces.map((piece) => ({ id: piece.id, libelle: piece.libelle, description: piece.zones.map((z) => z.libelle).join(", ") }));
   return (
     <>
       <Hero />
       <CeQueCaChange />
       <Prestations />
       <Realisations apercu />
-      <SimulationSection libelles={libelles} />
+      <SimulationSection pieces={pieces} zonesMax={zones.zonesMax} />
       <CommentCaMarche />
       <Tarifs />
       <Catalogue />

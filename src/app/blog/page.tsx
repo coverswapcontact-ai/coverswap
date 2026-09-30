@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DELAI_RENDU } from "@/lib/offre";
 import Link from "next/link";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import BlogClient from "@/components/BlogClient";
@@ -51,7 +52,7 @@ export default function BlogPage() {
               Envie de voir le résultat chez vous ?
             </p>
             <p className="text-gris-400 mb-6 text-sm">
-              Recevez une simulation gratuite en 60 secondes.
+              Recevez une simulation gratuite, rendu en {DELAI_RENDU}.
             </p>
             <Link href="/simulateur" className="btn-primary">
               Simuler mon projet

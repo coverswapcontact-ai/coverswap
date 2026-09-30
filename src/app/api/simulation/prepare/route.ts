@@ -1,29 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { checkSimulationRateLimit } from "@/lib/rate-limit";
-import { getProject, type ProjectType } from "@/lib/simulateur/projets";
-import { buildImagePrompt } from "@/lib/simulation-prompt";
-import { lireSelections } from "@/lib/simulateur/selections";
-import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
+import { depasseLaLimite } from "@/lib/limite-abus";
 import { parcoursIdValide } from "@/lib/parcours";
+import { validerSelections } from "@/lib/simulateur/selections";
+import { VALIDITE_SIGNATURE_MS, signerSelections } from "@/lib/simulateur/signature";
+import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
+import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 
 /**
- * /api/simulation/prepare — première moitié d'une simulation (rapide, sans
- * appel OpenAI) : limite indicative, captcha si configuré, prompt construit
- * depuis la source unique (lib/simulation-prompt), puis signature HMAC de
- * { prompt, swatchUrls, exp, parcours } avec SIMULATE_TOKEN_SECRET.
+ * /api/simulation/prepare — la première moitié d'une simulation, sur le site
+ * (mission 15, partie 4 : le site est un simple client du CRM, il ne construit
+ * plus de prompt) : pot de miel, limite d'abus, captcha si configuré,
+ * validation des sélections contre la liste de zones servie par le CRM et le
+ * catalogue, puis signature HMAC de { parcoursId, projet, selections, exp }
+ * avec SIMULATE_TOKEN_SECRET (partagé avec le CRM).
  *
- * Le navigateur transmet ensuite le tout au CRM (/api/simulate, sans limite de
- * temps), qui vérifie la signature, génère l'image et garde la simulation avec
- * le parcours. Aucune coordonnée à cette étape : elles viennent après le
- * résultat (/api/simulation/contact).
+ * Le navigateur transmet ensuite au CRM (/api/simulate, avec la photo) qui
+ * vérifie la signature, relit zones et références, et crée le travail. Aucune
+ * coordonnée ici : elles viennent après le résultat (/api/simulation/contact).
  *
- * Sans SIMULATE_TOKEN_SECRET → 503 : le navigateur bascule sur /api/simulation.
+ * Sans SIMULATE_TOKEN_SECRET → 503 : le simulateur le dit et propose de laisser
+ * ses coordonnées.
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 15;
-
-const TOKEN_TTL_MS = 90_000; // le navigateur a 90 s pour transmettre au CRM
 
 function getClientIp(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
@@ -34,19 +33,8 @@ export async function POST(req: NextRequest) {
   if (!secret) return NextResponse.json({ error: "not-configured", reason: "no-secret" }, { status: 503 });
 
   const ip = getClientIp(req);
-  const rl = checkSimulationRateLimit(ip);
-  if (!rl.ok) {
-    return NextResponse.json(
-      {
-        error:
-          rl.reason === "global-quota"
-            ? "Le quota quotidien de simulations gratuites est atteint. Réessayez demain ou demandez un devis : nous ferons la simulation pour vous."
-            : `Vous avez atteint la limite de ${rl.limit} simulations gratuites par jour. Demandez un devis : nous ferons la simulation pour vous.`,
-        reason: rl.reason,
-        resetAt: rl.resetAt,
-      },
-      { status: 429 }
-    );
+  if (depasseLaLimite(`prepare:${ip}`)) {
+    return NextResponse.json({ error: "Trop de demandes en peu de temps : réessayez dans quelques minutes.", reason: "ip-quota" }, { status: 429 });
   }
 
   let body: Record<string, unknown>;
@@ -66,17 +54,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: MESSAGE_CAPTCHA, reason: "captcha" }, { status: 400 });
   }
 
-  // Surfaces choisies : la référence est relue dans le catalogue du site, rien du navigateur n'entre dans la consigne
-  const project: ProjectType = getProject(typeof body.project_type === "string" ? body.project_type : "cuisine");
-  const lecture = lireSelections(body, project);
+  // Sélections validées contre la liste du CRM (zones de la pièce, limite, incompatibilités) et le catalogue.
+  const zones = await chargerZonesSimulateur();
+  const projet = typeof body.project_type === "string" ? body.project_type : "cuisine";
+  const lecture = validerSelections(zones, projet, body.selections);
   if (!lecture.ok) return NextResponse.json({ error: lecture.erreur, reason: lecture.raison }, { status: 400 });
-  const { choix, swatchUrls } = lecture;
-  const prompt = buildImagePrompt({ project, choix });
 
-  // Signature : prompt, échantillons, expiration et parcours — le CRM la vérifie
-  // avant de générer et rattache la simulation à ce parcours, pas à un autre.
-  const exp = Date.now() + TOKEN_TTL_MS;
-  const sig = crypto.createHmac("sha256", secret).update(`${prompt}\n${swatchUrls.join(",")}\n${exp}\np:${parcoursId}`).digest("hex");
-
-  return NextResponse.json({ ok: true, prompt, swatchUrls, sig, exp, parcoursId, rateLimit: { limit: rl.limit, remaining: rl.remaining, resetAt: rl.resetAt } });
+  // Signature : parcours, pièce, sélections et expiration — le CRM la vérifie avant de créer le travail.
+  const exp = Date.now() + VALIDITE_SIGNATURE_MS;
+  const sig = signerSelections(secret, { parcoursId, projet, selections: lecture.selections, exp });
+  return NextResponse.json({ ok: true, projet, selections: lecture.selections, sig, exp, parcoursId });
 }

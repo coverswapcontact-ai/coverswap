@@ -10,6 +10,7 @@ import Analytics from "@/components/Analytics";
 import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
 import HorsEspaceClient from "@/components/HorsEspaceClient";
+import HorsSimulateur from "@/components/HorsSimulateur";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 
@@ -118,13 +119,18 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <SuiviParcours />
           </Suspense>
-          <Header />
+          {/* Mission 15 : le simulateur porte son propre en-tête (retour à l'accueil) et n'a pas de bouton flottant. */}
+          <HorsSimulateur>
+            <Header />
+          </HorsSimulateur>
         </HorsEspaceClient>
         <main id="main-content">{children}</main>
         <HorsEspaceClient>
           <Footer />
           <CookieBanner />
-          <WhatsAppButton />
+          <HorsSimulateur>
+            <WhatsAppButton />
+          </HorsSimulateur>
           <Analytics />
           <VercelAnalytics />
         </HorsEspaceClient>

@@ -9,7 +9,8 @@
     "tags": [
       "wenge",
       "foncé"
-    ]
+    ],
+    "hex": "#583D29"
   },
   {
     "id": "AA01",
@@ -21,7 +22,8 @@
     "tags": [
       "chêne",
       "beige"
-    ]
+    ],
+    "hex": "#B49063"
   },
   {
     "id": "AA02",
@@ -33,7 +35,8 @@
     "tags": [
       "chêne",
       "rustique"
-    ]
+    ],
+    "hex": "#8B6B45"
   },
   {
     "id": "AA04",
@@ -44,7 +47,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/aa04_d4dbfa3468.jpg",
     "tags": [
       "chêne"
-    ]
+    ],
+    "hex": "#A47E51"
   },
   {
     "id": "AA05",
@@ -56,7 +60,8 @@
     "tags": [
       "chêne",
       "miel"
-    ]
+    ],
+    "hex": "#362318"
   },
   {
     "id": "AA06",
@@ -69,7 +74,8 @@
       "chêne",
       "fumé",
       "foncé"
-    ]
+    ],
+    "hex": "#64574B"
   },
   {
     "id": "AA08",
@@ -82,7 +88,8 @@
       "chêne",
       "marron",
       "orangé"
-    ]
+    ],
+    "hex": "#684C32"
   },
   {
     "id": "AA09",
@@ -94,7 +101,8 @@
     "tags": [
       "chêne",
       "gris"
-    ]
+    ],
+    "hex": "#7E6C55"
   },
   {
     "id": "AA12",
@@ -107,7 +115,8 @@
       "chêne",
       "marron",
       "ligné"
-    ]
+    ],
+    "hex": "#624431"
   },
   {
     "id": "AA14",
@@ -119,7 +128,8 @@
     "tags": [
       "chêne",
       "original"
-    ]
+    ],
+    "hex": "#6B5138"
   },
   {
     "id": "AA15",
@@ -132,7 +142,8 @@
       "chêne",
       "gris",
       "ligné"
-    ]
+    ],
+    "hex": "#827168"
   },
   {
     "id": "AA17",
@@ -145,7 +156,8 @@
       "chêne",
       "beige",
       "ligné"
-    ]
+    ],
+    "hex": "#B1946F"
   },
   {
     "id": "AB02",
@@ -157,7 +169,8 @@
     "tags": [
       "crème",
       "peint"
-    ]
+    ],
+    "hex": "#CCBDA6"
   },
   {
     "id": "AB03",
@@ -170,7 +183,8 @@
       "chêne",
       "kaki",
       "peint"
-    ]
+    ],
+    "hex": "#AA9E88"
   },
   {
     "id": "AB05",
@@ -183,7 +197,8 @@
       "ébène",
       "bleu",
       "peint"
-    ]
+    ],
+    "hex": "#797E80"
   },
   {
     "id": "AB06",
@@ -195,7 +210,8 @@
     "tags": [
       "turquoise",
       "peint"
-    ]
+    ],
+    "hex": "#97A5A5"
   },
   {
     "id": "AB07",
@@ -208,7 +224,8 @@
       "bleu",
       "foncé",
       "peint"
-    ]
+    ],
+    "hex": "#303948"
   },
   {
     "id": "AC01",
@@ -221,7 +238,8 @@
       "blanc",
       "ligné",
       "peint"
-    ]
+    ],
+    "hex": "#E8E5E0"
   },
   {
     "id": "AC04",
@@ -232,7 +250,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ac04_3e965d05da.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E5E1DC"
   },
   {
     "id": "AF02",
@@ -243,7 +262,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af02_b299ed5b51.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C6A681"
   },
   {
     "id": "AF03",
@@ -254,7 +274,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af03_dcbfa92c0b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BF9667"
   },
   {
     "id": "AF05",
@@ -265,7 +286,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af05_9b8d6cdace.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AB8256"
   },
   {
     "id": "AF06",
@@ -276,7 +298,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af06_3183f83750.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#77563B"
   },
   {
     "id": "AF07",
@@ -287,7 +310,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af07_1d049cee94.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D6C5AE"
   },
   {
     "id": "AF08",
@@ -298,7 +322,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af08_42f2e7bbce.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A2876A"
   },
   {
     "id": "AF09",
@@ -309,7 +334,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af09_65aa55dced.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CFAC75"
   },
   {
     "id": "AF10",
@@ -320,7 +346,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/af10_6c536d210d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7E6042"
   },
   {
     "id": "AG01",
@@ -331,7 +358,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag01_50bb5cfcb0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E6CDA6"
   },
   {
     "id": "AG02",
@@ -342,7 +370,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag02_8277e55310.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CAA97A"
   },
   {
     "id": "AG07",
@@ -353,7 +382,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag07_88b40a24d3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DFCCB1"
   },
   {
     "id": "AG10",
@@ -364,7 +394,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag10_3bddd7a2a5.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9D784D"
   },
   {
     "id": "AG11",
@@ -375,7 +406,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag11_9f1d686834.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C1A67E"
   },
   {
     "id": "AG13",
@@ -386,7 +418,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag13_3dad64f1dd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E1D4BB"
   },
   {
     "id": "AG14",
@@ -397,7 +430,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag14_16de4a1b1a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DCBF97"
   },
   {
     "id": "AG15",
@@ -408,7 +442,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag15_bbd0387a10.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CEAE84"
   },
   {
     "id": "AG16",
@@ -419,7 +454,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag16_87cdae4e05.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BB996B"
   },
   {
     "id": "AG17",
@@ -430,7 +466,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag17_300bcae267.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C69D6C"
   },
   {
     "id": "AG18",
@@ -441,7 +478,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag18_7e9df57d65.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AA8E6A"
   },
   {
     "id": "AG20",
@@ -452,7 +490,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ag20_bbff5b892c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CEBA9C"
   },
   {
     "id": "AL08",
@@ -463,7 +502,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al08_88e9527f57.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D8B684"
   },
   {
     "id": "AL10",
@@ -474,7 +514,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al10_8cd3cefaf4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D7B88B"
   },
   {
     "id": "AL12",
@@ -485,7 +526,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al12_0c4cd4076d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9D7C58"
   },
   {
     "id": "AL14",
@@ -496,7 +538,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al14_f076ed8d05.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A27854"
   },
   {
     "id": "AL23",
@@ -507,7 +550,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al23_35effb21e5.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CEB18B"
   },
   {
     "id": "AL24",
@@ -518,7 +562,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al24_f7d93c2ea4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C09D71"
   },
   {
     "id": "AL25",
@@ -529,7 +574,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al25_c23a5624db.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7A5E46"
   },
   {
     "id": "AL26",
@@ -540,7 +586,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al26_b1098cc751.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DAB388"
   },
   {
     "id": "AL28",
@@ -551,7 +598,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al28_7572873742.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B99160"
   },
   {
     "id": "AL29",
@@ -562,7 +610,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al29_9e531a4fbf.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#F3E6D6"
   },
   {
     "id": "AL30",
@@ -573,7 +622,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al30_f90be153ca.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E0C29C"
   },
   {
     "id": "AT02",
@@ -584,7 +634,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at02_f03a20ad4a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#60452D"
   },
   {
     "id": "AT03",
@@ -595,7 +646,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at03_e8326eaf13.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B49161"
   },
   {
     "id": "AT04",
@@ -606,7 +658,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at04_bd93ab04da.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#92633A"
   },
   {
     "id": "AT05",
@@ -617,7 +670,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at05_410e0ef87f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A97E52"
   },
   {
     "id": "AT06",
@@ -628,7 +682,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/at06_6914a76ae7.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#4C473C"
   },
   {
     "id": "AZ07",
@@ -639,7 +694,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/az07_82d30fab94.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#81694B"
   },
   {
     "id": "B1",
@@ -650,7 +706,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b1_e1f94e1298.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AF763E"
   },
   {
     "id": "B3",
@@ -661,7 +718,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b3_6305dbf1ed.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C1A073"
   },
   {
     "id": "B4",
@@ -672,7 +730,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b4_ec0e92839a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AF8359"
   },
   {
     "id": "B5",
@@ -683,7 +742,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b5_d5e3d18c69.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BF8D56"
   },
   {
     "id": "B50",
@@ -694,7 +754,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b50_0d209496cc.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D5C4AB"
   },
   {
     "id": "B6",
@@ -705,7 +766,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b6_ca0001ddcb.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A68865"
   },
   {
     "id": "B8",
@@ -716,7 +778,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b8_4adf533ea5.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#987B5D"
   },
   {
     "id": "B9",
@@ -727,7 +790,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/b9_e46158c3ae.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#574432"
   },
   {
     "id": "CT01",
@@ -738,7 +802,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct01_9e2f4d2432.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C6A274"
   },
   {
     "id": "CT02",
@@ -749,7 +814,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct02_8b86bc2689.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A87E52"
   },
   {
     "id": "CT05",
@@ -760,7 +826,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct05_1b42a71b91.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#996C42"
   },
   {
     "id": "CT06",
@@ -771,7 +838,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct06_229206d10b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#957957"
   },
   {
     "id": "CT08",
@@ -782,7 +850,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct08_3b9e4e01bb.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#8A4F2F"
   },
   {
     "id": "CT09",
@@ -793,7 +862,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct09_4dc0edd13a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#865129"
   },
   {
     "id": "CT10",
@@ -804,7 +874,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct10_1ee847e3ec.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AD7742"
   },
   {
     "id": "CT100",
@@ -815,7 +886,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct100_d589ff55c4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C5B499"
   },
   {
     "id": "CT101",
@@ -826,7 +898,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct101_2fb0d65b9d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D2BA9B"
   },
   {
     "id": "CT102",
@@ -837,7 +910,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct102_fa3444d3da.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D9C9B7"
   },
   {
     "id": "CT11",
@@ -848,7 +922,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct11_c4f572a77c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BC8243"
   },
   {
     "id": "CT13",
@@ -859,7 +934,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct13_7e8f00a68c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CEBEA6"
   },
   {
     "id": "CT14",
@@ -870,7 +946,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct14_82a214aab0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D0BDA4"
   },
   {
     "id": "CT15",
@@ -881,7 +958,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct15_7af5833dc2.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9B8464"
   },
   {
     "id": "CT16",
@@ -892,7 +970,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct16_0f635fce69.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A98967"
   },
   {
     "id": "CT17",
@@ -903,7 +982,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct17_9aedbd8020.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BCAC98"
   },
   {
     "id": "CT18",
@@ -914,7 +994,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct18_3e9c0542ab.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DECFBF"
   },
   {
     "id": "CT19",
@@ -925,7 +1006,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct19_7f1240ff55.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D8C8B0"
   },
   {
     "id": "CT20",
@@ -936,7 +1018,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct20_8f5acaae07.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C8AA7F"
   },
   {
     "id": "CT21",
@@ -947,7 +1030,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct21_eb7c82b56b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#725030"
   },
   {
     "id": "CT22",
@@ -958,7 +1042,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct22_826915729a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AD824B"
   },
   {
     "id": "CT24",
@@ -969,7 +1054,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct24_a07f906ab4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#5F402B"
   },
   {
     "id": "CT25",
@@ -980,7 +1066,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct25_1f7cc7eeca.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#8F6743"
   },
   {
     "id": "CT26",
@@ -991,7 +1078,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct26_a66325e72f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#5E3931"
   },
   {
     "id": "CT28",
@@ -1002,7 +1090,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct28_12a3e92a45.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CBAC83"
   },
   {
     "id": "CT29",
@@ -1013,7 +1102,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct29_9912fc14da.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#78502E"
   },
   {
     "id": "CT33",
@@ -1024,7 +1114,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct33_0f005cf0dd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C6AC89"
   },
   {
     "id": "CT35",
@@ -1035,7 +1126,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct35_2628117014.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9E836A"
   },
   {
     "id": "CT36",
@@ -1046,7 +1138,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct36_a7a1876c75.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#93785C"
   },
   {
     "id": "CT37",
@@ -1057,7 +1150,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct37_c1c1b3f675.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A0835F"
   },
   {
     "id": "CT41",
@@ -1068,7 +1162,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct41_8275f9ac8f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C29D69"
   },
   {
     "id": "CT42",
@@ -1079,7 +1174,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct42_99126ae01c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BE9167"
   },
   {
     "id": "CT43",
@@ -1090,7 +1186,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct43_e3dd38d503.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9A602B"
   },
   {
     "id": "CT44",
@@ -1101,7 +1198,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct44_f15853bf4a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C19057"
   },
   {
     "id": "CT45",
@@ -1112,7 +1210,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct45_128dced6de.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C0A071"
   },
   {
     "id": "CT46",
@@ -1123,7 +1222,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct46_ece4064458.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D2A86E"
   },
   {
     "id": "CT48",
@@ -1134,7 +1234,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct48_74238d4c9b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D5A766"
   },
   {
     "id": "CT53",
@@ -1145,7 +1246,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct53_33cc3d279a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A08057"
   },
   {
     "id": "CT54",
@@ -1156,7 +1258,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct54_ad05cae7b9.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B7854A"
   },
   {
     "id": "CT55",
@@ -1167,7 +1270,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct55_c58c5e0a7f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#46372B"
   },
   {
     "id": "CT56",
@@ -1178,7 +1282,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct56_8466747052.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#715839"
   },
   {
     "id": "CT58",
@@ -1189,7 +1294,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct58_64ae6f10c3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#393532"
   },
   {
     "id": "CT59",
@@ -1200,7 +1306,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct59_8da3ba4ef3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#402E25"
   },
   {
     "id": "CT60",
@@ -1211,7 +1318,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct60_05bd6a573f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7D624D"
   },
   {
     "id": "CT61",
@@ -1222,7 +1330,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct61_740c03772e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#322D27"
   },
   {
     "id": "CT62",
@@ -1233,7 +1342,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct62_045c0f08c8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B5A183"
   },
   {
     "id": "CT66",
@@ -1244,7 +1354,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct66_34400a330c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#463525"
   },
   {
     "id": "CT68",
@@ -1255,7 +1366,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct68_365410f248.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#5C4434"
   },
   {
     "id": "CT69",
@@ -1266,7 +1378,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct69_71f9c82a0f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#766653"
   },
   {
     "id": "CT70",
@@ -1277,7 +1390,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct70_8261b433bd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C8985C"
   },
   {
     "id": "CT71",
@@ -1288,7 +1402,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct71_b2946917ea.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B17F43"
   },
   {
     "id": "CT74",
@@ -1299,7 +1414,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct74_47386a223e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E2CFAE"
   },
   {
     "id": "CT75",
@@ -1310,7 +1426,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct75_fcc3cade1a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AF8652"
   },
   {
     "id": "CT76",
@@ -1321,7 +1438,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct76_f2efa93761.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C8B89D"
   },
   {
     "id": "CT77",
@@ -1332,7 +1450,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct77_2fc8f4cd36.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AF8B5D"
   },
   {
     "id": "CT78",
@@ -1343,7 +1462,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct78_d13062cadd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B18858"
   },
   {
     "id": "CT79",
@@ -1354,7 +1474,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct79_6a479a1496.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E2D1B9"
   },
   {
     "id": "CT80",
@@ -1365,7 +1486,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct80_3067f1a91e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#997B59"
   },
   {
     "id": "CT82",
@@ -1376,7 +1498,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct82_4944847d48.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D4B484"
   },
   {
     "id": "CT84",
@@ -1387,7 +1510,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct84_55a4269b06.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AA9172"
   },
   {
     "id": "CT87",
@@ -1398,7 +1522,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct87_8a35ed2e69.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C99C69"
   },
   {
     "id": "CT88",
@@ -1409,7 +1534,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct88_3f76a53dbf.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#866B4E"
   },
   {
     "id": "CT89",
@@ -1420,7 +1546,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct89_03040a181c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#775038"
   },
   {
     "id": "CT90",
@@ -1431,7 +1558,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct90_4fa93682e4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BBAD9D"
   },
   {
     "id": "CT91",
@@ -1442,7 +1570,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct91_12b5cbeeb7.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D8C7B0"
   },
   {
     "id": "CT92",
@@ -1453,7 +1582,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct92_219b9a6628.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CEBBA7"
   },
   {
     "id": "CT93",
@@ -1464,7 +1594,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct93_f2eef33bd2.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CDB69B"
   },
   {
     "id": "CT94",
@@ -1475,7 +1606,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct94_525ca4dac5.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D2BC9D"
   },
   {
     "id": "CT95",
@@ -1486,7 +1618,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct95_a5ebba321f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CCBB9D"
   },
   {
     "id": "CT96",
@@ -1497,7 +1630,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct96_7bb2406022.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C2A984"
   },
   {
     "id": "CT97",
@@ -1508,7 +1642,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct97_ab1db9e8d8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B2956F"
   },
   {
     "id": "CT98",
@@ -1519,7 +1654,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct98_e2f09193ee.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A17D4F"
   },
   {
     "id": "CT99",
@@ -1530,7 +1666,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ct99_a79c20ff2b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#94714A"
   },
   {
     "id": "D1",
@@ -1541,7 +1678,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/d1_085a670aef.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#654835"
   },
   {
     "id": "D4",
@@ -1552,7 +1690,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/d4_b48a10449e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A98A64"
   },
   {
     "id": "E4",
@@ -1563,7 +1702,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/e4_d622bc50f0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7C5D3D"
   },
   {
     "id": "E50",
@@ -1574,7 +1714,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/e50_317754e762.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#493D30"
   },
   {
     "id": "F4",
@@ -1585,7 +1726,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f4_64a61d43fd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9C8159"
   },
   {
     "id": "F5",
@@ -1596,7 +1738,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f5_8e274dd817.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#957658"
   },
   {
     "id": "F6",
@@ -1607,7 +1750,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f6_f3067d0df1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#413022"
   },
   {
     "id": "F7",
@@ -1618,7 +1762,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/f7_01564898c9.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#1B1B1B"
   },
   {
     "id": "G0",
@@ -1629,7 +1774,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/g0_2e966a2d5e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A48D77"
   },
   {
     "id": "G6",
@@ -1640,7 +1786,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/g6_4caa2e3d38.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A39B94"
   },
   {
     "id": "H10",
@@ -1651,7 +1798,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h10_b916d19fad.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D1C2BA"
   },
   {
     "id": "H4",
@@ -1662,7 +1810,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h4_89975d3f0f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#93704D"
   },
   {
     "id": "H5",
@@ -1673,7 +1822,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h5_216872374f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#35332F"
   },
   {
     "id": "H50",
@@ -1684,7 +1834,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/h50_5ce929d727.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B89474"
   },
   {
     "id": "I10",
@@ -1695,7 +1846,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i10_7fdc42c9e1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#2D2928"
   },
   {
     "id": "I14",
@@ -1706,7 +1858,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i14_4ccd0d6a25.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B8936B"
   },
   {
     "id": "I9",
@@ -1717,7 +1870,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/i9_3bc08f0227.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D0BBAB"
   },
   {
     "id": "J14",
@@ -1728,7 +1882,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j14_f5e7b664c5.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#F1F0ED"
   },
   {
     "id": "J17",
@@ -1739,7 +1894,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j17_a911f4acc4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EBE3D7"
   },
   {
     "id": "J18",
@@ -1750,7 +1906,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j18_2cfbb6108e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#65625D"
   },
   {
     "id": "J2",
@@ -1761,7 +1918,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j2_d21400def8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#42413E"
   },
   {
     "id": "MA10",
@@ -1772,7 +1930,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma10_e43ef2b52a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#F6F6F4"
   },
   {
     "id": "MA14",
@@ -1783,7 +1942,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma14_c3bc673cce.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#43413E"
   },
   {
     "id": "NE45",
@@ -1794,7 +1954,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne45_79122bdd5d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B7B4A5"
   },
   {
     "id": "NE46",
@@ -1805,7 +1966,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne46_9b51b16151.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#887C6E"
   },
   {
     "id": "NE57",
@@ -1816,7 +1978,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne57_d10f568008.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B89B7F"
   },
   {
     "id": "NE61",
@@ -1827,7 +1990,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne61_694b48c337.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BBAB8E"
   },
   {
     "id": "NE62",
@@ -1838,7 +2002,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne62_c28a6f8fba.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#82573A"
   },
   {
     "id": "NE63",
@@ -1849,7 +2014,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne63_49a718307a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D7C9B0"
   },
   {
     "id": "NE64",
@@ -1860,7 +2026,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne64_a42a63cd9b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CDB084"
   },
   {
     "id": "NE65",
@@ -1871,7 +2038,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne65_6c2acc8375.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B69972"
   },
   {
     "id": "NE66",
@@ -1882,7 +2050,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne66_fc40f346d4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D4C4AF"
   },
   {
     "id": "NE68",
@@ -1893,7 +2062,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne68_f4ad5fd3f3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AD875A"
   },
   {
     "id": "NF17",
@@ -1904,7 +2074,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf17_686186f59c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EFEEEA"
   },
   {
     "id": "NF18",
@@ -1915,7 +2086,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf18_a2e253789e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D6D3C7"
   },
   {
     "id": "NF19",
@@ -1926,7 +2098,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf19_d32c62d993.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C6BCB0"
   },
   {
     "id": "NF20",
@@ -1937,7 +2110,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf20_422c9c3135.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B6ADA4"
   },
   {
     "id": "NF21",
@@ -1948,7 +2122,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf21_856501ecd3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C9C0AF"
   },
   {
     "id": "NF22",
@@ -1959,7 +2134,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf22_8ef0bfaf7e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#8C8074"
   },
   {
     "id": "NF23",
@@ -1970,7 +2146,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf23_b6c9794e5b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AEA699"
   },
   {
     "id": "NF24",
@@ -1981,7 +2158,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf24_7581b3871c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A0968C"
   },
   {
     "id": "NF25",
@@ -1992,7 +2170,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf25_18560fcbfa.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#817775"
   },
   {
     "id": "NF26",
@@ -2003,7 +2182,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf26_fc25686292.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#282627"
   },
   {
     "id": "NF27",
@@ -2014,7 +2194,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf27_85e983d38b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DCD0BE"
   },
   {
     "id": "NF28",
@@ -2025,7 +2206,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf28_c79ba6a8e8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#8B887D"
   },
   {
     "id": "NF29",
@@ -2036,7 +2218,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf29_b6b0a3ef3e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E9DFC7"
   },
   {
     "id": "NF30",
@@ -2047,7 +2230,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf30_4cf29c991c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CDB88B"
   },
   {
     "id": "NF31",
@@ -2058,7 +2242,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf31_5916c3b77a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DACBA6"
   },
   {
     "id": "NF32",
@@ -2069,7 +2254,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf32_4bf32b9f8c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BFB091"
   },
   {
     "id": "NF33",
@@ -2080,7 +2266,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf33_0fe221a9e1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#6F5D47"
   },
   {
     "id": "NF34",
@@ -2091,7 +2278,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf34_2b0c3d605c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BFA270"
   },
   {
     "id": "NF35",
@@ -2102,7 +2290,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf35_276bb33763.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B4956A"
   },
   {
     "id": "NF36",
@@ -2113,7 +2302,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf36_5aa4664120.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D6C8AE"
   },
   {
     "id": "NF37",
@@ -2124,7 +2314,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf37_22a0ac1ec1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#98805F"
   },
   {
     "id": "NF38",
@@ -2135,7 +2326,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf38_3585b285a0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DCC598"
   },
   {
     "id": "NF39",
@@ -2146,7 +2338,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf39_6471e66d9b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A28154"
   },
   {
     "id": "NF40",
@@ -2157,7 +2350,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf40_3bb3212bd8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CFB180"
   },
   {
     "id": "NF41",
@@ -2168,7 +2362,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf41_580ae4d8ec.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BD9C70"
   },
   {
     "id": "NF42",
@@ -2179,7 +2374,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf42_1b0f884519.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BFA87F"
   },
   {
     "id": "NF43",
@@ -2190,7 +2386,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf43_cfee99d963.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A7895E"
   },
   {
     "id": "NF44",
@@ -2201,7 +2398,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf44_bddf4a2f2a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A79A7F"
   },
   {
     "id": "NF45",
@@ -2212,7 +2410,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf45_b8f86e5516.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B79F73"
   },
   {
     "id": "NF46",
@@ -2223,7 +2422,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf46_60abc316d0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B89B6C"
   },
   {
     "id": "NF47",
@@ -2234,7 +2434,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf47_480aef358f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B4905C"
   },
   {
     "id": "NF48",
@@ -2245,7 +2446,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf48_a94d8ea186.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C9A265"
   },
   {
     "id": "NF49",
@@ -2256,7 +2458,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf49_4ef6ef8d5e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#695137"
   },
   {
     "id": "NF50",
@@ -2267,7 +2470,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf50_b7de3b35a6.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#896A40"
   },
   {
     "id": "NF51",
@@ -2278,7 +2482,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf51_148f6b5063.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#82613C"
   },
   {
     "id": "NF53",
@@ -2289,7 +2494,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf53_8d6839bdf6.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D7C8A2"
   },
   {
     "id": "NF54",
@@ -2300,7 +2506,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf54_fdb8876a16.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#4A4744"
   },
   {
     "id": "NF55",
@@ -2311,7 +2518,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf55_27626db657.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#624F3F"
   },
   {
     "id": "NF56",
@@ -2322,7 +2530,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf56_fadf24b6a8.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#43423E"
   },
   {
     "id": "NF57",
@@ -2333,7 +2542,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf57_183f4f0a9e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A4886A"
   },
   {
     "id": "NF58",
@@ -2344,7 +2554,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf58_1119cbc750.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#876B4F"
   },
   {
     "id": "NF59",
@@ -2355,7 +2566,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf59_0e75228aca.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#583E2D"
   },
   {
     "id": "NF60",
@@ -2366,7 +2578,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf60_d78ec27bf7.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#32302B"
   },
   {
     "id": "NF61",
@@ -2377,7 +2590,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf61_75661b0679.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BA925C"
   },
   {
     "id": "NF62",
@@ -2388,7 +2602,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf62_8c8dc6438d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C1B399"
   },
   {
     "id": "NF63",
@@ -2399,7 +2614,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf63_4192811253.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AD9573"
   },
   {
     "id": "NF64",
@@ -2410,7 +2626,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf64_03c4ac015e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EFE9D5"
   },
   {
     "id": "NF65",
@@ -2421,7 +2638,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf65_8c2f652d12.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7C6D58"
   },
   {
     "id": "NF66",
@@ -2432,7 +2650,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf66_0c1f5f19d2.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#9A8265"
   },
   {
     "id": "NF70",
@@ -2443,7 +2662,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf70_ea152e2958.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#88705B"
   },
   {
     "id": "NF71",
@@ -2454,7 +2674,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf71_1e2a19aa0b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#463C33"
   },
   {
     "id": "NF72",
@@ -2465,7 +2686,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf72_3a88451104.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DBB88A"
   },
   {
     "id": "NF73",
@@ -2476,7 +2698,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf73_c5b129e58f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BEB099"
   },
   {
     "id": "NF74",
@@ -2487,7 +2710,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf74_b3a8758116.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AA9C83"
   },
   {
     "id": "NF76",
@@ -2498,7 +2722,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf76_ea6f2e158b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D5BF94"
   },
   {
     "id": "NF77",
@@ -2509,7 +2734,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf77_1a8abfff08.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BFA179"
   },
   {
     "id": "NF78",
@@ -2520,7 +2746,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf78_d720f85af3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B49065"
   },
   {
     "id": "NF79",
@@ -2531,7 +2758,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf79_3641d71c8e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BB905B"
   },
   {
     "id": "NF83",
@@ -2542,7 +2770,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf83_504ce64100.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#533D30"
   },
   {
     "id": "NF85",
@@ -2553,7 +2782,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf85_3572c665e9.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E9D7BC"
   },
   {
     "id": "NF86",
@@ -2564,7 +2794,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf86_2844482954.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E5D5BA"
   },
   {
     "id": "NF87",
@@ -2575,7 +2806,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf87_c6d2b74965.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EDD9B9"
   },
   {
     "id": "NF88",
@@ -2586,7 +2818,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf88_d8fd844ba4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D6B98A"
   },
   {
     "id": "NF89",
@@ -2597,7 +2830,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf89_ac6d4d8276.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#CCAB76"
   },
   {
     "id": "NF90",
@@ -2608,7 +2842,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf90_b46594cde9.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BEA276"
   },
   {
     "id": "NF91",
@@ -2619,7 +2854,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf91_b6ab9b0ee6.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B18955"
   },
   {
     "id": "NF95",
@@ -2630,7 +2866,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf95_5f9ed0bac4.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#8B7053"
   },
   {
     "id": "NH15",
@@ -2641,7 +2878,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh15_a40f057527.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#797F75"
   },
   {
     "id": "NH16",
@@ -2652,7 +2890,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh16_0a68494b8e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#7D746B"
   },
   {
     "id": "NH55",
@@ -2663,7 +2902,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh55_52df9c0cc1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#675D54"
   },
   {
     "id": "NH56",
@@ -2674,7 +2914,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh56_404bfa9972.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EEE8D9"
   },
   {
     "id": "NH57",
@@ -2685,7 +2926,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh57_d4a2018955.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#565F66"
   },
   {
     "id": "NH58",
@@ -2696,7 +2938,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh58_1dd560d697.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#615C58"
   },
   {
     "id": "NH64",
@@ -2707,7 +2950,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh64_357fd10b67.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E3D2B4"
   },
   {
     "id": "NH65",
@@ -2718,7 +2962,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh65_a0ac93f736.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#BDB09C"
   },
   {
     "id": "NH66",
@@ -2729,7 +2974,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh66_d908c2c6fb.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#E5D1B1"
   },
   {
     "id": "NH67",
@@ -2740,7 +2986,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh67_4a2f01e02b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#D9C198"
   },
   {
     "id": "NH68",
@@ -2751,7 +2998,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh68_0b5d28a6c0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#5F462F"
   },
   {
     "id": "NH69",
@@ -2762,7 +3010,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh69_b0e967359c.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#48331C"
   },
   {
     "id": "NH70",
@@ -2773,7 +3022,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh70_a28f29272f.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B59671"
   },
   {
     "id": "NH71",
@@ -2784,7 +3034,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh71_19ffc89603.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B49870"
   },
   {
     "id": "NH72",
@@ -2795,7 +3046,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh72_bf1bb2e757.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A18866"
   },
   {
     "id": "NH73",
@@ -2806,7 +3058,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh73_7b8264f01e.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AA875C"
   },
   {
     "id": "NH74",
@@ -2817,7 +3070,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh74_5fe53aba3d.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AB9B83"
   },
   {
     "id": "NH75",
@@ -2828,7 +3082,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh75_cfe61a67d3.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C0B096"
   },
   {
     "id": "NH76",
@@ -2839,7 +3094,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh76_93721ca19b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#74624B"
   },
   {
     "id": "NH77",
@@ -2850,7 +3106,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh77_75d80806fb.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B6A588"
   },
   {
     "id": "NH78",
@@ -2861,7 +3118,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh78_e2b64f124b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DCC5A5"
   },
   {
     "id": "NH79",
@@ -2872,7 +3130,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh79_bf75646fcd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A7967E"
   },
   {
     "id": "NH80",
@@ -2883,7 +3142,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh80_c03811f427.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#DAC8AD"
   },
   {
     "id": "NH81",
@@ -2894,7 +3154,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh81_160a7ee11b.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A89783"
   },
   {
     "id": "NH83",
@@ -2905,7 +3166,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh83_8ecb0597f0.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#A48D6C"
   },
   {
     "id": "NH84",
@@ -2916,7 +3178,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh84_48479a03bd.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#EBE1D4"
   },
   {
     "id": "NH85",
@@ -2927,7 +3190,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh85_3f7c3d766a.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#AD8C67"
   },
   {
     "id": "NH86",
@@ -2938,7 +3202,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh86_bc30eeb230.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#C6AE8A"
   },
   {
     "id": "WI01",
@@ -2949,7 +3214,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/wi01_8a942ebaa1.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B58B60"
   },
   {
     "id": "WI02",
@@ -2960,7 +3226,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/wi02_534b8d4fc9.jpg",
     "tags": [
       "bois"
-    ]
+    ],
+    "hex": "#B3885E"
   },
   {
     "id": "J3",
@@ -2971,7 +3238,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j3_8180ab9384.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFFFFF"
   },
   {
     "id": "J4",
@@ -2982,7 +3250,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j4_c5ad05fbc9.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F4F3F1"
   },
   {
     "id": "J5",
@@ -2993,7 +3262,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/j5_47a739f4e4.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#070707"
   },
   {
     "id": "K1",
@@ -3004,7 +3274,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k1_6dc839de4a.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#232220"
   },
   {
     "id": "K4",
@@ -3015,7 +3286,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k4_b2f14e47b2.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#97876D"
   },
   {
     "id": "K5",
@@ -3026,7 +3298,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k5_c2a17ac1ab.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#5D5D5D"
   },
   {
     "id": "K6",
@@ -3037,7 +3310,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k6_27c5ced4e3.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#CECAC7"
   },
   {
     "id": "K7",
@@ -3048,7 +3322,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/k7_6e108e84d4.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#C1B4A4"
   },
   {
     "id": "L2",
@@ -3059,7 +3334,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/l2_6deb551318.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#C94425"
   },
   {
     "id": "L3",
@@ -3070,7 +3346,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/l3_96e110813d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FE8F33"
   },
   {
     "id": "M0",
@@ -3081,7 +3358,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m0_4a3de3ae12.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFBF39"
   },
   {
     "id": "M10",
@@ -3092,7 +3370,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m10_87014b1576.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F5DEBC"
   },
   {
     "id": "M4",
@@ -3103,7 +3382,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m4_d8bc1a50ed.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#96A2A2"
   },
   {
     "id": "M5",
@@ -3114,7 +3394,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m5_5955d206d1.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A3C348"
   },
   {
     "id": "M6",
@@ -3125,7 +3406,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m6_68141ce0f8.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#666A75"
   },
   {
     "id": "M7",
@@ -3136,7 +3418,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m7_93c92902e8.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#C2B7A3"
   },
   {
     "id": "M8",
@@ -3147,7 +3430,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m8_689c4cd28d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFD225"
   },
   {
     "id": "M9",
@@ -3158,7 +3442,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/m9_9ea095be14.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#2B2E37"
   },
   {
     "id": "N3",
@@ -3169,7 +3454,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/n3_f87d1c27ed.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F1E4D3"
   },
   {
     "id": "NE53",
@@ -3180,7 +3466,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne53_a9a9f70926.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FEB592"
   },
   {
     "id": "NE54",
@@ -3191,7 +3478,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne54_7d995bca3c.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#DFE9DE"
   },
   {
     "id": "NE55",
@@ -3202,7 +3490,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne55_cee1852845.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#B59C7E"
   },
   {
     "id": "NE56",
@@ -3213,7 +3502,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne56_165141c4b0.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F5F4F0"
   },
   {
     "id": "NE77",
@@ -3224,7 +3514,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne77_45919ac29f.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFFCF5"
   },
   {
     "id": "NE78",
@@ -3235,7 +3526,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne78_99a72f7b11.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#ACA392"
   },
   {
     "id": "NE79",
@@ -3246,7 +3538,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne79_91f99b41f9.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#918E89"
   },
   {
     "id": "NE80",
@@ -3257,7 +3550,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne80_8582f1b8c5.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#393937"
   },
   {
     "id": "NE81",
@@ -3268,7 +3562,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne81_eddeea2bd7.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#222021"
   },
   {
     "id": "NE82",
@@ -3279,7 +3574,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne82_2a5abcfb1e.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#545045"
   },
   {
     "id": "NE83",
@@ -3290,7 +3586,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne83_73753f8933.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#273F29"
   },
   {
     "id": "NF01",
@@ -3301,7 +3598,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf01_58c4bf5461.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFDAD2"
   },
   {
     "id": "NF02",
@@ -3312,7 +3610,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf02_768c5d1a87.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#BC9B94"
   },
   {
     "id": "NF03",
@@ -3323,7 +3622,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf03_42222ce361.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D5AEAF"
   },
   {
     "id": "NF04",
@@ -3334,7 +3634,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf04_5a62451de4.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#6A2021"
   },
   {
     "id": "NF05",
@@ -3345,7 +3646,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf05_cc2579e729.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A7B546"
   },
   {
     "id": "NF06",
@@ -3356,7 +3658,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf06_f1aaf40e1e.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#516E72"
   },
   {
     "id": "NF07",
@@ -3367,7 +3670,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf07_02f505939d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFB7C2"
   },
   {
     "id": "NF08",
@@ -3378,7 +3682,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf08_6013a96e99.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#696661"
   },
   {
     "id": "NF09",
@@ -3389,7 +3694,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf09_1953087408.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#54483C"
   },
   {
     "id": "NF10",
@@ -3400,7 +3706,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf10_02c4089dfa.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#8F8B88"
   },
   {
     "id": "NF11",
@@ -3411,7 +3718,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf11_5991f9cbc6.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#ADADA5"
   },
   {
     "id": "NF13",
@@ -3422,7 +3730,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf13_e9bc121a61.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#23342E"
   },
   {
     "id": "NF14",
@@ -3433,7 +3742,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf14_85c3545c85.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#2D3041"
   },
   {
     "id": "NF15",
@@ -3444,7 +3754,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf15_ac78e03581.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFF3E3"
   },
   {
     "id": "NF16",
@@ -3455,7 +3766,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf16_6533169db0.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#E1D4C3"
   },
   {
     "id": "NH02",
@@ -3466,7 +3778,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh02_e8b2055032.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFF9ED"
   },
   {
     "id": "NH05",
@@ -3477,7 +3790,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh05_d91b8ee8f7.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D1D6C2"
   },
   {
     "id": "NH06",
@@ -3488,7 +3802,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh06_10afe95a61.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#DEC9B8"
   },
   {
     "id": "NH08",
@@ -3499,7 +3814,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh08_b45d64c950.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#5A6555"
   },
   {
     "id": "NH21",
@@ -3510,7 +3826,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh21_005df82500.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#CACCBF"
   },
   {
     "id": "NH22",
@@ -3521,7 +3838,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh22_e5bfe48e6b.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#E2D9D0"
   },
   {
     "id": "NH23",
@@ -3532,7 +3850,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh23_f55d220cb9.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFE9A5"
   },
   {
     "id": "NH24",
@@ -3543,7 +3862,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh24_56cc88d513.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#3A596D"
   },
   {
     "id": "NH25",
@@ -3554,7 +3874,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh25_f3acca81b4.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FAFAFA"
   },
   {
     "id": "NH26",
@@ -3565,7 +3886,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh26_57c1ed5cae.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#E3DAD1"
   },
   {
     "id": "NH27",
@@ -3576,7 +3898,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh27_25bc0e335d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D5D5D5"
   },
   {
     "id": "NH28",
@@ -3587,7 +3910,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh28_b7a81e3805.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A79883"
   },
   {
     "id": "NH29",
@@ -3598,7 +3922,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh29_37438bd91f.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#71695C"
   },
   {
     "id": "NH91",
@@ -3609,7 +3934,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh91_bbb2681bb0.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#5C5B57"
   },
   {
     "id": "NH92",
@@ -3620,7 +3946,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh92_6981f05107.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D6D1CA"
   },
   {
     "id": "NH93",
@@ -3631,7 +3958,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh93_62f44e6a88.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#EFECE3"
   },
   {
     "id": "O4",
@@ -3642,7 +3970,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o4_d973f9961c.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#59AEC3"
   },
   {
     "id": "O6",
@@ -3653,7 +3982,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o6_4cfb26fcfd.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#93B8D5"
   },
   {
     "id": "O8",
@@ -3664,7 +3994,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/o8_b946393ee6.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#0B3468"
   },
   {
     "id": "RM01",
@@ -3675,7 +4006,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm01_355cdc33c1.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F1ECE8"
   },
   {
     "id": "RM02",
@@ -3686,7 +4018,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm02_dffa093e05.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D2CBBB"
   },
   {
     "id": "RM03",
@@ -3697,7 +4030,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm03_dda391e2c3.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#7D7A75"
   },
   {
     "id": "RM04",
@@ -3708,7 +4042,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm04_0172f54979.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#684E37"
   },
   {
     "id": "RM06",
@@ -3719,7 +4054,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm06_04d007732c.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#3E3D3B"
   },
   {
     "id": "RM07",
@@ -3730,7 +4066,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm07_89b08d98e7.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#D5D6DA"
   },
   {
     "id": "RM08",
@@ -3741,7 +4078,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm08_f99e6c15c2.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F2E65C"
   },
   {
     "id": "RM09",
@@ -3752,7 +4090,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm09_9470804bcc.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#2957AF"
   },
   {
     "id": "RM10",
@@ -3763,7 +4102,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm10_6f33408de9.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFFAF6"
   },
   {
     "id": "RM11",
@@ -3774,7 +4114,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm11_0938d8349d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FBF0EC"
   },
   {
     "id": "RM12",
@@ -3785,7 +4126,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm12_dc3ea2b1e6.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFF6ED"
   },
   {
     "id": "RM13",
@@ -3796,7 +4138,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm13_6a12177b80.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F0E7D8"
   },
   {
     "id": "RM14",
@@ -3807,7 +4150,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm14_34a3cccdfe.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#7D7260"
   },
   {
     "id": "RM15",
@@ -3818,7 +4162,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm15_c268a6046f.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#CFD4E7"
   },
   {
     "id": "RM16",
@@ -3829,7 +4174,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm16_53479a6626.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#FFD68C"
   },
   {
     "id": "RM19",
@@ -3840,7 +4186,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm19_b01a39f079.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A39E64"
   },
   {
     "id": "RM20",
@@ -3851,7 +4198,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm20_59c34db7d2.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#616A57"
   },
   {
     "id": "RM21",
@@ -3862,7 +4210,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm21_1bfbbfe6a9.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#4D583A"
   },
   {
     "id": "RM23",
@@ -3873,7 +4222,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm23_df249f82dd.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#2B3751"
   },
   {
     "id": "RM25",
@@ -3884,7 +4234,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm25_60d371574b.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#C8ABA7"
   },
   {
     "id": "RM26",
@@ -3895,7 +4246,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm26_882a51d833.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#F9F4F0"
   },
   {
     "id": "RM27",
@@ -3906,7 +4258,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm27_37bb065216.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A7A1A1"
   },
   {
     "id": "RM28",
@@ -3917,7 +4270,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm28_943c0c4f4d.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#89857A"
   },
   {
     "id": "RM29",
@@ -3928,7 +4282,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm29_6798340a81.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#3B3B3B"
   },
   {
     "id": "RM30",
@@ -3939,7 +4294,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/rm30_b1724ef98b.jpg",
     "tags": [
       "couleur"
-    ]
+    ],
+    "hex": "#A4A38F"
   },
   {
     "id": "KN04",
@@ -3950,7 +4306,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/kn04_24d24271ba.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D5CEBF"
   },
   {
     "id": "MK13",
@@ -3961,7 +4318,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk13_2a79f1f1d1.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D5CBCB"
   },
   {
     "id": "MK14",
@@ -3972,7 +4330,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk14_792e853256.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#434343"
   },
   {
     "id": "MK15",
@@ -3983,7 +4342,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk15_8a065936ad.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#CDBCAD"
   },
   {
     "id": "NE11",
@@ -3994,7 +4354,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne11_c1f26dad79.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#68645E"
   },
   {
     "id": "NE28",
@@ -4005,7 +4366,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne28_aa0724117f.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#6F6B68"
   },
   {
     "id": "NE29",
@@ -4016,7 +4378,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne29_214e500b40.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#E7E1D9"
   },
   {
     "id": "NE31",
@@ -4027,7 +4390,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne31_abda3aee83.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#F2F2F2"
   },
   {
     "id": "NE32",
@@ -4038,7 +4402,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne32_00fb757005.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#E7E6E4"
   },
   {
     "id": "NE70",
@@ -4049,7 +4414,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne70_19308d1354.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#DCD7CE"
   },
   {
     "id": "NE71",
@@ -4060,7 +4426,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne71_fd42ed7f2c.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#A19990"
   },
   {
     "id": "NE72",
@@ -4071,7 +4438,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne72_f43e65ea15.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#F1F1F1"
   },
   {
     "id": "NF97",
@@ -4082,7 +4450,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf97_780a7ebffe.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#72736E"
   },
   {
     "id": "NF98",
@@ -4093,7 +4462,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf98_f247fa169f.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#54534F"
   },
   {
     "id": "NF99",
@@ -4104,7 +4474,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nf99_173cd3a686.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#A59A8E"
   },
   {
     "id": "NG01",
@@ -4115,7 +4486,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng01_8663093bb1.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D5C7B5"
   },
   {
     "id": "NG02",
@@ -4126,7 +4498,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng02_35ae70def1.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#9A9A97"
   },
   {
     "id": "NG04",
@@ -4137,7 +4510,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng04_d8dfbb6cda.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#F4F4F0"
   },
   {
     "id": "NG05",
@@ -4148,7 +4522,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng05_3b81df6d56.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D3D0C7"
   },
   {
     "id": "NG31",
@@ -4159,7 +4534,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng31_beae457e29.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#ECF0F2"
   },
   {
     "id": "NH09",
@@ -4170,7 +4546,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh09_0c5e29b5d6.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#6D6C68"
   },
   {
     "id": "NH10",
@@ -4181,7 +4558,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh10_2bf49d4c7f.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#E2E0DE"
   },
   {
     "id": "NH11",
@@ -4192,7 +4570,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh11_5afc830dcf.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#ACA7A3"
   },
   {
     "id": "NH34",
@@ -4203,7 +4582,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh34_a81c345ecd.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#A5A196"
   },
   {
     "id": "NH35",
@@ -4214,7 +4594,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh35_13cd57c3f4.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#C6BEAE"
   },
   {
     "id": "NH38",
@@ -4225,7 +4606,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh38_9343910860.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#797269"
   },
   {
     "id": "NH39",
@@ -4236,7 +4618,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh39_50fd03efff.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#BAB0A6"
   },
   {
     "id": "NH40",
@@ -4247,7 +4630,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh40_ebd8c9f78b.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D2CEC9"
   },
   {
     "id": "NH41",
@@ -4258,7 +4642,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh41_08c617c1d7.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#C0B7AD"
   },
   {
     "id": "NH42",
@@ -4269,7 +4654,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh42_9cd0587b14.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#8F8A84"
   },
   {
     "id": "NH43",
@@ -4280,7 +4666,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh43_00046013dc.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D9D5D0"
   },
   {
     "id": "NH45",
@@ -4291,7 +4678,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh45_28d1beef0d.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#D8CFC8"
   },
   {
     "id": "NH46",
@@ -4302,7 +4690,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh46_445b791c2d.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#8E8984"
   },
   {
     "id": "NH47",
@@ -4313,7 +4702,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/NH_47_final_1bb2de8e40.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#F4F1EE"
   },
   {
     "id": "NH48",
@@ -4324,7 +4714,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/NH_48_final_503bd8eb8f.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#EFEEEC"
   },
   {
     "id": "U50",
@@ -4335,7 +4726,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u50_498d699e62.jpg",
     "tags": [
       "pierre"
-    ]
+    ],
+    "hex": "#0A0A0A"
   },
   {
     "id": "NE24",
@@ -4346,7 +4738,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne24_50d2ddfad4.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#A9A49E"
   },
   {
     "id": "NE25",
@@ -4357,7 +4750,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne25_0338c23623.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#ABA194"
   },
   {
     "id": "NE26",
@@ -4368,7 +4762,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne26_b1d6e0c7e8.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#817C78"
   },
   {
     "id": "NH12",
@@ -4379,7 +4774,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh12_a67d2e63ac.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#AF9584"
   },
   {
     "id": "NH13",
@@ -4390,7 +4786,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh13_569fcea126.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#9A9087"
   },
   {
     "id": "NH14",
@@ -4401,7 +4798,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh14_6a3e9bc074.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#E2D8CC"
   },
   {
     "id": "NH33",
@@ -4412,7 +4810,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh33_4aee85fca9.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#E4DBD1"
   },
   {
     "id": "NH49",
@@ -4423,7 +4822,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh49_a73e8d2067.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#E0D4C4"
   },
   {
     "id": "NH50",
@@ -4434,7 +4834,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh50_10c518b015.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#CABDB0"
   },
   {
     "id": "NH51",
@@ -4445,7 +4846,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh51_49eb79e7cf.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#E9E3DA"
   },
   {
     "id": "NH52",
@@ -4456,7 +4858,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh52_1096887787.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#BCB4A9"
   },
   {
     "id": "NH53",
@@ -4467,7 +4870,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh53_06500ce2da.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#BCB2A9"
   },
   {
     "id": "NH54",
@@ -4478,7 +4882,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh54_b5ddbfa0cf.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#BEB4A9"
   },
   {
     "id": "U19",
@@ -4489,7 +4894,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u19_7c1fc04417.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#B1B0AC"
   },
   {
     "id": "U20",
@@ -4500,7 +4906,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u20_72b4c6e3d7.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#68645E"
   },
   {
     "id": "U21",
@@ -4511,7 +4918,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u21_e289c3c882.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#897F72"
   },
   {
     "id": "W7",
@@ -4522,7 +4930,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/w7_f66646e16b.jpg",
     "tags": [
       "béton"
-    ]
+    ],
+    "hex": "#B1907F"
   },
   {
     "id": "AL07",
@@ -4533,7 +4942,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al07_1970f4c2dc.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#8B6D32"
   },
   {
     "id": "AL09",
@@ -4544,7 +4954,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al09_9cc3cfd436.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#A18041"
   },
   {
     "id": "AU01",
@@ -4555,7 +4966,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/au01_38ce172534.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#DDDCE8"
   },
   {
     "id": "AU02",
@@ -4566,7 +4978,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/au02_665d95a130.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#CDCCD8"
   },
   {
     "id": "KI01",
@@ -4577,7 +4990,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ki01_e5536ae2ce.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#A8A8A8"
   },
   {
     "id": "ND01",
@@ -4588,7 +5002,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd01_81386003d8.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#454A4D"
   },
   {
     "id": "ND02",
@@ -4599,7 +5014,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd02_582369fdd5.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#946F42"
   },
   {
     "id": "ND03",
@@ -4610,7 +5026,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd03_f7d46cfd95.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#85817E"
   },
   {
     "id": "ND04",
@@ -4621,7 +5038,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd04_60ddd2099d.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#807D77"
   },
   {
     "id": "ND05",
@@ -4632,7 +5050,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd05_0ad1066d45.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#6C6865"
   },
   {
     "id": "ND07",
@@ -4643,7 +5062,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nd07_e28a5bd476.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#8A8985"
   },
   {
     "id": "NE47",
@@ -4654,7 +5074,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne47_cdfb641094.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#BF9F70"
   },
   {
     "id": "NE48",
@@ -4665,7 +5086,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne48_b729f8da13.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#584332"
   },
   {
     "id": "NE49",
@@ -4676,7 +5098,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne49_154f6e0709.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#484441"
   },
   {
     "id": "NE51",
@@ -4687,7 +5110,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne51_cd7c8b033d.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#989089"
   },
   {
     "id": "NG28",
@@ -4698,7 +5122,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng28_a844d1c9d8.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#4C3F32"
   },
   {
     "id": "NG29",
@@ -4709,7 +5134,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng29_63cb7b4ea0.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#675643"
   },
   {
     "id": "NH20",
@@ -4720,7 +5146,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh20_542e6ab9af.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#7E6C62"
   },
   {
     "id": "NH36",
@@ -4731,7 +5158,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh36_71fe3a0cf6.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#594F45"
   },
   {
     "id": "NH37",
@@ -4742,7 +5170,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh37_a9cb8e5d20.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#3F403B"
   },
   {
     "id": "NH60",
@@ -4753,7 +5182,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh60_e21e0fc26a.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#795E4E"
   },
   {
     "id": "NH61",
@@ -4764,7 +5194,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh61_92a13d9efa.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#AEA296"
   },
   {
     "id": "NH62",
@@ -4775,7 +5206,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh62_4c2bd8ed83.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#73695C"
   },
   {
     "id": "NH63",
@@ -4786,7 +5218,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh63_07e72c69b8.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#ACA092"
   },
   {
     "id": "Q1",
@@ -4797,7 +5230,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q1_e62a963e5f.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#C1BEBB"
   },
   {
     "id": "Q2",
@@ -4808,7 +5242,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q2_e76d3c364c.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#CBC7C4"
   },
   {
     "id": "Q3",
@@ -4819,7 +5254,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q3_ec902b751e.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#A67533"
   },
   {
     "id": "Q50",
@@ -4830,7 +5266,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/q50_758837a23d.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#84837E"
   },
   {
     "id": "U10",
@@ -4841,7 +5278,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/u10_6434fed280.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#1E1E1E"
   },
   {
     "id": "W6",
@@ -4852,7 +5290,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/w6_dcdd73327a.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#5E493D"
   },
   {
     "id": "Z2",
@@ -4863,7 +5302,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/z2_15c0e3c74a.jpg",
     "tags": [
       "métal"
-    ]
+    ],
+    "hex": "#242424"
   },
   {
     "id": "AL11",
@@ -4874,7 +5314,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al11_1570eeff2d.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#908F92"
   },
   {
     "id": "AL13",
@@ -4885,7 +5326,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al13_65c5e64db4.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#B09058"
   },
   {
     "id": "AL15",
@@ -4896,7 +5338,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al15_3bfd2a9d8e.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#AD802A"
   },
   {
     "id": "AL17",
@@ -4907,7 +5350,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/al17_71e1037d08.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#B58C50"
   },
   {
     "id": "MA12",
@@ -4918,7 +5362,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma12_c8004eaa7a.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#F3F2EF"
   },
   {
     "id": "MA16",
@@ -4929,7 +5374,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ma16_298957cf83.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#F8F7F5"
   },
   {
     "id": "MK18",
@@ -4940,7 +5386,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/mk18_a913f9bb23.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#C7BCAC"
   },
   {
     "id": "NE13",
@@ -4951,7 +5398,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne13_0dcc02877f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#877566"
   },
   {
     "id": "NE37",
@@ -4962,7 +5410,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne37_7e34bd101c.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#7E7468"
   },
   {
     "id": "NE38",
@@ -4973,7 +5422,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne38_2108481293.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#A49D93"
   },
   {
     "id": "NE40",
@@ -4984,7 +5434,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne40_5f181efbd0.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#44413C"
   },
   {
     "id": "NE41",
@@ -4995,7 +5446,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne41_f4653aef30.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#91877E"
   },
   {
     "id": "NE42",
@@ -5006,7 +5458,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne42_11e782b2d0.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#CCB998"
   },
   {
     "id": "NE43",
@@ -5017,7 +5470,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne43_4cd716ba77.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#F1E1C3"
   },
   {
     "id": "NE73",
@@ -5028,7 +5482,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne73_81ae0fc006.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#39342F"
   },
   {
     "id": "NE74",
@@ -5039,7 +5494,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ne74_3337a7319f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#CEC7BE"
   },
   {
     "id": "NG07",
@@ -5050,7 +5506,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng07_5ec8620411.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#8B8274"
   },
   {
     "id": "NG09",
@@ -5061,7 +5518,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng09_03cfe67cd5.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#5D4F3E"
   },
   {
     "id": "NG10",
@@ -5072,7 +5530,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng10_1c3826c9e0.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#A19F9B"
   },
   {
     "id": "NG11",
@@ -5083,7 +5542,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng11_5c03f07076.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#DBD5C6"
   },
   {
     "id": "NG20",
@@ -5094,7 +5554,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng20_e9d000f44f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#C5B496"
   },
   {
     "id": "NG23",
@@ -5105,7 +5566,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/ng23_d69e41f677.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#F5F1E7"
   },
   {
     "id": "NH17",
@@ -5116,7 +5578,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh17_0003b7bbba.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#D8D0C6"
   },
   {
     "id": "NH18",
@@ -5127,7 +5590,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh18_26ef45983f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#CFC9C0"
   },
   {
     "id": "NH19",
@@ -5138,7 +5602,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh19_9d4bdaebc7.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#DDD6C8"
   },
   {
     "id": "NH59",
@@ -5149,7 +5614,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/nh59_c459272c2c.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#CFC9BF"
   },
   {
     "id": "ST02",
@@ -5160,7 +5626,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/st02_4843758b3f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#AEA095"
   },
   {
     "id": "T12",
@@ -5171,7 +5638,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/t12_655b96d8cc.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#706F6B"
   },
   {
     "id": "X51",
@@ -5182,7 +5650,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/x51_b2a405472f.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#101010"
   },
   {
     "id": "X52",
@@ -5193,7 +5662,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/x52_f53cb92b27.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#D6D6DB"
   },
   {
     "id": "A1",
@@ -5204,7 +5674,8 @@
     "image": "https://ssi.s3.fr-par.scw.cloud/cover-styl/web/a1_dab5cb368b.jpg",
     "tags": [
       "textile"
-    ]
+    ],
+    "hex": "#362318"
   },
   {
     "id": "LP01",
@@ -5216,7 +5687,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#533D2A"
   },
   {
     "id": "LP02",
@@ -5228,7 +5700,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#686D6F"
   },
   {
     "id": "LP03",
@@ -5240,7 +5713,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#505D8C"
   },
   {
     "id": "LP04",
@@ -5252,7 +5726,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#535458"
   },
   {
     "id": "LP05",
@@ -5264,7 +5739,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#665344"
   },
   {
     "id": "LP06",
@@ -5276,7 +5752,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#90999B"
   },
   {
     "id": "LP07",
@@ -5288,7 +5765,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#E7EAE6"
   },
   {
     "id": "LP08",
@@ -5300,7 +5778,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#E4C3AD"
   },
   {
     "id": "LP09",
@@ -5312,7 +5791,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#383B3F"
   },
   {
     "id": "LP10",
@@ -5324,7 +5804,8 @@
     "tags": [
       "textile",
       "cuir"
-    ]
+    ],
+    "hex": "#4C7280"
   },
   {
     "id": "J7",
@@ -5336,7 +5817,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#F6F5F1"
   },
   {
     "id": "R10",
@@ -5348,7 +5830,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#C15B17"
   },
   {
     "id": "R11",
@@ -5360,7 +5843,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#2A357A"
   },
   {
     "id": "R12",
@@ -5372,7 +5856,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#178834"
   },
   {
     "id": "R13",
@@ -5384,7 +5869,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#B8237B"
   },
   {
     "id": "R14",
@@ -5396,7 +5882,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#717667"
   },
   {
     "id": "R15",
@@ -5408,7 +5895,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#0C215B"
   },
   {
     "id": "R16",
@@ -5420,7 +5908,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#834C40"
   },
   {
     "id": "R17",
@@ -5432,7 +5921,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#94908C"
   },
   {
     "id": "R18",
@@ -5444,7 +5934,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#9F8B7E"
   },
   {
     "id": "R19",
@@ -5456,7 +5947,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#A4976F"
   },
   {
     "id": "R5",
@@ -5468,7 +5960,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#AD8339"
   },
   {
     "id": "R6",
@@ -5480,7 +5973,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#AA6111"
   },
   {
     "id": "R7",
@@ -5492,7 +5986,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#BDAF96"
   },
   {
     "id": "R8",
@@ -5504,7 +5999,8 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#B41913"
   },
   {
     "id": "R9",
@@ -5516,6 +6012,7 @@
     "tags": [
       "paillettes",
       "brillant"
-    ]
+    ],
+    "hex": "#3A3024"
   }
 ]

@@ -26,6 +26,8 @@ export default function ScrollToTop() {
     if (typeof window === "undefined") return;
     // Respecte une ancre dans l'URL
     if (window.location.hash) return;
+    // Le simulateur gère lui-même son défilement (mission 15) : l'étape n'est jamais dans l'adresse, rien ne doit sauter.
+    if (pathname === "/simulateur") return;
     window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior });
   }, [pathname, searchParams]);
 

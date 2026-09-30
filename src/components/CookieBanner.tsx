@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { EVENEMENT_OUVERTURE, FINALITES, enregistrerChoixCookies, lireChoixCookies, type ChoixCookies } from "@/lib/cookies";
 
 /**
@@ -11,6 +12,8 @@ import { EVENEMENT_OUVERTURE, FINALITES, enregistrerChoixCookies, lireChoixCooki
  * tant que le visiteur n'a pas choisi.
  */
 export default function CookieBanner() {
+  // Mission 15 (partie 4) : sur le simulateur, le bandeau ne se pose pas tout seul sur le parcours ; « Gérer les cookies » (pied de page) le rouvre.
+  const discret = usePathname() === "/simulateur";
   const [visible, setVisible] = useState(false);
   const [detail, setDetail] = useState(false);
   const [choix, setChoix] = useState<Pick<ChoixCookies, "audience" | "publicite">>({ audience: false, publicite: false });
@@ -23,14 +26,14 @@ export default function CookieBanner() {
       setVisible(true);
     };
     const existant = lireChoixCookies();
-    if (!existant || existant.version < 2) {
+    if (!discret && (!existant || existant.version < 2)) {
       // Lecture d'un état externe (localStorage) après le montage, inconnu côté serveur.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
     }
     window.addEventListener(EVENEMENT_OUVERTURE, ouvrir);
     return () => window.removeEventListener(EVENEMENT_OUVERTURE, ouvrir);
-  }, []);
+  }, [discret]);
 
   const valider = (valeurs: Pick<ChoixCookies, "audience" | "publicite">) => {
     enregistrerChoixCookies(valeurs);

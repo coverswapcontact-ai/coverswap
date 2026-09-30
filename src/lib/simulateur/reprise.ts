@@ -25,29 +25,74 @@ export type RenduSimulateur = {
 
 export type TravailEnCours = { travailId: string; lanceLe: number; attenteEstimeeS: number };
 
+/**
+ * L'attente annoncée quand le CRM ne donne pas d'estimation : la même que la
+ * promesse du site (`lib/offre.ts › DELAI_RENDU`, « environ 1 min 30 ») — les
+ * deux vont ensemble.
+ */
+export const ATTENTE_PAR_DEFAUT_S = 90;
+
+/** Verdict de qualité de la photo, tel que le CRM le rend (mission 15, partie 2). */
+export type VerdictPhoto = "bonne" | "floue" | "sombre" | "contre-jour" | "trop-loin";
+
+/**
+ * L'analyse de la photo (mission 15, partie 4), gardée avec elle : les zones
+ * que le CRM voit et ne voit pas (pour griser), le conseil de qualité, et un
+ * code de raison quand elle a été sautée (le site ne lit jamais le détail).
+ */
+export type EtatAnalyse = {
+  empreinte: string;
+  statut: "EN_COURS" | "PRETE" | "SAUTEE" | "ECHEC";
+  zonesVisibles: string[];
+  zonesNonVisibles: string[];
+  verdict: VerdictPhoto | null;
+  conseil: string | null;
+  raison: string | null;
+};
+
 export type EtatSimulateur = {
   projet: string;
   /** La photo réduite (data URL), la seule image gardée ici. */
   photo: string | null;
+  /** Ses dimensions (px), connues à la préparation : l'écran réserve le rapport avant que l'image ne soit décodée (rien ne saute). */
+  photoLargeur: number | null;
+  photoHauteur: number | null;
   selections: Record<string, Selection | null>;
   /** Copié depuis le sessionStorage : il survit à la fermeture de l'onglet. */
   parcoursId: string | null;
   travailEnCours: TravailEnCours | null;
   /** Historique du parcours, le plus récent en fin de liste. */
   rendus: RenduSimulateur[];
+  /** L'analyse de la photo courante (partie 4) ; null tant qu'elle n'est pas demandée. */
+  analyse: EtatAnalyse | null;
   majLe: number;
 };
 
-export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], majLe: 0 };
+export const ETAT_VIDE: EtatSimulateur = { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, majLe: 0 };
+
+/** Le rapport CSS (`aspect-ratio`) de la photo, quand ses dimensions sont connues. */
+export function rapportPhoto(etat: Pick<EtatSimulateur, "photoLargeur" | "photoHauteur">): string | null {
+  return etat.photoLargeur && etat.photoHauteur && etat.photoLargeur > 0 && etat.photoHauteur > 0 ? `${etat.photoLargeur} / ${etat.photoHauteur}` : null;
+}
 
 /** Au-delà, un parcours n'est plus proposé à la reprise (les rendus du CRM sont purgés à 30 jours). */
 export const REPRISE_MAX_MS = 30 * 24 * 60 * 60 * 1000;
 
 const estObjet = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object";
 const texteOuNull = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
+const entierPositifOuNull = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.round(v) : null);
 
 function lireReferences(v: unknown): ReferenceRendu[] {
   return Array.isArray(v) ? v.filter(estObjet).map((r) => ({ zone: String(r.zone ?? ""), libelle: String(r.libelle ?? ""), ref: String(r.ref ?? ""), nom: String(r.nom ?? "") })) : [];
+}
+
+const listeDeTextes = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
+
+function lireAnalyse(v: unknown): EtatAnalyse | null {
+  if (!estObjet(v) || typeof v.empreinte !== "string" || typeof v.statut !== "string") return null;
+  const statut = ["EN_COURS", "PRETE", "SAUTEE", "ECHEC"].includes(v.statut) ? (v.statut as EtatAnalyse["statut"]) : "ECHEC";
+  const verdict = typeof v.verdict === "string" && VERDICTS.includes(v.verdict as VerdictPhoto) ? (v.verdict as VerdictPhoto) : null;
+  return { empreinte: v.empreinte, statut, zonesVisibles: listeDeTextes(v.zonesVisibles), zonesNonVisibles: listeDeTextes(v.zonesNonVisibles), verdict, conseil: texteOuNull(v.conseil), raison: texteOuNull(v.raison) };
 }
 
 function lireSelections(v: unknown): EtatSimulateur["selections"] {
@@ -70,12 +115,13 @@ export function migrerEtat(brut: unknown): EtatSimulateur | null {
   if (!estObjet(brut)) return null;
   const projet = typeof brut.projet === "string" && brut.projet ? brut.projet : "cuisine";
   const majLe = typeof brut.majLe === "number" ? brut.majLe : 0;
-  const base: EtatSimulateur = { projet, photo: texteOuNull(brut.photo), selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), travailEnCours: null, rendus: [], majLe };
+  const photo = texteOuNull(brut.photo);
+  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), majLe };
   if (brut.version === 2) {
     const t = brut.travailEnCours;
     return {
       ...base,
-      travailEnCours: estObjet(t) && typeof t.travailId === "string" ? { travailId: t.travailId, lanceLe: typeof t.lanceLe === "number" ? t.lanceLe : majLe, attenteEstimeeS: typeof t.attenteEstimeeS === "number" ? t.attenteEstimeeS : 75 } : null,
+      travailEnCours: estObjet(t) && typeof t.travailId === "string" ? { travailId: t.travailId, lanceLe: typeof t.lanceLe === "number" ? t.lanceLe : majLe, attenteEstimeeS: typeof t.attenteEstimeeS === "number" ? t.attenteEstimeeS : ATTENTE_PAR_DEFAUT_S } : null,
       rendus: Array.isArray(brut.rendus)
         ? brut.rendus.filter(estObjet).filter((r) => typeof r.travailId === "string").map((r) => ({ travailId: String(r.travailId), simulationSiteId: texteOuNull(r.simulationSiteId), urlApres: String(r.urlApres ?? ""), urlAvant: texteOuNull(r.urlAvant), references: lireReferences(r.references), le: typeof r.le === "number" ? r.le : majLe }))
         : [],
@@ -173,6 +219,50 @@ export const MESSAGE_INTROUVABLE = "Nous ne retrouvons pas cette simulation. Vot
 export const MESSAGE_SANS_PHOTO = "Nous ne retrouvons pas cette simulation sur cet appareil. Si un mail vous l'a annoncée, le rendu y est joint ; pour en faire une nouvelle, commencez par une photo.";
 /** La case cochée sous « Me prévenir » : transmise au CRM comme preuve du consentement. */
 export const TEXTE_CONSENTEMENT_PREVENIR = "J'accepte que CoverSwap me contacte au sujet de cette simulation (un e-mail au plus si j'ai donné une adresse ; par téléphone, un rappel de notre part, jamais de SMS automatique).";
+
+/* ── Analyse de la photo (partie 4) : ce que le CRM rend, réduit pour l'écran ── */
+
+export const VERDICTS: readonly VerdictPhoto[] = ["bonne", "floue", "sombre", "contre-jour", "trop-loin"];
+
+/** Réponse de `POST|GET /api/simulate/analyse` telle que le site la lit. */
+export type ReponseAnalyseCrm = {
+  empreinte: string;
+  statut: "EN_COURS" | "PRETE" | "SAUTEE" | "ECHEC";
+  analyse?: { zones_visibles?: Record<string, { visible?: boolean; description?: string }>; qualite_photo?: { verdict?: string; conseil?: string } } | null;
+  raison?: string | null;
+};
+
+/** La phrase neutre dite au visiteur quand l'analyse n'a pas pu être faite (le code de raison reste au CRM). */
+export const MESSAGE_ANALYSE_SAUTEE = "L'analyse de la photo n'a pas pu être faite : vous pouvez lancer la simulation sans.";
+
+export function reduireAnalyse(reponse: ReponseAnalyseCrm): EtatAnalyse {
+  const zones = reponse.analyse?.zones_visibles ?? {};
+  const zonesVisibles = Object.entries(zones).filter(([, z]) => z?.visible === true).map(([id]) => id);
+  const zonesNonVisibles = Object.entries(zones).filter(([, z]) => z?.visible === false).map(([id]) => id);
+  const verdictBrut = reponse.analyse?.qualite_photo?.verdict;
+  const verdict = typeof verdictBrut === "string" && VERDICTS.includes(verdictBrut as VerdictPhoto) ? (verdictBrut as VerdictPhoto) : null;
+  const conseil = reponse.statut === "PRETE" && verdict && verdict !== "bonne" ? reponse.analyse?.qualite_photo?.conseil?.trim() || null : null;
+  return { empreinte: reponse.empreinte, statut: reponse.statut, zonesVisibles, zonesNonVisibles, verdict: reponse.statut === "PRETE" ? verdict : null, conseil, raison: reponse.statut === "SAUTEE" || reponse.statut === "ECHEC" ? (reponse.raison ?? "erreur") : null };
+}
+
+/**
+ * Une zone choisie n'est pas visible sur la photo si TOUTES ses composantes
+ * connues de l'analyse le sont ; une zone que l'analyse ne connaît pas n'est
+ * jamais grisée (la règle du CRM : ne jamais bloquer à tort).
+ */
+export function zoneNonVisible(analyse: EtatAnalyse | null, composantes: string[]): boolean {
+  if (!analyse || analyse.statut !== "PRETE") return false;
+  const connues = composantes.filter((c) => analyse.zonesVisibles.includes(c) || analyse.zonesNonVisibles.includes(c));
+  return connues.length > 0 && connues.every((c) => analyse.zonesNonVisibles.includes(c));
+}
+
+/** Le titre du conseil de qualité, par verdict (la phrase du CRM, au vouvoiement, vient dessous). */
+export const TITRES_VERDICT: Record<Exclude<VerdictPhoto, "bonne">, string> = {
+  floue: "Votre photo semble floue",
+  sombre: "Votre photo semble sombre",
+  "contre-jour": "Votre photo est à contre-jour",
+  "trop-loin": "Votre photo est prise de trop loin",
+};
 
 export function debuterSondage(travail: TravailEnCours): EtatSondage {
   return { ...travail, etape: null, horsLigne: false, echecsReseau: 0, statut: "EN_ATTENTE" };

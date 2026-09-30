@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
  * Vérifie la chaîne du simulateur sur un site en ligne, de bout en bout :
- *   1. /api/simulation/prepare : consigne construite et signée, refus propres
- *      (surfaces incompatibles, référence inconnue, ancien format) ;
+ *   1. /api/simulation/prepare : sélections validées contre la liste de zones du CRM et signées
+ *      (mission 15, partie 4 : le site ne construit plus de prompt), refus propres
+ *      (zones incompatibles, référence inconnue, zone hors pièce) ;
  *   2. génération sur le CRM avec une photo d'essai, au contrat ASYNCHRONE de la
- *      mission 15 : POST `asynchrone: true` → 202 { travailId, attenteEstimeeS },
- *      puis sondage GET ?id=&p= jusqu'à PRETE ou ECHEC — soit un rendu, soit une
- *      erreur classée et lisible (crédit épuisé, surcharge…), jamais un échec muet ;
+ *      mission 15 : POST { projet, selections, sig, exp, parcoursId, photo_base64, asynchrone: true }
+ *      → 202 { travailId, attenteEstimeeS }, puis sondage GET ?id=&p= jusqu'à PRETE ou ECHEC —
+ *      soit un rendu, soit une erreur classée et lisible, jamais un échec muet ;
  *   3. avec --contact : la demande part au CRM avec la photo quand la génération a échoué.
  *
  *   node scripts/verifier-simulateur.mjs                     (coverswap.fr, étapes 1 et 2)
@@ -14,7 +15,7 @@
  *   node scripts/verifier-simulateur.mjs --contact           (crée un lead « AUDIT TEST » dans le CRM)
  *   SITE=http://localhost:3010 node scripts/verifier-simulateur.mjs
  *
- * Coût : une génération réussie ≈ 0,10 à 0,25 € selon le nombre de surfaces ; une génération refusée ne coûte rien.
+ * Coût : une génération réussie ≈ 0,10 à 0,25 € selon le nombre de zones ; une génération refusée ne coûte rien.
  */
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -51,15 +52,17 @@ const attendre = (ms) => new Promise((r) => setTimeout(r, ms));
 console.log(`Simulateur de ${SITE} (parcours ${parcoursId})\n1. Préparation`);
 const base = { project_type: "cuisine", parcoursId };
 const prep = await poster(`${SITE}/api/simulation/prepare`, { ...base, selections: [{ surface: "meubles-bas", ref: "AA05" }, { surface: "credence", ref: "NE31" }] });
-verifier(prep.statut === 200 && prep.data.sig && prep.data.prompt?.includes("FINAL CHECK"), "consigne construite et signée", `${prep.data.prompt?.length ?? 0} caractères, ${prep.data.swatchUrls?.length ?? 0} échantillon(s)`);
-verifier(prep.data.prompt?.includes("BASE UNITS") && prep.data.prompt?.includes("KITCHEN BACKSPLASH"), "une consigne par surface (meubles bas, crédence)");
-verifier(prep.data.prompt?.includes("Wood-grain decor film") && prep.data.prompt?.includes("Marble decor film"), "un descriptif par revêtement (bois, marbre)");
+verifier(prep.statut === 200 && typeof prep.data.sig === "string" && Array.isArray(prep.data.selections), "sélections validées et signées", `${prep.data.selections?.length ?? 0} zone(s), expire dans ${prep.data.exp ? Math.round((prep.data.exp - Date.now()) / 1000) : "?"} s`);
+verifier(!("prompt" in prep.data), "aucun prompt construit par le site (le CRM construit la consigne)");
+verifier(prep.data.projet === "cuisine" && prep.data.selections?.every((s) => typeof s.surface === "string" && typeof s.ref === "string"), "le corps signé ne porte que la pièce et les sélections");
 const conflit = await poster(`${SITE}/api/simulation/prepare`, { ...base, selections: [{ surface: "facades-cuisine", ref: "AA05" }, { surface: "meubles-hauts", ref: "AA05" }] });
-verifier(conflit.statut === 400 && conflit.data.reason === "surfaces-incompatibles", "surfaces incompatibles refusées", conflit.data.error);
+verifier(conflit.statut === 400 && conflit.data.reason === "surfaces-incompatibles", "zones incompatibles refusées", conflit.data.error);
 const inconnue = await poster(`${SITE}/api/simulation/prepare`, { ...base, selections: [{ surface: "credence", ref: "ZZZ999" }] });
 verifier(inconnue.statut === 400 && inconnue.data.reason === "reference-inconnue", "référence hors catalogue refusée", inconnue.data.error);
-const ancien = await poster(`${SITE}/api/simulation/prepare`, { ...base, zone1_ref: "AA05" });
-verifier(ancien.statut === 400 && ancien.data.reason === "version", "ancien format : invitation à recharger", ancien.data.error);
+const horsPiece = await poster(`${SITE}/api/simulation/prepare`, { ...base, selections: [{ surface: "plan-vasque", ref: "AA05" }] });
+verifier(horsPiece.statut === 400 && horsPiece.data.reason === "zone-inconnue", "zone d'une autre pièce refusée", horsPiece.data.error);
+const vide = await poster(`${SITE}/api/simulation/prepare`, { ...base, selections: [] });
+verifier(vide.statut === 400 && vide.data.reason === "aucune-zone", "sans zone : refus clair", vide.data.error);
 
 let raisonEchec = null;
 if (!sansGeneration && prep.statut === 200) {
@@ -68,13 +71,11 @@ if (!sansGeneration && prep.statut === 200) {
   const duree = () => `${Math.round((Date.now() - debut) / 1000)} s`;
   const lancement = await poster(CRM, {
     asynchrone: true,
-    prompt: prep.data.prompt,
-    swatchUrls: prep.data.swatchUrls,
+    projet: prep.data.projet,
+    selections: prep.data.selections,
     sig: prep.data.sig,
     exp: prep.data.exp,
     parcoursId,
-    projet: "cuisine",
-    references: [{ zone: "meubles-bas", libelle: "Meubles bas", ref: "AA05", nom: "Honey Oak" }],
     page: "/simulateur",
     photo_base64: photo,
   });
@@ -90,6 +91,7 @@ if (!sansGeneration && prep.statut === 200) {
     }
     if (suivi.statut === 200 && suivi.data.statut === "PRETE") {
       verifier(typeof suivi.data.image === "string" && suivi.data.image.startsWith("data:image/"), "rendu généré", `${duree()}, simulation gardée : ${suivi.data.simulationSiteId ?? "non"}`);
+      verifier(Array.isArray(suivi.data.references) && suivi.data.references.some((r) => r.libelle === "Crédence" && r.ref === "NE31"), "références relues par le CRM (libellé de la source unique)");
       const image = await fetch(`${CRM}/image?id=${encodeURIComponent(lancement.data.travailId)}&p=${encodeURIComponent(parcoursId)}&quoi=apres`, { headers: { Origin: SITE } });
       verifier(image.status === 200 && (image.headers.get("content-type") ?? "").startsWith("image/"), "rendu servi par adresse (/api/simulate/image)", image.headers.get("content-type") ?? "");
     } else if (suivi.statut === 200 && suivi.data.statut === "ECHEC") {
@@ -102,7 +104,7 @@ if (!sansGeneration && prep.statut === 200) {
     }
   } else {
     raisonEchec = lancement.data.reason ?? `http-${lancement.statut}`;
-    const classee = ["service-indisponible", "ip-quota", "global-quota", "expired", "bad-signature", "internal", "origin"].includes(raisonEchec);
+    const classee = ["service-indisponible", "ip-quota", "global-quota", "expired", "bad-signature", "internal", "origin", "zone-non-visible"].includes(raisonEchec);
     verifier(classee && typeof lancement.data.error === "string" && lancement.data.error.length > 20, `refus classé et lisible (${raisonEchec}, HTTP ${lancement.statut}, ${duree()})`, lancement.data.error);
   }
 }

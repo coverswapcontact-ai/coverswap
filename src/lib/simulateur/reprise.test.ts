@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { debuterSondage, decisionAuMontage, etapesCochees, migrerEtat, reduireSondage, texteAttente, MESSAGE_DELAI, MESSAGE_ECHEC_GENERIQUE, MESSAGE_INJOIGNABLE, MESSAGE_INTROUVABLE, MESSAGE_SANS_PHOTO, REPRISE_MAX_MS, type EtatSimulateur } from "./reprise";
+import { debuterSondage, decisionAuMontage, etapesCochees, migrerEtat, rapportPhoto, reduireAnalyse, reduireSondage, texteAttente, zoneNonVisible, ATTENTE_PAR_DEFAUT_S, MESSAGE_ANALYSE_SAUTEE, MESSAGE_DELAI, MESSAGE_ECHEC_GENERIQUE, MESSAGE_INJOIGNABLE, MESSAGE_INTROUVABLE, MESSAGE_SANS_PHOTO, REPRISE_MAX_MS, type EtatSimulateur } from "./reprise";
+import { DELAI_RENDU } from "@/lib/offre";
 
 /** Mission 15 (partie 1) — fonctions pures de la reprise du simulateur (aucun réseau, aucune génération). */
 
 const PHOTO = "data:image/jpeg;base64,AAAA";
-const etatV2 = (extra: Partial<EtatSimulateur> = {}): EtatSimulateur => ({ projet: "cuisine", photo: PHOTO, selections: {}, parcoursId: "aaaaaaaa-1500-4000-8000-000000000001", travailEnCours: null, rendus: [], majLe: Date.now() - 60_000, ...extra });
+const etatV2 = (extra: Partial<EtatSimulateur> = {}): EtatSimulateur => ({ projet: "cuisine", photo: PHOTO, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: "aaaaaaaa-1500-4000-8000-000000000001", travailEnCours: null, rendus: [], analyse: null, majLe: Date.now() - 60_000, ...extra });
 
 describe("migration de l'état v1 → v2", () => {
   test("l'ancien état repart sans image : identifiants gardés dans rendus, résultat et rendusLocaux abandonnés", () => {
@@ -25,7 +26,49 @@ describe("migration de l'état v1 → v2", () => {
     assert.equal(etat?.rendus[0].urlApres, "https://crm/api/simulate/image?id=x");
     assert.equal(migrerEtat(null), null);
     assert.equal(migrerEtat("n'importe quoi"), null);
-    assert.deepEqual(migrerEtat({}), { projet: "cuisine", photo: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], majLe: 0 });
+    assert.deepEqual(migrerEtat({}), { projet: "cuisine", photo: null, photoLargeur: null, photoHauteur: null, selections: {}, parcoursId: null, travailEnCours: null, rendus: [], analyse: null, majLe: 0 });
+  });
+
+  test("les dimensions de la photo sont gardées (rapport réservé à l'écran) ; sans estimation du CRM, l'attente par défaut est celle de la promesse du site", () => {
+    const etat = migrerEtat({ version: 2, projet: "cuisine", photo: PHOTO, photoLargeur: 1600, photoHauteur: 1200 });
+    assert.deepEqual([etat?.photoLargeur, etat?.photoHauteur, etat ? rapportPhoto(etat) : null], [1600, 1200, "1600 / 1200"]);
+    // Un ancien état v2 (sans dimensions) et des valeurs absurdes : rapport inconnu, jamais une erreur.
+    assert.equal(rapportPhoto(migrerEtat({ version: 2, projet: "cuisine", photo: PHOTO })!), null);
+    assert.equal(rapportPhoto(migrerEtat({ version: 2, projet: "cuisine", photo: PHOTO, photoLargeur: -3, photoHauteur: "x" })!), null);
+    assert.equal(migrerEtat({ version: 2, projet: "cuisine", photoLargeur: 1600, photoHauteur: 1200 })?.photoLargeur, null, "sans photo, pas de dimensions");
+    const sansEstimation = migrerEtat({ version: 2, projet: "cuisine", travailEnCours: { travailId: "cmun000000000001" } });
+    assert.equal(sansEstimation?.travailEnCours?.attenteEstimeeS, ATTENTE_PAR_DEFAUT_S);
+    assert.equal(texteAttente(ATTENTE_PAR_DEFAUT_S), DELAI_RENDU, "la même formulation que la promesse du site");
+  });
+
+  test("l'analyse de la photo (partie 4) est gardée avec l'état ; une analyse illisible donne null", () => {
+    const analyse = { empreinte: "a".repeat(64), statut: "PRETE", zonesVisibles: ["meubles-bas"], zonesNonVisibles: ["credence"], verdict: "floue", conseil: "Reprenez la photo en tenant le téléphone à deux mains.", raison: null };
+    assert.deepEqual(migrerEtat({ version: 2, projet: "cuisine", analyse })?.analyse, analyse);
+    assert.equal(migrerEtat({ version: 2, projet: "cuisine", analyse: { statut: "PRETE" } })?.analyse, null);
+    assert.equal(migrerEtat({ version: 2, projet: "cuisine", analyse: { empreinte: "x", statut: "AUTRE", verdict: "bizarre" } })?.analyse?.statut, "ECHEC");
+  });
+});
+
+describe("analyse de la photo (partie 4)", () => {
+  test("la réponse du CRM est réduite : zones vues et non vues, verdict et conseil seulement quand la photo n'est pas bonne, raison seulement quand elle est sautée", () => {
+    const prete = reduireAnalyse({ empreinte: "e", statut: "PRETE", analyse: { zones_visibles: { "meubles-hauts": { visible: true, description: "left" }, credence: { visible: false, description: "" } }, qualite_photo: { verdict: "sombre", conseil: "Allumez la lumière." } } });
+    assert.deepEqual([prete.zonesVisibles, prete.zonesNonVisibles, prete.verdict, prete.conseil, prete.raison], [["meubles-hauts"], ["credence"], "sombre", "Allumez la lumière.", null]);
+    const bonne = reduireAnalyse({ empreinte: "e", statut: "PRETE", analyse: { zones_visibles: {}, qualite_photo: { verdict: "bonne", conseil: "" } } });
+    assert.deepEqual([bonne.verdict, bonne.conseil], ["bonne", null]);
+    const sautee = reduireAnalyse({ empreinte: "e", statut: "SAUTEE", analyse: null, raison: "budget" });
+    assert.deepEqual([sautee.statut, sautee.raison, sautee.verdict], ["SAUTEE", "budget", null]);
+    assert.doesNotMatch(MESSAGE_ANALYSE_SAUTEE, /budget|euro|clé/i, "la phrase dite au visiteur ne porte aucun détail interne");
+  });
+
+  test("zone non visible : grisée seulement si toutes ses composantes connues le sont ; une zone inconnue de l'analyse ne l'est jamais", () => {
+    const analyse = reduireAnalyse({ empreinte: "e", statut: "PRETE", analyse: { zones_visibles: { "meubles-hauts": { visible: true, description: "" }, "meubles-bas": { visible: false, description: "" }, credence: { visible: false, description: "" } } } });
+    assert.equal(zoneNonVisible(analyse, ["credence"]), true);
+    assert.equal(zoneNonVisible(analyse, ["meubles-hauts"]), false);
+    // « Façades (toutes) » = hauts + bas : visible si l'un des deux l'est.
+    assert.equal(zoneNonVisible(analyse, ["meubles-hauts", "meubles-bas"]), false);
+    assert.equal(zoneNonVisible(analyse, ["plan-de-travail"]), false, "zone inconnue de l'analyse : jamais grisée");
+    assert.equal(zoneNonVisible(null, ["credence"]), false);
+    assert.equal(zoneNonVisible({ ...analyse, statut: "EN_COURS" }, ["credence"]), false);
   });
 });
 

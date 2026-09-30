@@ -50,12 +50,13 @@ export const FOURCHETTES = {
 export const DUREE_POSE = "1 journée";
 
 /**
- * Simulation : le rendu arrive « en une à deux minutes » (mission 15 : la
- * génération est asynchrone, la médiane observée avoisine 1 min 15). Une seule
- * formulation, reprise par la page du simulateur (titre, description, étapes,
- * bouton) ; l'écran d'attente, lui, annonce l'estimation calculée.
+ * Simulation : le rendu arrive en « environ 1 min 30 » (mission 15 : la
+ * génération est asynchrone ; l'attente médiane observée, arrondie). Une seule
+ * formulation, reprise PARTOUT où le site promet un délai (accueil, pied de
+ * page, blog, zones, FAQ, page du simulateur) ; l'écran d'attente, lui,
+ * annonce l'estimation calculée par le CRM. `DUREE_SIMULATION` y renvoie.
  */
-export const DELAI_RENDU = "une à deux minutes";
+export const DELAI_RENDU = "environ 1 min 30"; // va avec `lib/simulateur/reprise.ts › ATTENTE_PAR_DEFAUT_S` (90 s)
 export const DUREE_SIMULATION = DELAI_RENDU;
 
 /** Nombre exact de références du catalogue Cover Styl' (compté dans les données). */

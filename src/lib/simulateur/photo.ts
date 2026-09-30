@@ -1,24 +1,51 @@
 /**
- * Préparation de la photo côté navigateur : lecture (y compris HEIC quand le
- * navigateur sait le décoder), réduction à 1600 px, JPEG. Le simulateur ne
- * reçoit jamais un fichier de 10 Mo, et une photo illisible donne un message
- * précis au lieu d'un échec muet.
+ * Préparation de la photo côté navigateur (mission 15, partie 4) : contrôle du
+ * fichier (25 Mo, image), décodage avec l'orientation EXIF respectée
+ * (`createImageBitmap(file, { imageOrientation: "from-image" })`, repli `<img>`),
+ * réduction à 1600 px sur le grand côté, JPEG. Un HEIC que le navigateur ne
+ * sait pas décoder n'est plus refusé : le fichier est renvoyé tel quel pour que
+ * le CRM le convertisse (`POST /api/simulate/photo`, `generation-client.ts`).
+ * Les fonctions de calcul sont pures (testées sans DOM).
  */
 export const COTE_MAX = 1600;
 export const POIDS_MAX_OCTETS = 25 * 1024 * 1024;
+export const QUALITE_JPEG = 0.86;
 
 export type ErreurPhoto = "trop-lourde" | "format" | "illisible";
 
-function estHeic(file: File): boolean {
+export type FichierPhoto = { size: number; type: string; name: string };
+
+export function estHeic(file: FichierPhoto): boolean {
   return /image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+}
+
+/** Le fichier est-il acceptable avant tout décodage ? Une raison, ou null. */
+export function verifierFichier(file: FichierPhoto): ErreurPhoto | null {
+  if (file.size > POIDS_MAX_OCTETS) return "trop-lourde";
+  if (file.size === 0) return "illisible";
+  if (!file.type.startsWith("image/") && !estHeic(file)) return "format";
+  return null;
+}
+
+/** Les dimensions réduites : le grand côté ramené à `max`, jamais agrandi, jamais sous 1 px. */
+export function dimensionsReduites(largeur: number, hauteur: number, max: number = COTE_MAX): { largeur: number; hauteur: number } {
+  const ratio = Math.min(1, max / Math.max(1, largeur, hauteur));
+  return { largeur: Math.max(1, Math.round(largeur * ratio)), hauteur: Math.max(1, Math.round(hauteur * ratio)) };
+}
+
+/** Poids approximatif (Ko) d'une data URL base64. */
+export function poidsKoDe(dataUrl: string): number {
+  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  return Math.round((base64.length * 3) / 4 / 1024);
 }
 
 async function decoder(file: File): Promise<ImageBitmap | HTMLImageElement> {
   if ("createImageBitmap" in window) {
     try {
-      return await createImageBitmap(file);
+      // L'orientation EXIF est appliquée par le décodeur : une photo prise à la verticale reste verticale.
+      return await createImageBitmap(file, { imageOrientation: "from-image" });
     } catch {
-      /* on tente par <img> */
+      /* option refusée ou format inconnu : on tente par <img> */
     }
   }
   return new Promise((resolve, reject) => {
@@ -36,20 +63,27 @@ async function decoder(file: File): Promise<ImageBitmap | HTMLImageElement> {
   });
 }
 
-export async function preparerPhoto(file: File): Promise<{ dataUrl: string; largeur: number; hauteur: number; poidsKo: number }> {
-  if (file.size > POIDS_MAX_OCTETS) throw new Error("trop-lourde" satisfies ErreurPhoto);
-  if (!file.type.startsWith("image/") && !estHeic(file)) throw new Error("format" satisfies ErreurPhoto);
+export type PhotoPreparee = { dataUrl: string; largeur: number; hauteur: number; poidsKo: number };
+/** Le navigateur ne sait pas décoder ce fichier (HEIC) : à envoyer tel quel au CRM. */
+export type PhotoAConvertir = { aConvertir: true; file: File };
+
+/**
+ * Prépare la photo : data URL JPEG réduite, ou `{ aConvertir }` pour un HEIC
+ * que ce navigateur ne décode pas. Lève `Error(code)` (`ErreurPhoto`) sinon.
+ */
+export async function preparerPhoto(file: File): Promise<PhotoPreparee | PhotoAConvertir> {
+  const refus = verifierFichier(file);
+  if (refus) throw new Error(refus);
   let source: ImageBitmap | HTMLImageElement;
   try {
     source = await decoder(file);
   } catch {
-    throw new Error((estHeic(file) ? "format" : "illisible") satisfies ErreurPhoto);
+    if (estHeic(file)) return { aConvertir: true, file };
+    throw new Error("illisible" satisfies ErreurPhoto);
   }
   const largeurSource = "naturalWidth" in source ? source.naturalWidth : source.width;
   const hauteurSource = "naturalHeight" in source ? source.naturalHeight : source.height;
-  const ratio = Math.min(1, COTE_MAX / Math.max(largeurSource, hauteurSource));
-  const largeur = Math.max(1, Math.round(largeurSource * ratio));
-  const hauteur = Math.max(1, Math.round(hauteurSource * ratio));
+  const { largeur, hauteur } = dimensionsReduites(largeurSource, hauteurSource);
   const canvas = document.createElement("canvas");
   canvas.width = largeur;
   canvas.height = hauteur;
@@ -57,8 +91,8 @@ export async function preparerPhoto(file: File): Promise<{ dataUrl: string; larg
   if (!ctx) throw new Error("illisible" satisfies ErreurPhoto);
   ctx.drawImage(source, 0, 0, largeur, hauteur);
   if ("close" in source) source.close();
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.86);
-  return { dataUrl, largeur, hauteur, poidsKo: Math.round((dataUrl.length * 3) / 4 / 1024) };
+  const dataUrl = canvas.toDataURL("image/jpeg", QUALITE_JPEG);
+  return { dataUrl, largeur, hauteur, poidsKo: poidsKoDe(dataUrl) };
 }
 
 export function messageErreurPhoto(code: string): string {
@@ -66,7 +100,9 @@ export function messageErreurPhoto(code: string): string {
     case "trop-lourde":
       return "Cette photo dépasse 25 Mo. Choisissez une photo plus légère, ou faites une capture d'écran.";
     case "format":
-      return "Ce format n'est pas lisible par votre navigateur (souvent un HEIC). Sur iPhone : Réglages → Appareil photo → Formats → « Le plus compatible », ou envoyez une capture d'écran de la photo.";
+      return "Ce format de photo n'est pas lisible. Envoyez une photo en JPEG ou PNG, ou une capture d'écran de la photo.";
+    case "conversion":
+      return "Nous n'avons pas pu convertir cette photo. Envoyez une capture d'écran de la photo, ou une photo en JPEG.";
     default:
       return "Impossible de lire cette photo. Essayez une autre photo, en JPEG ou PNG.";
   }

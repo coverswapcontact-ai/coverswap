@@ -5,7 +5,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import TextureBackground from "@/components/TextureBackground";
 import { FAQSchema, BreadcrumbSchema } from "@/components/JsonLd";
 import { ZONES, getZoneSlug, getZoneBySlug, type Zone } from "@/data/zones";
-import { DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, GARANTIE, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
 
 /* ──────────────────────────────────────────────────────────────────
    STATIC GENERATION — pré-build des 8 pages au build time
@@ -487,7 +487,7 @@ export default async function ZonePage({
                 Votre projet covering à <span className="text-rouge">{zone.ville}</span> commence ici
               </h2>
               <p className="text-gris-300 text-lg mb-8 max-w-xl mx-auto">
-                Envoyez-nous une photo, recevez un rendu IA en 60 secondes et un devis détaillé {DELAI_REPONSE}.
+                Envoyez-nous une photo, recevez un rendu IA en {DELAI_RENDU} et un devis détaillé {DELAI_REPONSE}.
                 Sans engagement, sans visite obligatoire.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
