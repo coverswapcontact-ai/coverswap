@@ -6,8 +6,10 @@ const nextConfig: NextConfig = {
   images: {
     // Aucune optimisation à la volée : le quota d'images du plan Vercel Hobby
     // était épuisé (HTTP 402, catalogue vide). Les échantillons Cover Styl' (S3)
-    // sont déjà petits ; les photos de fond sont produites en local aux bonnes
-    // tailles par scripts/importer-fonds.mjs et servies par srcset.
+    // sont déjà petits ; les images du site sont produites en local aux bonnes
+    // tailles et formats (AVIF, WebP, JPEG) par scripts/preparer-images.mjs
+    // (`npm run images`, composant `Photo`), les fonds des guides par
+    // scripts/importer-fonds.mjs ; tout est servi tel quel par srcset.
     unoptimized: true,
     // Qualités autorisées (requis à partir de Next 16)
     qualities: [60, 75, 80, 85, 90],

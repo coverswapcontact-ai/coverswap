@@ -1,17 +1,31 @@
 "use client";
 
 import { CuisineDeFace, MobilierDeFace, MursDeFace, ProfessionnelDeFace, SalleDeBainDeFace } from "@/components/espace/Illustrations";
+import { photoDePiece, type PieceId } from "@/lib/images-pieces";
+import { imagePreparee } from "@/lib/images-preparees";
+import { Etiquette } from "./Etiquette";
+import { Photo } from "./Photo";
 
 /**
  * Les cinq cartes « Quelle pièce transformons-nous ? » (mission 15, partie 4),
- * partagées par le simulateur et le module d'accueil. Une carte = le dessin
- * au trait fin de la pièce (`espace/Illustrations`) — la photo d'une vraie
- * réalisation prendra sa place quand `public/` en aura une (à fournir) —, le
+ * partagées par le simulateur, le module d'accueil et l'espace client. Une
+ * carte = le dessin au trait fin de la pièce (`espace/Illustrations`), le
  * libellé et la description venus du CRM. Le dessin est en gris léger, et
  * passe en couleur avec le trait d'accent quand la carte est choisie. Jamais
  * un emoji. Hauteur fixe : les cartes ne font pas bouger la page. Des boutons
  * `aria-pressed` dans un groupe (pas un `radiogroup` : choisir une carte fait
  * avancer le parcours, les flèches n'auraient pas leur sens de radio).
+ *
+ * Mission 16 (partie 2) : `photos` (noms du manifeste, `lib/images-pieces`) —
+ * si l'image d'une pièce est préparée, la carte la montre en carré, en
+ * couleur, étiquetée « Ambiance » en bas à gauche (une illustration, jamais
+ * une réalisation) ; sinon le dessin. INTÉRIM : les photos de réalisation des
+ * cinq pièces restent à fournir. Sans `photos` (l'espace client) : les dessins.
+ * `photosImmediates` : les N premières cartes chargent leur photo tout de suite
+ * (`Photo immediat`) quand elles sont au premier écran de la page (le
+ * simulateur : 3, le premier rang sur ordinateur, le premier et un peu du
+ * second sur téléphone) ; les autres, et l'accueil (module sous l'ouverture),
+ * en `lazy`.
  */
 export type PieceCarte = { id: string; libelle: string; description: string };
 
@@ -23,12 +37,17 @@ const DESSINS: Record<string, (p: { className?: string }) => React.ReactElement>
   professionnel: ProfessionnelDeFace,
 };
 
-export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce" }: { pieces: PieceCarte[]; valeur: string | null; onChoisir: (id: string) => void; nom?: string }) {
+/** L'attribut `sizes` d'une carte : deux colonnes sur téléphone, trois (≈ 240 px) à partir de 640 px. */
+const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
+
+export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce", photos, photosImmediates = 0 }: { pieces: PieceCarte[]; valeur: string | null; onChoisir: (id: string) => void; nom?: string; photos?: Partial<Record<PieceId, string>>; photosImmediates?: number }) {
   return (
     <div role="group" aria-label={nom} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {pieces.map((p) => {
+      {pieces.map((p, rang) => {
         const Dessin = DESSINS[p.id] ?? CuisineDeFace;
         const choisie = valeur === p.id;
+        const photo = photoDePiece(photos, p.id);
+        const avecPhoto = photo !== null && imagePreparee(photo);
         return (
           <button
             key={p.id}
@@ -37,9 +56,18 @@ export function CartesPieces({ pieces, valeur, onChoisir, nom = "Pièce" }: { pi
             onClick={() => onChoisir(p.id)}
             className={`group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-accent ring-1 ring-accent" : "border-trait hover:border-encre-2"}`}
           >
-            <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>
-              <Dessin className="h-full w-full" />
-            </span>
+            {avecPhoto ? (
+              <span className="relative block w-full overflow-hidden rounded-[var(--rayon-sm)]">
+                <Photo nom={photo} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
+                <span aria-hidden="true">
+                  <Etiquette className="absolute bottom-2 left-2">Ambiance</Etiquette>
+                </span>
+              </span>
+            ) : (
+              <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>
+                <Dessin className="h-full w-full" />
+              </span>
+            )}
             <span className="mt-2 block text-[15.5px] leading-snug font-semibold text-encre">{p.libelle}</span>
             <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-encre-2">{p.description}</span>
           </button>

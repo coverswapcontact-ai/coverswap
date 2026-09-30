@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "images": "node scripts/preparer-images.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\""
   },
   "browserslist": [

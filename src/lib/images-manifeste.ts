@@ -1,48 +1,30 @@
 /**
- * Manifeste des images préparées du site (mission 16). Le site n'utilise pas
- * l'optimiseur de Vercel (`images.unoptimized`, quota épuisé → 402) : chaque
- * image du dépôt est produite en local, une fois, en AVIF + WebP + JPEG aux
- * largeurs 480 / 960 / 1600 (jamais agrandie), dans
- * `public/images/prep/<nom>-<largeur>.<avif|webp|jpg>`, et décrite ici.
+ * FICHIER GÉNÉRÉ par `scripts/preparer-images.mjs` (`npm run images`) : ne pas éditer à la main.
  *
- * La partie 2 de la mission 16 regénère l'objet `MANIFESTE_IMAGES` par
- * `scripts/preparer-images.mjs` ; en partie 1, il est vide et `Photo` accepte
- * aussi une `src` directe (images pas encore préparées).
+ * Les images préparées du site (mission 16, partie 2) : pour chaque original de
+ * `public/images/sources/`, ses dimensions (`width` / `height` réservés, CLS 0) et
+ * les largeurs produites dans `public/images/prep/<nom>-<largeur>.<avif|webp|jpg>`
+ * (480 / 960 / 1600 plafonnées à l'origine) et l'empreinte de l'original (sha1,
+ * 12 caractères : un original remplacé sous le même nom est repréparé). Lu par
+ * `Photo` via `sourcesPhoto` (`src/lib/images-preparees.ts`).
  */
-export type EntreeImage = {
-  /** Dimensions de l'image d'origine : `width` / `height` réservés (CLS 0). */
-  largeur: number;
-  hauteur: number;
-  /** Largeurs produites, croissantes (celles ≤ l'origine parmi 480, 960, 1600). */
-  largeurs: number[];
+import type { ManifesteImages } from "./images-preparees";
+
+export const MANIFESTE_IMAGES: ManifesteImages = {
+  "etape-photo": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "0d983799eaf0" },
+  "etape-pose": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "0306da50565b" },
+  "meubles-armoire": { largeur: 1024, hauteur: 1536, largeurs: [480, 960, 1024], empreinte: "92adbbe00c49" },
+  "mur-salon": { largeur: 1024, hauteur: 904, largeurs: [480, 960, 1024], empreinte: "44b83f181c49" },
+  "ouverture-cuisine-apres": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "e5261882c715" },
+  "ouverture-cuisine-avant": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "fdb1e19ea3c3" },
+  "ouverture-provisoire": { largeur: 1080, hauteur: 1080, largeurs: [480, 960, 1080], empreinte: "bd8f462fb495" },
+  "piece-cuisine": { largeur: 1024, hauteur: 1024, largeurs: [480, 960, 1024], empreinte: "cb7634eb26ea" },
+  "piece-meubles": { largeur: 1024, hauteur: 1024, largeurs: [480, 960, 1024], empreinte: "c0a716f7dd6e" },
+  "piece-murs": { largeur: 1024, hauteur: 1024, largeurs: [480, 960, 1024], empreinte: "a87908ded348" },
+  "piece-pro": { largeur: 1024, hauteur: 1024, largeurs: [480, 960, 1024], empreinte: "59f72c69b80e" },
+  "piece-salle-de-bain": { largeur: 1024, hauteur: 1024, largeurs: [480, 960, 1024], empreinte: "b9c8feecda6d" },
+  "pro-bureaux": { largeur: 1024, hauteur: 684, largeurs: [480, 960, 1024], empreinte: "29494d64594d" },
+  "pro-commerce": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "783c17f5d7f8" },
+  "pro-hotel": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "c5a35bc1a016" },
+  "pro-restaurant": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "c8686bf307e0" },
 };
-
-export type ManifesteImages = Record<string, EntreeImage>;
-
-export const MANIFESTE_IMAGES: ManifesteImages = {};
-
-/** Dossier public des images préparées. */
-export const DOSSIER_IMAGES = "/images/prep";
-
-export type SourcesPhoto = {
-  avif: string;
-  webp: string;
-  /** `srcset` des JPEG (repli universel). */
-  jpg: string;
-  /** Le JPEG du `src` : la plus grande largeur ≤ 960 (ou la plus petite). */
-  src: string;
-  largeur: number;
-  hauteur: number;
-};
-
-/** Les `srcset` AVIF / WebP / JPEG et les dimensions d'une image du manifeste ; `null` si le nom est inconnu. */
-export function sourcesPhoto(nom: string, manifeste: ManifesteImages = MANIFESTE_IMAGES): SourcesPhoto | null {
-  const entree = Object.prototype.hasOwnProperty.call(manifeste, nom) ? manifeste[nom] : undefined;
-  if (!entree || entree.largeurs.length === 0) return null;
-  const largeurs = [...entree.largeurs].sort((a, b) => a - b);
-  const fichier = (l: number, ext: string) => `${DOSSIER_IMAGES}/${nom}-${l}.${ext}`;
-  const srcset = (ext: string) => largeurs.map((l) => `${fichier(l, ext)} ${l}w`).join(", ");
-  const moyennes = largeurs.filter((l) => l <= 960);
-  const largeurSrc = moyennes.length > 0 ? moyennes[moyennes.length - 1] : largeurs[0];
-  return { avif: srcset("avif"), webp: srcset("webp"), jpg: srcset("jpg"), src: fichier(largeurSrc, "jpg"), largeur: entree.largeur, hauteur: entree.hauteur };
-}

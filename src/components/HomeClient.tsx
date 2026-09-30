@@ -7,6 +7,7 @@ import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
 import { CartesPieces, type PieceCarte } from "@/components/simulation/CartesPieces";
 import { Section } from "@/components/simulation/Section";
 import { track } from "@/lib/analytics";
+import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { envoyerEvenement } from "@/lib/evenements-site";
 import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
 import { obtenirParcoursId } from "@/lib/parcours";
@@ -116,7 +117,7 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
               <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
               <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">Quelle pièce transformons-nous ?</h3>
             </div>
-            <CartesPieces pieces={pieces} valeur={null} onChoisir={handleSelectProject} />
+            <CartesPieces pieces={pieces} valeur={null} onChoisir={handleSelectProject} photos={PHOTOS_PIECES} />
           </div>
         ) : !preview ? (
           <div
