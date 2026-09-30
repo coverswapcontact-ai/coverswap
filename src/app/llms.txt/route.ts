@@ -48,7 +48,7 @@ export function GET() {
     `- [Devis gratuit](${s}/devis)`,
     `- [Réalisations et avis](${s}/realisations)`,
     `- [Catalogue Cover Styl'](${s}/revetements)`,
-    `- [Questions fréquentes](${s}/#faq)`,
+    `- [Questions fréquentes](${s}/comment-ca-marche#faq)`,
     `- [Conditions générales de vente](${s}/cgv) · [Politique de confidentialité](${s}/politique-confidentialite) · [Mentions légales](${s}/mentions-legales)`,
     "",
   ];

@@ -48,6 +48,8 @@ export const FOURCHETTES = {
 
 /** Pose : une journée pour une cuisine ou une salle de bain courante. */
 export const DUREE_POSE = "1 journée";
+/** La même durée en toutes lettres, pour les phrases (« Votre cuisine, transformée en une journée. ») ; va avec `DUREE_POSE`. */
+export const DUREE_POSE_TEXTE = "une journée";
 
 /**
  * Simulation : le rendu arrive en « environ 1 min 30 » (mission 15 : la

@@ -76,7 +76,8 @@ export function OrganizationSchema() {
   );
 }
 
-export function ServiceSchema({ name, description, url, typeProjet }: { name: string; description: string; url: string; typeProjet?: string }) {
+/** `urlOffre` (mission 16, partie 3) : l'adresse de l'offre ; l'accueil passe `/simulateur` (le tunnel commence là). */
+export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/devis` }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string }) {
   return (
     <Script
       data={{
@@ -99,7 +100,7 @@ export function ServiceSchema({ name, description, url, typeProjet }: { name: st
             unitText: "mètre linéaire de film posé, fourni et posé",
           },
           availability: "https://schema.org/InStock",
-          url: `${ENTREPRISE.site}/devis`,
+          url: urlOffre,
         },
       }}
     />

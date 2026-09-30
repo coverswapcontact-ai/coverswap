@@ -1,3 +1,5 @@
+import type { SourcesImage } from "@/lib/images-preparees";
+
 /**
  * Réalisations et avis publiés depuis le CRM (écran « Site »), lus par le site
  * toutes les cinq minutes. Rien n'est écrit ici : la porte est ouverte, le CRM
@@ -15,9 +17,34 @@ export type Publication = {
   photoAvant: string | null;
   photoApres: string | null;
   publieLe: string;
+  /**
+   * Mission 16 (partie 3) : lus s'ils arrivent, jamais inventés — le CRM ne les publie pas encore (`PublicationSite`
+   * n'a ni matières, ni prix, ni durée). Une carte d'étude de cas montre le prix et la durée publiés ; à défaut, la
+   * fourchette et la durée habituelles d'`offre.ts`, libellées comme telles (`lib/etude-de-cas`).
+   */
+  matieres?: { ref: string; nom: string }[] | null;
+  prix?: number | null;
+  duree?: string | null;
 };
 
 const BASE_CRM = (process.env.NEXT_PUBLIC_SIMULATE_URL || "https://crm.coverswap.fr/api/simulate").replace(/\/api\/simulate\/?$/, "");
+
+/**
+ * Largeurs demandées au CRM pour une photo publiée (`/api/site/photos/<id>/<avant|apres>?l=<largeur>` : WebP réduit
+ * par le CRM, jamais agrandi ; mission 16, partie 3). Sans `l`, la photo telle quelle (1 600 px de côté au plus).
+ */
+export const LARGEURS_PHOTO_CRM = [480, 960, 1600] as const;
+
+/**
+ * Les sources d'une photo publiée par le CRM pour `ImagePreparee` : les WebP réduits en `srcset` (le navigateur prend
+ * la largeur utile, au lieu de la photo entière), la photo telle quelle en repli. Ses dimensions ne sont pas connues :
+ * le cadre de l'image réserve la place (`aspect-ratio`). Un CRM qui ne connaît pas `l` renvoie la photo entière : rien
+ * ne casse.
+ */
+export function sourcesPhotoCrm(url: string): SourcesImage {
+  const reduite = (largeur: number) => `${url}${url.includes("?") ? "&" : "?"}l=${largeur}`;
+  return { webp: LARGEURS_PHOTO_CRM.map((l) => `${reduite(l)} ${l}w`).join(", "), src: url };
+}
 
 const LIBELLES_PROJET: Record<string, string> = { CUISINE: "Cuisine", SDB: "Salle de bain", MEUBLES: "Meubles", PRO: "Professionnel", AUTRE: "Autre" };
 

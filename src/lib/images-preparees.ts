@@ -39,6 +39,22 @@ export type SourcesPhoto = {
   hauteur: number;
 };
 
+/**
+ * Ce que `ImagePreparee` (`components/simulation`) sait rendre : une image du dépôt (`SourcesPhoto`, tout est connu) ou
+ * une photo publiée par le CRM (`sourcesPhotoCrm` de `lib/publications` : WebP réduits en `srcset`, la photo telle
+ * quelle en `src`, dimensions inconnues). Une source absente n'est pas écrite.
+ */
+export type SourcesImage = {
+  avif?: string;
+  webp?: string;
+  /** `srcset` des JPEG. */
+  jpg?: string;
+  /** L'image du `src` (le repli). */
+  src: string;
+  largeur?: number;
+  hauteur?: number;
+};
+
 /** Les `srcset` AVIF / WebP / JPEG et les dimensions d'une image du manifeste ; `null` si le nom est inconnu. */
 export function sourcesPhoto(nom: string, manifeste: ManifesteImages = MANIFESTE_IMAGES): SourcesPhoto | null {
   const entree = Object.prototype.hasOwnProperty.call(manifeste, nom) ? manifeste[nom] : undefined;

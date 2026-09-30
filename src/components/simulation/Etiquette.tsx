@@ -16,6 +16,11 @@ const TONS = {
   sombre: "bg-encre/70 text-blanc",
 };
 
-export function Etiquette({ children, ton = "clair", className }: { children: TexteEtiquette | ReactNode; ton?: keyof typeof TONS; className?: string }) {
-  return <span className={`inline-flex items-center rounded-[4px] px-2 py-1 text-[12.5px] font-medium ${TONS[ton]}${className ? ` ${className}` : ""}`}>{children}</span>;
+/** `muette` : posée sur une image décorative (`alt=""`), la pastille est cachée aux lecteurs d'écran (`aria-hidden`). */
+export function Etiquette({ children, ton = "clair", className, muette = false }: { children: TexteEtiquette | ReactNode; ton?: keyof typeof TONS; className?: string; muette?: boolean }) {
+  return (
+    <span aria-hidden={muette || undefined} className={`inline-flex items-center rounded-[4px] px-2 py-1 text-[12.5px] font-medium ${TONS[ton]}${className ? ` ${className}` : ""}`}>
+      {children}
+    </span>
+  );
 }

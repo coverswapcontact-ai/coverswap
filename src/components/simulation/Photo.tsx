@@ -1,5 +1,6 @@
 import { sourcesPhoto } from "@/lib/images-preparees";
 import { Etiquette } from "./Etiquette";
+import { ImagePreparee } from "./ImagePreparee";
 
 /**
  * Une photo du site (mission 16) : `<picture>` AVIF + WebP + JPEG d'après le
@@ -57,18 +58,19 @@ export function Photo({ nom, src, largeur, hauteur, alt, ratio, priorite = false
   return (
     <Cadre className={`relative ${enLigne ? "block " : ""}overflow-hidden bg-fond-2${className ? ` ${className}` : ""}`} style={rapport ? { aspectRatio: rapport } : undefined}>
       {sources ? (
-        <picture>
-          <source type="image/avif" srcSet={sources.avif} sizes={tailles} />
-          <source type="image/webp" srcSet={sources.webp} sizes={tailles} />
-          <img src={sources.src} srcSet={sources.jpg} sizes={tailles} width={sources.largeur} height={sources.hauteur} alt={alt} className={classesImage} {...chargement} />
-        </picture>
+        <ImagePreparee sources={sources} tailles={tailles} alt={alt} className={classesImage} {...chargement} />
       ) : src ? (
         // eslint-disable-next-line @next/next/no-img-element -- image pas encore préparée, servie telle quelle
         <img src={src} width={largeur} height={hauteur} alt={alt} className={classesImage} {...chargement} />
       ) : (
         <span {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })} className="absolute inset-0" />
       )}
-      {etiquette ? <Etiquette className="absolute top-3 left-3">{etiquette}</Etiquette> : null}
+      {/* Image décorative (`alt=""`) : son étiquette non plus n'est pas lue, sinon il resterait un mot isolé (« Ambiance »). */}
+      {etiquette ? (
+        <Etiquette className="absolute top-3 left-3" muette={!alt}>
+          {etiquette}
+        </Etiquette>
+      ) : null}
     </Cadre>
   );
 }

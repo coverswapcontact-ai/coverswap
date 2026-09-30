@@ -11,15 +11,17 @@ import { lireOrigine, sourceCourte } from "@/lib/utm";
  * sendBeacon en JSON serait silencieusement abandonné par le navigateur.
  */
 /** Mission 15 (partie 4) : l'entonnoir du simulateur = PIECE_CHOISIE → PHOTO_CHARGEE → GENERATION_LANCEE → RESULTAT_VU → DEVIS_DEMANDE (mêmes noms côté CRM). */
-export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC";
+/** Mission 16 (partie 3) : `WHATSAPP_CLIQUE`, le bouton « Écrire sur WhatsApp » (liste blanche du CRM d'abord). */
+export type EvenementSite = "PAGE_VUE" | "PIECE_CHOISIE" | "PHOTO_CHARGEE" | "GENERATION_LANCEE" | "RESULTAT_VU" | "SIMULATION_ECHEC" | "DEVIS_DEMANDE" | "CONTACT_ENVOYE" | "FORMULAIRE_ECHEC" | "WHATSAPP_CLIQUE";
 
-const VERS_DATALAYER: Partial<Record<EvenementSite, TrackEvent>> = {
+export const VERS_DATALAYER: Partial<Record<EvenementSite, TrackEvent>> = {
   PHOTO_CHARGEE: "simulation_photo_uploaded",
   GENERATION_LANCEE: "simulation_textures_selected",
   RESULTAT_VU: "simulation_generated",
   SIMULATION_ECHEC: "simulation_failed",
   DEVIS_DEMANDE: "devis_form_submitted",
   CONTACT_ENVOYE: "contact_form_submitted",
+  WHATSAPP_CLIQUE: "whatsapp_clicked",
 };
 
 const URL_EVENEMENTS = (process.env.NEXT_PUBLIC_SIMULATE_URL || "").replace(/\/api\/simulate\/?$/, "/api/site/evenements");

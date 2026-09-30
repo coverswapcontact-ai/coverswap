@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
 import { CartesPieces, type PieceCarte } from "@/components/simulation/CartesPieces";
@@ -9,14 +8,13 @@ import { Section } from "@/components/simulation/Section";
 import { track } from "@/lib/analytics";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { envoyerEvenement } from "@/lib/evenements-site";
-import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
+import { DELAI_RENDU } from "@/lib/offre";
 import { obtenirParcoursId } from "@/lib/parcours";
 import { convertirPhotoParLeCrm } from "@/lib/simulateur/generation-client";
 import { getProject } from "@/lib/simulateur/projets";
 import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
 import { ETAT_VIDE } from "@/lib/simulateur/reprise";
 import { lireEtat, sauvegarderEtat } from "@/lib/simulateur/stockage";
-import { zonesMaxEnLettres } from "@/lib/simulateur/zones";
 
 /* ══════════════════════════════════════════════════════════════════
    SIMULATION — accès direct au simulateur depuis l'accueil (mission 15,
@@ -24,8 +22,12 @@ import { zonesMaxEnLettres } from "@/lib/simulateur/zones";
    jamais un emoji), les mêmes boutons photo, sur la carte claire du thème ;
    la photo va dans la mémoire du simulateur (fusion, rien n'est écrasé) et
    le parcours continue sur /simulateur à l'écran des matières.
+   Mission 16 (partie 3) : section 2 de l'accueil, « Essayez sur votre
+   photo » ; la logique ne change pas. Les trois étapes et les lignes du bas
+   sont retirées (l'accueil a sa section « Comment ça marche ») ; les titres
+   du module passent à la taille du texte (deux tailles de titre par page).
 ══════════════════════════════════════════════════════════════════ */
-export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; zonesMax: number }) {
+export function SimulationSection({ pieces }: { pieces: PieceCarte[] }) {
   const router = useRouter();
   const [projectId, setProjectId] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ dataUrl: string; largeur: number; hauteur: number } | null>(null);
@@ -95,18 +97,11 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
       id="simulation"
       large
       fond="fond-2"
-      surtitre="Simulation sur votre photo"
-      titre={
-        <>
-          Votre intérieur.
-          <br />
-          Transformé en {DELAI_RENDU}.
-        </>
-      }
+      surtitre="Sur votre photo"
+      titre="Essayez sur votre photo"
       intro={
         <>
-          Une photo de votre cuisine, salle de bain, meuble ou local, une matière parmi <strong className="text-encre">{NB_REFERENCES} références Cover Styl&apos;</strong>, et le rendu sur votre propre photo.{" "}
-          <span className="font-medium text-encre">Sans e-mail. Sans téléphone. Gratuit.</span>
+          Le rendu sur votre photo en {DELAI_RENDU}. <span className="font-medium text-encre">Sans e-mail, sans téléphone, gratuit.</span>
         </>
       }
     >
@@ -114,8 +109,8 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
         {!projectId ? (
           <div className="space-y-4">
             <div>
-              <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
-              <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">Quelle pièce transformons-nous ?</h3>
+              <p className="surtitre">Pièce · Photo</p>
+              <h3 className="mt-1 text-[17px] font-semibold leading-tight text-encre">Quelle pièce transformons-nous ?</h3>
             </div>
             <CartesPieces pieces={pieces} valeur={null} onChoisir={handleSelectProject} photos={PHOTOS_PIECES} />
           </div>
@@ -136,8 +131,8 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">Pièce · Photo</p>
-                <h3 className="mt-1 font-display text-[22px] font-semibold leading-tight text-encre">{projet?.uploadHint}</h3>
+                <p className="surtitre">Pièce · Photo</p>
+                <h3 className="mt-1 text-[17px] font-semibold leading-tight text-encre">{projet?.uploadHint}</h3>
                 <p className="mt-1 text-[14.5px] text-encre-2">{projet?.uploadTip}.</p>
               </div>
               <Bouton variante="discret" onClick={() => setProjectId(null)}>
@@ -161,7 +156,7 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-encre-2">
+              <p className="surtitre">
                 {projet?.label} · Photo prête
               </p>
               <Bouton
@@ -198,32 +193,6 @@ export function SimulationSection({ pieces, zonesMax }: { pieces: PieceCarte[]; 
             {error}
           </p>
         ) : null}
-      </div>
-
-      <ol className="mt-10 grid max-w-4xl grid-cols-1 gap-3 md:grid-cols-3 md:gap-4">
-        {[
-          { num: "01", title: "Photo", desc: "Prenez ou choisissez une photo de votre pièce, de face et bien éclairée." },
-          { num: "02", title: "Matières", desc: `Jusqu'à ${zonesMaxEnLettres(zonesMax)} zones, une matière chacune parmi ${NB_REFERENCES} références Cover Styl'.` },
-          { num: "03", title: "Rendu", desc: `Le rendu sur votre photo en ${DELAI_RENDU}. Vous pouvez quitter la page : la simulation continue.` },
-        ].map((step) => (
-          <li key={step.num} className="h-full rounded-[var(--rayon-md)] border border-trait bg-white p-6">
-            <p className="mb-1 flex items-baseline gap-2">
-              <span className="font-display text-[17px] font-semibold text-encre-2">{step.num}</span>
-              <span className="text-[17px] font-semibold text-encre">{step.title}</span>
-            </p>
-            <p className="text-[14.5px] leading-relaxed text-encre-2">{step.desc}</p>
-          </li>
-        ))}
-      </ol>
-
-      <div className="mt-8">
-        <p className="text-[14px] text-encre-2">Sans e-mail · Sans téléphone · Sans inscription · Gratuit</p>
-        <p className="mt-3 text-[14px] text-encre-2">
-          Préférez parler à un humain ?{" "}
-          <Link href="/contact" className="font-medium text-encre underline underline-offset-4">
-            Demandez un devis personnalisé
-          </Link>
-        </p>
       </div>
     </Section>
   );

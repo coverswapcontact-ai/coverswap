@@ -7,6 +7,7 @@ import { Lien } from "@/components/simulation/Lien";
 import { CHAMP } from "@/app/simulateur/_components/Formulaires";
 import revetements from "@/data/revetements.json";
 import { FAMILLES, estFamille, libelleFamille } from "@/lib/familles-matieres";
+import { referenceDeLAdresse } from "@/lib/matieres-vedettes";
 
 /* ══════════════════════════════════════════════════════════════════
    TYPES
@@ -30,14 +31,16 @@ const REFERENCES = revetements as Reference[];
 const compter = (famille: string) => REFERENCES.filter((r) => r.famille === famille).length;
 const CHOIX_FAMILLES = [{ id: "tout", libelle: "Tout", count: REFERENCES.length }, ...FAMILLES.map((f) => ({ ...f, count: compter(f.id) }))];
 
-/* La famille demandée par l'adresse (`/matieres?famille=bois`, tuiles de l'accueil). Lue sans
-   `useSearchParams` (qui ferait rendre tout le catalogue côté client, sous Suspense) : le rendu
-   serveur montre « Tout », le client applique la famille juste après l'hydratation. */
+/* La famille demandée par l'adresse (`/matieres?famille=bois`) et la référence (`/matieres?ref=K1`,
+   tuiles de l'accueil, mission 16 partie 3 : sa fiche s'ouvre, sa famille filtre la grille). Lues
+   sans `useSearchParams` (qui ferait rendre tout le catalogue côté client, sous Suspense) : le rendu
+   serveur montre « Tout », le client applique l'adresse juste après l'hydratation. */
 const ecouterAdresse = (rappel: () => void) => {
   window.addEventListener("popstate", rappel);
   return () => window.removeEventListener("popstate", rappel);
 };
 const familleDeLAdresse = () => new URLSearchParams(window.location.search).get("famille");
+const refDeLAdresse = () => new URLSearchParams(window.location.search).get("ref");
 const aucuneFamille = () => null;
 
 const ITEMS_PER_PAGE = 48;
@@ -50,10 +53,21 @@ const PASTILLE = "inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-[
 export default function CatalogueClient() {
   const familleAdresse = useSyncExternalStore(ecouterAdresse, familleDeLAdresse, aucuneFamille);
   const [familleChoisie, setFamilleChoisie] = useState<string | null>(null);
-  const activeFamille = familleChoisie ?? (estFamille(familleAdresse) ? familleAdresse : "tout");
+  const refAdresse = useSyncExternalStore(ecouterAdresse, refDeLAdresse, aucuneFamille);
+  const referenceAdresse = referenceDeLAdresse(refAdresse, REFERENCES);
+  const familleDeLaReference = referenceAdresse && estFamille(referenceAdresse.famille) ? referenceAdresse.famille : null;
+  const activeFamille = familleChoisie ?? (estFamille(familleAdresse) ? familleAdresse : (familleDeLaReference ?? "tout"));
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedRef, setSelectedRef] = useState<Reference | null>(null);
+
+  /* ── La référence de l'adresse : sa fiche s'ouvre UNE fois (état ajusté pendant le rendu) ; fermée,
+     elle ne se rouvre pas au retour d'historique (l'adresse garde `?ref=`). ── */
+  const [refOuverte, setRefOuverte] = useState<string | null>(null);
+  if (referenceAdresse && refOuverte !== referenceAdresse.id) {
+    setRefOuverte(referenceAdresse.id);
+    setSelectedRef(referenceAdresse);
+  }
 
   /* ── La fiche : la feuille commune (Échap, geste retour, page verrouillée) ; à la fermeture, le
      focus revient sur la carte qui l'a ouverte. ── */

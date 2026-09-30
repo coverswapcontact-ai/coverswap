@@ -20,7 +20,7 @@ const LIEN = "inline-flex min-h-[44px] items-center text-encre-2 transition-colo
 
 export default function PiedDePage() {
   return (
-    <footer className="border-t border-trait bg-fond-2 px-4 md:px-6">
+    <footer id="pied-de-page" className="border-t border-trait bg-fond-2 px-4 md:px-6">
       <div className="mx-auto w-full max-w-6xl">
         <div className="flex flex-col gap-1 border-b border-trait py-8 sm:flex-row sm:items-center sm:gap-6">
           <p className="texte font-semibold text-encre">Une question ?</p>

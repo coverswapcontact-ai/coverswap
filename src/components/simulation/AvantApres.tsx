@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
+import type { SourcesImage } from "@/lib/images-preparees";
 import { Etiquette } from "./Etiquette";
+import { ImagePreparee } from "./ImagePreparee";
 import { PleinEcran } from "./PleinEcran";
 
 /**
@@ -21,8 +23,35 @@ import { PleinEcran } from "./PleinEcran";
  * après, jamais coupée en bas d'un seul côté). Sans `ratio`, l'image « après »
  * donne sa hauteur naturelle.
  * Les pastilles « Avant » / « Après » sont l'`Etiquette` commune.
+ *
+ * Mission 16 (partie 3), pour l'ouverture de l'accueil (rien ne change sans
+ * ces options) :
+ *  - `preparees` : les sources de chaque image (`ImagePreparee`) — images du
+ *    dépôt en AVIF / WebP / JPEG (`sourcesPhoto`, `width` / `height`
+ *    réservés), ou photos publiées par le CRM en WebP réduit
+ *    (`sourcesPhotoCrm`) ; `<picture>` au lieu d'un `<img>` seul ; `apres` /
+ *    `avant` restent les images du plein écran ;
+ *  - `priorite` : l'image du premier écran (LCP) — « avant » en `eager` +
+ *    `fetchpriority="high"`, « après » en `eager` ;
+ *  - `outilsMobile="comparer"` : sous 768 px, seul « Comparer » reste (l'image
+ *    occupe déjà l'écran) ;
+ *  - `etiquette` : la pastille « Simulation » ou « Réalisation, <ville> » en bas
+ *    à gauche de l'image (les pastilles « Avant » / « Après » sont en haut).
  */
-export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean }) {
+export type ImagesPreparees = { avant?: SourcesImage | null; apres?: SourcesImage | null; /** L'attribut `sizes`. */ tailles: string };
+
+type ProprietesImage = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | "sizes" | "width" | "height"> & { src: string; alt: string; sources?: SourcesImage | null; tailles?: string };
+
+/** Un `<img>` (la photo du visiteur, telle quelle), ou le `<picture>` commun (`ImagePreparee`) quand les sources sont connues. */
+function ImageCadre({ src, sources, tailles, alt, ...props }: ProprietesImage) {
+  if (!sources) {
+    // eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM, pas d'optimisation
+    return <img src={src} alt={alt} {...props} />;
+  }
+  return <ImagePreparee sources={sources} tailles={tailles} alt={alt} {...props} />;
+}
+
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer"; etiquette?: ReactNode }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
@@ -30,6 +59,9 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
   const reserve = ratio ? { aspectRatio: ratio } : undefined;
   // Avec un rapport réservé, l'image « après » remplit le cadre comme l'« avant » ; sinon elle le dimensionne.
   const classesApres = ratio ? "absolute inset-0 h-full w-full object-cover" : "block w-full";
+  const chargementApres = priorite ? ({ loading: "eager" } as const) : ({ loading: "lazy" } as const);
+  const chargementAvant = priorite ? ({ loading: "eager", fetchPriority: "high" } as const) : ({ loading: "lazy" } as const);
+  const pastille = etiquette ? <Etiquette className="pointer-events-none absolute bottom-3 left-3">{etiquette}</Etiquette> : null;
 
   const suivre = useCallback((clientX: number) => {
     const rect = boite.current?.getBoundingClientRect();
@@ -44,7 +76,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           Comparer
         </button>
       ) : null}
-      <button type="button" onClick={() => setPleinEcran(true)} className="min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2">
+      <button type="button" onClick={() => setPleinEcran(true)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile === "comparer" ? " max-md:hidden" : ""}`}>
         Plein écran
       </button>
       <PleinEcran ouvert={pleinEcran} onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
@@ -55,8 +87,8 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
     return (
       <div className={className}>
         <div className="relative overflow-hidden rounded-[var(--rayon-md)] bg-fond-2" style={reserve}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM, pas d'optimisation */}
-          <img src={apres} alt={alt} className={classesApres} loading="lazy" referrerPolicy="no-referrer" />
+          <ImageCadre src={apres} sources={preparees?.apres} tailles={preparees?.tailles} alt={alt} className={classesApres} {...chargementApres} referrerPolicy="no-referrer" />
+          {pastille}
         </div>
         {outils}
       </div>
@@ -74,22 +106,23 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           if (!glisse) suivre(e.clientX);
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
-        <img src={apres} alt={alt} className={classesApres} draggable={false} loading="lazy" referrerPolicy="no-referrer" />
-        {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
-        <img
+        <ImageCadre src={apres} sources={preparees?.apres} tailles={preparees?.tailles} alt={alt} className={classesApres} draggable={false} {...chargementApres} referrerPolicy="no-referrer" />
+        <ImageCadre
           src={avant}
+          sources={preparees?.avant}
+          tailles={preparees?.tailles}
           alt={altAvant}
           className="absolute inset-0 h-full w-full object-cover"
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)`, transition: glisse ? "none" : "clip-path var(--duree-moyenne) var(--ease)" }}
           draggable={false}
-          loading="lazy"
+          {...chargementAvant}
           referrerPolicy="no-referrer"
         />
         <Etiquette ton="sombre" className="pointer-events-none absolute top-3 left-3">
           Avant
         </Etiquette>
         <Etiquette className="pointer-events-none absolute top-3 right-3">Après</Etiquette>
+        {pastille}
         <div className="pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_4px_rgba(0,0,0,0.35)]" style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }} />
         <div
           role="slider"

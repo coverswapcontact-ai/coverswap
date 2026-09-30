@@ -12,7 +12,7 @@ import { envoyerEvenement } from "@/lib/evenements-site";
 import { DELAI_REPONSE } from "@/lib/offre";
 import { adopterParcoursId, obtenirParcoursId } from "@/lib/parcours";
 import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/lib/simulateur/ecrans";
-import { creerEmetteur, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
+import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
 import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, urlEchantillon, urlVignette, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
 import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
 import { getProject } from "@/lib/simulateur/projets";
@@ -66,6 +66,8 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
   const premierEcran = useRef(true);
   const lanceLe = useRef<number>(0);
   const emetteur = useRef<Emetteur>(creerEmetteur((type, meta) => envoyerEvenement(type, meta)));
+  /** Mission 16 (partie 3) : le bouton qui a amené ici (`?depuis=accueil-ouverture`…), repris dans le meta de PIECE_CHOISIE. */
+  const depuisLien = useRef<string | null>(null);
 
   const projet = useMemo(() => getProject(etat.projet), [etat.projet]);
   const piece = useMemo(() => pieceDe(zones, etat.projet), [zones, etat.projet]);
@@ -84,6 +86,7 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
       const reprise = parametres.get("reprise");
       const parcoursDuLien = parametres.get("p");
       const depuisAccueil = parametres.get("suite") === "1";
+      depuisLien.current = lireDepuis(parametres.get("depuis"));
       if (annule) return;
       const base = memoire ?? ETAT_VIDE;
       // Une génération en cours fige la pièce : l'adresse ne la change pas (les choix serviraient encore à « Réessayer »).
@@ -172,7 +175,7 @@ export default function Simulateur({ zones }: { zones: ZonesSimulateur }) {
     setPieceChoisie(true);
     setBandeau(null);
     effacerEchec();
-    emetteur.current.marquer("PIECE_CHOISIE", { projet: id });
+    emetteur.current.marquer("PIECE_CHOISIE", { projet: id, ...(depuisLien.current ? { depuis: depuisLien.current } : {}) });
     setEcran(transition.ecran);
   };
 

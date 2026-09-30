@@ -34,6 +34,15 @@ export function creerEmetteur(envoyer: Envoi, dejaEmises: EtapeEntonnoir[] = [])
   };
 }
 
+/**
+ * Le `?depuis=` d'un lien vers le simulateur (mission 16, partie 3 : `accueil-ouverture`, `accueil-final`…), repris
+ * dans le `meta` de PIECE_CHOISIE pour savoir quel bouton a amené la personne. Minuscules, chiffres et tirets, 40
+ * caractères au plus : tout autre texte est ignoré (rien de ce que l'adresse porte d'autre ne part au CRM).
+ */
+export function lireDepuis(valeur: string | null | undefined): string | null {
+  return typeof valeur === "string" && /^[a-z0-9-]{1,40}$/.test(valeur) ? valeur : null;
+}
+
 /** Une génération relancée (« Réessayer », « Essayer d'autres matières ») recompte une génération et un résultat, pas la pièce ni la photo. */
 export function rouvrirGeneration(emetteur: Emetteur, envoyer: Envoi): Emetteur {
   return creerEmetteur(

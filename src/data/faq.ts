@@ -5,7 +5,9 @@ export type QuestionReponse = { q: string; a: string };
 
 /**
  * Questions fréquentes — vraies réponses, sans promesse invérifiable.
- * Servies sur la page d'accueil et dans le balisage FAQPage.
+ * Servies sur /comment-ca-marche (#faq) et dans le balisage FAQPage de cette
+ * page (`SectionsCommentCaMarche`) ; l'accueil ne les montre plus (mission 16,
+ * partie 3).
  */
 export const FAQ_GENERALE: QuestionReponse[] = [
   {
