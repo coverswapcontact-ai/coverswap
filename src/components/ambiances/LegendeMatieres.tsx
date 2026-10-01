@@ -18,7 +18,7 @@ export function LegendeMatieres({ matieres, lienComposition, className, sansList
   return (
     <div className={`mt-2.5 text-[13.5px] leading-snug text-encre-2${className ? ` ${className}` : ""}`}>
       {sansListe ? null : (
-        <ol className="flex flex-wrap gap-x-1.5 gap-y-1 md:hidden" aria-label="Matières de la photo">
+        <ol className="flex flex-wrap gap-x-1.5 md:hidden" aria-label="Matières de la photo">
           {matieres.map((m, i) => (
             <li key={m.ref + m.surface} className="inline-flex items-baseline">
               {i > 0 ? (
@@ -26,7 +26,7 @@ export function LegendeMatieres({ matieres, lienComposition, className, sansList
                   ·
                 </span>
               ) : null}
-              <a href={lienMatiere(m.ref)} className="underline-offset-2 hover:underline">
+              <a href={lienMatiere(m.ref)} className="inline-flex min-h-[28px] items-center gap-1 underline-offset-2 hover:underline">
                 <span className="font-semibold text-encre">{i + 1}</span> {m.nom} {m.ref}
               </a>
             </li>

@@ -11,7 +11,7 @@ import { LegendeMatieres } from "./LegendeMatieres";
  * `paire` : si l'ambiance a un « avant » calé, le curseur avant / après (les étiquettes côté « après » seulement).
  * L'image porte toujours l'étiquette « Ambiance » : c'est une image générée, jamais un chantier. Composant serveur.
  */
-export function PhotoAmbiance({ ambiance, tailles, ratio, paire = false, priorite = false, className, sansListe = false, sansLienComposition = false }: { ambiance: AmbianceResolue; tailles: string; ratio?: string; paire?: boolean; priorite?: boolean; className?: string; sansListe?: boolean; /** La page Pro : pas de lien vers le simulateur. */ sansLienComposition?: boolean }) {
+export function PhotoAmbiance({ ambiance, tailles, ratio, paire = false, priorite = false, immediat = false, className, sansListe = false, sansLienComposition = false }: { ambiance: AmbianceResolue; tailles: string; ratio?: string; paire?: boolean; priorite?: boolean; /** Une image du premier écran qui n'est pas la première : chargée tout de suite, sans priorité haute. */ immediat?: boolean; className?: string; sansListe?: boolean; /** La page Pro : pas de lien vers le simulateur. */ sansLienComposition?: boolean }) {
   const avant = paire && ambiance.avant ? sourcesPhoto(ambiance.avant) : null;
   const apres = sourcesPhoto(ambiance.image);
   return (
@@ -30,7 +30,7 @@ export function PhotoAmbiance({ ambiance, tailles, ratio, paire = false, priorit
           matieres={ambiance.surfaces}
         />
       ) : (
-        <Photo nom={ambiance.image} alt={ambiance.alt} ratio={ratio} tailles={tailles} priorite={priorite} etiquette="Ambiance" className="rounded-[var(--rayon-md)]" calque={<CalqueMatieres matieres={ambiance.surfaces} />} />
+        <Photo nom={ambiance.image} alt={ambiance.alt} ratio={ratio} tailles={tailles} priorite={priorite} immediat={immediat} etiquette="Ambiance" className="rounded-[var(--rayon-md)]" calque={<CalqueMatieres matieres={ambiance.surfaces} />} />
       )}
       <figcaption>
         <LegendeMatieres matieres={ambiance.surfaces} lienComposition={sansLienComposition ? undefined : ambiance.lienComposition} sansListe={sansListe} />

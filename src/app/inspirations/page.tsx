@@ -72,9 +72,9 @@ export default function PageInspirations() {
       </section>
       <Section large className="pt-6 md:pt-8">
         <ul className="flex flex-col gap-12 md:block md:columns-2 md:gap-6">
-          {liste.map((a) => (
+          {liste.map((a, rang) => (
             <li key={a.id} id={a.id} data-inspiration="" data-piece={a.piece} data-teintes={jetons(a).join(" ")} className="scroll-mt-[80px] md:mb-12 md:break-inside-avoid">
-              <PhotoAmbiance ambiance={a} tailles={TAILLES} sansListe />
+              <PhotoAmbiance ambiance={a} tailles={TAILLES} sansListe priorite={rang === 0} immediat={rang > 0 && rang < 3} />
               <h2 className="mt-4 text-[19px] font-semibold text-encre">{a.titre}</h2>
               <ul className="mt-3 flex flex-col gap-2" aria-label={`Composition : ${a.titre}`}>
                 {a.surfaces.map((s, i) => (
