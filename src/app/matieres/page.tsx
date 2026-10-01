@@ -3,6 +3,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
+import { vueDans } from "@/lib/ambiances";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { MATIERES_PAR_PAGE, choixFamilles, type Matiere } from "@/lib/matieres";
 import { metadonneesPage } from "@/lib/metadonnees";
@@ -14,6 +15,7 @@ import { Matieres } from "./_components/Matieres";
  * partie 1 et `/revetements` (301 ici, `?famille=` conservé). Le serveur rend le titre, l'intro et le premier lot de
  * 30 matières (référencement : noms, références, familles) ; `Matieres` (client) fait le reste — familles,
  * recherche, favoris, « Voir plus », la matière en grand et « Essayer sur ma photo » → `/simulateur?ref=<ref>`.
+ * Mission 19 : la matière en grand dit aussi « Vue dans » (les ambiances de /inspirations où elle apparaît).
  * Textes de `/revetements` repris : sa description (qui porte sa phrase « bois, pierre, béton, métal, couleur, textile,
  * paillettes » ; à l'écran, ce sont les pastilles des familles) et ses mots-clés.
  */
@@ -43,7 +45,7 @@ export default function PageMatieres() {
         </div>
       </section>
       <Section large className="pt-6 md:pt-6">
-        <Matieres premieres={CATALOGUE.slice(0, MATIERES_PAR_PAGE)} familles={choixFamilles(CATALOGUE)} />
+        <Matieres premieres={CATALOGUE.slice(0, MATIERES_PAR_PAGE)} familles={choixFamilles(CATALOGUE)} vueDans={vueDans()} />
       </Section>
     </div>
   );

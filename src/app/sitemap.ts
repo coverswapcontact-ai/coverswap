@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/simulateur`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${baseUrl}/matieres`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/realisations`, lastModified: LAST_BUILD, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/inspirations`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/comment-ca-marche`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/pro`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${baseUrl}/contact`, lastModified: LAST_BUILD, changeFrequency: 'monthly', priority: 0.7 },

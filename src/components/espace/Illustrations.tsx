@@ -174,44 +174,45 @@ export function MursDeFace({ className }: { className?: string }) {
   );
 }
 
-/** Le dessin d'une famille de prestations (cartes de l'onglet Projet, du nouveau projet). */
-export function DessinFamille({ famille, className }: { famille: string; className?: string }) {
-  if (famille === "SDB") return <SalleDeBainDeFace className={className} />;
-  if (famille === "MEUBLES") return <MobilierDeFace className={className} />;
-  if (famille === "PRO") return <ProfessionnelDeFace className={className} />;
-  if (famille === "MURS") return <MursDeFace className={className} />;
-  return <CuisineDeFace className={className} />;
+/**
+ * Mission 19 : les pictogrammes en image (« petites maquettes » détourées, fond transparent, AVIF + WebP en deux
+ * tailles, `scripts/preparer-pictos.mjs`) remplacent les anciens dessins de la famille et des plans de cuisine ;
+ * affichés à 64 px au moins. Les petites icônes d'interface (téléphone, coche, cadenas…) restent au trait, plus bas.
+ */
+export const DOSSIER_PICTOS = "/images/pictos";
+export const PICTOS_FAMILLES: Record<string, string> = { CUISINE: "picto-cuisine", SDB: "picto-salle-de-bain", MEUBLES: "picto-mobilier", PRO: "picto-pro", MURS: "picto-murs" };
+export type FormeCuisine = "une-rangee" | "en-l" | "en-u" | "ilot";
+
+/**
+ * Un pictogramme : `<picture>` AVIF puis WebP (128 px, 256 px en haute densité), décoratif (le texte voisin le nomme).
+ * `enSvg` : le même pictogramme dans un conteneur SVG (`<image>`, WebP 256 px) — pour un bouton qui attend un dessin
+ * vectoriel (les formats de l'estimation du simulateur).
+ */
+export function Picto({ nom, className, enSvg = false }: { nom: string; className?: string; enSvg?: boolean }) {
+  if (enSvg) {
+    return (
+      <svg viewBox="0 0 128 128" className={className} aria-hidden>
+        <image href={`${DOSSIER_PICTOS}/${nom}-256.webp`} width="128" height="128" preserveAspectRatio="xMidYMid meet" />
+      </svg>
+    );
+  }
+  const serie = (ext: string) => `${DOSSIER_PICTOS}/${nom}-128.${ext} 1x, ${DOSSIER_PICTOS}/${nom}-256.${ext} 2x`;
+  return (
+    <picture>
+      <source type="image/avif" srcSet={serie("avif")} />
+      <img src={`${DOSSIER_PICTOS}/${nom}-128.webp`} srcSet={serie("webp")} alt="" aria-hidden width={128} height={128} loading="lazy" decoding="async" className={`object-contain${className ? ` ${className}` : ""}`} />
+    </picture>
+  );
 }
 
-/** Plans vus de dessus, pour estimer la longueur de meubles. */
-export function PlanCuisine({ forme, className }: { forme: "une-rangee" | "en-l" | "en-u" | "ilot"; className?: string }) {
-  const meuble = { fill: MEUBLE, stroke: TRAIT, strokeWidth: 1.4 };
-  return (
-    <svg viewBox="0 0 64 48" className={className} aria-hidden fill="none">
-      <rect x="4" y="4" width="56" height="40" rx="2" stroke="#CFCBC4" strokeWidth="1" strokeDasharray="2 2" />
-      {forme === "une-rangee" ? <rect x="8" y="8" width="48" height="9" rx="1" {...meuble} /> : null}
-      {forme === "en-l" ? (
-        <>
-          <rect x="8" y="8" width="48" height="9" rx="1" {...meuble} />
-          <rect x="8" y="17" width="9" height="22" rx="1" {...meuble} />
-        </>
-      ) : null}
-      {forme === "en-u" ? (
-        <>
-          <rect x="8" y="8" width="48" height="9" rx="1" {...meuble} />
-          <rect x="8" y="17" width="9" height="22" rx="1" {...meuble} />
-          <rect x="47" y="17" width="9" height="22" rx="1" {...meuble} />
-        </>
-      ) : null}
-      {forme === "ilot" ? (
-        <>
-          <rect x="8" y="8" width="48" height="9" rx="1" {...meuble} />
-          <rect x="8" y="17" width="9" height="22" rx="1" {...meuble} />
-          <rect x="26" y="27" width="24" height="10" rx="1" {...meuble} />
-        </>
-      ) : null}
-    </svg>
-  );
+/** Le pictogramme d'une famille de prestations (cartes de l'onglet Projet, du nouveau projet, estimation). */
+export function DessinFamille({ famille, className, enSvg }: { famille: string; className?: string; enSvg?: boolean }) {
+  return <Picto nom={PICTOS_FAMILLES[famille] ?? PICTOS_FAMILLES.CUISINE} className={className} enSvg={enSvg} />;
+}
+
+/** Les plans de cuisine (pour estimer la longueur de meubles) : une rangée, en L, en U, avec îlot. */
+export function PlanCuisine({ forme, className, enSvg }: { forme: FormeCuisine; className?: string; enSvg?: boolean }) {
+  return <Picto nom={`plan-${forme}`} className={className} enSvg={enSvg} />;
 }
 
 /** Le logo CoverSwap : le carré rouge, le « C », le mot. */

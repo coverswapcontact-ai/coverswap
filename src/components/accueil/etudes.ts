@@ -1,3 +1,5 @@
+import type { MatiereCalque } from "@/components/ambiances/CalqueMatieres";
+import { ambianceDeLImage } from "@/lib/ambiances";
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
 import { ALT_PIECES, PHOTOS_PIECES } from "@/lib/images-pieces";
 import { sourcesPhoto, type ManifesteImages, type SourcesImage, type SourcesPhoto, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "@/lib/images-preparees";
@@ -13,8 +15,9 @@ export type { EtudeReelle } from "@/lib/etude-de-cas";
  *  - l'ouverture prend la PREMIÈRE réalisation publiée par le CRM qui a une
  *    photo avant ET une photo après (étiquette « Réalisation, <ville> »), en
  *    WebP réduit par le CRM (`sourcesPhotoCrm` : le LCP n'est pas la photo
- *    entière) ; sinon la simulation du moteur sur l'image d'ambiance de
- *    l'ouverture (étiquette « Simulation », AVIF préparé) ;
+ *    entière) ; sinon la paire d'ambiance de l'ouverture (mission 19 : deux
+ *    images générées et calées, étiquette « Ambiance » — « Simulation » est
+ *    réservé aux rendus du moteur —, AVIF préparé, étiquettes matière) ;
  *  - « Réalisations » montre jusqu'à trois réalisations publiées (avec leur
  *    photo après ; prix et durée publiés, sinon habituels libellés comme tels :
  *    `lib/etude-de-cas`) ; sinon trois études SIMULÉES : la cuisine de
@@ -29,15 +32,21 @@ const APRES_OUVERTURE = "ouverture-cuisine-apres";
 /** Le cadre d'une réalisation publiée à l'ouverture (ses photos n'ont pas de dimensions connues) : celui des images d'ambiance. */
 export const RATIO_REALISATION = "3 / 2";
 
-/** Les textes de l'image de l'ouverture : l'« après » est lu en premier (il vient d'abord dans le document) et seul en plein écran. */
-export const ALT_OUVERTURE = "Cuisine simulée après la pose : façades noir mat, plan de travail effet travertin";
-export const ALT_AVANT_OUVERTURE = "La même cuisine avant la pose";
+/**
+ * Les textes de l'image de l'ouverture : l'« après » est lu en premier (il vient d'abord dans le document) et seul en
+ * plein écran. Mission 19 : tiré de l'ambiance (`data/ambiances`, la scène et chaque matière) ; l'« avant » dit ce
+ * qu'on voit sur la nouvelle image.
+ */
+const AMBIANCE_OUVERTURE = ambianceDeLImage(APRES_OUVERTURE);
+export const ALT_OUVERTURE = AMBIANCE_OUVERTURE?.alt ?? "Cuisine rénovée au film, image d'ambiance";
+export const ALT_AVANT_OUVERTURE = "La même cuisine avant la pose : façades en bois orangé brillant, plan de travail en granit";
 
 /** L'attribut `sizes` de l'image de l'ouverture : le même pour le `<picture>` et pour son préchargement. */
 export const TAILLES_OUVERTURE = "(min-width: 1152px) 672px, (min-width: 768px) 58vw, 100vw";
 
 export type ChoixOuverture = {
-  type: "realisation" | "simulation";
+  /** « ambiance » (mission 19, ex-« simulation ») : la paire générée de l'ouverture, avant la première réalisation publiée. */
+  type: "realisation" | "ambiance";
   avant: string;
   apres: string;
   ratio: string;
@@ -45,6 +54,9 @@ export type ChoixOuverture = {
   alt: string;
   altAvant: string;
   preparees: { avant: SourcesImage; apres: SourcesImage };
+  /** Mission 19 : les étiquettes matière de l'« après » et le lien de sa composition (l'ambiance seulement). */
+  matieres?: MatiereCalque[];
+  lienComposition?: string;
 };
 
 /** Une réalisation avec les deux photos, dans l'ordre du CRM. */
@@ -71,14 +83,15 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
   const apres = sourcesPhoto(APRES_OUVERTURE, manifeste);
   if (!avant || !apres) return null;
   return {
-    type: "simulation",
+    type: "ambiance",
     avant: avant.src,
     apres: apres.src,
     ratio: `${avant.largeur} / ${avant.hauteur}`,
-    etiquette: "Simulation",
+    etiquette: "Ambiance",
     alt: ALT_OUVERTURE,
     altAvant: ALT_AVANT_OUVERTURE,
     preparees: { avant, apres },
+    ...(AMBIANCE_OUVERTURE ? { matieres: AMBIANCE_OUVERTURE.surfaces, lienComposition: AMBIANCE_OUVERTURE.lienComposition } : {}),
   };
 }
 
@@ -132,40 +145,73 @@ export type EtudeSimulee = {
   etiquette: "Simulation" | "Ambiance";
   /** Le texte de l'image, qui se lit seul (lecteur d'écran). */
   alt: string;
+  /** Le texte de l'« avant » d'une paire. */
+  altAvant?: string;
   /** La fourchette d'`offre.ts` (« 1 200 € à 3 500 € », « dès 250 € »). */
   prix: string;
   /** La durée de pose d'`offre.ts` (« une journée »). */
   duree: string;
+  /** Mission 19 : les étiquettes matière de l'« après » et le lien de sa composition (paire d'ambiance). */
+  matieres?: MatiereCalque[];
+  lienComposition?: string;
 };
 
 export type ChoixEtudes = { mode: "reelles"; titre: "Ils l'ont fait"; etudes: EtudeReelle[] } | { mode: "simulees"; titre: "Ce que ça donne"; etudes: EtudeSimulee[] };
 
 export const ETUDES_MAX = 3;
 
-/** Une étude en image d'ambiance (la photo de la carte de pièce, `lib/images-pieces`), étiquetée « Ambiance ». */
+/** Une étude en image d'ambiance (la photo de la carte de pièce, `lib/images-pieces`), étiquetée « Ambiance » : le repli. */
 function etudeAmbiance(id: EtudeSimulee["id"], titre: string, cle: "cuisine" | "sdb" | "meuble"): EtudeSimulee {
   return { id, titre, image: { type: "photo", nom: PHOTOS_PIECES[id] }, etiquette: "Ambiance", alt: ALT_PIECES[id], prix: fourchette(cle), duree: DUREE_POSE_TEXTE };
 }
 
-/** La cuisine simulée : le rendu du moteur sur l'image d'ambiance de l'ouverture (avant / après, « Simulation »), si les deux images sont préparées. */
-export function etudeCuisineSimulee(manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudeSimulee | null {
-  const avant = sourcesPhoto(AVANT_OUVERTURE, manifeste);
-  const apres = sourcesPhoto(APRES_OUVERTURE, manifeste);
-  if (!avant || !apres) return null;
-  return { id: "cuisine", titre: "Cuisine", image: { type: "avant-apres", avant: avant.src, apres: apres.src, preparees: { avant, apres } }, etiquette: "Simulation", alt: "Cuisine simulée après la pose", prix: fourchette("cuisine"), duree: DUREE_POSE_TEXTE };
+/**
+ * Mission 19 : une étude en PAIRE d'ambiance (deux images générées et calées, `data/ambiances`) : l'« après » (nom du
+ * manifeste) et son « avant », étiquetée « Ambiance », avec ses étiquettes matière ; null si l'une des deux images
+ * n'est pas préparée.
+ */
+function etudePaire(id: EtudeSimulee["id"], titre: string, cle: "cuisine" | "sdb" | "meuble", imageApres: string, manifeste: ManifesteImages): EtudeSimulee | null {
+  const ambiance = ambianceDeLImage(imageApres);
+  const avant = ambiance?.avant ? sourcesPhoto(ambiance.avant, manifeste) : null;
+  const apres = sourcesPhoto(imageApres, manifeste);
+  if (!ambiance || !avant || !apres) return null;
+  return {
+    id,
+    titre,
+    image: { type: "avant-apres", avant: avant.src, apres: apres.src, preparees: { avant, apres } },
+    etiquette: "Ambiance",
+    alt: ambiance.alt,
+    altAvant: `La même pièce avant la pose, avec ses matières d'origine`,
+    prix: fourchette(cle),
+    duree: DUREE_POSE_TEXTE,
+    matieres: ambiance.surfaces,
+    lienComposition: ambiance.lienComposition,
+  };
 }
 
-/** Les études de cas de l'accueil : les réalisations publiées si le CRM en a, sinon les trois études simulées. */
+/** La cuisine de l'ouverture (avant / après) : depuis la mission 19, deux images d'ambiance générées et calées (« Ambiance »), si elles sont préparées. */
+export function etudeCuisineSimulee(manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudeSimulee | null {
+  const etude = etudePaire("cuisine", "Cuisine", "cuisine", APRES_OUVERTURE, manifeste);
+  return etude ? { ...etude, altAvant: ALT_AVANT_OUVERTURE } : null;
+}
+
+/** Les images « après » des paires d'étude : la cuisine de l'ouverture, la salle de bain, le meuble TV, le dressing (Prestations › Meubles). */
+export const PAIRES_ETUDES = { "salle-de-bain": "etude-salle-de-bain-apres", meubles: "etude-meubles-apres", dressing: "meubles-armoire" } as const;
+
+/** Les études de cas de l'accueil : les réalisations publiées si le CRM en a, sinon trois paires d'ambiance (mission 19). */
 export function choisirEtudes(realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): ChoixEtudes {
   const publiees = realisations.filter((p): p is Publication & { photoApres: string } => p.type === "REALISATION" && !!p.photoApres).slice(0, ETUDES_MAX);
   if (publiees.length > 0) return { mode: "reelles", titre: "Ils l'ont fait", etudes: publiees.map(versEtudeReelle) };
 
-  // La cuisine : la simulation du moteur de l'ouverture (avant / après) ; à défaut, son image d'ambiance.
-  const cuisine = etudeCuisineSimulee(manifeste) ?? etudeAmbiance("cuisine", "Cuisine", "cuisine");
+  // Trois paires avant / après d'ambiance ; à défaut (image non préparée), l'image d'ambiance de la pièce.
   return {
     mode: "simulees",
     titre: "Ce que ça donne",
-    etudes: [cuisine, etudeAmbiance("salle-de-bain", "Salle de bain", "sdb"), etudeAmbiance("meubles", "Meubles", "meuble")],
+    etudes: [
+      etudeCuisineSimulee(manifeste) ?? etudeAmbiance("cuisine", "Cuisine", "cuisine"),
+      etudePaire("salle-de-bain", "Salle de bain", "sdb", PAIRES_ETUDES["salle-de-bain"], manifeste) ?? etudeAmbiance("salle-de-bain", "Salle de bain", "sdb"),
+      etudePaire("meubles", "Meubles", "meuble", PAIRES_ETUDES.meubles, manifeste) ?? etudeAmbiance("meubles", "Meubles", "meuble"),
+    ],
   };
 }
 
@@ -175,13 +221,19 @@ export type EtudePiece = { mode: "reelle"; etude: EtudeReelle } | { mode: "simul
 
 /**
  * L'étude de cas de la page d'une pièce (`/prestations/<slug>`) : la PREMIÈRE réalisation publiée par le CRM pour ce
- * type de projet (avec sa photo après) ; sinon, pour la cuisine, la simulation du moteur (« Simulation ») ; sinon
- * rien — l'image d'ambiance de la pièce est déjà l'ouverture de la page, elle n'est pas montrée deux fois
- * (emplacement en attente d'une vraie réalisation).
+ * type de projet (avec sa photo après) ; sinon, depuis la mission 19, la paire d'ambiance de la pièce — la cuisine de
+ * l'ouverture, la salle de bain, le dressing pour les meubles (l'image verticale) ; sinon rien.
  */
 export function etudeDeLaPiece(typeProjet: string, pieceId: string | null, realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudePiece | null {
   const reelle = realisations.find((p) => p.type === "REALISATION" && p.typeProjet === typeProjet && !!p.photoApres);
   if (reelle) return { mode: "reelle", etude: versEtudeReelle(reelle) };
-  const simulee = pieceId === "cuisine" ? etudeCuisineSimulee(manifeste) : null;
+  const simulee =
+    pieceId === "cuisine"
+      ? etudeCuisineSimulee(manifeste)
+      : pieceId === "salle-de-bain"
+        ? etudePaire("salle-de-bain", "Salle de bain", "sdb", PAIRES_ETUDES["salle-de-bain"], manifeste)
+        : pieceId === "meubles"
+          ? etudePaire("meubles", "Dressing", "meuble", PAIRES_ETUDES.dressing, manifeste)
+          : null;
   return simulee ? { mode: "simulee", etude: simulee } : null;
 }

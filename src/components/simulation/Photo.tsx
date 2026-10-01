@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { sourcesPhoto } from "@/lib/images-preparees";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
@@ -29,6 +30,8 @@ type ProprietesCommunes = {
   tailles?: string;
   className?: string;
   etiquette?: "Ambiance" | "Simulation";
+  /** Mission 19 : un calque posé sur l'image, dans son cadre (les étiquettes matière, `ambiances/CalqueMatieres`). */
+  calque?: ReactNode;
   /** Cadre en `span` (bloc) au lieu d'un `div` : pour une photo posée dans un bouton ou un lien, qui n'admettent pas de `div`. */
   enLigne?: boolean;
 };
@@ -45,7 +48,7 @@ const RATIO_DE_REPLI = "4 / 3";
 
 const TAILLES_PAR_DEFAUT = "(min-width: 1024px) 50vw, 100vw";
 
-export function Photo({ nom, src, largeur, hauteur, alt, ratio, priorite = false, immediat = false, tailles = TAILLES_PAR_DEFAUT, className, etiquette, enLigne = false }: ProprietesPhoto) {
+export function Photo({ nom, src, largeur, hauteur, alt, ratio, priorite = false, immediat = false, tailles = TAILLES_PAR_DEFAUT, className, etiquette, enLigne = false, calque }: ProprietesPhoto) {
   const sources = nom ? sourcesPhoto(nom) : null;
   const l = sources?.largeur ?? largeur;
   const h = sources?.hauteur ?? hauteur;
@@ -65,6 +68,7 @@ export function Photo({ nom, src, largeur, hauteur, alt, ratio, priorite = false
       ) : (
         <span {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })} className="absolute inset-0" />
       )}
+      {calque}
       {/* Image décorative (`alt=""`) : son étiquette non plus n'est pas lue, sinon il resterait un mot isolé (« Ambiance »). */}
       {etiquette ? (
         <Etiquette className="absolute top-3 left-3" muette={!alt}>

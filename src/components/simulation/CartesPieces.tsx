@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CuisineDeFace, MobilierDeFace, MursDeFace, ProfessionnelDeFace, SalleDeBainDeFace } from "@/components/espace/Illustrations";
 import { photoDePiece, type PieceId } from "@/lib/images-pieces";
 import { imagePreparee } from "@/lib/images-preparees";
+import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
 import { Etiquette } from "./Etiquette";
 import { Photo } from "./Photo";
 
@@ -25,6 +26,9 @@ import { Photo } from "./Photo";
  * simulateur : 3, le premier rang sur ordinateur, le premier et un peu du
  * second sur téléphone) ; les autres, et l'accueil (module sous l'ouverture),
  * en `lazy`.
+ *
+ * Mission 19 : sur une photo, les pastilles des vraies matières de l'ambiance (`ambiances/PastillesMatieres`), en bas à
+ * droite ; leurs noms au survol ou à l'appui.
  *
  * Mission 16 (partie 6) : sans état, donc sans « use client » — rendu serveur quand la page est serveur (les cartes
  * en liens de `/realisations` n'envoient aucun JavaScript), rendu dans le paquet client quand un composant client
@@ -68,6 +72,7 @@ export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce",
                 <span aria-hidden="true">
                   <Etiquette className="absolute bottom-2 left-2">Ambiance</Etiquette>
                 </span>
+                <PastillesMatieres image={photo} />
               </span>
             ) : (
               <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>

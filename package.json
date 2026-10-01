@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "images": "node scripts/preparer-images.mjs",
+    "pictos": "node scripts/preparer-pictos.mjs",
     "lighthouse": "lhci autorun --config=lighthouserc.json",
     "captures": "node scripts/captures.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\""

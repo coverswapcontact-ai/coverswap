@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
 import type { SourcesImage } from "@/lib/images-preparees";
+import { CalqueMatieres, type MatiereCalque } from "@/components/ambiances/CalqueMatieres";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
 import { PleinEcran } from "./PleinEcran";
@@ -37,6 +38,9 @@ import { PleinEcran } from "./PleinEcran";
  *    occupe déjà l'écran) ;
  *  - `etiquette` : la pastille « Simulation » ou « Réalisation, <ville> » en bas
  *    à gauche de l'image (les pastilles « Avant » / « Après » sont en haut).
+ *
+ * Mission 19 : `matieres` (les étiquettes matière d'une ambiance, `ambiances/CalqueMatieres`) sont posées sur l'image ;
+ * elles décrivent l'« après » : une étiquette ne se montre que si son point est à droite du curseur.
  */
 export type ImagesPreparees = { avant?: SourcesImage | null; apres?: SourcesImage | null; /** L'attribut `sizes`. */ tailles: string };
 
@@ -51,7 +55,7 @@ function ImageCadre({ src, sources, tailles, alt, ...props }: ProprietesImage) {
   return <ImagePreparee sources={sources} tailles={tailles} alt={alt} {...props} />;
 }
 
-export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer"; etiquette?: ReactNode }) {
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
@@ -89,6 +93,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
       <div className={className}>
         <div className="relative overflow-hidden rounded-[var(--rayon-md)] bg-fond-2" style={reserve}>
           <ImageCadre src={apres} sources={preparees?.apres} tailles={preparees?.tailles} alt={alt} className={classesApres} {...chargementApres} referrerPolicy="no-referrer" />
+          {matieres ? <CalqueMatieres matieres={matieres} /> : null}
           {pastille}
         </div>
         {outils}
@@ -119,6 +124,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           {...chargementAvant}
           referrerPolicy="no-referrer"
         />
+        {matieres ? <CalqueMatieres matieres={matieres} seuilX={position} /> : null}
         <Etiquette ton="sombre" className="pointer-events-none absolute top-3 left-3">
           Avant
         </Etiquette>

@@ -26,14 +26,15 @@ export const PHOTOS_PIECES: Readonly<Record<PieceId, string>> = {
 
 /**
  * Le texte de chaque image d'ambiance de pièce, quand elle est une image de contenu (études simulées de l'accueil,
- * ouverture des pages par pièce, mission 16, parties 3 et 5) : il dit que c'est une image d'ambiance.
+ * ouverture des pages par pièce, mission 16, parties 3 et 5) : il dit que c'est une image d'ambiance. Mission 19 : le
+ * texte complet (chaque matière) vient de `data/ambiances` ; ceux-ci, ce que montre l'image, servent de repli.
  */
 export const ALT_PIECES: Readonly<Record<PieceId, string>> = {
-  cuisine: "Cuisine rénovée au film, image d'ambiance",
-  "salle-de-bain": "Salle de bain rénovée au film, image d'ambiance",
-  meubles: "Meubles rénovés au film, image d'ambiance",
-  "mur-plafond": "Mur habillé au film, image d'ambiance",
-  professionnel: "Local professionnel rénové au film, image d'ambiance",
+  cuisine: "Cuisine ouverte, îlot vert de gris, colonnes grège, plan et joue en chêne, image d'ambiance",
+  "salle-de-bain": "Salle de bain, meuble vasque suspendu en chêne, plan effet pierre beige, image d'ambiance",
+  meubles: "Buffet bas aux portes bleu nuit, dessus en chêne clair, image d'ambiance",
+  "mur-plafond": "Chambre, mur de tête de lit effet pierre grège, image d'ambiance",
+  professionnel: "Entrée d'un local, comptoir en noyer au dessus noir, image d'ambiance",
 };
 
 /** Le nom de la photo d'une pièce, s'il y en a une dans `photos` (un identifiant hérité d'`Object` n'en a pas). */

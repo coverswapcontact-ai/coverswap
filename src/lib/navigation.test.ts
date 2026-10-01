@@ -22,9 +22,10 @@ describe("navigation du site", () => {
     );
   });
 
-  test("le pied : le contact, l'espace client, le menu", () => {
+  test("le pied : le contact, l'espace client, le menu, les inspirations (mission 19, au pied seulement)", () => {
     const hrefs = LIENS_PIED.map((e) => e.href);
-    for (const attendu of [LIEN_CONTACT.href, LIEN_ESPACE_CLIENT.href, ...ENTREES_MENU.map((e) => e.href)]) assert.ok(hrefs.includes(attendu), attendu);
+    for (const attendu of [LIEN_CONTACT.href, LIEN_ESPACE_CLIENT.href, ...ENTREES_MENU.map((e) => e.href), "/inspirations"]) assert.ok(hrefs.includes(attendu), attendu);
+    assert.ok(!ENTREES_MENU.some((e) => e.href === "/inspirations"), "le menu garde ses quatre entrées");
   });
 
   test("en-tête, menu du téléphone et pied n'écrivent aucune adresse du menu en dur", () => {

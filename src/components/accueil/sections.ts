@@ -2,11 +2,11 @@ import { DUREE_POSE_TEXTE, PRIX_PLAGE } from "@/lib/offre";
 
 /**
  * L'accueil (mission 16, partie 3) : huit sections, dans cet ordre, rien
- * d'autre (énoncé § 3). `page.tsx` rend EXACTEMENT cette liste : une section
+ * d'autre (énoncé § 3) ; mission 19 : neuf, avec la rangée « Inspirations » après les réalisations. `page.tsx` rend EXACTEMENT cette liste : une section
  * ajoutée ailleurs ne compile pas (`Record<IdSectionAccueil, …>`), une section
  * retirée d'ici disparaît de la page. Module pur (testé sans React).
  */
-export type IdSectionAccueil = "ouverture" | "essayer" | "faits" | "matieres" | "realisations" | "comment" | "confiance" | "dernier-appel";
+export type IdSectionAccueil = "ouverture" | "essayer" | "faits" | "matieres" | "realisations" | "inspirations" | "comment" | "confiance" | "dernier-appel";
 
 export const SECTIONS_ACCUEIL: readonly { id: IdSectionAccueil; nom: string }[] = [
   { id: "ouverture", nom: "Ouverture" },
@@ -14,6 +14,7 @@ export const SECTIONS_ACCUEIL: readonly { id: IdSectionAccueil; nom: string }[] 
   { id: "faits", nom: "Trois faits" },
   { id: "matieres", nom: "Matières" },
   { id: "realisations", nom: "Réalisations" },
+  { id: "inspirations", nom: "Inspirations" },
   { id: "comment", nom: "Comment ça marche" },
   { id: "confiance", nom: "Confiance" },
   { id: "dernier-appel", nom: "Dernier appel" },

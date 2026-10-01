@@ -44,13 +44,13 @@ function publication(p: Partial<Publication> & { id: string }): Publication {
   return { type: "REALISATION", titre: `Chantier ${p.id}`, texte: null, ville: null, typeProjet: "CUISINE", note: null, auteur: null, photoAvant: null, photoApres: null, publieLe: "2026-09-01T00:00:00.000Z", ...p };
 }
 
-describe("les huit sections, dans l'ordre", () => {
-  test("sectionsAccueil() rend 8 entrées dans l'ordre de l'énoncé", () => {
+describe("les neuf sections, dans l'ordre", () => {
+  test("sectionsAccueil() rend 9 entrées dans l'ordre de l'énoncé (mission 19 : « Inspirations » après les réalisations)", () => {
     assert.deepEqual(
       sectionsAccueil().map((s) => s.id),
-      ["ouverture", "essayer", "faits", "matieres", "realisations", "comment", "confiance", "dernier-appel"]
+      ["ouverture", "essayer", "faits", "matieres", "realisations", "inspirations", "comment", "confiance", "dernier-appel"]
     );
-    assert.equal(sectionsAccueil().length, 8);
+    assert.equal(sectionsAccueil().length, 9);
   });
 
   test("la page rend cette liste et rien d'autre : plus de FAQ, de tarifs, de zones, de prestations ni de catalogue", () => {
@@ -97,10 +97,12 @@ describe("les huit sections, dans l'ordre", () => {
 });
 
 describe("1. Ouverture", () => {
-  test("sans réalisation publiée : la simulation du moteur, étiquetée, en AVIF prioritaire", () => {
+  test("sans réalisation publiée : la paire d'ambiance, étiquetée « Ambiance » (mission 19), en AVIF prioritaire, ses matières côté « après »", () => {
     const choix = choisirOuverture([]);
-    assert.ok(choix && choix.type === "simulation");
-    assert.equal(choix.etiquette, "Simulation");
+    assert.ok(choix && choix.type === "ambiance");
+    assert.equal(choix.etiquette, "Ambiance", "« Simulation » est réservé aux rendus du moteur");
+    assert.deepEqual(choix.matieres?.map((m) => m.ref), ["RM20", "I14", "NE31"]);
+    assert.equal(choix.lienComposition, "/simulateur?projet=cuisine&ref=meubles-bas:RM20,meubles-hauts:I14,plan-de-travail:NE31");
     assert.equal(choix.ratio, "1536 / 1024");
     const html = rendre(createElement(Ouverture, { choix }));
     assert.match(html, /<h1 id="titre-accueil" class="titre-1[^"]*">Votre cuisine, transformée en une journée\.<\/h1>/);
@@ -113,7 +115,9 @@ describe("1. Ouverture", () => {
     assert.equal(compter(html, 'fetchPriority="high"'), 2, "les deux images de l'ouverture, et elles seules");
     assert.match(html, new RegExp(`<img src="/images/prep/ouverture-cuisine-avant-960\\.jpg\\?v=${v}"[^>]*fetchPriority="high"`));
     assert.ok(!/loading="lazy"/.test(html), "rien de différé au premier écran");
-    assert.match(html, />Simulation<\/span>/);
+    assert.match(html, />Ambiance<\/span>/);
+    assert.ok(!html.includes(">Simulation<"));
+    assert.ok(html.includes("Sage Green · RM20") && html.includes("Essayer cette composition chez moi"));
     assert.match(html, /max-md:hidden[^"]*">Plein écran/, "sur téléphone, seul « Comparer »");
     assert.equal(boutons(html, "principal"), 1);
     assert.equal(boutons(html, "secondaire"), 0, "rien d'autre qu'un bouton ici");
@@ -123,8 +127,10 @@ describe("1. Ouverture", () => {
     assert.ok(!html.includes("100vh"), "jamais 100vh");
     assert.match(html, /100svh/);
     // L'« après » vient d'abord dans le document (et seul en plein écran) : son texte se lit seul.
-    assert.ok(html.indexOf(`alt="${ALT_OUVERTURE}"`) > 0 && html.indexOf(`alt="${ALT_OUVERTURE}"`) < html.indexOf(`alt="${ALT_AVANT_OUVERTURE}"`));
-    assert.ok(!/^La même/.test(ALT_OUVERTURE) && /^Cuisine simulée après la pose/.test(ALT_OUVERTURE));
+    const altApres = `alt="${ALT_OUVERTURE.replace(/'/g, "&#x27;")}"`;
+    assert.ok(html.indexOf(altApres) > 0 && html.indexOf(altApres) < html.indexOf(`alt="${ALT_AVANT_OUVERTURE}"`));
+    assert.ok(!/^La même/.test(ALT_OUVERTURE) && /^Cuisine en U/.test(ALT_OUVERTURE), ALT_OUVERTURE);
+    assert.ok(ALT_OUVERTURE.includes("Sage Green RM20") && ALT_OUVERTURE.endsWith("Image d'ambiance aux teintes du catalogue."), ALT_OUVERTURE);
   });
 
   test("l'image « avant » pèse 80 Ko au plus en AVIF (le LCP)", () => {
@@ -143,7 +149,7 @@ describe("1. Ouverture", () => {
     assert.equal(choix.apres, complete.photoApres);
     assert.deepEqual(choix.preparees, { avant: sourcesPhotoCrm(complete.photoAvant!), apres: sourcesPhotoCrm(complete.photoApres!) });
     assert.equal(choisirOuverture([{ ...complete, ville: null }])?.etiquette, "Réalisation");
-    assert.equal(choisirOuverture([{ ...complete, type: "AVIS" }])?.type, "simulation", "un avis n'est pas une réalisation");
+    assert.equal(choisirOuverture([{ ...complete, type: "AVIS" }])?.type, "ambiance", "un avis n'est pas une réalisation");
     const html = rendre(createElement(Ouverture, { choix }));
     assert.match(html, />Réalisation, Lattes<\/span>/);
     assert.ok(!html.includes(">Simulation<"));
@@ -234,32 +240,34 @@ describe("4. Matières", () => {
 });
 
 describe("5. Réalisations", () => {
-  test("sans réalisation publiée : trois études SIMULÉES, étiquetées, prix d'offre.ts, jamais une ville", () => {
+  test("sans réalisation publiée : trois paires avant / après d'ambiance (mission 19), étiquetées, avec leurs matières, prix d'offre.ts, jamais une ville", () => {
     const choix = choisirEtudes([]);
     assert.equal(choix.mode, "simulees");
     assert.equal(choix.titre, "Ce que ça donne");
     assert.equal(choix.etudes.length, 3);
     if (choix.mode !== "simulees") return;
     assert.deepEqual(choix.etudes.map((e) => e.id), ["cuisine", "salle-de-bain", "meubles"]);
-    assert.deepEqual(choix.etudes.map((e) => e.etiquette), ["Simulation", "Ambiance", "Ambiance"], "le rendu du moteur est une simulation ; une image générée, une ambiance");
+    assert.deepEqual(choix.etudes.map((e) => e.etiquette), ["Ambiance", "Ambiance", "Ambiance"], "des images générées : des ambiances (mission 19 : la cuisine de l'ouverture aussi)");
     assert.deepEqual(choix.etudes.map((e) => e.prix), [fourchette("cuisine"), fourchette("sdb"), fourchette("meuble")]);
     assert.equal(fourchette("cuisine"), `${FOURCHETTES.cuisine.min.toLocaleString("fr-FR")} € à ${FOURCHETTES.cuisine.max.toLocaleString("fr-FR")} €`);
     assert.ok(choix.etudes.every((e) => e.duree === DUREE_POSE_TEXTE));
-    assert.equal(choix.etudes[0].image.type, "avant-apres");
-    assert.deepEqual(choix.etudes.slice(1).map((e) => (e.image.type === "photo" ? e.image.nom : null)), ["piece-salle-de-bain", "piece-meubles"]);
+    assert.deepEqual(choix.etudes.map((e) => (e.image.type === "avant-apres" ? e.image.apres.split("?")[0] : null)), ["/images/prep/ouverture-cuisine-apres-960.jpg", "/images/prep/etude-salle-de-bain-apres-960.jpg", "/images/prep/etude-meubles-apres-960.jpg"]);
+    assert.deepEqual(choix.etudes.map((e) => e.matieres?.map((m) => m.ref)), [["RM20", "I14", "NE31"], ["K4", "NE31"], ["NH12", "AA17"]]);
     for (const e of choix.etudes) assert.ok(!("ville" in e));
 
     const html = rendre(createElement(RealisationsAccueil, { choix }));
     assert.equal(compter(html, "<article"), 3);
-    assert.equal(compter(html, ">Simulation</span>"), 1);
-    assert.equal(compter(html, ">Ambiance</span>"), 2);
+    assert.equal(compter(html, ">Simulation</span>"), 0);
+    assert.equal(compter(html, ">Ambiance</span>"), 3);
     assert.ok(!html.includes('href="/realisations"'), "pas de bouton vers /realisations tant qu'elle n'a rien à montrer");
     assert.equal(boutons(html, "principal"), 0);
     assert.equal(boutons(html, "secondaire"), 0);
     assert.ok(!html.includes('fetchPriority="high"'), "une seule image prioritaire par page : l'ouverture");
     // Les images sont le contenu de la section : chacune a un texte, et aucune étiquette n'est cachée.
-    assert.ok(!html.includes('alt=""'));
-    assert.ok(html.includes("alt=\"Salle de bain rénovée au film, image d&#x27;ambiance\"") && html.includes("alt=\"Cuisine simulée après la pose\""));
+    // (Les vignettes des étiquettes matière sont décoratives : le texte de l'étiquette les nomme.)
+    assert.ok(!/<img (?![^>]*api\/site\/echantillons)[^>]*alt=""/.test(html));
+    for (const e of choix.etudes) assert.ok(html.includes(`alt="${e.alt.replace(/'/g, "&#x27;")}"`), e.id);
+    assert.ok(html.includes("Sage Green · RM20") && html.includes("Khaki · K4") && html.includes("Terracotta Stucco · NH12"));
     assert.ok(!html.includes("aria-hidden=\"true\" class=\"inline-flex"));
   });
 

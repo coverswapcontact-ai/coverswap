@@ -1,3 +1,4 @@
+import { LegendeMatieres } from "@/components/ambiances/LegendeMatieres";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
 import { ANCRES_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, lienSimulerCuisine } from "./sections";
@@ -15,7 +16,10 @@ import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
  * L'image « avant » est le LCP (`fetchpriority="high"`, `srcset` + `sizes` :
  * AVIF préparé pour la simulation, WebP réduit par le CRM pour une
  * réalisation). Ce que montre l'image est décidé par `choisirOuverture`
- * (`etudes.ts`) : une réalisation publiée, sinon la simulation étiquetée.
+ * (`etudes.ts`) : une réalisation publiée, sinon la paire d'ambiance étiquetée.
+ * Mission 19 : l'ambiance porte ses étiquettes matière, côté « après »
+ * seulement ; sa légende vient sous l'image (ordinateur) ou après le bouton
+ * (téléphone : le premier écran 390 × 660 garde image, titre et bouton).
  * Composant serveur (seul le curseur est client). Mission 16 (partie 6) : la
  * page d'accueil précharge l'« avant » (`prechargementOuverture`, même
  * `srcset`, mêmes `sizes`) ; ce composant, lui, ne précharge rien.
@@ -55,7 +59,14 @@ export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
               priorite
               outilsMobile="comparer"
               etiquette={choix.etiquette}
+              matieres={choix.matieres}
             />
+          </div>
+        ) : null}
+        {/* La légende des matières : sous l'image sur ordinateur ; sur téléphone, après le bouton (le premier écran garde image, titre et bouton). */}
+        {choix?.matieres && choix.lienComposition ? (
+          <div className="w-full max-md:order-last md:col-start-2 md:-mt-4 md:ml-auto" style={{ maxWidth: largeurMax(choix.ratio) }}>
+            <LegendeMatieres matieres={choix.matieres} lienComposition={choix.lienComposition} />
           </div>
         ) : null}
       </div>

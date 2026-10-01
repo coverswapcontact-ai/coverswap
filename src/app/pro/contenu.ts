@@ -12,10 +12,13 @@ export const TITRE_PRO = "Vos espaces professionnels, rénovés sans fermer.";
 export const LIGNE_PRO = "Comptoirs, mobilier, portes et murs, recouverts hors heures d'ouverture.";
 
 export const REFERENCES_PRO = [
-  { nom: "pro-hotel", titre: "Hôtel", ligne: "Chambres et têtes de lit.", alt: "Chambre d'hôtel, tête de lit et placards effet chêne clair, image d'ambiance" },
-  { nom: "pro-restaurant", titre: "Restaurant", ligne: "Bar et salle.", alt: "Salle de restaurant, bar effet noyer au plateau effet pierre, image d'ambiance" },
-  { nom: "pro-commerce", titre: "Commerce", ligne: "Mobilier et comptoir.", alt: "Boutique, comptoir et mobilier blanc mat et chêne clair, image d'ambiance" },
+  { nom: "pro-hotel", titre: "Hôtel", ligne: "Chambres, têtes de lit et placards." },
+  { nom: "pro-commerce", titre: "Commerce", ligne: "Comptoir et mobilier." },
+  { nom: "pro-bureaux", titre: "Bureaux", ligne: "Rangements et salles de réunion." },
 ] as const;
+
+/** Mission 19 : la paire avant / après du restaurant (l'« après » ; son « avant » est dans `data/ambiances`). */
+export const PAIRE_PRO = { nom: "pro-restaurant", titre: "Un bar, avant et après", ligne: "Le même bar en pin verni des années 2000, puis habillé de noir mat, de pierre et de noyer." } as const;
 
 export const ARGUMENTS_PRO = [
   { titre: "Sans fermeture", texte: "De nuit ou hors service." },

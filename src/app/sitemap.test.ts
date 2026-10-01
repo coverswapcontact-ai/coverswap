@@ -33,6 +33,7 @@ describe("sitemap.xml", () => {
       "/simulateur",
       "/matieres",
       "/realisations",
+      "/inspirations",
       "/comment-ca-marche",
       "/pro",
       "/contact",

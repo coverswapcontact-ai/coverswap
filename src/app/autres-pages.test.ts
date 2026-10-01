@@ -68,7 +68,7 @@ describe("/realisations", () => {
     assert.match(html, /<h1 class="titre-1 max-w-3xl text-encre">Ce que ça donne<\/h1>/);
     assert.equal(compter(html, "<h1"), 1);
     assert.ok(html.includes("Les premières réalisations arrivent"));
-    for (const etiquette of ["Simulation", "Ambiance"]) assert.ok(html.includes(`>${etiquette}</span>`), etiquette);
+    assert.ok(html.includes(">Ambiance</span>") && !html.includes(">Simulation</span>"), "mission 19 : des images générées, toutes « Ambiance »");
     assert.ok(html.includes(`${fourchette("cuisine")} fourni et posé`));
     assert.deepEqual(boutons(html, "principal"), [["/simulateur", "Simuler ma pièce"]]);
     assert.ok(!/Lattes|Réalisation, /.test(html), "jamais une ville, jamais « Réalisation » sur une simulation");
@@ -154,14 +154,17 @@ describe("pages par pièce", () => {
     assert.ok(!html.includes("Une réalisation"), "un chantier « AUTRE » n'est pas une étude de vitrages");
   });
 
-  test("l'étude de cas : la réalisation publiée de la pièce, sinon la simulation (cuisine), sinon rien", async () => {
+  test("l'étude de cas : la réalisation publiée de la pièce, sinon sa paire d'ambiance (mission 19 : cuisine, salle de bain, dressing), sinon rien", async () => {
     const cuisine = publication({ id: "c1" }) as Publication;
     const sdb = publication({ id: "s1", typeProjet: "SDB" }) as Publication;
     assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [sdb, cuisine])?.mode, "reelle");
     assert.equal(etudeDeLaPiece("SDB", "salle-de-bain", [sdb, cuisine])?.mode, "reelle");
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [sdb])?.mode, "simulee", "la simulation du moteur");
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [], {}), null, "sans les images de la simulation : rien");
-    assert.equal(etudeDeLaPiece("SDB", "salle-de-bain", [cuisine]), null, "l'ambiance de l'ouverture n'est pas montrée deux fois");
+    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [sdb])?.mode, "simulee", "la paire d'ambiance de l'ouverture");
+    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [], {}), null, "sans les images de la paire : rien");
+    assert.equal(etudeDeLaPiece("SDB", "salle-de-bain", [cuisine])?.mode, "simulee", "la paire de la salle de bain");
+    const dressing = etudeDeLaPiece("MEUBLES", "meubles", []);
+    assert.ok(dressing?.mode === "simulee" && dressing.etude.image.type === "avant-apres" && dressing.etude.image.apres.includes("meubles-armoire"), "Prestations › Meubles : la paire du dressing");
+    assert.equal(etudeDeLaPiece("AUTRE", null, []), null);
     assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [publication({ id: "sans", photoApres: null }) as Publication])?.mode, "simulee", "une réalisation sans photo après n'est pas une étude");
 
     publications = [cuisine];
@@ -169,9 +172,11 @@ describe("pages par pièce", () => {
     assert.ok(reelle.includes("Une réalisation") && reelle.includes("/api/site/photos/c1/apres?l=960 960w"));
     publications = [];
     const simulee = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "cuisine" }) });
-    assert.ok(simulee.includes("Ce que ça donne") && simulee.includes(">Simulation</span>"));
+    assert.ok(simulee.includes("Ce que ça donne") && simulee.includes(">Ambiance</span>"));
     const salle = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "salle-de-bain" }) });
-    assert.ok(!salle.includes("Ce que ça donne") && !salle.includes("Une réalisation"));
+    assert.ok(salle.includes("Ce que ça donne") && salle.includes("Khaki · K4"), "la paire de la salle de bain, étiquetée");
+    const meubles = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "meubles" }) });
+    assert.ok(meubles.includes("meubles-dressing-avant") && meubles.includes("Pastel Olive Green · RM30"), "Prestations › Meubles : le dressing avant / après, étiqueté");
   });
 
   test("« professionnel » n'est plus une page par pièce ; la liste des pièces reste celle des données", () => {

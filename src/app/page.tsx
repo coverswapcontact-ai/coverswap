@@ -4,6 +4,7 @@ import { preload } from "react-dom";
 import { CommentCaMarche } from "@/components/accueil/CommentCaMarche";
 import { Confiance } from "@/components/accueil/Confiance";
 import { DernierAppel } from "@/components/accueil/DernierAppel";
+import { InspirationsAccueil } from "@/components/accueil/InspirationsAccueil";
 import { choisirEtudes, choisirOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import { MatieresAccueil } from "@/components/accueil/MatieresAccueil";
 import { Ouverture } from "@/components/accueil/Ouverture";
@@ -48,6 +49,7 @@ export default async function PageAccueil() {
     faits: <TroisFaits />,
     matieres: <MatieresAccueil />,
     realisations: <RealisationsAccueil choix={choisirEtudes(realisations)} />,
+    inspirations: <InspirationsAccueil />,
     comment: <CommentCaMarche depuis="accueil-etapes" idBouton={ANCRES_ACCUEIL.boutonEtapes} fond="fond-2" />,
     confiance: <Confiance />,
     "dernier-appel": <DernierAppel />,

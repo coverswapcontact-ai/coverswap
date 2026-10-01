@@ -42,7 +42,7 @@ const PASTILLE = "inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-[
  */
 const SOUS_LES_BARRES = "scroll-mt-[140px]";
 
-export function Matieres({ premieres, familles }: { premieres: Matiere[]; familles: ChoixFamille[] }) {
+export function Matieres({ premieres, familles, vueDans = {} }: { premieres: Matiere[]; familles: ChoixFamille[]; /** Mission 19 : pour chaque référence, les ambiances de /inspirations où elle apparaît. */ vueDans?: Record<string, { id: string; titre: string }[]> }) {
   const rechercheAdresse = useSyncExternalStore(ecouterAdresse, rechercheDeLAdresse, rechercheServeur);
   const [catalogue, setCatalogue] = useState<Matiere[] | null>(null);
   const [probleme, setProbleme] = useState(false);
@@ -217,6 +217,19 @@ export function Matieres({ premieres, familles }: { premieres: Matiere[]; famill
               <p className="texte-2 mt-0.5">
                 Réf. {agrandie.id} · {libelleFamille(agrandie.famille)}
               </p>
+              {vueDans[agrandie.id]?.length ? (
+                <p className="mt-2 text-[14.5px] text-encre-2">
+                  Vue dans :{" "}
+                  {vueDans[agrandie.id].map((a, i) => (
+                    <span key={a.id}>
+                      {i > 0 ? ", " : ""}
+                      <a href={`/inspirations#${a.id}`} onClick={aller(`/inspirations#${a.id}`)} className="font-medium text-encre underline underline-offset-4">
+                        {a.titre}
+                      </a>
+                    </span>
+                  ))}
+                </p>
+              ) : null}
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 <Lien href={lienEssayer(agrandie.id)} onClick={aller(lienEssayer(agrandie.id))} plein>
                   Essayer sur ma photo

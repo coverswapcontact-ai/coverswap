@@ -6,7 +6,9 @@ import { CarteSimulee } from "@/components/accueil/RealisationsAccueil";
 import type { EtudePiece } from "@/components/accueil/etudes";
 import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
+import { PhotoAmbiance } from "@/components/ambiances/PhotoAmbiance";
 import { Photo } from "@/components/simulation/Photo";
+import { ambianceDeLImage, type AmbianceResolue } from "@/lib/ambiances";
 import { Section } from "@/components/simulation/Section";
 import { PRESTATIONS, lienPrestation, type Prestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
@@ -21,8 +23,8 @@ import { DELAI_REPONSE, GARANTIE_ANS } from "@/lib/offre";
  *     (`piece-*`, étiquetée « Ambiance », jamais présentée comme un chantier).
  *  2. La présentation (l'ancien titre de la page quand il est plus long que le titre court, et ses paragraphes).
  *  3. « Ce que nous recouvrons » : les surfaces, puis les atouts.
- *  4. Une étude de cas (`etude`) : la réalisation publiée de la pièce, sinon la simulation du moteur (cuisine) ; sans
- *     l'une ni l'autre, pas de section (l'ambiance de l'ouverture n'est pas montrée deux fois).
+ *  4. Une étude de cas (`etude`) : la réalisation publiée de la pièce, sinon sa paire d'ambiance (mission 19 : cuisine,
+ *     salle de bain, dressing pour les meubles) ; sans l'une ni l'autre, pas de section.
  *  5. Le déroulement, 6. « Combien ça coûte » (fourchette d'`offre.ts`, lien vers l'estimation du simulateur),
  *  7. la FAQ, 8. les autres pages de pièce, 9. le dernier appel (le même bouton).
  * Textes et balisage (`Service`, `FAQPage`, `HowTo`, fil d'Ariane) : ceux de `data/prestations.ts`, rien de réécrit.
@@ -43,11 +45,12 @@ export type ProprietesContenuPrestation = {
 
 const TAILLES_OUVERTURE = "(min-width: 1152px) 552px, (min-width: 768px) 50vw, 100vw";
 
-/** L'image d'ambiance de la pièce, si elle est préparée (`lib/images-pieces`), avec son texte. */
-export function imageDeLaPiece(p: Prestation): { nom: string; alt: string } | null {
+/** L'image d'ambiance de la pièce, si elle est préparée (`lib/images-pieces`), avec son texte ; mission 19 : et son ambiance (étiquettes matière). */
+export function imageDeLaPiece(p: Prestation): { nom: string; alt: string; ambiance: AmbianceResolue | null } | null {
   const nom = p.simulateur ? photoDePiece(PHOTOS_PIECES, p.simulateur) : null;
   if (!nom || !imagePreparee(nom)) return null;
-  return { nom, alt: ALT_PIECES[p.simulateur as PieceId] };
+  const ambiance = ambianceDeLImage(nom);
+  return { nom, alt: ambiance?.alt ?? ALT_PIECES[p.simulateur as PieceId], ambiance };
 }
 
 export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = "/contact", devisPrincipal = false, etude = null }: ProprietesContenuPrestation) {
@@ -103,7 +106,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
                 Devis gratuit {DELAI_REPONSE} · pose garantie {GARANTIE_ANS} ans · {ENTREPRISE.zone.principale}, France entière sur devis
               </p>
             </div>
-            {image ? <Photo nom={image.nom} alt={image.alt} etiquette="Ambiance" priorite ratio="1 / 1" tailles={TAILLES_OUVERTURE} className="rounded-[var(--rayon-md)]" /> : null}
+            {image?.ambiance ? <PhotoAmbiance ambiance={image.ambiance} priorite ratio="1 / 1" tailles={TAILLES_OUVERTURE} /> : image ? <Photo nom={image.nom} alt={image.alt} etiquette="Ambiance" priorite ratio="1 / 1" tailles={TAILLES_OUVERTURE} className="rounded-[var(--rayon-md)]" /> : null}
           </div>
         </div>
       </section>
@@ -125,7 +128,7 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
 
       {/* ── 4. Étude de cas : réelle, sinon simulée (étiquetée) ── */}
       {etude ? (
-        <Section large fond="fond-2" titre={etude.mode === "reelle" ? "Une réalisation" : "Ce que ça donne"} intro={etude.mode === "simulee" ? "Une simulation sur une image d'ambiance, et le prix constaté pour ce type de projet. Les photos de nos chantiers arrivent." : undefined}>
+        <Section large fond="fond-2" titre={etude.mode === "reelle" ? "Une réalisation" : "Ce que ça donne"} intro={etude.mode === "simulee" ? "Une ambiance avant / après, aux teintes réelles du catalogue, et le prix constaté pour ce type de projet. Les photos de nos chantiers arrivent." : undefined}>
           <div className="max-w-md">{etude.mode === "reelle" ? <CarteRealisation etude={etude.etude} avecTexte tailles="(min-width: 768px) 448px, 100vw" /> : <CarteSimulee etude={etude.etude} tailles="(min-width: 768px) 448px, 100vw" />}</div>
         </Section>
       ) : null}

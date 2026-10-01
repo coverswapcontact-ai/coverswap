@@ -33,7 +33,7 @@ export function Estimation({ famille, formats, format, onFormat, estimation }: {
                 onClick={() => onFormat(f.id)}
                 className={`flex min-h-[44px] flex-col items-center gap-1 rounded-[var(--rayon-sm)] border bg-white px-2 py-3 text-center transition-colors duration-[var(--duree-courte)] ${choisi ? "border-encre ring-1 ring-encre" : "border-trait hover:border-encre"}`}
               >
-                {famille === "CUISINE" && estForme(f.id) ? <PlanCuisine forme={f.id} className="h-10 w-14" /> : <DessinFamille famille={famille ?? "CUISINE"} className="h-10 w-14" />}
+                {famille === "CUISINE" && estForme(f.id) ? <PlanCuisine forme={f.id} className="h-16 w-16" enSvg /> : <DessinFamille famille={famille ?? "CUISINE"} className="h-16 w-16" enSvg />}
                 <span className="text-[15px] font-medium text-encre">{f.libelle}</span>
                 <span className="text-[12.5px] leading-snug text-encre-2">{f.aide}</span>
               </button>

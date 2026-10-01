@@ -20,6 +20,8 @@ export const LIEN_SIMULER: EntreeNavigation = { href: "/simulateur", libelle: "S
 export const LIEN_CONTACT: EntreeNavigation = { href: "/contact", libelle: "Contact" };
 export const LIEN_ESPACE_CLIENT: EntreeNavigation = { href: "/contact#espace", libelle: "Espace client" };
 export const LIEN_ZONES: EntreeNavigation = { href: "/zones", libelle: "Zones d'intervention" };
+/** Mission 19 : /inspirations, au pied de page seulement (le menu garde ses quatre entrées). */
+export const LIEN_INSPIRATIONS: EntreeNavigation = { href: "/inspirations", libelle: "Inspirations" };
 
-/** Le pied de page : le contact et l'espace client d'abord, puis le menu et les zones. */
-export const LIENS_PIED: readonly EntreeNavigation[] = [LIEN_CONTACT, LIEN_ESPACE_CLIENT, ...ENTREES_MENU, LIEN_ZONES];
+/** Le pied de page : le contact et l'espace client d'abord, puis le menu, les inspirations et les zones. */
+export const LIENS_PIED: readonly EntreeNavigation[] = [LIEN_CONTACT, LIEN_ESPACE_CLIENT, ...ENTREES_MENU, LIEN_INSPIRATIONS, LIEN_ZONES];
