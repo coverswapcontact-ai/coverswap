@@ -1,7 +1,7 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil) et C1 (les pages de prestation).
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`) et C5 (`/realisations`).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -444,6 +444,52 @@ prestations » portent chacune la leur. Vitrages : aucune teinte, ni image, ni c
 - **Les cas** (`components/ambiances/CarteAmbiance.tsx`, partagé avec « Des cuisines comme la vôtre ») : titre,
   curseur ou photo seule étiquetés, cartels (2 colonnes au téléphone, 1 dans une colonne de cas), lien. Aucune image
   n'est à la fois l'ouverture et un cas ; l'après d'une paire est celui au plus petit ΔE affiché (sauf la bordeaux).
+
+## La page Pro
+
+Lot C2, `src/app/pro/page.tsx`, ce qu'elle montre dans `src/app/pro/vue.ts` (pur, testé), textes dans `contenu.ts`
+(énoncé, § C.2). Captures de référence : `docs/captures/site-3-0/pro-390.jpg` et `pro-1440.jpg`. La page porte les
+**deux teintes du professionnel** : Black Mat K1 (`--teinte`) sur les filets, Classic Walnut D1 (`--teinte-2`) sur le
+filet des cartels et la bande de matière ; le trait du surtitre est double (K1 puis D1).
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Ouverture | papier | la grille des prestations : téléphone, l'image, la légende, le titre, le bouton, la ligne ; dès 1 024 px, le texte à gauche (5/12), l'image et les cartels à droite (7/12) |
+| 2. Des lieux comme le vôtre | papier-2 | « Nos chantiers » (réalisations PRO publiées), puis le bar en paire (4xl au plus), l'hôtel, la boutique, les bureaux en trois colonnes, chacun sous un filet K1 |
+| — bande | Classic Walnut D1 | |
+| 3. Trois arguments | papier | titres en Playfair, entre filets K1 |
+| 4. Le formulaire | papier-2 | `FormulairePro`, inchangé |
+| 5. En détail | papier | les textes de l'ancienne page, `BlocsPrestation` |
+| 6. Dernier appel | encre | « Demander un devis pro » (principal, vers le formulaire) et « Être rappelé » (`sur-encre`, `depuis=pro`) |
+
+- **Les vraies d'abord** : la première réalisation PRO publiée qui a ses deux photos prend l'ouverture (« Réalisation,
+  <ville> »), les autres suivent sous « Nos chantiers » ; le comptoir descend alors en tête des lieux. Sans
+  réalisation : le comptoir d'accueil avant → après bois (D1 + K1, le même que sur l'accueil), seul couple en
+  `fetchPriority="high"`, son « avant » préchargé.
+- **Aucun lien vers le simulateur** : les lieux sont des `CarteAmbiance sansLien` (titre, image étiquetée, cartels, une
+  ligne). « Ambiance » sur l'hôtel, la boutique et les bureaux ; « Ambiance · avant / après » sur le comptoir et le bar.
+  La section le dit dans son intro, sans pastille de tête (trois « Ambiance » exactement, testé).
+- Une seule action : le devis pro. Sur téléphone, la ligne passe sous le bouton pour qu'il tienne au premier écran
+  (390 × 660 : 591-639 px).
+
+## La page Réalisations
+
+Lot C5, `src/app/realisations/page.tsx`, paires dans `src/app/realisations/paires.ts` (pur, testé). Les vraies d'abord,
+les images d'ambiance ensuite, dans une section à part :
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Titre | papier | « Ce que ça donne », une phrase qui dit ce que la page montre vraiment |
+| 2. Nos chantiers | papier | les réalisations publiées (`CarteRealisation`), puis « Simuler ma pièce » ; sans réalisation, « Les premières réalisations arrivent », Instagram et le même bouton |
+| 3. Avant / après en ambiance | papier-2 | l'étiquette « Ambiance · avant / après » en tête, quatre paires en deux colonnes (une au téléphone), chacune `<article>` sous un filet à la teinte de sa prestation |
+| 4. Avis clients | papier | s'il y en a |
+| 5. Ce que nous recouvrons | papier ou papier-2 | les cinq pièces, les textes de l'ancien index `/prestations` |
+
+- Les quatre paires sont les ouvertures des pages de prestation (cuisine bordeaux → NF13, salle de bain → NF13,
+  buffet → NH29 + AA14) et le comptoir de `/pro` : une paire raconte la même histoire partout.
+- Chaque paire : titre, curseur, cartels (filet à la teinte ; D1 pour le pro), **prix habituel** d'`offre.ts` libellé
+  comme tel (« Prix habituel : … fourni et posé », « Sur devis » pour le pro, jamais le prix d'un chantier), « Essayer
+  cette composition chez moi » (`depuis=realisations`).
 
 ## Ce qu'on a jeté de la maquette
 

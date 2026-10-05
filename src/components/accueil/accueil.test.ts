@@ -13,7 +13,7 @@ import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import type { ManifesteImages } from "@/lib/images-preparees";
 import { avecDepuis, lienSimuler } from "@/lib/liens-simulateur";
 import { MATIERES_VEDETTES, lienMatiere, matiereCartel, matieresVedettes, referenceDeLAdresse } from "@/lib/matieres-vedettes";
-import { DELAI_REPONSE, DUREE_POSE, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_REPONSE, DUREE_POSE, DUREE_POSE_TEXTE, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 import { LARGEURS_PHOTO_CRM, sourcesPhotoCrm, type Publication } from "@/lib/publications";
 import { lireDepuis } from "@/lib/simulateur/entonnoir";
 import { lireComposition, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
@@ -27,14 +27,14 @@ import { BoutonWhatsApp } from "./BoutonWhatsApp";
 import { CommentOnTravaille, ETAPES_TRAVAIL, GARANTIES, PHRASE_COVERING } from "./CommentOnTravaille";
 import { CUISINES_ACCUEIL, CuisinesCommeLaVotre, cuisinesAccueil } from "./CuisinesCommeLaVotre";
 import { DernierAppel } from "./DernierAppel";
-import { ALT_AVANT_OUVERTURE, ALT_OUVERTURE, IMAGE_OUVERTURE, LEGENDE_OUVERTURE, choisirEtudes, choisirOuverture, imageObjetOuverture, partageOuverture } from "./etudes";
+import { ALT_AVANT_OUVERTURE, ALT_OUVERTURE, IMAGE_OUVERTURE, LEGENDE_OUVERTURE, choisirOuverture, imageObjetOuverture, partageOuverture } from "./etudes";
 import { FORMULAIRE_RAPPEL, FormulaireRappel } from "./FormulaireRappel";
 import { LARGEUR_OUVERTURE, Ouverture } from "./Ouverture";
 import { PICTOS_ACCUEIL, ParOuCommencer } from "./ParOuCommencer";
 import { Presentoir } from "./Presentoir";
 import { ProAccueil } from "./ProAccueil";
 import { QuestionsAccueil } from "./QuestionsAccueil";
-import { AMBIANCES_ACCUEIL, CarteSimulee, RealisationsAccueil, realisationsAccueil } from "./RealisationsAccueil";
+import { AMBIANCES_ACCUEIL, RealisationsAccueil, realisationsAccueil } from "./RealisationsAccueil";
 import { ANCRES_ACCUEIL, BANDES_ACCUEIL, CIBLES_BOUTON_COLLE, DESCRIPTION_META_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, TITRE_META_ACCUEIL, lienSimulerAccueil, lienSimulerCuisine, sectionsAccueil, type DepuisAccueil } from "./sections";
 
 /**
@@ -436,22 +436,6 @@ describe("6. Réalisations : les vraies d'abord, puis la rangée « Ambiances »
     assert.equal(boutons(html, "secondaire"), 1);
     assert.match(html, /href="\/realisations"/);
     assert.ok(!html.includes('fetchPriority="high"'), "une seule image prioritaire par page : l'ouverture");
-  });
-
-  test("les études de cas de /realisations et des pages par pièce (sans réalisation publiée) : trois paires d'ambiance, prix d'offre.ts, jamais une ville", () => {
-    const choix = choisirEtudes([]);
-    assert.equal(choix.mode, "simulees");
-    if (choix.mode !== "simulees") return;
-    assert.deepEqual(choix.etudes.map((e) => e.etiquette), ["Ambiance", "Ambiance", "Ambiance"]);
-    assert.deepEqual(choix.etudes.map((e) => e.prix), [fourchette("cuisine"), fourchette("sdb"), fourchette("meuble")]);
-    assert.equal(fourchette("cuisine"), `${FOURCHETTES.cuisine.min.toLocaleString("fr-FR")} € à ${FOURCHETTES.cuisine.max.toLocaleString("fr-FR")} €`);
-    assert.deepEqual(choix.etudes.map((e) => e.matieres?.map((m) => m.ref)), [["RM20", "I14", "NE31"], ["K4", "NE31"], ["NH12", "AA17"]]);
-    for (const e of choix.etudes) assert.ok(!("ville" in e));
-    const html = choix.etudes.map((e) => rendre(createElement(CarteSimulee, { etude: e }))).join("");
-    assert.equal(compter(html, "<article"), 3);
-    assert.equal(compter(html, ">Ambiance</span>"), 3);
-    assert.equal(compter(html, ">Simulation</span>"), 0);
-    assert.equal(choisirEtudes([publication({ id: "x" })]).mode, "simulees", "une réalisation sans photo n'est pas une étude de cas");
   });
 
   test("prix et durée d'une réalisation : publiés, sinon habituels selon le type de projet, rien pour un local pro", () => {

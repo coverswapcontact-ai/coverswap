@@ -23,7 +23,9 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 ## Phase C : le tunnel, page par page
 
 - C1, `/prestations/[slug]` : fait (cas, vedettes, prix du CRM, villes, teinte ; `docs/DESIGN.md` « Les pages de prestation »).
-- C0, C2 à C7 : à venir.
+- C2, `/pro` : fait (réalisations PRO d'abord, comptoir en ouverture, lieux de la série 1, teinte K1 + D1, formulaire inchangé).
+- C5, `/realisations` : fait (les vraies d'abord, puis « Avant / après en ambiance », quatre paires).
+- C0, C3, C4, C6, C7 : à venir.
 
 ## Phase D : le catalogue des matières
 
@@ -581,3 +583,89 @@ arrive sur toutes les pages par le préchargement Next de « / » (lien du logo 
 `preload`) — existait depuis B6, à traiter en F6 si le LCP en souffre. Les cartes blanches de `BlocsPrestation`
 détonnent avec les filets : à reprendre avec C2 / C3.
 
+## C2 — `/pro` (06/10/2026)
+
+**Fait** (aucune image régénérée, aucun envoi ; `docs/DESIGN.md` « La page Pro », captures
+`docs/captures/site-3-0/pro-390.jpg` et `pro-1440.jpg`)
+- `src/app/pro/vue.ts` (`vueDuPro`, pur) : l'ouverture par `choisirOuverture(…, { typeProjet: "PRO", paire:
+  PAIRE_COMPTOIR_PRO })` — la première réalisation PRO publiée qui a ses deux photos, sinon le comptoir d'accueil
+  avant → après bois (`pro-comptoir-accueil-apres-bois`, D1 + K1, légende dans `contenu.ts`) ; les autres réalisations
+  PRO (6 au plus) ; les lieux : le comptoir s'il a cédé l'ouverture, puis le bar du restaurant (paire), l'hôtel, la
+  boutique (« Commerce »), les bureaux, par `resoudreCas`.
+- `page.tsx` devient asynchrone (`chargerPublications`, `revalidate = 300`, comme les prestations) : ouverture dans la
+  grille de `ContenuPrestation` (mêmes `TAILLES_OUVERTURE_PRESTATION`, « avant » préchargé), « Des lieux comme le vôtre »
+  (« Nos chantiers » puis `CarteAmbiance sansLien` avec la ligne de chaque lieu), bande Classic Walnut D1, trois
+  arguments entre filets, formulaire **inchangé** (`FormulairePro` non touché), « En détail » inchangé, dernier appel
+  en encre (« Demander un devis pro » + « Être rappelé » `depuis=pro`).
+- `CarteAmbiance` : `sansLien` (pas de lien vers le simulateur) et `children` (une ligne sous les cartels).
+- `docs/SUIVI.md` : /pro, `RAPPEL_DEMANDE` / `CONTACT_ENVOYE` `depuis: pro` ; aucun type d'événement nouveau.
+
+**Décisions prises seul**
+1. Le comptoir **ouvre** la page (curseur dans la grille des prestations), au lieu d'une ouverture texte seule : c'est
+   la paire que l'énoncé place en tête de `/pro`, et la page ressemble aux autres pages de prestation.
+2. Après « bois » (D1 + K1) plutôt que « couleur » : ce sont les deux teintes du professionnel, et l'accueil montre le
+   même (l'après couleur reste sur `/inspirations`).
+3. Teinte : K1 sur les filets (`--teinte`), D1 sur le filet des cartels et la bande (`--teinte-2`) — K1, presque noir,
+   ne se distingue pas de l'encre sur un cartel.
+4. Pas de pastille « Ambiance » en tête des lieux : l'intro le dit, et chaque image porte son étiquette (le test garde
+   ses trois « Ambiance » exacts, plus deux « Ambiance · avant / après »).
+5. Dernier appel ajouté (encre, comme partout) avec « Être rappelé » (`depuis=pro`, nouvelle valeur) ; le formulaire
+   reste la seule action principale (le lien de l'ouverture, « Envoyer ma demande », le lien du dernier appel).
+6. Préchargement de l'« avant » de l'ouverture sur `/pro` aussi (`perf.test.ts` : accueil, prestations, /pro).
+7. « Commerce » gardé comme titre de la boutique (c'est le type de lieu du formulaire).
+
+**Tests** : `tunnel.test.ts` « /pro et /contact » : le test de la page rendu en asynchrone avec le CRM simulé (aucune
+requête réseau), mêmes intentions (titre, ligne courte dans l'ouverture, **3 `>Ambiance<`** + 2 « Ambiance · avant /
+après », jamais « Simulation » ni « Réalisation », arguments, ancre `#devis-pro`, textes de l'ancienne page, FAQ,
+**jamais le mot « simulateur »**) + un principal avant le formulaire, deux liens « Demander un devis pro », dernier appel
+en encre ; + 2 tests : comptoir en ouverture (seul couple prioritaire, légende, cartels D1 / K1), ordre des lieux, pas de
+« Essayer », teinte K1 + D1, bande D1, formulaire posé tel quel ; réalisation PRO d'abord (ouverture « Réalisation,
+Lattes », « Nos chantiers », comptoir descendu, cuisine publiée exclue). `ambiances.test.ts` (intégration /pro) : rendu
+asynchrone, CRM simulé, matières lues dans les cartels (texte sans balises). `perf.test.ts` : préchargement de /pro.
+
+**Vérification visuelle** : build local comme la CI (`NEXT_PUBLIC_SIMULATE_URL` de production,
+`NEXT_PUBLIC_SANS_EVENEMENTS=1`), `next start -p 3100` (arrêté ensuite), Playwright + Edge à 360 × 660, 390 × 660 / 844
+et 1 440 × 900, sections différées forcées : aucun débordement à 360 px, 0 image cassée, 0 requête coupée (rien
+envoyé, formulaire jamais rempli), LCP = l'après du comptoir (256 à 376 ms ; 644 ms à 360 px). Corrigé après la
+première capture : le principal tombait à 661-709 px à 390 × 660 → la ligne passe sous le bouton (591-639 px).
+
+**Problèmes** : le préchargement de l'image de l'accueil arrive aussi sur /pro par le préchargement Next de « / » (connu
+depuis C1, F6). Les cartes blanches de `BlocsPrestation` (« En détail ») ne sont toujours pas restylées.
+
+## C5 — `/realisations` (06/10/2026)
+
+**Fait**
+- `src/app/realisations/paires.ts` (pur) : `PAIRES_REALISATIONS` — les ouvertures des trois pages de prestation
+  (`CAS_PRESTATIONS[…].ouverture.apres`) et le comptoir de `/pro` —, `prixHabituel` (fourchette d'`offre.ts` « fourni
+  et posé », durée habituelle pour cuisine et salle de bain, « Sur devis » pour le pro), `pairesRealisations` (paires
+  préparées seulement, `depuis=realisations`).
+- `page.tsx` : les vraies d'abord (inchangé : `CarteRealisation`, h2 masqué, « Simuler ma pièce »), sinon « Les
+  premières réalisations arrivent » sans images ; puis la section séparée **« Avant / après en ambiance »**
+  (`id="en-ambiance"`, étiquette en tête, quatre `<article>` en `CarteAmbiance` à la teinte de leur prestation, prix
+  habituel, « Essayer cette composition chez moi ») ; avis ; les cinq pièces. Description : « des exemples en
+  ambiance, étiquetés comme tels ».
+- Retirés (plus rien ne les lisait) : `choisirEtudes`, `etudeCuisineSimulee`, `PAIRES_ETUDES`, `EtudeSimulee` et
+  `ALT_AVANT_ETUDE_CUISINE` (`accueil/etudes.ts`), `CarteSimulee` (`RealisationsAccueil.tsx`). Les images de la mission
+  19 (`ouverture-cuisine-apres`, `etude-*`) restent : d'autres pages les lisent.
+- `docs/SUIVI.md` : `/realisations` décrite à neuf, valeur `realisations` de `PIECE_CHOISIE`.
+
+**Décisions prises seul**
+1. Titre « Avant / après en ambiance » (barre espacée, comme partout sur le site) pour la section de l'énoncé.
+2. Les quatre paires = les ouvertures des prestations + le comptoir (le plan : cuisine, salle de bain, meubles, pro) ;
+   pas de nouvelle sélection.
+3. Le prix habituel reste sur chaque paire (la description promet « les prix par projet »), libellé « Prix habituel ».
+4. Le bouton principal garde `/simulateur` sans `depuis` (le test l'exige) ; seuls les « Essayer » portent
+   `depuis=realisations`.
+
+**Tests** : `autres-pages.test.ts` « /realisations » : le test sans publication réécrit (h1 exact, 4 `<article>`, 4 + 1
+« Ambiance · avant / après », jamais « Simulation » ni « simulé », prix, un seul principal `/simulateur`, jamais une
+ville, description « exemples en ambiance ») ; + 1 test : la section séparée après les vrais chantiers (avec et sans
+publication), 4 curseurs, 4 articles, cartels, prix, teinte, 4 « Essayer » `depuis=realisations` parsés, aucun
+principal dedans, `SUIVI.md` ; avec publications : `<article` 2 + 4, les vraies avant la section. `accueil.test.ts` :
+le test des études simulées retiré avec le code (son intention — images générées étiquetées « Ambiance », prix
+d'`offre.ts`, jamais une ville — passe dans les tests de `/realisations`).
+
+**Tests C2 + C5** : 396 → 398, tous réussis ; `npx eslint .` et `npm run build` passent.
+
+**Vérification visuelle** : même build, 360 × 660 à 1 440 × 900 : aucun débordement, 0 image cassée, 4 curseurs, un
+seul principal. Captures hors dépôt dans `scratchpad/m21/c2c5/captures`.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Photo } from "@/components/simulation/Photo";
@@ -66,9 +67,11 @@ export function resoudreCas(image: string, { nom, depuis }: { nom?: string; depu
 
 /**
  * La carte (titre, image, cartels, lien), à poser dans un `<li>`. `teinte` : la teinte de la prestation, sur le filet
- * des cartels (sinon la couleur de chaque matière). `cartelsColonnes` : la grille des cartels.
+ * des cartels (sinon la couleur de chaque matière). `cartelsColonnes` : la grille des cartels. `children` : une ligne
+ * de plus sous les cartels (le prix habituel sur `/realisations`). `sansLien` : pas de lien vers le simulateur (`/pro`,
+ * une page sans simulateur).
  */
-export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2" }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string }) {
+export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; children?: ReactNode }) {
   const { preparees } = cas;
   return (
     <>
@@ -96,9 +99,12 @@ export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid
           </li>
         ))}
       </ul>
-      <Link href={cas.lien} className="mt-auto inline-flex self-start pt-3 min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
-        Essayer cette composition chez moi
-      </Link>
+      {children}
+      {sansLien ? null : (
+        <Link href={cas.lien} className="mt-auto inline-flex self-start pt-3 min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
+          Essayer cette composition chez moi
+        </Link>
+      )}
     </>
   );
 }

@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
-import { choisirEtudes } from "@/components/accueil/etudes";
-import { CarteSimulee } from "@/components/accueil/RealisationsAccueil";
+import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { CartesPieces } from "@/components/simulation/CartesPieces";
+import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { lienPiece } from "@/data/prestations";
@@ -16,15 +16,20 @@ import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 import { chargerPublications, libelleProjet, type Publication } from "@/lib/publications";
 import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
+import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
+import { pairesRealisations } from "./paires";
 
 /**
- * « Réalisations » (mission 16, partie 5) : se projeter, puis simuler.
- *  - Des réalisations publiées par le CRM (`chargerPublications`, accord écrit du client) : une carte par
+ * « Réalisations » (mission 16, partie 5 ; site 3.0, lot C5) : se projeter, puis simuler. Les vraies d'abord :
+ *  - Les réalisations publiées par le CRM (`chargerPublications`, accord écrit du client) : une carte par
  *    réalisation (`CarteRealisation` : avant / après, matières → /matieres?ref=, prix et durée publiés sinon
- *    habituels libellés comme tels, ville), puis « Simuler ma pièce ». Les avis publiés suivent (`PublicationSite`
- *    ne relie pas un avis à une réalisation : ils ont leur section).
- *  - Sinon : « Les premières réalisations arrivent » et les trois études SIMULÉES de l'accueil (`choisirEtudes`),
- *    chacune étiquetée (« Simulation », « Ambiance »), jamais présentées comme des chantiers.
+ *    habituels libellés comme tels, ville), puis « Simuler ma pièce ». Sans réalisation : « Les premières réalisations
+ *    arrivent », le lien Instagram et le même bouton.
+ *  - Puis, SÉPARÉE et clairement étiquetée, la section « Avant / après en ambiance » : quatre paires de la série 2
+ *    (cuisine, salle de bain, meubles, pro ; `./paires`), chacune « Ambiance · avant / après », à la teinte de sa
+ *    prestation, avec ses cartels, le prix habituel et « Essayer cette composition chez moi » (`depuis=realisations`).
+ *    Jamais présentées comme des chantiers, jamais « Simulation ».
+ *  - Les avis publiés (`PublicationSite` ne relie pas un avis à une réalisation : ils ont leur section).
  *  - En bas : les cinq pièces (`CartesPieces`, photos d'ambiance) → les pages par pièce (/prestations/cuisine,
  *    /salle-de-bain, /meubles, /pro ; murs et plafond → le simulateur), avec les textes de l'ancien index
  *    /prestations (301 ici) : présentation, tarif, « Un doute sur ce qui est possible chez vous ? », vitrages.
@@ -38,7 +43,8 @@ const SUJET = "Cuisines, salles de bain, meubles et locaux recouverts d'un film 
 
 /**
  * La description (et donc l'Open Graph et la carte de partage) dit ce que la page montre VRAIMENT : des photos de
- * chantier seulement si le CRM en a publié, sinon des exemples simulés étiquetés ; « leurs avis » seulement s'il y en a.
+ * chantier seulement si le CRM en a publié, sinon des exemples en ambiance étiquetés ; « leurs avis » seulement s'il y
+ * en a.
  * Même lecture que la page (`chargerPublications`, en cache 300 s) : aucune requête de plus.
  */
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,11 +52,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     realisations.length > 0
       ? `${SUJET} : photos après chantier publiées avec l'accord des clients${avis.length > 0 ? ", et leurs avis" : ""}.`
-      : `${SUJET} : des exemples simulés, étiquetés comme tels, et les prix par projet.`;
+      : `${SUJET} : des exemples en ambiance, étiquetés comme tels, et les prix par projet.`;
   return metadonneesPage({ titre: TITRE, description, chemin: CHEMIN });
 }
 
 const TAILLES_CARTE = "(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw";
+const TAILLES_PAIRE = "(min-width: 1152px) 552px, (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)";
 
 function CarteAvis({ p }: { p: Publication }) {
   return (
@@ -64,7 +71,7 @@ function CarteAvis({ p }: { p: Publication }) {
 
 export default async function PageRealisations() {
   const [{ realisations, avis }, zones] = await Promise.all([chargerPublications(), chargerZonesSimulateur()]);
-  const etudes = choisirEtudes([]);
+  const paires = pairesRealisations();
   const pieces = zones.pieces.map((piece) => ({ id: piece.id, libelle: piece.libelle, description: piece.zones.map((z) => z.libelle).join(", ") }));
   const liens = Object.fromEntries(pieces.map((piece) => [piece.id, lienPiece(piece.id)]));
   const lienTexte = "text-encre underline underline-offset-4";
@@ -77,7 +84,7 @@ export default async function PageRealisations() {
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Réalisations" }]} />
           <h1 className="titre-1 max-w-3xl text-encre">Ce que ça donne</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">
-            {realisations.length > 0 ? "Photos prises à la fin des chantiers, publiées avec l'accord des personnes. Pas d'image de catalogue présentée comme une pose." : "Des exemples simulés, étiquetés comme tels, avec les prix habituels par projet."}
+            {realisations.length > 0 ? "Photos prises à la fin des chantiers, publiées avec l'accord des personnes. Pas d'image de catalogue présentée comme une pose." : "Des avant / après en ambiance, étiquetés comme tels, avec les prix habituels par projet, en attendant les photos de nos chantiers."}
           </p>
         </div>
       </section>
@@ -105,21 +112,38 @@ export default async function PageRealisations() {
             .
           </>
         }>
-          {etudes.mode === "simulees" ? (
-            <div className="grid gap-5 md:grid-cols-3">
-              {etudes.etudes.map((e) => (
-                <CarteSimulee key={e.id} etude={e} />
-              ))}
-            </div>
-          ) : null}
-          <div className="mt-8 md:mt-10">
+          <div>
             <Lien href="/simulateur">Simuler ma pièce</Lien>
           </div>
         </Section>
       )}
 
+      {/* ── Les avant / après en ambiance : une section à part, toujours après les vrais chantiers ── */}
+      {paires.length > 0 ? (
+        <Section id="en-ambiance" large differee ton="papier-2" titre="Avant / après en ambiance" intro="Glissez le curseur : à gauche la pièce d'origine, à droite la même avec les vraies matières du catalogue.">
+          <p className="flex flex-wrap items-center gap-3">
+            <Etiquette>Ambiance · avant / après</Etiquette>
+            <span className="text-[15px] text-encre-2">Images d&apos;ambiance, pas des chantiers : les teintes sont celles du catalogue.</span>
+          </p>
+          <ul className="mt-8 grid gap-12 md:grid-cols-2 md:gap-x-6">
+            {paires.map(({ id, cas, prix }) => {
+              const t = teintePrestation(id);
+              return (
+                <li key={cas.ambiance.id} className="filet flex flex-col pt-4" style={styleTeinte(t)}>
+                  <article className="flex grow flex-col">
+                    <CarteAmbiance cas={cas} tailles={TAILLES_PAIRE} teinte={t?.seconde?.hex ?? t?.teinte.hex} cartelsColonnes="grid-cols-2">
+                      <p className="mt-4 text-[15px] font-medium text-encre">{prix}</p>
+                    </CarteAmbiance>
+                  </article>
+                </li>
+              );
+            })}
+          </ul>
+        </Section>
+      ) : null}
+
       {avis.length > 0 ? (
-        <Section large differee titre="Avis clients" fond="fond-2">
+        <Section large differee titre="Avis clients">
           <div className="grid gap-5 md:grid-cols-3">
             {avis.map((p) => (
               <CarteAvis key={p.id} p={p} />
@@ -129,7 +153,7 @@ export default async function PageRealisations() {
       ) : null}
 
       {/* Les cinq pièces → les pages par pièce ; les textes de l'ancien index /prestations. */}
-      <Section large differee fond={avis.length > 0 ? "fond" : "fond-2"} titre="Ce que nous recouvrons" intro="Un film adhésif Cover Styl' posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace.">
+      <Section large differee ton={avis.length > 0 ? "papier-2" : "papier"} titre="Ce que nous recouvrons" intro="Un film adhésif Cover Styl' posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace.">
         <CartesPieces pieces={pieces} liens={liens} photos={PHOTOS_PIECES} nom="Les pièces que nous recouvrons" />
         <div className="texte-2 mt-8 max-w-2xl space-y-3">
           <p>

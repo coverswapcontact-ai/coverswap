@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { CarteRealisation, CLASSE_CARTE_REALISATION, RATIO_CARTE_REALISATION } from "@/components/CarteRealisation";
-import { LegendeMatieres } from "@/components/ambiances/LegendeMatieres";
+import { CarteRealisation } from "@/components/CarteRealisation";
 import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
-import { AvantApres } from "@/components/simulation/AvantApres";
 import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
@@ -10,7 +8,6 @@ import { Section } from "@/components/simulation/Section";
 import { ambiances, lienInspiration, type AmbianceResolue } from "@/lib/ambiances";
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
 import type { Publication } from "@/lib/publications";
-import type { EtudeSimulee } from "./etudes";
 
 /**
  * 6. Réalisations (site 3.0, lot B6 ; énoncé, § C.1) : les VRAIES d'abord — les réalisations publiées par le CRM, avec
@@ -36,30 +33,6 @@ export function realisationsAccueil(realisations: readonly Publication[]): Etude
 
 export function ambiancesAccueil(liste: readonly AmbianceResolue[] = ambiances()): AmbianceResolue[] {
   return AMBIANCES_ACCUEIL.flatMap((id) => liste.filter((a) => a.id === id));
-}
-
-/**
- * La carte d'une étude simulée (image étiquetée, fourchette et durée d'`offre.ts`) : rendue par `/realisations` et
- * les pages par pièce (mission 16, partie 5 ; mission 19 : une paire d'ambiance garde son cadre d'origine, ses
- * étiquettes matière sont placées en % de l'image, et porte sa légende sous l'image). Plus sur l'accueil.
- */
-export function CarteSimulee({ etude, tailles = TAILLES_CARTE }: { etude: EtudeSimulee; tailles?: string }) {
-  return (
-    <article className={CLASSE_CARTE_REALISATION}>
-      {etude.image.type === "avant-apres" ? (
-        <AvantApres apres={etude.image.apres} avant={etude.image.avant} alt={etude.alt} altAvant={etude.altAvant ?? `${etude.titre} avant la pose`} ratio={etude.matieres ? `${etude.image.preparees.apres.largeur} / ${etude.image.preparees.apres.hauteur}` : RATIO_CARTE_REALISATION} preparees={{ ...etude.image.preparees, tailles }} sansOutils etiquette={etude.etiquette} matieres={etude.matieres} />
-      ) : (
-        <Photo nom={etude.image.nom} alt={etude.alt} ratio={RATIO_CARTE_REALISATION} tailles={tailles} etiquette={etude.etiquette} />
-      )}
-      {etude.matieres && etude.lienComposition ? <LegendeMatieres matieres={etude.matieres} lienComposition={etude.lienComposition} className="px-5" /> : null}
-      <div className="p-5">
-        <h3 className="text-[17px] font-semibold text-encre">{etude.titre}</h3>
-        <p className="texte-2 mt-1">
-          {etude.prix} fourni et posé · pose en {etude.duree}
-        </p>
-      </div>
-    </article>
-  );
 }
 
 export function RealisationsAccueil({ reelles, ambiancesRangee = ambiancesAccueil() }: { reelles: EtudeReelle[]; ambiancesRangee?: AmbianceResolue[] }) {

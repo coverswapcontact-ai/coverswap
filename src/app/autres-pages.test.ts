@@ -72,22 +72,71 @@ async function rendrePage(module: string, props?: Record<string, unknown>): Prom
 }
 
 describe("/realisations", () => {
-  test("sans réalisation publiée : « Ce que ça donne », trois études SIMULÉES étiquetées, « Simuler ma pièce »", async () => {
+  /** Les liens « Essayer cette composition chez moi » : leurs adresses. */
+  const essais = (html: string) => [...html.matchAll(/<a[^>]* href="([^"]*)"[^>]*>Essayer cette composition chez moi<\/a>/g)].map((m) => texteHtml(m[1]));
+
+  test("sans réalisation publiée : « Ce que ça donne », « Les premières réalisations arrivent », puis les avant / après EN AMBIANCE étiquetés, « Simuler ma pièce »", async () => {
     publications = [];
     const html = await rendrePage("@/app/realisations/page");
     assert.match(html, /<h1 class="titre-1 max-w-3xl text-encre">Ce que ça donne<\/h1>/);
     assert.equal(compter(html, "<h1"), 1);
     assert.ok(html.includes("Les premières réalisations arrivent"));
-    assert.ok(html.includes(">Ambiance</span>") && !html.includes(">Simulation</span>"), "mission 19 : des images générées, toutes « Ambiance »");
+    // Site 3.0 (lot C5) : quatre paires d'ambiance, chacune « Ambiance · avant / après » (+ l'étiquette en tête de section), jamais « Simulation ».
+    assert.equal(compter(html, "<article"), 4);
+    assert.equal(compter(html, ">Ambiance · avant / après</span>"), 4 + 1);
+    assert.ok(!html.includes(">Simulation</span>") && !/simulés?/.test(html), "des images générées, jamais présentées comme des rendus du simulateur");
     assert.ok(html.includes(`${fourchette("cuisine")} fourni et posé`));
     assert.deepEqual(boutons(html, "principal"), [["/simulateur", "Simuler ma pièce"]]);
-    assert.ok(!/Lattes|Réalisation, /.test(html), "jamais une ville, jamais « Réalisation » sur une simulation");
+    assert.ok(!/Lattes|Réalisation, |>Réalisation</.test(html), "jamais une ville, jamais « Réalisation » sur une image d'ambiance");
     // La description (Open Graph, carte de partage) ne promet pas de photos de chantier qui n'existent pas.
     const { generateMetadata } = await import("@/app/realisations/page");
     const m = await generateMetadata();
-    assert.match(String(m.description), /exemples simulés, étiquetés comme tels/);
-    assert.doesNotMatch(String(m.description), /chantier|avis/);
+    assert.match(String(m.description), /exemples en ambiance, étiquetés comme tels/);
+    assert.doesNotMatch(String(m.description), /chantier|avis|simulé/);
     assert.equal((m.openGraph as { description?: string }).description, m.description);
+  });
+
+  test("« Avant / après en ambiance » : une section séparée, après les vrais chantiers ; quatre paires (cuisine, salle de bain, meubles, pro), leurs cartels, le prix habituel, « Essayer » depuis=realisations", async () => {
+    const { PAIRES_REALISATIONS, pairesRealisations, prixHabituel } = await import("@/app/realisations/paires");
+    const paires = pairesRealisations();
+    assert.deepEqual(paires.map((p) => p.id), ["cuisine", "salle-de-bain", "meubles", "professionnel"], "les quatre paires sont préparées");
+    // Les mêmes paires que les ouvertures des pages de prestation, et le comptoir de /pro : une paire, une histoire.
+    assert.deepEqual(PAIRES_REALISATIONS.map((p) => p.apres), [CAS_PRESTATIONS.cuisine.ouverture.apres, CAS_PRESTATIONS["salle-de-bain"].ouverture.apres, CAS_PRESTATIONS.meubles.ouverture.apres, "pro-comptoir-accueil-apres-bois"]);
+    assert.ok(paires.every((p) => p.cas.preparees.avant), "des paires, jamais un avant seul ni un après seul");
+    assert.equal(prixHabituel({ cle: "cuisine", enUneJournee: true }), `Prix habituel : ${fourchette("cuisine")} fourni et posé · pose en une journée en général`);
+    assert.equal(prixHabituel({ cle: "meuble", enUneJournee: false }), `Prix habituel : ${fourchette("meuble")} fourni et posé`);
+    assert.equal(prixHabituel({ cle: "pro", enUneJournee: false }), "Sur devis, après une visite ou sur vos photos", "aucun prix inventé pour un local pro");
+
+    for (const avecChantiers of [false, true]) {
+      publications = avecChantiers ? [publication({ id: "r1" })] : [];
+      const html = await rendrePage("@/app/realisations/page");
+      const debut = html.indexOf('id="en-ambiance"');
+      assert.ok(debut > 0);
+      assert.ok(debut > html.indexOf(avecChantiers ? "Nos chantiers" : "Les premières réalisations arrivent"), "les vraies d'abord");
+      const section = html.slice(debut, html.indexOf("Ce que nous recouvrons"));
+      assert.ok(section.includes(">Avant / après en ambiance</h2>"));
+      assert.equal(compter(section, 'role="slider"'), 4);
+      assert.equal(compter(section, "<article"), 4);
+      for (const p of paires) {
+        assert.ok(section.includes(`>${p.cas.nom}</h3>`), p.cas.nom);
+        assert.ok(section.includes(`/images/prep/${p.cas.ambiance.avant}-`) && section.includes(`/images/prep/${p.cas.ambiance.image}-`), p.id);
+        for (const m of p.cas.matieres) assert.ok(section.includes(`${m.matiere.id} · `), `${p.id} : ${m.matiere.id}`);
+        assert.ok(texteHtml(section).includes(p.prix), p.prix);
+        // Chaque carte à la teinte de sa prestation.
+        assert.ok(section.includes(`--teinte:${teintePrestation(p.id)!.teinte.hex}`), `${p.id} : teinte`);
+      }
+      const liens = essais(section);
+      assert.equal(liens.length, 4);
+      for (const lien of liens) {
+        const parametres = new URLSearchParams(lien.split("?")[1]);
+        assert.equal(lireDepuis(parametres.get("depuis")), "realisations", lien);
+        assert.ok(lireComposition(lireRefDemandee(parametres.get("ref")))?.length, lien);
+      }
+      assert.equal(boutons(section, "principal").length, 0, "une seule action principale, hors de la section");
+      assert.ok(!section.includes(">Simulation</span>") && !section.includes("Lattes"));
+    }
+    // La valeur `depuis` est documentée au suivi.
+    assert.ok(readFileSync(join(process.cwd(), "docs", "SUIVI.md"), "utf8").includes("`realisations`"));
   });
 
   test("les cinq pièces → les pages par pièce ; les textes de l'ancien index /prestations sont repris", async () => {
@@ -106,7 +155,8 @@ describe("/realisations", () => {
   test("avec des réalisations publiées : une carte chacune (photos du CRM réduites), les avis, un seul bouton principal", async () => {
     publications = [publication({ id: "r1" }), publication({ id: "r2", typeProjet: "SDB", ville: "Pérols", prix: 2400 }), { ...publication({ id: "a1" }), type: "AVIS", texte: "Très propre.", note: 5, auteur: "M. D.", photoAvant: null, photoApres: null }];
     const html = await rendrePage("@/app/realisations/page");
-    assert.equal(compter(html, "<article"), 2);
+    assert.equal(compter(html, "<article"), 2 + 4, "les deux chantiers, puis les quatre avant / après en ambiance");
+    assert.ok(html.indexOf("/api/site/photos/r2/apres") < html.indexOf('id="en-ambiance"'), "les vraies d'abord");
     assert.ok(html.includes("/api/site/photos/r1/apres?l=480 480w"));
     assert.ok(html.includes(euros(2400)));
     assert.ok(html.includes(`Prix habituel : ${fourchette("cuisine")}`));

@@ -197,10 +197,20 @@ describe("le simulateur reçoit une composition (?ref=zone:REF,…)", () => {
 
 describe("intégration (mission 19)", () => {
   test("/pro : la paire du restaurant, puis l'hôtel, la boutique et les bureaux, étiquetés ; pas de lien vers le simulateur", async () => {
-    const { default: PagePro } = await import("@/app/pro/page");
-    const html = renderToStaticMarkup(createElement(PagePro));
+    // Site 3.0 (lot C2) : la page lit les publications du CRM — CRM injoignable simulé (aucune requête réseau).
+    const fetchOrigine = globalThis.fetch;
+    globalThis.fetch = (async () => new Response("{}", { status: 503 })) as typeof fetch;
+    let html: string;
+    try {
+      const { default: PagePro } = await import("@/app/pro/page");
+      html = renderToStaticMarkup((await PagePro()) as Parameters<typeof renderToStaticMarkup>[0]);
+    } finally {
+      globalThis.fetch = fetchOrigine;
+    }
     assert.ok(html.includes("/images/prep/pro-restaurant-avant-") && html.includes("/images/prep/pro-restaurant-"));
-    for (const t of ["Black Mat · K1", "Classic Walnut · D1", "Caffe Latte · NE55", "Freijo Laurel · NE68", "Beige Brown Ash · AL26"]) assert.ok(html.includes(t), t);
+    // Les matières de chaque lieu, en cartels (« Nom » puis « RÉF · famille · finition », lus « Nom · RÉF · … »).
+    const texte = html.replace(/<[^>]+>/g, "");
+    for (const t of ["Black Mat · K1", "Classic Walnut · D1", "Caffe Latte · NE55", "Freijo Laurel · NE68", "Beige Brown Ash · AL26"]) assert.ok(texte.includes(t), t);
     assert.ok(html.includes(">Ambiance · avant / après<"));
     assert.ok(!html.includes("Essayer cette composition"), "la page Pro n'envoie pas au simulateur");
   });

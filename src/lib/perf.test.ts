@@ -243,7 +243,7 @@ describe("l'ouverture : l'« avant » préchargé sur / et les prestations seule
     assert.equal(adresseMoyenne("/a-1200.avif 1200w, /a-1600.avif 1600w"), "/a-1200.avif");
   });
 
-  test("appelé par la page d'accueil et par les pages de prestation (lot C1 : elles ouvrent aussi sur un curseur), par elles seules ; l'ancien préchargement du poster n'existe plus", () => {
+  test("appelé par la page d'accueil, les pages de prestation (lot C1) et /pro (lot C2), qui ouvrent sur un curseur, par elles seules ; l'ancien préchargement du poster n'existe plus", () => {
     const accueil = lire("src/app/page.tsx");
     assert.match(accueil, /import \{ preload \} from "react-dom";/);
     assert.match(accueil, /for \(const prechargement of prechargementsOuverture\(ouverture\)\) preload\(prechargement\.href, prechargement\.options\);/);
@@ -252,7 +252,12 @@ describe("l'ouverture : l'« avant » préchargé sur / et les prestations seule
     assert.match(prestation, /import \{ preload \} from "react-dom";/);
     assert.match(prestation, /for \(const prechargement of prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\) preload\(prechargement\.href, prechargement\.options\);/);
     assert.match(lire("src/components/ContenuPrestation.tsx"), /preparees=\{\{ \.\.\.ouverture\.preparees, tailles: TAILLES_OUVERTURE_PRESTATION \}\}/);
-    const pagesAOuverture = ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx"];
+    // Lot C2 : /pro ouvre aussi sur un curseur (le comptoir, ou une réalisation PRO) : même préchargement, mêmes `sizes`.
+    const pro = lire("src/app/pro/page.tsx");
+    assert.match(pro, /import \{ preload \} from "react-dom";/);
+    assert.match(pro, /for \(const prechargement of prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\) preload\(prechargement\.href, prechargement\.options\);/);
+    assert.match(pro, /preparees=\{\{ \.\.\.ouverture\.preparees, tailles: TAILLES_OUVERTURE_PRESTATION \}\}/);
+    const pagesAOuverture = ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx", "src/app/pro/page.tsx"];
     const autres = SOURCES.filter((f) => !pagesAOuverture.includes(f) && /\bpreload\(|rel="preload"|hero-poster/.test(lire(f)));
     assert.deepEqual(autres, []);
   });
