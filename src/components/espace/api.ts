@@ -145,6 +145,9 @@ export type Devis = {
   pdf: string | null;
 };
 
+/** Mission 18 (B7) : la prochaine étape d'un projet (une phrase, un bouton, l'onglet où il mène), calculée par le CRM. */
+export type ProchainPas = { phrase: string; bouton: string; vue: "photos" | "projet" | "simulations" | "devis" | "paiement" | "apres" };
+
 export type Etat = {
   version?: 2;
   apercu?: boolean;
@@ -180,6 +183,13 @@ export type Etat = {
   devis: Devis | null;
   /** Mission 11 : les devis proposés visibles (plusieurs → le client en choisit un) ; l'accepté y est toujours. */
   devisProposes?: Devis[];
+  /**
+   * Mission 18 (B7) : ceux qu'il peut signer maintenant, calculés par le CRM — avant la signature, les devis proposés ;
+   * après, l'avenant ou le nouveau devis émis depuis. Absent d'un état gardé avant B7 (ou d'un CRM d'avant).
+   */
+  devisASigner?: Devis[];
+  /** Mission 18 (B7) : la prochaine étape de l'accueil et le point rouge des onglets, calculés par le CRM. */
+  prochainPas?: ProchainPas;
   paiement?: Paiement | null;
   acompte: { montant: number; recu: number; complet: boolean } | null;
   virement: { titulaire: string; iban: string; bic: string; reference: string } | null;
