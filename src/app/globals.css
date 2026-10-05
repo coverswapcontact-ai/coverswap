@@ -171,6 +171,9 @@
     outline-offset: 2px;
   }
   .ton-encre :focus-visible { outline-color: var(--color-fond); }
+  /* Sur l'encre, le gris chaud tomberait à 2,92:1 : le secondaire passe en sur-encre-2 (6,69), les liens nus au papier. */
+  .ton-encre .surtitre, .ton-encre .texte-2 { color: var(--color-sur-encre-2); }
+  :where(.ton-encre) a:not([class]) { color: var(--color-fond); }
 }
 
 ::-webkit-scrollbar { width: 8px; }

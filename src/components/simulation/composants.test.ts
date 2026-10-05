@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { describe, test } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AvantApres } from "./AvantApres";
+import { PAS_CURSEUR, PAS_PAGE_CURSEUR, positionAuClavier } from "./curseur-clavier";
 import { Etiquette } from "./Etiquette";
 import { Photo, type ProprietesPhoto } from "./Photo";
 import { RESERVE_BOUTON_COLLE, RESERVE_BOUTON_COLLE_MOBILE } from "./reserve-bouton-colle";
@@ -74,6 +77,62 @@ describe("AvantApres", () => {
     assert.ok(avant && apres);
     for (const c of ["rounded-[4px]", "px-2", "py-1", "text-[12.5px]", "font-medium", "bg-encre/70", "text-blanc"]) assert.ok(classes(avant).includes(c), `Avant : ${c}`);
     for (const c of ["rounded-[4px]", "px-2", "py-1", "text-[12.5px]", "font-medium", "bg-white/85", "text-encre"]) assert.ok(classes(apres).includes(c), `Après : ${c}`);
+  });
+});
+
+describe("site 3.0, lot B3 : le curseur avant / après au clavier, sa place réservée", () => {
+  test("flèches de 5 %, Page ↑ / ↓ de 25 %, Début et Fin ; toujours entre 0 et 100", () => {
+    assert.equal(PAS_CURSEUR, 5);
+    assert.equal(PAS_PAGE_CURSEUR, 25);
+    for (const [touche, attendue] of [["ArrowRight", 55], ["ArrowUp", 55], ["ArrowLeft", 45], ["ArrowDown", 45], ["PageUp", 75], ["PageDown", 25], ["Home", 0], ["End", 100]] as const) {
+      assert.equal(positionAuClavier(touche, 50), attendue, touche);
+    }
+    assert.equal(positionAuClavier("ArrowRight", 98), 100);
+    assert.equal(positionAuClavier("PageUp", 90), 100);
+    assert.equal(positionAuClavier("ArrowDown", 3), 0);
+    assert.equal(positionAuClavier("PageDown", 10), 0);
+  });
+
+  test("une touche que le curseur ne gère pas garde son effet (Tab, Entrée, Espace, lettres)", () => {
+    for (const touche of ["Tab", "Enter", " ", "a", "Escape"]) assert.equal(positionAuClavier(touche, 50), null, touche);
+  });
+
+  test("le curseur appelle la règle et retient le défilement de la page pour toute touche gérée", () => {
+    const source = readFileSync(join(process.cwd(), "src", "components", "simulation", "AvantApres.tsx"), "utf8").replace(/\r\n/g, "\n");
+    assert.match(source, /onKeyDown=\{\(e\) => \{\s*const suivante = positionAuClavier\(e\.key, position\);\s*if \(suivante === null\) return;\s*e\.preventDefault\(\);\s*setPosition\(suivante\);\s*\}\}/);
+    assert.doesNotMatch(source, /e\.key === "Arrow/, "plus de touche gérée hors de la règle");
+  });
+
+  test("un vrai curseur pour les lecteurs d'écran : role slider, focalisable, nommé, bornes et valeur", () => {
+    const html = renderToStaticMarkup(createElement(AvantApres, { apres: "/apres.jpg", avant: "/avant.jpg", alt: "Après", ratio: "4 / 3", sansOutils: true }));
+    const curseur = balises(html, "div").find((b) => b.includes('role="slider"'));
+    assert.ok(curseur);
+    for (const attribut of ['tabindex="0"', 'aria-label="Comparer avant et après"', 'aria-valuemin="0"', 'aria-valuemax="100"', 'aria-valuenow="50"', 'aria-valuetext="Moitié avant, moitié après"']) assert.ok(curseur.includes(attribut), attribut);
+    // La poignée fait 48 px (cible tactile ≥ 44 px).
+    assert.ok(classes(curseur).includes("h-12") && classes(curseur).includes("w-12"));
+  });
+
+  test("hors espace client, chaque curseur réserve sa place (ratio) : aucun décalage au chargement", () => {
+    const src = join(process.cwd(), "src");
+    const tous = (d: string, sortie: string[] = []): string[] => {
+      for (const n of readdirSync(d)) {
+        const c = join(d, n);
+        if (statSync(c).isDirectory()) tous(c, sortie);
+        else if (c.endsWith(".tsx")) sortie.push(c);
+      }
+      return sortie;
+    };
+    const appels: string[] = [];
+    for (const f of tous(src)) {
+      const nom = relative(src, f).split(sep).join("/");
+      // L'espace client, et l'arrivée du rendu qu'il est seul à employer : images du CRM au format inconnu.
+      if (nom.startsWith("components/espace/") || nom === "components/simulation/FonduRendu.tsx") continue;
+      for (const m of readFileSync(f, "utf8").matchAll(/<AvantApres\b([\s\S]*?)\/>/g)) {
+        appels.push(nom);
+        assert.match(m[1], /\bratio=\{/, `${nom} : <AvantApres> sans ratio`);
+      }
+    }
+    assert.ok(appels.length >= 5, `${appels.length} appels relus`);
   });
 });
 

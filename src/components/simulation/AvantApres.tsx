@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
 import type { SourcesImage } from "@/lib/images-preparees";
 import { CalqueMatieres, type MatiereCalque } from "@/components/ambiances/CalqueMatieres";
+import { positionAuClavier } from "./curseur-clavier";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
 import { PleinEcran } from "./PleinEcran";
@@ -13,7 +14,8 @@ import { PleinEcran } from "./PleinEcran";
  * cadre au rapport de l'image, la photo d'origine par-dessus, découpée par
  * un curseur. Le curseur se glisse depuis sa POIGNÉE (`touch-action: none`
  * dessus seulement : ailleurs, la page défile normalement au doigt), à la
- * souris, au clavier (flèches, Début, Fin). « Comparer » alterne entre tout
+ * souris, au clavier (site 3.0, lot B3 : les quatre flèches, Page ↑ / ↓ par
+ * 25 %, Début, Fin, sans faire défiler la page — `curseur-clavier.ts`). « Comparer » alterne entre tout
  * avant et tout après ; « Plein écran » ouvre l'image à pincer.
  * `altAvant` (mission 16) : le texte de la photo « avant » quand ce n'est pas
  * celle du visiteur (une réalisation publiée).
@@ -22,7 +24,9 @@ import { PleinEcran } from "./PleinEcran";
  * rapport réel de la photo (rien n'est coupé), une carte de réalisation un
  * rapport fixe (une photo d'un autre format est recadrée pareil avant et
  * après, jamais coupée en bas d'un seul côté). Sans `ratio`, l'image « après »
- * donne sa hauteur naturelle.
+ * donne sa hauteur naturelle : réservé à l'espace client (images du CRM de
+ * format inconnu) ; partout ailleurs `ratio` est obligatoire, la place est
+ * réservée avant le chargement (composants.test.ts).
  * Les pastilles « Avant » / « Après » sont l'`Etiquette` commune.
  *
  * Mission 16 (partie 3), pour l'ouverture de l'accueil (rien ne change sans
@@ -151,10 +155,10 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           onPointerUp={() => setGlisse(false)}
           onPointerCancel={() => setGlisse(false)}
           onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") setPosition((p) => Math.max(0, p - 5));
-            if (e.key === "ArrowRight") setPosition((p) => Math.min(100, p + 5));
-            if (e.key === "Home") setPosition(0);
-            if (e.key === "End") setPosition(100);
+            const suivante = positionAuClavier(e.key, position);
+            if (suivante === null) return;
+            e.preventDefault();
+            setPosition(suivante);
           }}
           className="absolute top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-white text-encre shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
           style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }}

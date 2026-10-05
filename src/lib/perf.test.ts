@@ -106,7 +106,7 @@ describe("JavaScript client : « use client » sur la liste blanche seulement", 
     assert.ok(!estClient(cartes));
     assert.match(cartes, /onClick=\{onChoisir \? \(\) => onChoisir\(p\.id\) : undefined\}/, "un bouton sans onChoisir n'a pas de gestionnaire");
     // Les composants de page qui n'ont pas d'état restent serveur.
-    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/Confiance.tsx", "src/components/Logo.tsx"]) assert.ok(!estClient(lire(f)), f);
+    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/Confiance.tsx", "src/components/Logo.tsx", "src/components/revue/Cartel.tsx", "src/components/revue/BandeMatiere.tsx", "src/components/revue/GrandNumero.tsx", "src/components/revue/Pastille497.tsx", "src/components/revue/Echantillon.tsx"]) assert.ok(!estClient(lire(f)), f);
   });
 });
 

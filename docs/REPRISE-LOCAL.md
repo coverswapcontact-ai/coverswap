@@ -16,7 +16,9 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 - B0, mise en place : fait (Lighthouse avant dans `docs/SEO.md`, `scripts/captures.mjs` revu).
 - B1, jetons et polices : fait (`docs/DESIGN.md` commencé).
-- B2 à B7 : à venir.
+- B2, le rouge réservé aux actions : fait.
+- B3, composants de base : fait (`src/components/revue/`, `lib/teintes-prestations.ts`, `docs/DESIGN.md` complet).
+- B4 à B7 : à venir.
 
 ## Phase C : le tunnel, page par page
 
@@ -209,3 +211,79 @@ Lint et build passent.
 **Problèmes** : `espace/Illustrations.tsx` dessine encore le cadre « Toute la zone visible » (conseils de l'écran
 Photo) en rouge `#CC0000` écrit en dur : hors champ du test jusqu'au lot C6 / E2, qui remplacent ses couleurs.
 `HomeClient.tsx` garde son libellé-bouton de fichier en encre plein (il disparaît en B6).
+
+## B3 — composants de base (05/10/2026)
+
+**Fait**
+- `src/components/revue/` (5 composants serveur, aucun JavaScript envoyé, ajoutés à la liste de `perf.test.ts`) :
+  - `Cartel` : « Nom · RÉF · famille · finition » (nom en Playfair italique, puis « RM20 · Couleur · Standard » en
+    `.cartel`), filet vertical de 3 px à la teinte (celle de la prestation, sinon la couleur de la matière, liseré
+    d'encre à 15 % pour les matières blanches) ; variantes `clair`, `encre`, `sur-photo` ;
+  - `BandeMatiere` : l'échantillon du CRM étiré en fond (`srcSet` vignette 320 w / échantillon entier 595 w,
+    `object-cover`), hauteur réservée (96 / 128 px, ou 160 / 240 px), couleur `hex` en attendant, `loading="lazy"`,
+    `role="img"` nommé par le cartel, cartel `sur-photo` muet posé dessus ;
+  - `GrandNumero` : `<span class="grand-numero …" aria-hidden="true">`, deux chiffres, encre (papier sur l'encre) ou
+    teinte là où elle tient 4,5:1, jamais rouge ;
+  - `Pastille497` : lien rouge vers `/matieres`, nombre = `NB_REFERENCES`, 112 / 144 px, légèrement penché ;
+  - `Echantillon` : vignette `?l=320` carrée, arrondie, ombre légère, sur la couleur de la matière, cartel dessous,
+    lien facultatif nommé par le cartel.
+- `src/lib/cartel.ts` (pur) : famille au singulier, finitions en français (Soft « Standard », Structured
+  « Structurée », Rustic « Rustique », Glitter « Pailletée »), `ligneCartel`, `texteCartel`.
+- `src/lib/teintes-prestations.ts` (pur, sans import du catalogue) : cuisine RM20, salle de bain M6, meubles NH12,
+  portes et placards NF13, murs NF99, professionnel K1 + D1, vitrages sans teinte ; contrastes déclarés (papier,
+  papier granulé, fond-2, encre) et `texteAutorise` ; `teintePrestation(id)` (slugs, `mur-plafond`, éléments portes
+  et placards), `styleTeinte` (`--teinte`, `--teinte-2`), `classeTexteTeinte`.
+- `Etiquette` : six textes (« Réalisation », « Simulation », « Ambiance », « Ambiance · avant / après », « Avant »,
+  « Après », `TEXTES_ETIQUETTE`), classes inchangées.
+- `AvantApres` : clavier par `curseur-clavier.ts` (← → ↑ ↓ 5 %, Page ↑ / ↓ 25 %, Début, Fin), `preventDefault` sur
+  toute touche gérée ; `ratio` obligatoire hors espace client (vérifié sur les appels existants, tous conformes).
+- `Section` : `ton` = `papier` (transparent, le papier et le grain de la page), `papier-2` (`bg-fond-2`), `encre`
+  (`ton-encre bg-encre text-fond`, titre au papier) ; `fond="fond-2"` reste accepté (= `papier-2`).
+- `globals.css` (194 lignes) : sur `.ton-encre`, `.surtitre` et `.texte-2` passent en `sur-encre-2`, les liens nus
+  au papier.
+- `docs/DESIGN.md` complet : teintes des prestations et leurs contrastes, les règles, les composants de base (boutons,
+  cartel, échantillon, bande, filet, grand numéro, pastille, étiquette d'honnêteté, curseur, tons de section), ce
+  qu'on a jeté de la maquette.
+
+**Vérification visuelle** : page de contrôle temporaire `/controle-revue` (jamais commitée, supprimée avant le build
+final) sur un build local construit comme la CI, captures 390 et 1 440 px (Edge) ; tous les composants, les trois
+tons, les six étiquettes, le curseur. Aucun débordement à 360 px (contrôle, accueil, `/comment-ca-marche`, `/pro`),
+0 requête coupée. **Clavier dans Edge** à 390 et 1 440 px : → 55, ↑ 60, ← 55, ↓ 50, Page ↑ 75 puis 100 (borné),
+Page ↓ 75, Début 0, Fin 100 ; la page ne défile pas (scrollY inchangé) ; contour de focus 3 px à l'encre ; Tab sort
+du curseur. La capture a montré une pastille ovale à 1 440 px (112 × 144) : `md:w-36` collé à `${className…}`
+n'était pas généré par Tailwind ; corrigé (chaîne entière) et testé, 144 × 144 ensuite.
+
+**Décisions prises seul**
+1. **Steel Blue M6 n'écrit pas sur le papier** (le plan le permettait à 4,65) : sous le grain (5ᵉ centile `#EBE5DA`,
+   mesuré en B1), il tombe à 4,31. La règle « texte en teinte ≥ 4,5:1 » est prise au pire du papier uni et granulé.
+   RM20 tient (4,52 sous le grain). `texteAutorise` est calculé couple par couple plutôt que « jamais sur fond-2 » :
+   NF13, K1 et D1 y tiennent (10,21, 12,38, 6,46), NH12 et NF99 tiennent sur l'encre (6,37, 6,50).
+2. La bande de matière **étire** l'échantillon (énoncé : « étirée en fond ») au lieu de répéter la vignette (plan) :
+   l'échantillon entier (595 px) évite les raccords visibles d'une tuile ; la vignette de 320 px sert aux petits
+   écrans à densité 1. Hauteurs : 96 / 128 px (`fine`), 160 / 240 px (`haute`).
+3. Le grand numéro en teinte suit le même seuil 4,5:1 que le texte courant (pas le 3:1 des grands textes) : une seule
+   règle.
+4. `Section ton="papier"` est **transparente** (le papier et le grain de la page, sans raccord) plutôt que `.papier`
+   ou `bg-fond` : rien ne change sur les pages qui ont encore une enveloppe `bg-fond` ; sur l'accueil (sans
+   enveloppe), les sections papier montrent déjà le grain, l'ouverture (`bg-fond`) pas encore — écart de 5 niveaux
+   (244 → 239), réglé par le gabarit B5 et l'accueil B6.
+5. Finition « Soft » glosée « Standard » (le plan D1 : « Standard (Soft) ») : des matières laquées sont « Soft », on
+   ne peut pas écrire « mat ». La famille passe au singulier sur le cartel (« Couleur »), comme la maquette.
+6. `ton.test.ts` affine les formules du plan pour épargner les sens propres déjà au site : « la couverture
+   géographique » (mentions légales) et « du numéro de téléphone » (espace client). Il attrape aussi les saisons,
+   « faisait la couverture », le code-barres et « le nuancier du numéro ».
+7. Teintes recopiées dans `teintes-prestations.ts` (avec un test de parité) plutôt que lues dans
+   `revetements.json` : un composant client qui l'importerait tirerait les 497 matières dans son JavaScript.
+
+**Tests** : 306 → 341, tous réussis. `components/revue/revue.test.ts` (28) : serveur et sans hexadécimal ni classe
+collée à une expression ; rendu du cartel (3 variantes), de l'échantillon (avec et sans lien), de la bande (nom,
+hauteur, `srcSet`, différé) ; teintes de l'énoncé, parité avec `revetements.json`, contrastes recalculés depuis les
+jetons et `texteAutorise` pour chacune des 7 références ; grand numéro jamais rouge (source et rendu, 21
+combinaisons) ; pastille ; six étiquettes au même dessin ; trois tons de section et règles `.ton-encre`.
+`composants.test.ts` +5 (touches, touches non gérées, `preventDefault`, attributs du curseur, `ratio` partout hors
+espace). `src/app/ton.test.ts` (2) : 0 constat sur les sources, formules attrapant la maquette et épargnant les sens
+propres. `perf.test.ts` : les 5 composants dans la liste serveur. Lint et build passent.
+
+**Problèmes** : les captures pleine page à 1 440 px laissent toujours blanches les sections en `content-visibility`
+de l'accueil (connu depuis B0) ; les vignettes et échantillons viennent du CRM de production (GET seulement, comme
+en B0) ; le cartel d'une matière blanche (NE31) a un filet très pâle, gardé lisible par le liseré.

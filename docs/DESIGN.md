@@ -1,12 +1,15 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
-Commencé au lot B1 (mission 21) : les jetons, les polices, le grain et les contrastes. Les composants de base
-(boutons, cartel, bande de matière, filet, grand numéro, étiquette d'honnêteté, curseur avant / après) et ce qu'on
-jette de la maquette s'ajoutent au lot B3.
+Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions) et B3 (les teintes des
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette).
 
-Le site est un artisan qui montre ce qu'il fait, pas un magazine : la maquette (`maquette-11-la-revue.html`) donne
-la grammaire (titres serif très grands, filets fins, grands numéros, cartels de matière, blocs papier et encre),
-pas un gabarit à recopier.
+Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
+(`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
+matière, blocs papier et encre), pas un gabarit à recopier.
+
+Plan : [Jetons et contrastes](#jetons-et-contrastes) · [Les règles](#les-règles) · [Le rouge
+réservé aux actions](#le-rouge-réservé-aux-actions) · [Les composants de base](#les-composants-de-base) · [Ce qu'on a
+jeté de la maquette](#ce-quon-a-jeté-de-la-maquette).
 
 ## Jetons et contrastes
 
@@ -84,8 +87,33 @@ sans texte (25 200 pixels) :
 Le gris chaud reste au-dessus de 4,5:1 même sur le grain le plus sombre. Sur fond-2, le même grain le ferait tomber
 à 4,25 au pire : c'est pourquoi fond-2 n'en porte jamais.
 
-Les teintes de prestation (cuisine RM20, salle de bain M6…) et leurs contrastes s'ajoutent au lot B3
-(`src/lib/teintes-prestations.ts`).
+### Les teintes des prestations
+
+Lot B3, `src/lib/teintes-prestations.ts`. Le site est coloré par les matières, pas par l'interface : chaque
+prestation prend une vraie référence du catalogue, qui colore le cartel, les filets et les bandes de sa page **et de
+ses cartes** (pictos de l'accueil, cartes des zones, « autres prestations »). Le bloc qui la porte pose
+`styleTeinte(…)` (`--teinte`, et `--teinte-2` pour le pro) ; `.filet`, le cartel et le grand numéro la lisent.
+
+| Prestation | Teinte | Hex | papier | papier granulé | fond-2 | encre | Texte en teinte |
+|---|---|---|---|---|---|---|---|
+| cuisine | Sage Green RM20 | `#616A57` | 4,87 | 4,52 | 4,41 | 3,17 | **sur le papier** |
+| salle de bain | Steel Blue M6 | `#666A75` | 4,65 | 4,31 | 4,21 | 3,32 | jamais |
+| meubles | Terracotta Stucco NH12 | `#AF9584` | 2,42 | 2,25 | 2,19 | 6,37 | **sur l'encre** |
+| portes et placards | Deep Green NF13 | `#23342E` | 11,27 | 10,46 | 10,21 | 1,37 | papier et fond-2 |
+| murs | Lombarda Grigio NF99 | `#A59A8E` | 2,37 | 2,20 | 2,15 | 6,50 | **sur l'encre** |
+| professionnel | Black Mat K1 | `#232220` | 13,67 | 12,68 | 12,38 | 1,13 | papier et fond-2 |
+| professionnel (seconde) | Classic Walnut D1 | `#654835` | 7,13 | 6,62 | 6,46 | 2,16 | papier et fond-2 |
+| vitrages | aucune | | | | | | |
+
+- **Texte en teinte seulement à 4,5:1** (`texteAutorise`, testé) ; sur le papier, le rapport retenu est le pire du
+  papier uni et du papier granulé (5ᵉ centile, `#EBE5DA`). Ailleurs, la teinte ne fait que les filets, les cartels et
+  les bandes, et le texte reste à l'encre (au papier sur l'encre) : `classeTexteTeinte(teinte, fond)` choisit.
+- Steel Blue M6 passe 4,5:1 sur le papier uni (4,65) mais pas sous le grain (4,31) : la salle de bain n'écrit jamais
+  en teinte. Sur fond-2, ni la cuisine (4,41) ni la salle de bain (4,21) n'écrivent.
+- Les valeurs du catalogue et les rapports sont recopiés dans le fichier (un composant client ne doit pas tirer les
+  497 matières) et vérifiés par `components/revue/revue.test.ts` contre `data/revetements.json` et les jetons.
+- `teintePrestation(id)` accepte le slug de page, la pièce du simulateur (`mur-plafond`) et les éléments portes et
+  placards (`placard`, `porte-entree`…) ; rend `null` pour les vitrages.
 
 ### Les polices
 
@@ -138,6 +166,26 @@ rouge, en Playfair 900. `espace/Illustrations.tsx` le réexporte pour l'espace c
 et `public/og-image.jpg` n'ont pas été refaits au lot B1 (rouge et polices d'avant) : l'image de partage est
 recomposée au lot F2.
 
+## Les règles
+
+1. **Le rouge pour les actions, et rien d'autre** : boutons principaux, lien « Simuler », pastille « 497 matières »
+   (et la marque). Ni titre, ni numéro, ni surtitre, ni sélection, ni erreur (section suivante).
+2. **Les fonds d'interface restent papier et encre.** Les blocs alternent papier clair, papier foncé et encre ;
+   la couleur vient des photos en pleine largeur, des bandes de matière et des teintes des prestations.
+3. **Le grain sur le papier seulement** : `body` et `.papier`. Jamais sur fond-2 (cadres des photos), l'encre, une
+   photo, une bande de matière.
+4. **Les teintes sur les filets, les cartels et les bandes.** Du texte en teinte seulement là où il tient 4,5:1
+   (tableau plus haut).
+5. **Toute image générée porte son étiquette** (« Ambiance », « Ambiance · avant / après ») ; « Simulation » pour les
+   rendus du simulateur seulement ; « Réalisation » pour les vrais chantiers, qui passent toujours en premier.
+6. **Téléphone d'abord** : chaque écran est pensé à 390 px avant 1 440 px, rien ne déborde à 360 px ; cibles
+   tactiles de 44 px au moins.
+7. **Le ton est direct et concret**, à la première personne du pluriel (« on pose en une journée », « on vient avec
+   les échantillons »), sans jargon de décorateur (« écrin », « esprit », « signature », « tendance de la saison »),
+   sans rien de « faux magazine » (dernière section ; `src/app/ton.test.ts` y veille).
+8. **Les places sont réservées** : toute image, tout curseur, toute bande a sa hauteur avant de charger (aucun
+   décalage de mise en page).
+
 ## Le rouge réservé aux actions
 
 Lot B2. Le rouge CoverSwap (`accent`, `#B3261E`) sert à convertir, et à rien d'autre. Les fonds d'interface restent
@@ -185,3 +233,128 @@ l'encre, `secondaire` ailleurs.
   couleur du texte du bouton (encre, blanc au survol).
 - **Liens de texte** (pages légales, désinscription, opposition à la mesure) : `text-encre underline`, gris chaud au
   survol.
+
+## Les composants de base
+
+Lot B3. Les nouveaux sont dans `src/components/revue/` (composants serveur, aucun JavaScript envoyé) ; les communs
+déjà là (`Bouton`, `Lien`, `Etiquette`, `AvantApres`, `Section`) restent dans `src/components/simulation/`. Tous sont
+rendus et vérifiés par `components/revue/revue.test.ts` et `components/simulation/composants.test.ts`.
+
+### Les boutons
+
+`Bouton` (`<button>`) et `Lien` (`<a>`) partagent `classesBouton(variante)` : **principal rouge** (un seul par
+écran : l'action de l'écran), **secondaire à l'encre en contour**, `sur-encre` (contour papier, sur un bloc encre),
+`discret` (lien souligné). 48 px de haut au moins. Détail dans « Les boutons » plus haut.
+
+### Le cartel de matière — `revue/Cartel.tsx`
+
+L'étiquette d'un échantillon en boutique : **« Nom · RÉF · famille · finition »**. Le nom du fabricant en Playfair
+italique 19 px (« Sage Green »), puis « RM20 · Couleur · Standard » en petites capitales espacées (`.cartel`, 12 px),
+à côté d'un **filet vertical de 3 px à la teinte** (celle de la prestation passée en `teinte`, sinon la couleur de la
+matière ; un liseré d'encre à 15 % le garde visible quand la matière est blanche). Le texte ne prend jamais la teinte.
+
+- Famille au singulier (« Couleur », « Bois », « Pierre », « Béton »…), finition en français (`lib/cartel.ts`) :
+  Soft → « Standard » (474 matières sur 497), Structured → « Structurée », Rustic → « Rustique », Glitter →
+  « Pailletée ».
+- Variantes : `clair` (papier ou fond-2 : encre et gris chaud), `encre` (bloc encre : papier et `sur-encre-2`),
+  `sur-photo` (sur une image : voile d'encre à 80 %, tout en blanc).
+- Usage : sous un échantillon, sur une bande, sous une ambiance pour dire ses matières, sur la fiche d'une matière.
+
+### L'échantillon — `revue/Echantillon.tsx`
+
+Une matière comme un échantillon physique : la **vraie vignette** du catalogue (`/api/site/echantillons/<REF>?l=320`
+du CRM), carrée (place réservée), coin arrondi, ombre portée légère, posée sur la couleur de la matière tant qu'elle
+charge (chargement différé, `priorite` pour le premier écran), et son cartel dessous. Avec `href`, tout l'échantillon
+est un lien nommé par son cartel. Usage : le présentoir de l'accueil (8 vedettes), `/matieres`, les « matières
+proches » d'une fiche.
+
+### La bande de matière — `revue/BandeMatiere.tsx`
+
+Elle **sépare les grandes sections** avec une vraie matière (chêne, marbre, vert profond, terracotta, bleu nuit) :
+l'échantillon du CRM **étiré en fond** sur toute la largeur (`object-cover` ; la vignette de 320 px ou l'échantillon
+entier de 595 px, au choix du navigateur), son cartel `sur-photo` posé en bas à gauche.
+
+- Hauteur réservée : `fine` 96 px (128 px dès 768 px), `haute` 160 px (240 px) ; la couleur de la matière remplit la
+  bande avant l'image.
+- Chargement différé : une bande n'est jamais en haut de page.
+- Une seule image pour les lecteurs d'écran (`role="img"`, nommée « Matière Classic Walnut · D1 · Bois · Standard »).
+- Pas de grain dessus, pas de texte d'interface dessus : seulement le cartel.
+
+### Le filet — `.filet`
+
+Un trait de 1 px (`<hr class="filet">`, ou `border-top` d'un bloc) à la teinte de la page (`--teinte`), à l'encre
+s'il n'y en a pas. Il sépare deux idées dans une section (étapes, questions, cartes), au lieu d'un cadre ou d'une
+ombre. Les bordures neutres (champs, cartes) restent au `trait`.
+
+### Le grand numéro — `revue/GrandNumero.tsx`
+
+« 01 », « 02 »… en Playfair 900, 64 px (`.grand-numero`) : le numéro d'une étape de « Comment on travaille » ou du
+déroulé d'une page. **À l'encre** (au papier sur l'encre), ou **à la teinte** de la prestation là où elle tient
+4,5:1. **Jamais rouge** (testé : source et rendu). Décoratif (`aria-hidden`) : il se pose dans une liste ordonnée,
+qui dit déjà l'ordre aux lecteurs d'écran. Jamais un numéro de page, jamais un « N° ».
+
+### La pastille « 497 matières » — `revue/Pastille497.tsx`
+
+Un disque rouge un peu penché (112 px, 144 px dès 768 px), le nombre du catalogue en Playfair 900 et « matières » en
+petites capitales, blanc sur rouge : c'est une action, elle mène à `/matieres`. Le nombre vient de `NB_REFERENCES`
+(compté dans `revetements.json`), jamais écrit à la main. Une par page au plus, sur une photo d'ouverture ou à côté du
+présentoir.
+
+### L'étiquette d'honnêteté — `simulation/Etiquette.tsx`
+
+La pastille posée sur une image, un seul dessin partout (12,5 px, fond blanc à 85 % et encre ; encre à 70 % et blanc
+pour « Avant ») :
+
+| Texte | Sur quoi |
+|---|---|
+| Réalisation | un vrai chantier (toujours montré en premier) |
+| Simulation | un rendu du simulateur, rien d'autre |
+| Ambiance | une image générée (photos d'ambiance, photos utiles) |
+| Ambiance · avant / après | un avant / après généré |
+| Avant, Après | les deux côtés d'un curseur |
+
+Les pictos (dessins) n'en portent pas. Une étiquette décorative sur une image `alt=""` est muette (`muette`).
+
+### Le curseur avant / après — `simulation/AvantApres.tsx`
+
+Les deux images superposées, l'« avant » découpé par le curseur ; poignée de 48 px qu'on glisse au doigt (la page
+défile ailleurs), un toucher sur l'image place le curseur.
+
+- **Au clavier** (`curseur-clavier.ts`) : ← → ↑ ↓ de 5 %, Page ↑ / Page ↓ de 25 %, Début (tout après), Fin (tout
+  avant) ; ces touches ne font pas défiler la page pendant qu'on règle (`preventDefault`), les autres gardent leur
+  effet. `role="slider"`, nommé « Comparer avant et après », valeur et texte de valeur annoncés.
+- **Place réservée** : `ratio` obligatoire hors espace client (testé), les deux images remplissent le cadre de la même
+  façon.
+- Pastilles « Avant » / « Après » en haut, l'étiquette d'honnêteté en bas à gauche.
+
+### Les sections et leurs tons — `simulation/Section.tsx`
+
+Une idée par section, de l'air (64 px, 96 px dès 768 px), largeur de lecture ou large. Trois tons (`ton`) :
+
+| Ton | Fond | Titre | Secondaire | Boutons |
+|---|---|---|---|---|
+| `papier` (par défaut) | transparent : le papier de la page et son grain, sans raccord | encre | gris chaud | principal, secondaire |
+| `papier-2` | `bg-fond-2`, sans grain | encre | gris chaud (4,78) | principal, secondaire |
+| `encre` | `ton-encre bg-encre text-fond`, sans grain | papier | `sur-encre-2` (6,69), automatique pour `.surtitre` et `.texte-2` | `sur-encre` |
+
+Sur l'encre, les liens nus passent au papier et le contour de focus aussi (globals.css). Le dernier appel et le pied de
+page sont en encre (lots B5 / B6), jamais en rouge. L'ancien `fond="fond-2"` vaut `ton="papier-2"`.
+
+## Ce qu'on a jeté de la maquette
+
+Tout ce qui fait « faux magazine » (énoncé, phase B) :
+
+- « N° 01 », « Automne 2026 », « La revue des intérieurs qui changent » et son titre de 250 px ;
+- le sommaire et ses grands numéros rouges (« 04 », « 12 »… renvoyant à des pages) ;
+- « Dossier », « En couverture », « Grand format · Salon », « Le nuancier du numéro », « Et si votre pièce faisait la
+  couverture ? » ;
+- le surtitre rouge « Entretien » et la lettrine du paragraphe d'ouverture ;
+- le grain posé sur toute la page, photos comprises (ici : le papier seulement) ;
+- le code-barres, et le bloc rouge du dernier appel (ici : encre, avec un bouton principal rouge).
+
+`src/app/ton.test.ts` relit toutes les sources (pages, composants, données, articles, hors tests) et échoue sur un
+numéro de revue, une saison, « la revue », « sommaire », « ce numéro » / « du numéro », « à la une », « en
+couverture », « faisait la couverture », « grand format » ou un code-barres. « Dossier » reste permis : l'espace
+client l'emploie au sens propre (le dossier d'un client). Ce qu'on garde : la grammaire (titres serif très grands
+posés sur une photo pleine largeur, filets fins, grands numéros, cartels, blocs papier et encre), les jetons, le
+lien rouge « Simuler », la pastille.
