@@ -269,7 +269,7 @@ describe("/pro et /contact", () => {
     assert.doesNotMatch(page, /lg:grid-cols/, "une seule colonne");
     // La confirmation du formulaire : titre et texte, sans pastille colorée ; une réponse neutre (la page sert aussi à redemander son lien).
     const formulaire = lire("components/DevisForm.tsx");
-    assert.doesNotMatch(formulaire, /bg-ok-fond|<svg/);
+    assert.doesNotMatch(formulaire, /bg-(ok|succes)-fond|<svg/);
     assert.match(formulaire, /Nous vous répondons \{DELAI_REPONSE\}\./);
   });
 

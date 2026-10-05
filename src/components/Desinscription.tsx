@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Logo } from "@/components/espace/Illustrations";
+import { Logo } from "@/components/Logo";
 import { Bouton } from "@/components/simulation/Bouton";
 import { SITE } from "@/lib/constants";
 

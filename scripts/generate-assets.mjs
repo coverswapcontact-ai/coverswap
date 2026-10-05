@@ -2,21 +2,25 @@ import sharp from 'sharp';
 import { writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { lireJetons } from './jetons.mjs';
 
 /**
  * Le logo (512 × 512) et l'image de partage (1200 × 630) du site, en SVG puis
- * en PNG / JPEG par sharp (sans coût, en local). Mission 16 : le thème clair
- * du site — fond blanc cassé, encre noire douce, un seul accent — sans ombre
- * ni dégradé. Les couleurs sont celles des jetons de src/app/globals.css.
+ * en PNG / JPEG par sharp (sans coût, en local). Fond papier, encre, le rouge
+ * de la marque, sans ombre ni dégradé. Les couleurs sont lues dans leur seule
+ * source, le bloc @theme de src/app/globals.css (scripts/jetons.mjs, site 3.0
+ * lot B1) ; les polices sont celles du site (Playfair Display, Libre Franklin),
+ * à installer sur le poste pour que sharp les trouve.
  *   node scripts/generate-assets.mjs
  */
-const FOND = '#F5F4F1';
-const ENCRE = '#1A1A1A';
-const ENCRE_2 = '#5F5A53';
-const TRAIT = '#D3CFC8';
-const ACCENT = '#CC0000';
-const POLICE_TITRE = "'Space Grotesk', 'Segoe UI', Arial, sans-serif";
-const POLICE_TEXTE = "'Inter', 'Segoe UI', Arial, sans-serif";
+const JETONS = lireJetons();
+const FOND = JETONS.fond;
+const ENCRE = JETONS.encre;
+const ENCRE_2 = JETONS['encre-2'];
+const TRAIT = JETONS.trait;
+const ACCENT = JETONS.accent;
+const POLICE_TITRE = "'Playfair Display', Georgia, serif";
+const POLICE_TEXTE = "'Libre Franklin', 'Segoe UI', Arial, sans-serif";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');

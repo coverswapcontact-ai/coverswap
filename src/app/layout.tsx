@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Libre_Franklin, Playfair_Display } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import EnteteSite from "@/components/EnteteSite";
@@ -11,15 +11,22 @@ import HorsSimulateur from "@/components/HorsSimulateur";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
-const inter = Inter({
+/**
+ * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900, droit et italique) et Libre Franklin pour le texte,
+ * en polices variables téléchargées au build et servies par le site (next/font) : aucun appel à Google Fonts depuis
+ * le navigateur. `display: swap`, préchargées, et une police de repli ajustée (adjustFontFallback, par défaut) contre
+ * le décalage au chargement. Les jetons --font-display et --font-sans de globals.css pointent sur ces variables.
+ */
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter",
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const franklin = Libre_Franklin({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-franklin",
   display: "swap",
 });
 
@@ -75,9 +82,9 @@ export const metadata: Metadata = {
   },
 };
 
-/** Mission 16 : la couleur de la barre du navigateur = le fond du thème clair (jeton --color-fond), une seule fois pour tout le site. */
+/** La couleur de la barre du navigateur = le papier (jeton --color-fond, vérifié par theme.test.ts) ; l'espace client (/e/…) a la même. */
 export const viewport: Viewport = {
-  themeColor: "#F5F4F1",
+  themeColor: "#F4EDE2",
   width: "device-width",
   initialScale: 1,
 };
@@ -88,7 +95,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="fr" className={`${playfair.variable} ${franklin.variable}`}>
       <body className="bg-fond font-sans text-encre antialiased">
         {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans suivi de parcours ni habillage commercial. */}
         {/* Mission 16 (partie 6) : aucun script tiers ni cookie de mesure (GTM, GA4, pixel Meta, Clarity et Vercel Analytics retirés,

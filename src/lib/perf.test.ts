@@ -106,7 +106,7 @@ describe("JavaScript client : « use client » sur la liste blanche seulement", 
     assert.ok(!estClient(cartes));
     assert.match(cartes, /onClick=\{onChoisir \? \(\) => onChoisir\(p\.id\) : undefined\}/, "un bouton sans onChoisir n'a pas de gestionnaire");
     // Les composants de page qui n'ont pas d'état restent serveur.
-    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/Confiance.tsx"]) assert.ok(!estClient(lire(f)), f);
+    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/Confiance.tsx", "src/components/Logo.tsx"]) assert.ok(!estClient(lire(f)), f);
   });
 });
 
@@ -249,10 +249,17 @@ describe("l'ouverture : l'« avant » préchargé sur / seulement", () => {
     assert.deepEqual(autres, []);
   });
 
-  test("la police d'affichage reste préchargée (next/font, sans preload: false)", () => {
+  test("les polices du site 3.0 : Playfair Display et Libre Franklin par next/font, préchargées, en swap ; aucun appel à Google Fonts", () => {
     const gabarit = lire("src/app/layout.tsx");
-    assert.match(gabarit, /Space_Grotesk\(/);
-    assert.doesNotMatch(gabarit, /preload:\s*false/);
+    assert.match(gabarit, /import \{ Libre_Franklin, Playfair_Display \} from "next\/font\/google";/);
+    assert.match(gabarit, /Playfair_Display\(\{[^}]*style: \["normal", "italic"\][^}]*variable: "--font-playfair",\s*display: "swap"/);
+    assert.match(gabarit, /Libre_Franklin\(\{[^}]*variable: "--font-franklin",\s*display: "swap"/);
+    assert.doesNotMatch(gabarit, /preload:\s*false|adjustFontFallback:\s*false/);
+    assert.doesNotMatch(gabarit, /Space_Grotesk|\bInter\(/, "les anciennes polices sont parties");
+    const css = lire("src/app/globals.css");
+    assert.match(css, /--font-display: var\(--font-playfair\)/);
+    assert.match(css, /--font-sans: var\(--font-franklin\)/);
+    for (const f of [...SOURCES, "src/app/globals.css"]) assert.doesNotMatch(lire(f), /fonts\.googleapis|fonts\.gstatic/, `${f} appelle Google Fonts`);
   });
 });
 

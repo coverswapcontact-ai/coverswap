@@ -487,7 +487,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
             lecturePhoto={lecturePhoto}
           >
             {envoye ? (
-              <div role="status" className="rounded-[var(--rayon-sm)] bg-ok-fond p-4 text-ok-texte">
+              <div role="status" className="rounded-[var(--rayon-sm)] bg-succes-fond p-4 text-succes">
                 <p className="text-[17px] font-semibold">Demande bien reçue</p>
                 <p className="mt-1 text-[14.5px] leading-relaxed">Votre photo et vos choix de matières nous sont parvenus. Nous réalisons la simulation et vous l&apos;envoyons par e-mail avec votre devis, {DELAI_REPONSE}. Besoin de nous joindre avant ? {ENTREPRISE.telephone}.</p>
               </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Logo } from "@/components/espace/Illustrations";
+import { Logo } from "@/components/Logo";
 import { Lien } from "@/components/simulation/Lien";
 import { ENTREES_MENU, LIEN_SIMULER } from "@/lib/navigation";
 import MenuMobile from "./MenuMobile";

@@ -215,20 +215,8 @@ export function PlanCuisine({ forme, className, enSvg }: { forme: FormeCuisine; 
   return <Picto nom={`plan-${forme}`} className={className} enSvg={enSvg} />;
 }
 
-/** Le logo CoverSwap : le carré rouge, le « C », le mot. */
-export function Logo({ className }: { className?: string }) {
-  return (
-    <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
-      <span className="relative h-8 w-8" aria-hidden>
-        <span className="absolute inset-[3px] rotate-45 rounded-[6px] bg-[#CC0000]" />
-        <span className="absolute inset-0 flex items-center justify-center font-display text-[15px] font-bold text-white">C</span>
-      </span>
-      <span className="font-display text-[19px] font-bold tracking-tight text-[#1A1A1A]">
-        Cover<span className="text-[#CC0000]">Swap</span>
-      </span>
-    </span>
-  );
-}
+/** Le logo vit dans `components/Logo.tsx` (composant serveur, site 3.0) ; réexporté ici pour l'espace client. */
+export { Logo } from "@/components/Logo";
 
 export const IconeTelephone = ({ taille = 18 }: { taille?: number }) => (
   <svg width={taille} height={taille} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
