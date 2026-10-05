@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { CarteRealisation } from "@/components/CarteRealisation";
 import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
 import { Etiquette } from "@/components/simulation/Etiquette";
@@ -67,14 +66,15 @@ export function RealisationsAccueil({ reelles, ambiancesRangee = ambiancesAccuei
         <ul className="-mx-4 mt-5 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0 [&::-webkit-scrollbar]:hidden">
           {ambiancesRangee.map((a) => (
             <li key={a.id} className="w-[70vw] max-w-[300px] shrink-0 snap-start md:w-auto md:max-w-none">
-              <Link href={lienInspiration(a.id)} className="group block">
+              {/* Un lien de page, pas `Link` : l'ancre (`:target`) montre l'ambiance même si elle est dans la suite de /inspirations (lot C4). */}
+              <a href={lienInspiration(a.id)} className="group block">
                 <span className="relative block overflow-hidden rounded-[var(--rayon-md)]">
                   <Photo nom={a.image} alt="" ratio="1 / 1" tailles={TAILLES_AMBIANCE} etiquette="Ambiance" enLigne />
                   <PastillesMatieres image={a.image} />
                 </span>
                 <span className="mt-3 block text-[16px] leading-snug font-semibold text-encre group-hover:underline">{a.titre}</span>
                 <span className="mt-0.5 block text-[13.5px] text-encre-2">{a.surfaces.map((s) => `${s.nom} ${s.ref}`).join(" · ")}</span>
-              </Link>
+              </a>
             </li>
           ))}
         </ul>

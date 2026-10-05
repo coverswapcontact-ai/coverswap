@@ -1,7 +1,7 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets) et C5
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`) et C5
 (`/realisations`).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
@@ -526,6 +526,27 @@ page, l'encre sans teinte), sans fond ni cadre ; les étapes portent leur **gran
 travaille ») ; les questions se replient entre des filets, comme celles de l'accueil. Restent en carte blanche, pour
 l'instant : les formulaires (`DevisForm`, `FormulairePro`), les avis, les cartes de réalisation et les pages hors
 tunnel (zones, CGV, blog).
+
+## La page Inspirations
+
+Lot C4, `src/app/inspirations/page.tsx`, ordre dans `_components/ordre.ts`, filtres et suite dans
+`_components/FiltresInspirations.tsx` (énoncé, § C.2). Toutes les ambiances : la série 1, les 36 « après » de la série
+2, les 2 ambiances ; jamais un « avant » seul (il n'apparaît que dans le curseur de ses « après »).
+
+- **La carte** est celle des pages de prestation (`CarteAmbiance`) : titre (`h2`), curseur « Ambiance · avant / après »
+  si c'est une paire, sinon la photo « Ambiance », les cartels de sa composition (chacun mène à sa matière),
+  « Essayer cette composition chez moi » (`depuis=inspirations`). Sous un filet d'encre.
+- **Une grille dense** : 1 colonne, 2 dès 640 px, 3 dès 1 024 px (en colonnes : les images portrait ne laissent pas
+  de trou).
+- **Les pièces mêlées** (`ordreInspirations`) : une photo seule de cuisine en tête (la seule image prioritaire ; une
+  paire ne l'est jamais), puis une pièce après l'autre ; les deux « après » d'un même avant ne se suivent jamais.
+- **Praticable** : les 12 premières du choix en cours, puis « Voir toutes les ambiances » (bouton secondaire, avec ce
+  qu'il reste : « 40 de plus »). Le tout sans JavaScript : une case à cocher et des règles CSS écrites par le serveur
+  (`reglesSuite`), comme les filtres. Les 52 sont dans la page (référencement) ; la suite est masquée, ses images ne se
+  chargent pas. Une ambiance visée par l'adresse (`#<id>`, `:target`) se montre toujours : les liens qui y mènent
+  sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres`, qui
+  navigue par le routeur, est à passer en lien de page avec la phase D). La page passe de 18 800 à 3 700 px de haut à
+  1 440 px de large, et mesure 8 800 px à 390 px.
 
 ## Ce qu'on a jeté de la maquette
 

@@ -26,7 +26,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - C2, `/pro` : fait (réalisations PRO d'abord, comptoir en ouverture, lieux de la série 1, teinte K1 + D1, formulaire inchangé).
 - C5, `/realisations` : fait (les vraies d'abord, puis « Avant / après en ambiance », quatre paires).
 - C3, `/comment-ca-marche` : fait (étapes de l'accueil, déroulé et délais, en place, entretien, « Quand rénover ? », blocs aux filets).
-- C0, C4, C6, C7 : à venir.
+- C4, `/inspirations` : fait (52 ambiances en cartes de prestation, pièces mêlées, 12 premières puis « Voir toutes les ambiances », sans JavaScript).
+- C0, C6, C7 : à venir.
 
 ## Phase D : le catalogue des matières
 
@@ -728,3 +729,55 @@ autres sections (`large`), la première photo des étapes prioritaire.
 
 **Problèmes** : la page est longue au téléphone (13 800 px : c'est la page qu'on lit). Restent en cartes blanches
 (hors de ce lot) : formulaires, avis, cartes de réalisation, pages zones / CGV / blog.
+
+## C4 — `/inspirations` (06/10/2026)
+
+**Fait** (aucune image régénérée, aucun envoi ; `docs/DESIGN.md` « La page Inspirations »)
+- **Toutes les ambiances**, 52 : les 14 de la série 1, les 36 « après » de la série 2, les 2 ambiances ; un « avant »
+  n'apparaît que dans le curseur de ses « après ».
+- **La carte des pages de prestation** (`CarteAmbiance`) sur chacune : titre en `h2`, curseur « Ambiance · avant /
+  après » pour les 41 paires (36 de la série 2, 5 de la série 1), photo « Ambiance » pour les 11 autres, cartels de la
+  composition (chacun mène à `/matieres?ref=`), « Essayer cette composition chez moi » (`depuis=inspirations`).
+  `CarteAmbiance` gagne `balise`, `priorite` (photo seule seulement) et `liensMatieres`.
+- **Praticable** : grille dense (1, 2 puis 3 colonnes), pièces mêlées (`_components/ordre.ts`, `ordreInspirations` :
+  une photo seule de cuisine en tête, puis une pièce après l'autre, le premier « après » de chaque avant avant le
+  second), **12 premières du choix en cours** puis « Voir toutes les ambiances » (« 40 de plus »). Sans JavaScript :
+  une case à cocher et des règles écrites par le serveur (`reglesSuite`, `suitesDesAmbiances`, `data-suite`), comme
+  les filtres ; rien dans `globals.css` (194 lignes, plafond 200). Le serveur rend les 52 ; la suite masquée ne charge
+  pas ses images (4 à 16 images au premier chargement, 21 après défilement complet). 18 800 → 3 734 px à 1 440 px,
+  8 787 px à 390 px.
+- **Ancres** : une ambiance visée par l'adresse (`#<id>`, `:target`) se montre même dans la suite (vérifié à 390 et
+  1 440 px). La rangée « Ambiances » de l'accueil y mène par un lien de page (`<a>`), plus par `Link` (la navigation du
+  routeur ne pose pas `:target`).
+- Retirés (plus rien ne les lisait) : `PhotoAmbiance` et `LegendeMatieres` (le calque d'étiquettes sur la photo et sa
+  légende) ; `CalqueMatieres` reste (curseur, tests). `docs/SUIVI.md` : valeur `inspirations`, page décrite.
+
+**Décisions prises seul**
+1. « Voir toutes les ambiances » plutôt qu'une pagination par adresse : les filtres restent sans JavaScript et
+   combinables, la page reste statique et entière pour le référencement. 12 premières : 4 rangées à 1 440 px, environ
+   6 000 px au téléphone.
+2. La composition en cartels sous l'image, comme partout au site 3.0, au lieu des étiquettes posées sur la photo
+   (illisibles sur une carte de 360 px).
+3. Ordre : la première ambiance simple de la cuisine en tête (`cuisine-ilot-vert`), seule image prioritaire ; aucune
+   autre image en chargement immédiat (en colonnes, les cartes 2 et 3 ne sont pas au premier écran du téléphone).
+4. Les cartels sur deux colonnes à toutes les largeurs (cartes plus courtes), au prix d'une finition renvoyée à la
+   ligne à 1 440 px.
+
+**Tests** : 401 → 410, tous réussis. Nouveau `src/app/inspirations/inspirations.test.ts` (9) : l'ordre (mêmes 52,
+photo seule de cuisine en tête, toutes les pièces dans les 12 premières, jamais deux « après » d'un même avant à la
+suite) ; la suite (jetons par combinaison, règles : masquée sauf `:target`, bouton et reste comptés, rien pour une
+combinaison courte) ; la page rendue (52 cartes, ancres et données de filtre, 52 `h2`, grille ; une étiquette par
+carte, 41 curseurs, un avant seulement dans un curseur, 93 `<picture`, jamais « Simulation » ni « Réalisation » ;
+« Essayer » parsé par `lireDepuis` / `lireComposition` et cartels vers leur matière ; une seule image prioritaire, la
+première carte, aucune autre en `eager` ; 40 cartes dans la suite, règle `:not(:target)`, « 40 de plus », la case ;
+aucun « use client », plus de `PhotoAmbiance`, l'accueil sans `Link` vers les ancres). `ambiances.test.ts` inchangé
+(52 inspirations, filtres sans JavaScript, rangée `relative` : passent).
+
+**Vérification visuelle** : même build, `next start -p 3100` (arrêté ensuite), Playwright + Edge à 360 × 660,
+390 × 660 / 844, 1 024 et 1 440 px : aucun débordement de page (les pastilles de filtre défilent dans leur rangée),
+0 image cassée, 0 requête coupée ; 12 cartes visibles, « Salle de bain » → 8 sans bouton, « Cuisine » → 12 et « 13 de
+plus », la case → 52 ; ancre dans la suite montrée en haut d'écran. Captures hors dépôt dans `scratchpad/m21/c3c4`.
+
+**Problèmes** : le « Vue dans » de `/matieres` navigue par le routeur (`router.push`) : une ambiance de la suite n'y est
+pas montrée à l'arrivée (on reste en haut de /inspirations) — à passer en lien de page avec la phase D, qui refait les
+fiches. Le HTML de la page pèse ≈ 400 Ko non compressé (93 `<picture` avec leurs sources) ; à surveiller en F6.

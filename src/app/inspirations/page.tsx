@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
-import { PhotoAmbiance } from "@/components/ambiances/PhotoAmbiance";
-import { lienMatiere } from "@/components/ambiances/CalqueMatieres";
+import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
 import { BreadcrumbSchema } from "@/components/JsonLd";
+import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
-import { PIECES_INSPIRATION, TEINTES, inspirations, type AmbianceResolue } from "@/lib/ambiances";
+import { PIECES_INSPIRATION, TEINTES, type AmbianceResolue } from "@/lib/ambiances";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
-import { urlVignette } from "@/lib/simulateur/generation-client";
-import { FiltresInspirations, reglesFiltres, teinteJeton } from "./_components/FiltresInspirations";
+import { FiltresInspirations, VoirLaSuite, reglesFiltres, reglesSuite, suitesDesAmbiances, teinteJeton } from "./_components/FiltresInspirations";
+import { cartesInspirations } from "./_components/ordre";
 
 /**
- * « Inspirations » (mission 19) : toutes les ambiances, filtrables par pièce et par teinte. C'est l'association des
- * matières qui crée l'ambiance : chaque photo montre sa composition (2 ou 3 revêtements, la surface de chacun, la
- * vraie vignette), ses étiquettes matière, et « Essayer cette composition chez moi » (le simulateur avec les
- * références posées zone par zone). Les images sont des ambiances générées aux teintes réelles du catalogue, jamais
- * des chantiers : l'étiquette « Ambiance » le dit sur chaque photo. Source unique : `data/ambiances`. Les filtres
- * n'envoient aucun JavaScript (boutons radio et règles CSS `:has()`, `FiltresInspirations`).
+ * « Inspirations » (mission 19 ; site 3.0, lot C4) : toutes les ambiances — la série 1, les 36 « après » de la série 2,
+ * les 2 ambiances ; jamais un « avant » seul —, filtrables par pièce et par teinte, sans JavaScript (boutons radio et
+ * règles CSS `:has()`, `FiltresInspirations`). Chaque carte (`CarteAmbiance`, celle des pages de prestation) : son
+ * titre, le curseur avant / après si c'est une paire (« Ambiance · avant / après »), sinon la photo (« Ambiance »), sa
+ * composition en cartels (chacun mène à sa matière) et « Essayer cette composition chez moi » (`depuis=inspirations`).
+ *
+ * Praticable (la page faisait 52 cartes en deux colonnes, 18 800 px) : une grille dense (1, 2 puis 3 colonnes), un
+ * ordre qui mêle les pièces (`ordreInspirations`), et les 12 premières du choix en cours seulement — le reste attend
+ * « Voir toutes les ambiances » (`reglesSuite`, toujours sans JavaScript). Le serveur rend les 52 (référencement,
+ * ancres `#<id>` de l'accueil et des matières, montrées même dans la suite) ; les images de la suite, différées, ne se
+ * chargent pas. La première carte est une photo seule : la seule image prioritaire de la page.
  */
 const CHEMIN = "/inspirations";
 const TITRE = "Inspirations : cuisines, salles de bain, meubles et locaux en film adhésif | CoverSwap";
@@ -30,13 +35,14 @@ export const metadata: Metadata = metadonneesPage({
   chemin: CHEMIN,
 });
 
-const TAILLES = "(min-width: 1152px) 560px, (min-width: 768px) 50vw, 100vw";
+const TAILLES = "(min-width: 1024px) 360px, (min-width: 640px) calc(50vw - 36px), calc(100vw - 32px)";
 
 /** Les teintes d'une ambiance, en jetons CSS (`data-teintes`). */
 const jetons = (a: AmbianceResolue) => [...new Set(a.surfaces.map((s) => teinteJeton(s.teinte)))];
 
 export default function PageInspirations() {
-  const liste = inspirations();
+  const cartes = cartesInspirations();
+  const liste = cartes.map((c) => c.ambiance);
   const pieces = PIECES_INSPIRATION.map((p) => ({
     id: p.id,
     libelle: p.libelle,
@@ -47,10 +53,14 @@ export default function PageInspirations() {
     libelle: t,
     nombre: liste.filter((a) => a.surfaces.some((s) => s.teinte === t)).length,
   })).filter((t) => t.nombre > 0);
+  const filtrables = liste.map((a) => ({ piece: a.piece, teintes: jetons(a) }));
+  const idsPieces = pieces.map((p) => p.id);
+  const idsTeintes = teintes.map((t) => t.id);
+  const suites = suitesDesAmbiances(filtrables, idsPieces, idsTeintes);
 
   return (
-    <div className="filtrable bg-fond">
-      <style>{reglesFiltres(".filtrable", liste.map((a) => ({ piece: a.piece, teintes: jetons(a) })), pieces.map((p) => p.id), teintes.map((t) => t.id))}</style>
+    <div className="filtrable">
+      <style>{`${reglesFiltres(".filtrable", filtrables, idsPieces, idsTeintes)}\n${reglesSuite(".filtrable", filtrables, idsPieces, idsTeintes)}`}</style>
       <BreadcrumbSchema
         items={[
           { name: "Accueil", url: ENTREPRISE.site },
@@ -63,7 +73,11 @@ export default function PageInspirations() {
           <p className="surtitre">Ambiances</p>
           <h1 className="titre-1 mt-2 text-encre">Inspirations</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">
-            Une ambiance, c&apos;est une association de matières. Chaque photo donne les siennes, surface par surface, aux teintes réelles du catalogue : essayez-la chez vous en un geste.
+            Une ambiance, c&apos;est une association de matières. Chaque image donne les siennes, surface par surface, aux teintes réelles du catalogue : essayez-la chez vous en un geste.
+          </p>
+          <p className="mt-4 flex flex-wrap items-center gap-3">
+            <Etiquette>Ambiance</Etiquette>
+            <span className="text-[15px] text-encre-2">Images d&apos;ambiance, pas des chantiers. Sur les avant / après, glissez le curseur.</span>
           </p>
           <div className="mt-6">
             <FiltresInspirations pieces={pieces} teintes={teintes} />
@@ -71,42 +85,22 @@ export default function PageInspirations() {
         </div>
       </section>
       <Section large className="pt-6 md:pt-8">
-        <ul className="flex flex-col gap-12 md:block md:columns-2 md:gap-6">
-          {liste.map((a, rang) => (
-            <li key={a.id} id={a.id} data-inspiration="" data-piece={a.piece} data-teintes={jetons(a).join(" ")} className="scroll-mt-[80px] md:mb-12 md:break-inside-avoid">
-              <PhotoAmbiance ambiance={a} tailles={TAILLES} sansListe priorite={rang === 0} immediat={rang > 0 && rang < 3} />
-              <h2 className="mt-4 text-[19px] font-semibold text-encre">{a.titre}</h2>
-              <ul className="mt-3 flex flex-col gap-2" aria-label={`Composition : ${a.titre}`}>
-                {a.surfaces.map((s, i) => (
-                  <li key={s.ref + s.surface}>
-                    <a href={lienMatiere(s.ref)} className="group flex items-center gap-3">
-                      {/* Le numéro du point posé sur la photo (téléphone). */}
-                      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-trait bg-white text-[12px] font-semibold text-encre md:hidden">
-                        {i + 1}
-                      </span>
-                      {/* eslint-disable-next-line @next/next/no-img-element -- vignette de 320 px servie par le CRM */}
-                      <img
-                        src={urlVignette(s.ref)}
-                        alt=""
-                        width={40}
-                        height={40}
-                        loading="lazy"
-                        decoding="async"
-                        className="h-10 w-10 shrink-0 rounded-[var(--rayon-sm)] object-cover ring-1 ring-trait"
-                      />
-                      <span className="text-[15px] leading-snug">
-                        <span className="block text-encre-2 first-letter:uppercase">{s.surface}</span>
-                        <span className="block font-medium text-encre group-hover:underline">
-                          {`${s.nom} · ${s.ref}`}
-                        </span>
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
+        <ul className="sm:columns-2 sm:gap-x-6 lg:columns-3">
+          {cartes.map(({ ambiance: a, cas }, rang) => (
+            <li
+              key={a.id}
+              id={a.id}
+              data-inspiration=""
+              data-piece={a.piece}
+              data-teintes={jetons(a).join(" ")}
+              data-suite={suites[rang] || undefined}
+              className="filet mb-12 flex scroll-mt-[80px] flex-col pt-4 break-inside-avoid"
+            >
+              <CarteAmbiance cas={cas} tailles={TAILLES} balise="h2" priorite={rang === 0} liensMatieres cartelsColonnes="grid-cols-2" />
             </li>
           ))}
         </ul>
+        <VoirLaSuite />
         <div className="mt-14 flex flex-col items-start gap-3">
           <p className="texte-2">Une matière vous plaît seule ? Elles sont toutes dans le catalogue.</p>
           <Lien href="/matieres" variante="secondaire">

@@ -7,12 +7,14 @@ import { urlVignette } from "@/lib/simulateur/generation-client";
  *  - à partir de 768 px : un point blanc de 8 px finement cerclé SUR la surface, un trait de 1 px blanc à 80 % (ombre
  *    légère pour rester lisible sur un fond clair), et l'étiquette posée dans un vide — vignette ronde de la vraie
  *    matière, puis « Sage Green · RM20 » en petites capitales sur un fond blanc translucide ;
- *  - sur téléphone : des points numérotés (muets), la légende vient sous la photo (`LegendeMatieres`, ses liens) ;
+ *  - sur téléphone : des points numérotés (muets), la légende vient sous la photo ;
  *  - un clic sur une étiquette ouvre la matière en grand sur /matieres ;
  *  - le calque apparaît en fondu (`.calque-matieres`, coupé si la personne préfère moins de mouvement).
  * Le calque remplit son cadre (`absolute inset-0`) : le parent est l'image, `relative`. Sur une paire avant / après,
  * `seuilX` (la position du curseur, en %) : une étiquette ne se montre, entière, que si son point est côté « après »
  * (à droite du curseur) — elle s'efface en fondu quand le curseur la recouvre. Sans état : serveur ou client.
+ * Site 3.0 (lot C4) : `/inspirations`, qui le posait sur ses photos (`PhotoAmbiance`, `LegendeMatieres`, retirés), dit
+ * désormais la composition en cartels sous l'image (`CarteAmbiance`) ; le calque reste offert au curseur (`matieres`).
  */
 export type MatiereCalque = Pick<SurfaceAmbiance, "surface" | "ref" | "nom" | "ancre" | "etiquette">;
 

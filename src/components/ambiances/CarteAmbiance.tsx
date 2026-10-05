@@ -9,7 +9,7 @@ import type { MatiereCartel } from "@/lib/cartel";
 import { sourcesPhoto, type ManifesteImages, type SourcesPhoto } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { avecDepuis } from "@/lib/liens-simulateur";
-import { matiereCartel } from "@/lib/matieres-vedettes";
+import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 
 /**
  * Le cas d'une ambiance (site 3.0, lots B6 et C1) : un titre, l'image — le curseur avant / après d'une paire calée
@@ -69,13 +69,17 @@ export function resoudreCas(image: string, { nom, depuis }: { nom?: string; depu
  * La carte (titre, image, cartels, lien), à poser dans un `<li>`. `teinte` : la teinte de la prestation, sur le filet
  * des cartels (sinon la couleur de chaque matière). `cartelsColonnes` : la grille des cartels. `children` : une ligne
  * de plus sous les cartels (le prix habituel sur `/realisations`). `sansLien` : pas de lien vers le simulateur (`/pro`,
- * une page sans simulateur).
+ * une page sans simulateur). Lot C4 (`/inspirations`) : `balise` (le titre en `h2` quand la carte est directement
+ * sous le `h1`), `priorite` (la première image de la page, en `fetchPriority="high"` — une photo seule seulement :
+ * une paire n'est jamais prioritaire, ses deux images passeraient devant tout), `liensMatieres` (chaque cartel mène à
+ * sa matière).
  */
-export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; children?: ReactNode }) {
+export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, balise = "h3", priorite = false, liensMatieres = false, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; balise?: "h2" | "h3"; priorite?: boolean; liensMatieres?: boolean; children?: ReactNode }) {
   const { preparees } = cas;
+  const Titre = balise;
   return (
     <>
-      <h3 className="font-display text-[24px] leading-tight font-semibold text-encre">{cas.nom}</h3>
+      <Titre className="font-display text-[24px] leading-tight font-semibold text-encre">{cas.nom}</Titre>
       {preparees.avant ? (
         <AvantApres
           className="mt-3"
@@ -89,13 +93,19 @@ export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid
           etiquette="Ambiance · avant / après"
         />
       ) : (
-        <Photo nom={cas.ambiance.image} alt={cas.ambiance.alt} ratio={cas.ratio} tailles={tailles} etiquette="Ambiance" className="mt-3 rounded-[var(--rayon-md)]" />
+        <Photo nom={cas.ambiance.image} alt={cas.ambiance.alt} ratio={cas.ratio} tailles={tailles} priorite={priorite} etiquette="Ambiance" className="mt-3 rounded-[var(--rayon-md)]" />
       )}
       <ul className={`mt-4 grid gap-x-4 gap-y-3 ${cartelsColonnes}`} aria-label={`Matières posées : ${cas.nom}`}>
         {cas.matieres.map((m) => (
           <li key={m.matiere.id}>
             <p className="text-[13px] text-encre-2">{m.surfaces}</p>
-            <Cartel matiere={m.matiere} teinte={teinte} className="mt-1" />
+            {liensMatieres ? (
+              <Link href={lienMatiere(m.matiere.id)} className="mt-1 block underline-offset-4 hover:underline">
+                <Cartel matiere={m.matiere} teinte={teinte} />
+              </Link>
+            ) : (
+              <Cartel matiere={m.matiere} teinte={teinte} className="mt-1" />
+            )}
           </li>
         ))}
       </ul>
