@@ -1,24 +1,25 @@
 #!/usr/bin/env node
 /**
  * Compare les captures d'écran de cette exécution à celles de la dernière exécution réussie sur `main` (mission 16,
- * partie 6) : pour chaque `<page>-<largeur>.png` présente des deux côtés, `pixelmatch` compte les pixels changés et
- * écrit `diff-<page>-<largeur>.png` (en rouge : ce qui a changé) à côté des nouvelles captures ; une page qui a changé
- * de hauteur est comparée sur le plus grand cadre (la bande en plus compte comme changée). Le résumé (pourcentage par
- * page et par largeur) va dans le résumé du job GitHub (`$GITHUB_STEP_SUMMARY`), sinon à l'écran.
+ * partie 6) : pour chaque `<page>-<largeur>.jpg` (ou `.png`, le format d'avant le site 3.0) présente des deux côtés,
+ * `pixelmatch` compte les pixels changés et écrit `diff-<page>-<largeur>.png` (en rouge : ce qui a changé) à côté des
+ * nouvelles captures ; une page qui a changé de hauteur est comparée sur le plus grand cadre (la bande en plus compte
+ * comme changée). Le résumé (pourcentage par page et par largeur) va dans le résumé du job GitHub
+ * (`$GITHUB_STEP_SUMMARY`), sinon à l'écran.
  *
  *   node scripts/comparer-captures.mjs [captures-precedentes] [captures]
  *
  * INFORMATION SEULEMENT : le script finit toujours avec le code 0 (une capture qui change n'est pas une erreur ; c'est
- * Lighthouse qui fait échouer le job). Décodage et encodage des PNG par sharp (déjà une dépendance du site).
+ * Lighthouse qui fait échouer le job). Décodage des captures et encodage des différences par sharp (déjà une dépendance du site).
  */
 import { appendFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-/** Une capture : `<page>-<largeur>.png` ; les images de différence (`diff-…`) ne se comparent pas. */
+/** Une capture : `<page>-<largeur>.jpg` (ou `.png`) ; les images de différence (`diff-…`) ne se comparent pas. */
 export function lireNomCapture(fichier) {
   if (fichier.startsWith("diff-")) return null;
-  const m = /^([a-z0-9]+(?:-[a-z0-9]+)*)-(\d{3,4})\.png$/.exec(fichier);
+  const m = /^([a-z0-9]+(?:-[a-z0-9]+)*)-(\d{3,4})\.(?:jpg|png)$/.exec(fichier);
   return m ? { page: m[1], largeur: Number(m[2]) } : null;
 }
 
@@ -30,7 +31,7 @@ async function lireCaptures(dossier) {
   }
 }
 
-/** Les pixels RGBA d'un PNG, étendus à `largeur` × `hauteur` (fond magenta : une bande ajoutée se voit et compte). */
+/** Les pixels RGBA d'une capture (JPEG ou PNG), étendus à `largeur` × `hauteur` (fond magenta : une bande ajoutée se voit et compte). */
 async function pixels(sharp, fichier, largeur, hauteur) {
   const image = sharp(fichier).ensureAlpha();
   const { width, height } = await sharp(fichier).metadata();
@@ -60,7 +61,7 @@ export async function comparerCaptures({ avant = "captures-precedentes", apres =
   for (const fichier of nouvelles.filter((f) => anciennes.includes(f))) {
     const { page, largeur } = lireNomCapture(fichier);
     try {
-      lignes.push({ page, largeur, ...(await comparerDeux(path.join(avant, fichier), path.join(apres, fichier), path.join(apres, `diff-${fichier}`))) });
+      lignes.push({ page, largeur, ...(await comparerDeux(path.join(avant, fichier), path.join(apres, fichier), path.join(apres, `diff-${fichier.replace(/\.jpg$/, ".png")}`))) });
     } catch (erreur) {
       lignes.push({ page, largeur, erreur: erreur instanceof Error ? erreur.message : String(erreur) });
     }
@@ -72,7 +73,7 @@ const pourcentFr = (n) => `${n.toLocaleString("fr-FR", { maximumFractionDigits: 
 
 /** Le résumé en Markdown (résumé du job GitHub). */
 export function resumeMarkdown({ reference, lignes, nouvelles, disparues }) {
-  const titre = "### Captures 375 / 768 / 1440 : comparaison avec la dernière exécution réussie sur main";
+  const titre = "### Captures 390 / 768 / 1440 : comparaison avec la dernière exécution réussie sur main";
   if (!reference) return `${titre}\n\nAucune capture de référence (première exécution, ou aucune exécution réussie sur main) : rien à comparer. Les captures de cette exécution sont dans l'artefact « captures ».\n`;
   const tableau = [
     "| Page | Largeur | Pixels changés | Taille (avant → après) |",

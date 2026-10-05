@@ -21,7 +21,8 @@ import { NB_REFERENCES } from "./offre";
 
 const CATALOGUE = revetements as Matiere[];
 const SRC = join(process.cwd(), "src");
-const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8");
+/** Fins de ligne ramenées à LF : sous Windows (`core.autocrlf`), un fichier repris par git revient en CRLF. */
+const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8").replace(/\r\n/g, "\n");
 const compter = (texte: string, motif: string) => texte.split(motif).length - 1;
 /** Un routeur factice : la page (liens posés dans le plein écran) lit le routeur de Next ; rien ne navigue ici. */
 const ROUTEUR = { back() {}, forward() {}, refresh() {}, hmrRefresh() {}, push() {}, replace() {}, prefetch() {} };

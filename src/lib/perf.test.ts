@@ -8,7 +8,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 import nextConfig from "../../next.config";
-import { LARGEURS_CAPTURES, PAGES_CAPTURES, nomCapture } from "../../scripts/captures.mjs";
+import { FORMAT_CAPTURE, LARGEUR_CONTROLE, LARGEURS_CAPTURES, PAGES_CAPTURES, echelle, hotesCrm, lireOptions, nomCapture, nomDeChemin, requeteCoupee } from "../../scripts/captures.mjs";
 import { comparerCaptures, lireNomCapture, resumeMarkdown } from "../../scripts/comparer-captures.mjs";
 import { CommentCaMarche } from "@/components/accueil/CommentCaMarche";
 import { ContenuConfiance } from "@/components/accueil/Confiance";
@@ -400,13 +400,65 @@ describe("intégration continue", () => {
     assert.match(flux, /branch: main/);
   });
 
-  test("captures : six pages × 375 / 768 / 1440, les mêmes que Lighthouse", () => {
+  test("captures : six pages × 390 / 768 / 1440, les mêmes que Lighthouse ; JPEG qualité 80, échelle 2 sous 768 px", () => {
     assert.deepEqual(PAGES_CAPTURES.map((p: { nom: string }) => p.nom), ["accueil", "simulateur", "matieres", "realisations", "comment-ca-marche", "pro"]);
-    assert.deepEqual(LARGEURS_CAPTURES.map((l: { largeur: number }) => l.largeur), [375, 768, 1440]);
-    assert.equal(nomCapture("comment-ca-marche", 768), "comment-ca-marche-768.png");
-    assert.deepEqual(lireNomCapture("comment-ca-marche-768.png"), { page: "comment-ca-marche", largeur: 768 });
-    assert.equal(lireNomCapture("diff-accueil-375.png"), null, "une image de différence ne se compare pas");
+    assert.deepEqual(LARGEURS_CAPTURES.map((l: { largeur: number }) => l.largeur), [390, 768, 1440]);
+    assert.deepEqual(LARGEURS_CAPTURES.map((l: { mobile: boolean }) => l.mobile), [true, false, false]);
+    assert.deepEqual([360, 390, 767, 768, 1440].map(echelle), [2, 2, 2, 1, 1]);
+    assert.deepEqual(FORMAT_CAPTURE, { type: "jpeg", quality: 80 });
+    assert.equal(LARGEUR_CONTROLE, 360);
+    assert.equal(nomCapture("comment-ca-marche", 768), "comment-ca-marche-768.jpg");
+    assert.deepEqual(lireNomCapture("comment-ca-marche-768.jpg"), { page: "comment-ca-marche", largeur: 768 });
+    assert.deepEqual(lireNomCapture("comment-ca-marche-768.png"), { page: "comment-ca-marche", largeur: 768 }, "les captures d'avant le site 3.0 se lisent encore");
+    assert.equal(lireNomCapture("diff-accueil-390.png"), null, "une image de différence ne se compare pas");
     assert.equal(lireNomCapture("notes.txt"), null);
+    // Le contrôle à 360 px existe et fait échouer le script ; le script finit en erreur après les captures.
+    const script = lire("scripts/captures.mjs");
+    assert.match(script, /scrollWidth/);
+    assert.match(script, /process\.exit\(1\)/);
+    assert.match(script, /serviceWorkers: "block"/, "un service worker ne doit pas contourner la coupure des requêtes");
+  });
+
+  test("captures : options --pages et --largeurs ; une page par son nom ou son adresse ; erreurs dites", () => {
+    const defaut = lireOptions([]);
+    assert.equal(defaut.dossier, "captures");
+    assert.equal(defaut.pages, PAGES_CAPTURES);
+    assert.equal(defaut.largeurs, LARGEURS_CAPTURES);
+    const o = lireOptions(["sortie", "--pages=accueil,prestation-cuisine,/matieres?ref=NF13,/zones/montpellier", "--largeurs", "1440,390"]);
+    assert.equal(o.dossier, "sortie");
+    assert.deepEqual(o.pages, [
+      { nom: "accueil", chemin: "/" },
+      { nom: "prestation-cuisine", chemin: "/prestations/cuisine" },
+      { nom: "matieres-nf13", chemin: "/matieres?ref=NF13" },
+      { nom: "zones-montpellier", chemin: "/zones/montpellier" },
+    ]);
+    assert.deepEqual(o.largeurs.map((l: { largeur: number }) => l.largeur), [390, 1440], "triées");
+    assert.deepEqual(lireOptions(["--largeurs=414"]).largeurs, [{ largeur: 414, hauteur: 844, mobile: true }]);
+    assert.equal(nomDeChemin("/"), "accueil");
+    assert.equal(nomDeChemin("/Matières/Bois?ref=W12"), "matieres-bois-ref-w12");
+    assert.match(nomCapture(nomDeChemin("/matieres?ref=NF13"), 390), /^[a-z0-9]+(?:-[a-z0-9]+)*-390\.jpg$/, "lisible par la comparaison");
+    assert.throws(() => lireOptions(["--pages=inconnue"]), /page inconnue/);
+    assert.throws(() => lireOptions(["--largeurs=200"]), /largeur invalide/);
+    assert.throws(() => lireOptions(["--pages"]), /attend une liste/);
+    assert.throws(() => lireOptions(["--hauteur=3"]), /option inconnue/);
+    assert.throws(() => lireOptions(["a", "b"]), /argument en trop/);
+    assert.throws(() => lireOptions(["--etat-resultat"]), /G1/);
+  });
+
+  test("captures : rien ne part (aucun POST, aucun appel au CRM ni à la génération) ; les images du CRM passent en lecture", () => {
+    const hotes = hotesCrm({ NEXT_PUBLIC_SIMULATE_URL: "https://crm-essai.example.org/api/simulate", NEXT_PUBLIC_CRM_URL: "pas une adresse" });
+    assert.deepEqual([...hotes].sort(), ["crm-essai.example.org", "crm.coverswap.fr"]);
+    const coupee = (methode: string, url: string, type = "fetch") => requeteCoupee({ methode, url, type }, hotes);
+    for (const methode of ["POST", "PUT", "PATCH", "DELETE", "post"]) assert.equal(coupee(methode, "http://localhost:3100/api/contact"), true, methode);
+    assert.equal(coupee("POST", "https://crm.coverswap.fr/api/site/evenements", "ping"), true, "sendBeacon");
+    assert.equal(coupee("GET", "https://crm.coverswap.fr/api/site/tarifs"), true);
+    assert.equal(coupee("GET", "https://crm-essai.example.org/api/site/zones"), true);
+    assert.equal(coupee("GET", "https://coverswap-crm.up.railway.app/api/health"), true);
+    assert.equal(coupee("GET", "https://crm.coverswap.fr/api/site/echantillons/NF13?l=320", "image"), false, "vignettes des matières");
+    for (const chemin of ["/api/simulate", "/api/simulate-v2", "/api/simulation/abc"]) assert.equal(coupee("GET", `http://localhost:3100${chemin}`), true, chemin);
+    assert.equal(coupee("GET", "http://localhost:3100/api/site/evenements?x=1"), true);
+    for (const [url, type] of [["http://localhost:3100/", "document"], ["http://localhost:3100/_next/static/chunks/a.js", "script"], ["http://localhost:3100/images/prep/a-640.avif", "image"], ["http://localhost:3100/api/tarifs", "fetch"]]) assert.equal(coupee("GET", url, type), false, url);
+    assert.equal(coupee("HEAD", "http://localhost:3100/"), false);
   });
 
   test("comparaison : pixels changés, hauteur changée, image de différence, résumé ; rien à comparer sans référence", async () => {
