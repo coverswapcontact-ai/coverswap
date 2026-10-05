@@ -22,7 +22,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 ## Phase C : le tunnel, page par page
 
-À venir (C0 à C7).
+- C1, `/prestations/[slug]` : fait (cas, vedettes, prix du CRM, villes, teinte ; `docs/DESIGN.md` « Les pages de prestation »).
+- C0, C2 à C7 : à venir.
 
 ## Phase D : le catalogue des matières
 
@@ -511,3 +512,72 @@ alignés sur les bords des sections, photo d'ouverture alignée sur l'en-tête.
 le premier écran d'une tablette en paysage montre surtout le titre) — à revoir avec les retouches. Vignettes, prix et
 publications lus au CRM de production (GET seulement). Les captures pleine page de `captures.mjs` laissent toujours
 blanches les sections en `content-visibility` (connu depuis B0).
+
+## C1 — `/prestations/[slug]` (06/10/2026)
+
+**Fait par page** (aucune image régénérée, aucun envoi ; `docs/DESIGN.md` « Les pages de prestation »)
+- **Commun** (`ContenuPrestation.tsx`, données `src/data/cas-prestations.ts`) : ouverture avant / après — la première
+  réalisation publiée de la pièce qui a ses deux photos (`choisirOuverture` généralisée : `typeProjet`, `paire`), sinon
+  la paire d'ambiance de la page, « Ambiance · avant / après », légende, cartels à la teinte —, titre court, UNE action
+  principale (le simulateur de la pièce, `depuis=prestation-<slug>`, en haut et au dernier appel), « Demander un
+  devis » en secondaire ; puis les autres réalisations publiées de la pièce (« Nos chantiers », 3 au plus), les cas
+  d'ambiance (`components/ambiances/CarteAmbiance.tsx` : curseur ou photo seule étiquetés, cartels, « Essayer cette
+  composition chez moi » `depuis=prestation-<slug>`), la bande de matière de la teinte, 8 vedettes en `Echantillon`,
+  présentation / surfaces / atouts, déroulement, prix (texte de la page + `ContenuPrix` filtré sur la famille du
+  CRM, tel quel), les 8 villes, FAQ, autres prestations à leur teinte, dernier appel en encre (principal, « Être
+  rappelé » et devis en `sur-encre`). L'« avant » de l'ouverture est préchargé par la page, comme à l'accueil.
+- **Cuisine** : bordeaux → Deep Green NF13 en ouverture (la paire et la légende de l'accueil) ; 11 cas : les 10 autres
+  cuisines de la série 2 + `amb-cuisine-familiale` ; vedettes NF13, RM20, NF14, NE83, AA14, AG13, U50, NE31.
+- **Salle de bain** : `sdb-baignoire-tablier` (après couleur, NF13) en ouverture ; cas : petit meuble vasque (bois),
+  double vasque wengé (neutre) ; vedettes NF13, M6, NE83, RM26, NH22, AA14, AG13, NE31. La paire série 1 (Khaki K4) n'y est plus.
+- **Meubles** : buffet (après neutre, NH29 + AA14) en ouverture ; cas : placard coulissant (couleur), portes de
+  couloir (bois), `amb-couloir-portes`, dressing (`meubles-armoire`) et meuble TV (`etude-meubles-apres`) de la
+  série 1 ; vedettes NH12, NH29, RM16, RM30, NF13, D1, AA14, NF04.
+- **Vitrages** : contenu inchangé (ni image, ni cas, ni vedettes, ni teinte ; devis en principal) ; prend les tons
+  de la page (papier / papier-2, dernier appel en encre) et les villes.
+- **Professionnel** : `/prestations/professionnel` → `/pro` (301) gardé, page toujours non générée.
+- `CuisinesCommeLaVotre` (accueil) passe par `resoudreCas` / `CarteAmbiance` (même rendu). `etudeDeLaPiece` et la
+  paire « dressing » de `PAIRES_ETUDES` retirées (plus rien ne les lisait) ; l'étude cuisine de `/realisations` reste
+  jusqu'à C5. `docs/SUIVI.md` : valeurs `prestation-cuisine`, `prestation-salle-de-bain`, `prestation-meubles`
+  (PIECE_CHOISIE, RAPPEL_DEMANDE, CONTACT_ENVOYE), aucun type nouveau. Captures
+  `docs/captures/site-3-0/prestation-cuisine-390.jpg` et `-1440.jpg`.
+
+**Décisions prises seul**
+1. L'après de chaque paire = le plus petit ΔE affiché maximal (règle de l'accueil, testée contre
+   `scripts/bibliotheque/serie-2.json`), sauf la bordeaux (NF13, fixée par l'énoncé). Conséquence : cuisine et salle de
+   bain ouvrent toutes deux sur du NF13 ; le buffet ouvre sur sa version neutre (la jaune moutarde reste sur l'accueil).
+2. Les légendes des ouvertures salle de bain et meubles sont écrites dans `cas-prestations.ts` (avant → matières),
+   sans promesse de durée ; celle de la cuisine est celle de l'énoncé.
+3. Les boutons de la page portent `depuis=prestation-<slug>` (pas seulement les « Essayer ») ; l'offre du `Service`
+   garde `/simulateur?projet=<pièce>` sans `depuis`. Pas de `choix=1` : la carte est présélectionnée comme avant.
+4. Prix : `ContenuPrix` gagne `familles` et `sansIntro` ; la page ne montre que sa famille (le CRM répond aujourd'hui
+   110 €/ml pour la cuisine, rien pour la salle de bain → « Sur devis ») ; le texte de la page (plage et fourchette
+   d'`offre.ts`) reste au-dessus.
+5. Les cas en colonnes (1, 2 puis 3 : les images portrait — couloir, portes, dressing — ne laissent pas de trou),
+   cartels sur 2 colonnes au téléphone pour raccourcir la page.
+6. Téléphone : l'accroche passe sous les boutons, pour que le principal tienne dans 390 × 660 (573-621 px ; 727 px
+   sans cela).
+7. Préchargement de l'« avant » de l'ouverture aussi sur les prestations (`perf.test.ts` : « / et les prestations
+   seulement ») ; pas d'`ImageObject` (exactement 4 types JSON-LD, comme le plan).
+8. Les cartes surfaces / atouts / étapes (`BlocsPrestation`, partagées avec `/pro`) ne sont pas restylées ici.
+
+**Tests** : 391 → 396, tous réussis ; lint et build passent. `autres-pages.test.ts`, « pages par pièce » réécrit (4 →
+9 tests) : h1 exact, 2 principaux `depuis=prestation-<slug>`, dernier appel en encre, 4 types JSON-LD (`Service` à
+l'adresse sans `depuis`) ; ouverture = le seul couple `fetchPriority="high"`, légende, cartels à la teinte, jamais
+« Simulation » ni « Réalisation » ; cas (curseurs, étiquettes, liens parsés par `lireDepuis` / `lireComposition`,
+aucun doublon, bande, aucun principal dans les cas ; « Khaki · K4 » remplacé par les références de la série 2) ;
+vedettes, villes, prix du CRM tels quels / masqués / repli / « Sur devis » ; teinte de la page et des autres
+prestations ; la réalisation de la pièce d'abord (ouverture, « Nos chantiers », avis exclu, autre pièce exclue) ;
+vitrages inchangée ; données (11 cuisines, 3 salles de bain, meubles, ΔE, 8 vedettes au catalogue) ; `SUIVI.md`.
+`perf.test.ts` : préchargement sur `/` et les prestations seulement. `tunnel.test.ts` inchangé (passe).
+
+**Vérification visuelle** : build local (comme la CI), `next start -p 3100`, Playwright + Edge, cuisine, salle de bain,
+meubles et vitrages à 360 × 660, 390 × 660 / 844, 1 024 et 1 440 px, sections différées forcées : aucun débordement à
+360 px, 0 image cassée, 0 requête coupée (rien envoyé), LCP = l'après de l'ouverture (216 à 324 ms ; 704 ms à 360 px
+pour la cuisine, premier chargement). Captures hors dépôt dans `scratchpad/m21/c1/captures`.
+
+**Problèmes** : la cuisine est longue au téléphone (11 cas, ≈ 15 600 px). Le préchargement de l'image d'accueil
+arrive sur toutes les pages par le préchargement Next de « / » (lien du logo : la charge RSC porte l'indice
+`preload`) — existait depuis B6, à traiter en F6 si le LCP en souffre. Les cartes blanches de `BlocsPrestation`
+détonnent avec les filets : à reprendre avec C2 / C3.
+

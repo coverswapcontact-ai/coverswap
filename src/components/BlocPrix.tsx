@@ -8,6 +8,9 @@ import { chargerTarifs, type IdFamilleTarifs, type SousPartieTarif, type TarifsS
  * répond pas, le repli documenté de `tarifs-site.ts` : la plage au mètre linéaire et les fourchettes d'`offre.ts`.
  * Aucun chiffre écrit ici. Montants en chiffres alignés (`tabular-nums`). Partagé : l'accueil (lot B6), puis les pages
  * de prestation et le blog (lots C). `ContenuPrix` est pur (testé) ; `BlocPrix` lit le CRM. Composants serveur.
+ *
+ * Lot C1 : `familles` restreint aux familles d'une page (la cuisine sur `/prestations/cuisine`) — en repli, la plage
+ * au mètre linéaire et la seule fourchette de la famille ; `sansIntro` quand la page dit déjà comment on facture.
  */
 export const NOMS_FAMILLES_PRIX: Readonly<Record<IdFamilleTarifs, string>> = { CUISINE: "Cuisine", SDB: "Salle de bain", MEUBLES: "Meubles", PRO: "Professionnels" };
 
@@ -18,9 +21,9 @@ export function prixAffiche(s: Pick<SousPartieTarif, "prixUnitaire" | "unite">):
   return s.prixUnitaire === null ? null : `${euros(s.prixUnitaire)}${SUFFIXES[s.unite] ?? ""}`;
 }
 
-/** Les familles du CRM, chacune avec ses seules sous-parties qui ont un prix. */
-export function lignesPrix(tarifs: TarifsSite): { id: IdFamilleTarifs; nom: string; lignes: { libelle: string; prix: string }[] }[] {
-  return tarifs.familles.map((f) => ({
+/** Les familles du CRM (celles de `familles`, si la liste est donnée), chacune avec ses seules sous-parties qui ont un prix. */
+export function lignesPrix(tarifs: TarifsSite, familles?: readonly IdFamilleTarifs[]): { id: IdFamilleTarifs; nom: string; lignes: { libelle: string; prix: string }[] }[] {
+  return tarifs.familles.filter((f) => !familles || familles.includes(f.id)).map((f) => ({
     id: f.id,
     nom: NOMS_FAMILLES_PRIX[f.id] ?? f.id,
     lignes: f.sousParties.flatMap((s) => {
@@ -30,18 +33,24 @@ export function lignesPrix(tarifs: TarifsSite): { id: IdFamilleTarifs; nom: stri
   }));
 }
 
+/** La fourchette d'`offre.ts` de chaque famille du CRM (repli). */
+export const FOURCHETTE_DE_LA_FAMILLE: Readonly<Record<IdFamilleTarifs, keyof typeof FOURCHETTES>> = { CUISINE: "cuisine", SDB: "sdb", MEUBLES: "meuble", PRO: "pro" };
+
 const LIGNE = "flex items-baseline justify-between gap-4 border-t border-trait py-2.5 text-[15.5px]";
 const MONTANT = "font-sans font-semibold whitespace-nowrap tabular-nums text-encre";
 
-export function ContenuPrix({ tarifs, className }: { tarifs: TarifsSite | null; className?: string }) {
+export function ContenuPrix({ tarifs, familles, sansIntro = false, className }: { tarifs: TarifsSite | null; familles?: readonly IdFamilleTarifs[]; sansIntro?: boolean; className?: string }) {
+  const retenues = (Object.keys(FOURCHETTES) as (keyof typeof FOURCHETTES)[]).filter((cle) => !familles || familles.some((f) => FOURCHETTE_DE_LA_FAMILLE[f] === cle));
   return (
     <div className={className}>
-      <p className="texte-2 max-w-xl">
-        Fourni et posé, au {UNITE_PRIX}. Le devis, gratuit, fixe le chiffre exact selon les découpes et l&apos;accès.
-      </p>
+      {sansIntro ? null : (
+        <p className="texte-2 max-w-xl">
+          Fourni et posé, au {UNITE_PRIX}. Le devis, gratuit, fixe le chiffre exact selon les découpes et l&apos;accès.
+        </p>
+      )}
       {tarifs ? (
-        <div className="mt-6 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-          {lignesPrix(tarifs).map((f) => (
+        <div className={`${sansIntro ? "" : "mt-6 "}grid gap-x-10 gap-y-8${familles?.length === 1 ? "" : " sm:grid-cols-2"}`}>
+          {lignesPrix(tarifs, familles).map((f) => (
             <div key={f.id}>
               <h3 className="font-display text-[22px] leading-tight font-semibold text-encre">{f.nom}</h3>
               {f.lignes.length > 0 ? (
@@ -60,12 +69,12 @@ export function ContenuPrix({ tarifs, className }: { tarifs: TarifsSite | null; 
           ))}
         </div>
       ) : (
-        <dl className="mt-6 max-w-xl">
+        <dl className={`${sansIntro ? "" : "mt-6 "}max-w-xl`}>
           <div className={LIGNE}>
             <dt className="text-encre-2">Au mètre linéaire</dt>
             <dd className={MONTANT}>{PRIX_PLAGE}</dd>
           </div>
-          {(Object.keys(FOURCHETTES) as (keyof typeof FOURCHETTES)[]).map((cle) => (
+          {retenues.map((cle) => (
             <div key={cle} className={LIGNE}>
               <dt className="text-encre-2">{FOURCHETTES[cle].libelle.charAt(0).toUpperCase() + FOURCHETTES[cle].libelle.slice(1)}</dt>
               <dd className={MONTANT}>{fourchette(cle)}</dd>
@@ -77,6 +86,6 @@ export function ContenuPrix({ tarifs, className }: { tarifs: TarifsSite | null; 
   );
 }
 
-export async function BlocPrix({ className }: { className?: string }) {
-  return <ContenuPrix tarifs={await chargerTarifs()} className={className} />;
+export async function BlocPrix({ familles, sansIntro, className }: { familles?: readonly IdFamilleTarifs[]; sansIntro?: boolean; className?: string }) {
+  return <ContenuPrix tarifs={await chargerTarifs()} familles={familles} sansIntro={sansIntro} className={className} />;
 }

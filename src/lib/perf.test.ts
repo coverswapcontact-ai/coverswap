@@ -32,7 +32,7 @@ import { sourcesPhotoCrm, type Publication } from "./publications";
  * Mission 16 (partie 6) — performance, mesure, intégration continue. Ce que Lighthouse mesure en CI, ces tests le
  * GARDENT dans le code : aucun script tiers hors Turnstile (ni GTM, ni GA4, ni pixel Meta, ni Clarity, ni Vercel
  * Analytics), plus de bandeau cookies ; « use client » seulement sur la liste blanche ; l'« avant » de l'ouverture
- * préchargé sur `/` seulement ; `globals.css` ≤ 200 lignes ; sections sous la ligne de flottaison en
+ * préchargé sur `/` et les prestations seulement ; `globals.css` ≤ 200 lignes ; sections sous la ligne de flottaison en
  * `content-visibility: auto` ; images préparées en cache immuable, adresse versionnée ; recherche des matières
  * différée ; `lighthouserc.json` et le workflow de CI tels que la conception les décrit ; la comparaison des captures.
  */
@@ -201,7 +201,7 @@ describe("scripts tiers et cookies : plus rien hors Turnstile", () => {
   });
 });
 
-describe("l'ouverture : l'« avant » préchargé sur / seulement", () => {
+describe("l'ouverture : l'« avant » préchargé sur / et les prestations seulement", () => {
   test("simulation : deux préchargements AVIF (téléphone plafonné à 960 px, écran large entier), mêmes sizes et media que le <picture>", () => {
     const choix = choisirOuverture([]);
     assert.ok(choix);
@@ -243,11 +243,17 @@ describe("l'ouverture : l'« avant » préchargé sur / seulement", () => {
     assert.equal(adresseMoyenne("/a-1200.avif 1200w, /a-1600.avif 1600w"), "/a-1200.avif");
   });
 
-  test("appelé par la page d'accueil, et par elle seule ; l'ancien préchargement du poster n'existe plus", () => {
+  test("appelé par la page d'accueil et par les pages de prestation (lot C1 : elles ouvrent aussi sur un curseur), par elles seules ; l'ancien préchargement du poster n'existe plus", () => {
     const accueil = lire("src/app/page.tsx");
     assert.match(accueil, /import \{ preload \} from "react-dom";/);
     assert.match(accueil, /for \(const prechargement of prechargementsOuverture\(ouverture\)\) preload\(prechargement\.href, prechargement\.options\);/);
-    const autres = SOURCES.filter((f) => f !== "src/app/page.tsx" && /\bpreload\(|rel="preload"|hero-poster/.test(lire(f)));
+    // La page de prestation précharge l'« avant » de SON ouverture, avec les `sizes` de son `<picture>`.
+    const prestation = lire("src/app/prestations/[slug]/page.tsx");
+    assert.match(prestation, /import \{ preload \} from "react-dom";/);
+    assert.match(prestation, /for \(const prechargement of prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\) preload\(prechargement\.href, prechargement\.options\);/);
+    assert.match(lire("src/components/ContenuPrestation.tsx"), /preparees=\{\{ \.\.\.ouverture\.preparees, tailles: TAILLES_OUVERTURE_PRESTATION \}\}/);
+    const pagesAOuverture = ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx"];
+    const autres = SOURCES.filter((f) => !pagesAOuverture.includes(f) && /\bpreload\(|rel="preload"|hero-poster/.test(lire(f)));
     assert.deepEqual(autres, []);
   });
 

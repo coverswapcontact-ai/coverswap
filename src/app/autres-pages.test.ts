@@ -4,19 +4,29 @@ import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { etudeDeLaPiece } from "@/components/accueil/etudes";
-import { classesBouton } from "@/components/simulation/Bouton";
+import { IMAGE_OUVERTURE, LEGENDE_OUVERTURE } from "@/components/accueil/etudes";
+import ContenuPrestation, { vueDeLaPrestation } from "@/components/ContenuPrestation";
+import { classesBouton, type VarianteBouton } from "@/components/simulation/Bouton";
+import { PAIRES_SERIE_2 } from "@/data/ambiances";
+import { CAS_PRESTATIONS, casDeLaPrestation } from "@/data/cas-prestations";
 import { articles } from "@/data/blog-articles";
 import { FAQ_EAU_CHALEUR, FAQ_GARANTIE, FAQ_GENERALE, FAQ_RETRAIT } from "@/data/faq";
 import { PRESTATIONS, getPrestation, lienPiece } from "@/data/prestations";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import { ACOMPTE_POURCENT, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, euros, fourchette } from "@/lib/offre";
+import { ambianceDeLImage } from "@/lib/ambiances";
+import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import type { Publication } from "@/lib/publications";
+import { lireDepuis } from "@/lib/simulateur/entonnoir";
+import { lireComposition, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
+import type { TarifsSite } from "@/lib/tarifs-site";
+import { teintePrestation } from "@/lib/teintes-prestations";
 import { FAQ_RESTANTE, INTRO_GUIDES, OBJECTIONS } from "./comment-ca-marche/contenu";
 
 /**
  * Mission 16 (partie 5) — les autres pages rendues : /realisations (réalisations publiées, sinon études simulées
- * étiquetées ; les cinq pièces → pages par pièce), les pages par pièce (titre court, ambiance, étude de cas, bouton
+ * étiquetées ; les cinq pièces → pages par pièce), les pages par pièce (site 3.0, lot C1 : titre court, ouverture
+ * avant / après — la réalisation de la pièce d'abord —, cas d'ambiance, vedettes, prix du CRM, villes, teinte, bouton
  * de la pièce, balisage), /comment-ca-marche (procédé, prix, objections, guides), les pages locales (plus de
  * `LocalBusiness` par ville). Le CRM est simulé (`fetch` remplacé) : aucune requête réseau.
  */
@@ -29,7 +39,7 @@ const texteHtml = (html: string) => html.replace(/&#x27;/g, "'").replace(/&quot;
 const sansScripts = (html: string) => html.replace(/<script[\s\S]*?<\/script>/g, "");
 
 /** Les liens rendus en bouton principal (ou secondaire) : [adresse, libellé]. */
-function boutons(html: string, variante: "principal" | "secondaire"): [string, string][] {
+function boutons(html: string, variante: VarianteBouton): [string, string][] {
   const motif = new RegExp(`<a class="${echapper(classesBouton(variante))}[^"]*" href="([^"]*)"[^>]*>([^<]*)</a>`, "g");
   return [...html.matchAll(motif)].map((m) => [texteHtml(m[1]), texteHtml(m[2])]);
 }
@@ -114,74 +124,228 @@ describe("/realisations", () => {
   });
 });
 
-describe("pages par pièce", () => {
-  test("titre de 7 mots au plus ; l'ancien titre et les paragraphes restent ; le bouton de la pièce ; « Demander un devis » en secondaire", async () => {
+describe("pages par pièce (site 3.0, lot C1)", () => {
+  const PIECES = ["cuisine", "salle-de-bain", "meubles"] as const;
+  const page = (slug: string) => rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug }) });
+  /** Les liens « Essayer cette composition chez moi » : leurs adresses. */
+  const essais = (html: string) => [...html.matchAll(/<a[^>]* href="([^"]*)"[^>]*>Essayer cette composition chez moi<\/a>/g)].map((m) => texteHtml(m[1]));
+
+  test("titre de 7 mots au plus ; l'ancien titre et les paragraphes restent ; UNE action principale (le simulateur de la pièce, depuis=prestation-<slug>), en haut et au dernier appel ; « Demander un devis » en secondaire", async () => {
     publications = [];
-    for (const slug of ["cuisine", "salle-de-bain", "meubles"]) {
+    for (const slug of PIECES) {
       const p = getPrestation(slug)!;
       assert.ok(p.titreCourt.replace(/[,.:;]/g, "").split(/\s+/).filter(Boolean).length <= 7, p.titreCourt);
-      const html = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug }) });
-      assert.ok(html.includes(`<h1 class="titre-1 mt-2 max-w-3xl text-encre">${p.titreCourt}</h1>`), slug);
+      const html = await page(slug);
+      assert.ok(html.includes(`<h1 id="titre-prestation" class="titre-1 mt-2 max-w-3xl text-balance text-encre">${p.titreCourt}</h1>`), slug);
       assert.equal(compter(html, "<h1"), 1);
       if (p.h1 !== p.titreCourt) assert.ok(html.includes(`>${p.h1}</h2>`), `${slug} : ancien titre gardé`);
       for (const para of p.intro) assert.ok(html.includes(para), `${slug} : paragraphe gardé`);
       const principaux = boutons(html, "principal");
-      assert.ok(principaux.length === 2 && principaux.every(([href, libelle]) => href === `/simulateur?projet=${p.simulateur}` && libelle === p.libelleSimuler), `${slug} : ${JSON.stringify(principaux)}`);
+      assert.ok(principaux.length === 2 && principaux.every(([href, libelle]) => href === `/simulateur?projet=${p.simulateur}&depuis=prestation-${slug}` && libelle === p.libelleSimuler), `${slug} : ${JSON.stringify(principaux)}`);
       assert.ok(boutons(html, "secondaire").some(([href, libelle]) => href === "/contact" && libelle === "Demander un devis"));
-      // L'image d'ambiance de la pièce ouvre la page : étiquetée, prioritaire (une seule).
-      assert.ok(html.includes(`/images/prep/piece-${slug === "salle-de-bain" ? "salle-de-bain" : slug}-`), slug);
-      assert.equal(compter(html, 'fetchPriority="high"'), 1, slug);
-      assert.ok(html.includes(">Ambiance</span>"));
+      // Le dernier appel, en encre : le même principal, « Être rappelé » et le devis posés sur l'encre.
+      const dernier = html.slice(html.indexOf('id="dernier-appel"'));
+      assert.match(dernier, /^id="dernier-appel"[^>]*class="ton-encre bg-encre/);
+      assert.equal(boutons(dernier, "principal").length, 1);
+      assert.ok(dernier.includes(">Être rappelé</button>") && boutons(dernier, "sur-encre").some(([href]) => href === "/contact"));
       assert.ok(html.includes(p.prix.fourchette));
       assert.ok(!html.includes('href="/prestations"'), "le fil d'Ariane passe par /realisations");
       const types = balisage(html).map((b) => b["@type"]);
       assert.deepEqual([...types].sort(), ["BreadcrumbList", "FAQPage", "HowTo", "Service"]);
       const service = balisage(html).find((b) => b["@type"] === "Service") as { offers: { url: string }; provider: { "@id": string } };
-      assert.equal(service.offers.url, `https://coverswap.fr/simulateur?projet=${p.simulateur}`);
+      assert.equal(service.offers.url, `https://coverswap.fr/simulateur?projet=${p.simulateur}`, "l'offre : l'adresse du simulateur de la pièce, sans le `depuis` du bouton");
       assert.equal(service.provider["@id"], "https://coverswap.fr/#entreprise");
       const fil = balisage(html).find((b) => b["@type"] === "BreadcrumbList") as { itemListElement: { name: string; item: string }[] };
       assert.deepEqual(fil.itemListElement.map((e) => e.item), ["https://coverswap.fr", "https://coverswap.fr/realisations", `https://coverswap.fr/prestations/${slug}`]);
     }
   });
 
-  test("vitrages : pas de simulateur, « Demander un devis » en principal, pas d'image ni d'étude", async () => {
-    publications = [publication({ id: "x", typeProjet: "AUTRE" })];
-    const p = getPrestation("vitrages")!;
-    const html = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "vitrages" }) });
-    assert.ok(html.includes(`>${p.titreCourt}</h1>`));
-    assert.ok(boutons(html, "principal").every(([href, libelle]) => href === "/contact" && libelle === "Demander un devis"));
-    assert.equal(compter(html, "<picture"), 0);
-    assert.ok(!html.includes("Une réalisation"), "un chantier « AUTRE » n'est pas une étude de vitrages");
+  test("l'ouverture : la paire d'ambiance de la pièce, étiquetée, sa légende et ses cartels ; le seul couple prioritaire (l'« avant » est le LCP) ; jamais « Simulation » ni « Réalisation »", async () => {
+    publications = [];
+    for (const slug of PIECES) {
+      const { ouverture } = CAS_PRESTATIONS[slug];
+      const html = await page(slug);
+      // L'image de la page est celle de l'ouverture : ses deux images, et elles seules, en priorité haute.
+      const prioritaires = [...html.matchAll(/<img [^>]*src="([^"]*)"[^>]*fetchPriority="high"/g)].map((m) => m[1]);
+      assert.equal(compter(html, 'fetchPriority="high"'), 2, slug);
+      assert.deepEqual(prioritaires.map((src) => src.replace(/-\d+\.jpg\?v=.*$/, "").replace("/images/prep/", "")).sort(), [ouverture.apres, ouverture.avant].sort(), slug);
+      assert.ok(html.indexOf(`/images/prep/${ouverture.avant}-`) < html.indexOf('id="cas"'), `${slug} : l'ouverture avant les cas`);
+      assert.ok(html.includes(`>${ouverture.legende}</figcaption>`), slug);
+      assert.ok(html.includes(">Ambiance · avant / après</span>"));
+      assert.ok(!html.includes(">Simulation</span>") && !/>Réalisation(, [^<]*)?</.test(html), slug);
+      assert.ok(!html.includes("/images/prep/piece-"), `${slug} : plus l'ambiance piece-* de la mission 16`);
+      // Les cartels des matières de l'ouverture, au filet de la teinte de la prestation.
+      const teinte = teintePrestation(slug)!.teinte.hex;
+      assert.ok(html.includes(`style="--teinte:${teinte}"`), slug);
+      assert.match(html, new RegExp(`<ul class="grid grid-cols-2[^"]*" aria-label="Matières posées">`), slug);
+    }
+    const cuisine = await page("cuisine");
+    assert.ok(cuisine.includes(">Deep Green</span>") && cuisine.includes("NF13 · Couleur"), "cuisine : la bordeaux passée en Deep Green NF13");
   });
 
-  test("l'étude de cas : la réalisation publiée de la pièce, sinon sa paire d'ambiance (mission 19 : cuisine, salle de bain, dressing), sinon rien", async () => {
-    const cuisine = publication({ id: "c1" }) as Publication;
-    const sdb = publication({ id: "s1", typeProjet: "SDB" }) as Publication;
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [sdb, cuisine])?.mode, "reelle");
-    assert.equal(etudeDeLaPiece("SDB", "salle-de-bain", [sdb, cuisine])?.mode, "reelle");
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [sdb])?.mode, "simulee", "la paire d'ambiance de l'ouverture");
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [], {}), null, "sans les images de la paire : rien");
-    assert.equal(etudeDeLaPiece("SDB", "salle-de-bain", [cuisine])?.mode, "simulee", "la paire de la salle de bain");
-    const dressing = etudeDeLaPiece("MEUBLES", "meubles", []);
-    assert.ok(dressing?.mode === "simulee" && dressing.etude.image.type === "avant-apres" && dressing.etude.image.apres.includes("meubles-armoire"), "Prestations › Meubles : la paire du dressing");
-    assert.equal(etudeDeLaPiece("AUTRE", null, []), null);
-    assert.equal(etudeDeLaPiece("CUISINE", "cuisine", [publication({ id: "sans", photoApres: null }) as Publication])?.mode, "simulee", "une réalisation sans photo après n'est pas une étude");
-
-    publications = [cuisine];
-    const reelle = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "cuisine" }) });
-    assert.ok(reelle.includes("Une réalisation") && reelle.includes("/api/site/photos/c1/apres?l=960 960w"));
+  test("les cas : chacun étiqueté, avec son curseur (paire) ou sa photo seule, ses cartels à la teinte et « Essayer cette composition chez moi » (depuis=prestation-<slug>) ; aucun doublon avec l'ouverture", async () => {
     publications = [];
-    const simulee = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "cuisine" }) });
-    assert.ok(simulee.includes("Ce que ça donne") && simulee.includes(">Ambiance</span>"));
-    const salle = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "salle-de-bain" }) });
-    assert.ok(salle.includes("Ce que ça donne") && salle.includes("Khaki · K4"), "la paire de la salle de bain, étiquetée");
-    const meubles = await rendrePage("@/app/prestations/[slug]/page", { params: Promise.resolve({ slug: "meubles" }) });
-    assert.ok(meubles.includes("meubles-dressing-avant") && meubles.includes("Pastel Olive Green · RM30"), "Prestations › Meubles : le dressing avant / après, étiqueté");
+    for (const slug of PIECES) {
+      const html = await page(slug);
+      const vue = vueDeLaPrestation(getPrestation(slug)!);
+      assert.equal(vue.cas.length, CAS_PRESTATIONS[slug].cas.length, `${slug} : toutes les images préparées`);
+      const paires = vue.cas.filter((c) => c.preparees.avant).length;
+      assert.equal(compter(html, 'role="slider"'), 1 + paires, slug);
+      assert.equal(compter(html, ">Ambiance · avant / après</span>"), 1 + paires, slug);
+      assert.equal(compter(html, ">Ambiance</span>"), vue.cas.length - paires + 1, `${slug} : les photos seules, et l'étiquette en tête des cas`);
+      const liens = essais(html);
+      assert.equal(liens.length, vue.cas.length, slug);
+      for (const lien of liens) {
+        const parametres = new URLSearchParams(lien.split("?")[1]);
+        assert.equal(lireDepuis(parametres.get("depuis")), `prestation-${slug}`, lien);
+        assert.equal(parametres.get("projet"), getPrestation(slug)!.simulateur, lien);
+        assert.ok(lireComposition(lireRefDemandee(parametres.get("ref")))?.length, lien);
+      }
+      for (const c of vue.cas) {
+        assert.ok(html.includes(`>${c.nom}</h3>`), `${slug} : ${c.nom}`);
+        for (const m of c.matieres) assert.ok(html.includes(`${m.matiere.id} · `), `${slug} : ${m.matiere.id}`);
+      }
+      // Aucune image n'est à la fois l'ouverture et un cas.
+      const { ouverture, cas } = CAS_PRESTATIONS[slug];
+      assert.ok(!cas.includes(ouverture.apres));
+      assert.ok(vue.cas.every((c) => c.ambiance.avant !== ouverture.avant), `${slug} : pas l'autre après de l'avant de l'ouverture`);
+      // La bande de matière de la teinte ferme les cas.
+      const ref = teintePrestation(slug)!.teinte.ref;
+      assert.ok(html.indexOf(`aria-label="Matière ${matiereCartel(ref)!.nom} · ${ref}`) > html.indexOf('id="cas"'), `${slug} : bande ${ref}`);
+      assert.equal(boutons(html.slice(html.indexOf('id="cas"'), html.indexOf('id="matieres"')), "principal").length, 0, "une seule action principale : pas dans les cas");
+    }
+    const salle = await page("salle-de-bain");
+    assert.ok(salle.includes("AA14 · ") && salle.includes("RM26 · ") && !salle.includes("Khaki"), "la salle de bain : les références de la série 2");
+    // Les nouvelles valeurs `depuis` sont documentées au suivi (aucun type d'événement nouveau).
+    const suivi = readFileSync(join(process.cwd(), "docs", "SUIVI.md"), "utf8");
+    for (const slug of PIECES) assert.ok(suivi.includes(`\`prestation-${slug}\``), slug);
+    const meubles = await page("meubles");
+    assert.ok(meubles.includes("meubles-dressing-avant") && meubles.includes("etude-meubles-avant") && meubles.includes("RM30 · ") && meubles.includes("NH12 · "), "meubles : le dressing et le meuble TV de la série 1");
+  });
+
+  test("les matières vedettes (8 vrais échantillons vers leur fiche), les prix du CRM de la famille tels quels, les villes", async () => {
+    publications = [];
+    for (const slug of PIECES) {
+      const html = await page(slug);
+      const section = html.slice(html.indexOf('id="matieres"'));
+      for (const ref of CAS_PRESTATIONS[slug].vedettes) assert.ok(section.includes(`href="${lienMatiere(ref)}"`), `${slug} : ${ref}`);
+      assert.ok(section.includes('href="/matieres"'));
+      // Les villes : une page chacune.
+      for (const z of ZONES) assert.ok(html.includes(`href="/zones/${getZoneSlug(z)}"`), `${slug} : ${z.ville}`);
+    }
+    // Les prix : les tarifs du CRM de la famille, tels quels (sans le CRM : la plage et la fourchette de la famille).
+    const tarifs: TarifsSite = {
+      version: 1,
+      familles: [
+        { id: "CUISINE", sousParties: [{ id: "facades-hautes", libelle: "Façades hautes", metrage: true, prixUnitaire: 110, unite: "ml" }, { id: "credence", libelle: "Crédence", metrage: false, prixUnitaire: null, unite: "ml" }], formats: [] },
+        { id: "MEUBLES", sousParties: [{ id: "meuble-tv", libelle: "Meuble TV", metrage: false, prixUnitaire: 65, unite: "ml" }], formats: [] },
+      ],
+    };
+    const avec = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("cuisine")!, url: "https://coverswap.fr/prestations/cuisine", fil: [], filSchema: [], tarifs })));
+    const prix = avec.slice(avec.indexOf('id="prix"'), avec.indexOf('id="villes"'));
+    assert.ok(prix.includes("Façades hautes") && prix.includes(`${euros(110)}/ml`), "le prix du CRM, tel quel");
+    assert.ok(!prix.includes("Crédence") && !prix.includes("Meuble TV"), "un prix nul est masqué ; les autres familles n'y sont pas");
+    const sans = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: null })));
+    const repli = sans.slice(sans.indexOf('id="prix"'), sans.indexOf('id="villes"'));
+    assert.ok(repli.includes(PRIX_PLAGE) && repli.includes(fourchette("sdb")) && !repli.includes(fourchette("cuisine")), "le repli d'offre.ts : la plage et la fourchette de la famille");
+    const sdbCrm = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: { version: 1, familles: [{ id: "SDB", sousParties: [{ id: "meuble-vasque", libelle: "Meuble vasque", metrage: true, prixUnitaire: null, unite: "ml" }], formats: [] }] } })));
+    assert.ok(sdbCrm.includes("Sur devis, après une visite ou sur vos photos."), "une famille sans aucun prix : « Sur devis »");
+  });
+
+  test("la teinte de la prestation sur la page (filets, cartels, bande) ; les autres prestations à la leur", async () => {
+    publications = [];
+    for (const slug of PIECES) {
+      const html = await page(slug);
+      const t = teintePrestation(slug)!;
+      assert.ok(html.startsWith(`<div style="--teinte:${t.teinte.hex}">`), slug);
+      assert.ok(compter(html, 'class="filet') >= 8 + 1, `${slug} : filets des villes et des cas`);
+      // Les autres prestations portent leur propre teinte (vitrages : aucune).
+      const pro = html.match(/<a [^>]*href="\/pro"[^>]*>/)?.[0] ?? "";
+      assert.ok(pro.includes(`--teinte:${teintePrestation("professionnel")!.teinte.hex};--teinte-2:${teintePrestation("professionnel")!.seconde!.hex}`), `${slug} : ${pro}`);
+      const vitrages = html.match(/<a [^>]*href="\/prestations\/vitrages"[^>]*>/)?.[0] ?? "";
+      assert.ok(vitrages && !vitrages.includes("--teinte"), `${slug} : vitrages sans teinte`);
+    }
+  });
+
+  test("une réalisation publiée de la pièce passe d'abord : l'ouverture (avec ses deux photos), puis les autres de la pièce, puis les ambiances", async () => {
+    const c1 = publication({ id: "c1", titre: "Cuisine en chêne" });
+    const c2 = publication({ id: "c2", titre: "Cuisine noire", photoAvant: null });
+    const s1 = publication({ id: "s1", typeProjet: "SDB", titre: "Salle de bain verte" });
+    const avis = publication({ id: "a1", type: "AVIS" });
+    publications = [avis, s1, c2, c1];
+    const cuisine = await page("cuisine");
+    assert.ok(cuisine.includes(">Réalisation, Lattes</span>") && cuisine.includes(">Cuisine en chêne, Lattes.</figcaption>"));
+    assert.match(cuisine, /<img src="[^"]*\/api\/site\/photos\/c1\/avant"[^>]*fetchPriority="high"/);
+    assert.equal(compter(cuisine, 'fetchPriority="high"'), 2);
+    assert.ok(cuisine.indexOf(">Nos chantiers</h3>") < cuisine.indexOf(">Ambiance</span>"), "les chantiers avant les ambiances");
+    assert.ok(cuisine.includes(">Cuisine noire</h3>") && !cuisine.includes(">Cuisine en chêne</h3>"), "l'ouverture n'est pas répétée en carte");
+    assert.ok(!cuisine.includes("Salle de bain verte"), "une réalisation d'une autre pièce n'est pas montrée");
+    const salle = await page("salle-de-bain");
+    assert.ok(salle.includes(">Salle de bain verte, Lattes.</figcaption>") && !salle.includes(">Nos chantiers</h3>"));
+    const meubles = await page("meubles");
+    assert.ok(meubles.includes(`>${CAS_PRESTATIONS.meubles.ouverture.legende}</figcaption>`), "sans réalisation de meubles : la paire d'ambiance");
+
+    // En règles pures.
+    const p = getPrestation("cuisine")!;
+    const sansAvant = vueDeLaPrestation(p, [c2 as Publication]);
+    assert.equal(sansAvant.ouverture?.type, "ambiance", "une réalisation sans photo avant ne prend pas l'ouverture…");
+    assert.deepEqual(sansAvant.reelles.map((e) => e.id), ["c2"], "… mais passe avant les ambiances");
+    assert.equal(vueDeLaPrestation(p, [avis as Publication]).ouverture?.type, "ambiance", "un avis n'est pas une réalisation");
+    assert.deepEqual(vueDeLaPrestation(getPrestation("vitrages")!, [publication({ id: "v", typeProjet: "AUTRE" }) as Publication]), { ouverture: null, reelles: [], cas: [], vedettes: [] });
+    assert.equal(vueDeLaPrestation(p, [], {}).ouverture, null, "sans les images de la paire : pas d'image");
+    assert.deepEqual(vueDeLaPrestation(p, [], {}).cas, [], "un cas non préparé est sauté");
+  });
+
+  test("vitrages : inchangée — pas de simulateur, « Demander un devis » en principal, ni image, ni cas, ni vedettes, ni teinte", async () => {
+    publications = [publication({ id: "x", typeProjet: "AUTRE" })];
+    const p = getPrestation("vitrages")!;
+    const html = await page("vitrages");
+    assert.ok(html.includes(`>${p.titreCourt}</h1>`));
+    assert.ok(boutons(html, "principal").length > 0 && boutons(html, "principal").every(([href, libelle]) => href === "/contact" && libelle === "Demander un devis"));
+    assert.equal(compter(html, "<picture"), 0);
+    assert.ok(!/>Réalisation(, [^<]*)?</.test(html) && !html.includes("Ambiance") && !html.includes('id="cas"') && !html.includes('id="matieres"'));
+    assert.ok(html.startsWith("<div>"), "pas de teinte");
+    assert.ok(html.includes(p.prix.fourchette));
+  });
+
+  test("les cas de chaque page (data/cas-prestations) : cuisine = la bordeaux puis les 10 autres cuisines de la série 2 et la cuisine familiale ; salle de bain = les 3 ; meubles = buffet, placard, portes de couloir, dressing, meuble TV ; l'après au plus petit ΔE affiché", () => {
+    const avantDe = (image: string) => ambianceDeLImage(image)?.avant ?? null;
+    const avantsSerie2 = (piece: string) => PAIRES_SERIE_2.filter((x) => x.piece === piece).map((x) => x.avant);
+    const { cuisine, "salle-de-bain": salle, meubles } = CAS_PRESTATIONS;
+    assert.deepEqual({ avant: cuisine.ouverture.avant, apres: cuisine.ouverture.apres }, IMAGE_OUVERTURE);
+    assert.equal(cuisine.ouverture.legende, LEGENDE_OUVERTURE);
+    assert.equal(cuisine.cas.length, 11);
+    assert.deepEqual([cuisine.ouverture.avant, ...cuisine.cas.map(avantDe).filter(Boolean)].sort(), avantsSerie2("cuisine").sort(), "les 11 cuisines de la série 2, une fois chacune");
+    assert.ok(cuisine.cas.includes("amb-cuisine-familiale"));
+    assert.deepEqual([salle.ouverture.avant, ...salle.cas.map(avantDe)].sort(), avantsSerie2("salle-de-bain").sort(), "les 3 salles de bain");
+    assert.equal(meubles.ouverture.avant, "buffet-salle-a-manger-avant");
+    assert.deepEqual(meubles.cas.map(avantDe), ["placard-coulissant-chambre-avant", "portes-couloir-avant", null, "meubles-dressing-avant", "etude-meubles-avant"]);
+    assert.ok(meubles.cas.includes("amb-couloir-portes"));
+    // L'après d'une paire de la série 2 : le plus petit ΔE affiché maximal (sauf la bordeaux, fixée par l'énoncé).
+    type Composee = { nom: string; avant?: string; composition?: Record<string, { deltaEAffichee?: number }> };
+    const serie2 = JSON.parse(readFileSync(join(process.cwd(), "scripts", "bibliotheque", "serie-2.json"), "utf8")) as Composee[];
+    const pire = (nom: string) => Math.max(...Object.values(serie2.find((x) => x.nom === nom)!.composition!).map((c) => c.deltaEAffichee ?? 0));
+    for (const data of [cuisine, salle, meubles]) {
+      for (const image of [data.ouverture.apres, ...data.cas]) {
+        if (image === IMAGE_OUVERTURE.apres) continue;
+        const entree = serie2.find((x) => x.nom === image);
+        if (!entree?.avant) continue;
+        const soeurs = serie2.filter((x) => x.avant === entree.avant && x.composition);
+        assert.ok(soeurs.every((s) => pire(image) <= pire(s.nom)), `${image} : ΔE ${pire(image)}`);
+      }
+      // Aucun doublon ; les vedettes, huit références du catalogue.
+      assert.equal(new Set([data.ouverture.apres, ...data.cas]).size, data.cas.length + 1);
+      assert.equal(new Set(data.vedettes).size, 8);
+      for (const ref of data.vedettes) assert.ok(matiereCartel(ref), ref);
+    }
   });
 
   test("« professionnel » n'est plus une page par pièce ; la liste des pièces reste celle des données", () => {
     assert.deepEqual(PRESTATIONS.map((p) => p.slug), ["cuisine", "salle-de-bain", "meubles", "professionnel", "vitrages"]);
     assert.equal(lienPiece("professionnel"), "/pro");
+    assert.equal(casDeLaPrestation("professionnel"), null);
+    assert.equal(casDeLaPrestation("vitrages"), null);
+    assert.equal(casDeLaPrestation("toString"), null);
   });
 });
 

@@ -1,7 +1,7 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit) et B6 (l'accueil).
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil) et C1 (les pages de prestation).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -411,6 +411,39 @@ référence : `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
   marbre).
 - Une seule action principale par écran ; le bouton collé « Simuler ma pièce » du téléphone s'efface sur les autres
   appels, pendant une saisie et tant qu'une feuille est ouverte.
+
+## Les pages de prestation
+
+Lot C1, `src/components/ContenuPrestation.tsx`, données `src/data/cas-prestations.ts` (énoncé, § C.2). Captures de
+référence : `docs/captures/site-3-0/prestation-cuisine-390.jpg` et `prestation-cuisine-1440.jpg`. La page porte la
+teinte de sa prestation (`styleTeinte`) : le trait devant le surtitre, les filets des cas et des villes, le filet des
+cartels et des échantillons, la bande de matière de la teinte (RM20, M6, NH12) après les cas. Les « autres
+prestations » portent chacune la leur. Vitrages : aucune teinte, ni image, ni cas, ni vedettes (page inchangée).
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Ouverture | papier | téléphone : l'image, la légende, le titre, les boutons, l'accroche, les cartels ; dès 1 024 px, le texte à gauche (5/12) et l'image à droite (7/12), les cartels sous l'image |
+| 2. Les cas | papier-2 | « Nos chantiers » (réalisations publiées de la pièce) d'abord, puis l'étiquette « Ambiance » et les cas en colonnes (1, 2 puis 3), séparés par un filet à la teinte |
+| — bande | la teinte | |
+| 3. Les matières | papier | 8 échantillons (`Echantillon`, filet à la teinte), « Voir les 497 matières » |
+| 4. Présentation, surfaces | papier-2 | les textes de `data/prestations.ts`, cartes des surfaces et des atouts |
+| 5. Déroulement | papier | |
+| 6. Prix | papier-2 | le texte de la page, puis les tarifs du CRM de la famille (`ContenuPrix`, `familles`), « Estimer sur ma photo » |
+| 7. Villes | papier | huit villes, de la plus proche, entre filets |
+| 8. Questions | papier-2 | |
+| 9. Autres prestations | papier | pastilles à la teinte de chacune |
+| 10. Dernier appel | encre | principal rouge, « Être rappelé » et « Demander un devis » en `sur-encre` |
+
+- **L'ouverture** : la première réalisation publiée de la pièce qui a ses deux photos (« Réalisation, <ville> »), sinon
+  la paire d'ambiance de la page (« Ambiance · avant / après », sa légende, ses cartels) ; c'est le seul couple en
+  `fetchPriority="high"`, et son « avant » est préchargé comme à l'accueil. Sur téléphone, l'accroche passe sous les
+  boutons : le principal tient au premier écran (390 × 660 : 573-621 px).
+- **Une seule action principale** : le simulateur de la pièce (`depuis=prestation-<slug>`), en haut et au dernier
+  appel ; « Demander un devis » toujours visible en secondaire ; chaque cas a son lien « Essayer cette composition
+  chez moi ».
+- **Les cas** (`components/ambiances/CarteAmbiance.tsx`, partagé avec « Des cuisines comme la vôtre ») : titre,
+  curseur ou photo seule étiquetés, cartels (2 colonnes au téléphone, 1 dans une colonne de cas), lien. Aucune image
+  n'est à la fois l'ouverture et un cas ; l'après d'une paire est celui au plus petit ΔE affiché (sauf la bordeaux).
 
 ## Ce qu'on a jeté de la maquette
 

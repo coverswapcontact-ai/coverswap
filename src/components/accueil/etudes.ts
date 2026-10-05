@@ -36,7 +36,7 @@ export const IMAGE_OUVERTURE = { avant: "cuisine-bordeaux-brillante-avant", apre
 /** La légende de l'ouverture, exacte (énoncé, § C.1). */
 export const LEGENDE_OUVERTURE = "Cuisine des années 2000, façades bordeaux brillantes → Deep Green NF13, plan Pale Oak AG13. Posé en une journée.";
 export const ETIQUETTE_OUVERTURE = "Ambiance · avant / après";
-/** La cuisine de l'ouverture de la mission 19 : elle reste l'étude de cas cuisine (`/realisations`, `/prestations/cuisine`) jusqu'aux lots C. */
+/** La cuisine de l'ouverture de la mission 19 : elle reste l'étude de cas cuisine de `/realisations` jusqu'au lot C5 (les pages de prestation ont leurs cas depuis le lot C1). */
 const APRES_ETUDE_CUISINE = "ouverture-cuisine-apres";
 /** Le cadre d'une réalisation publiée à l'ouverture (ses photos n'ont pas de dimensions connues) : celui des images d'ambiance. */
 export const RATIO_REALISATION = "3 / 2";
@@ -74,16 +74,30 @@ export type ChoixOuverture = {
   /** Mission 19 : les étiquettes matière de l'« après » et le lien de sa composition (l'ambiance seulement). */
   matieres?: MatiereCalque[];
   lienComposition?: string;
+  /** L'identifiant de la réalisation publiée montrée (elle n'est pas répétée plus bas). */
+  idPublication?: string;
 };
 
-/** Une réalisation avec les deux photos, dans l'ordre du CRM. */
-function premiereAvantApres(realisations: readonly Publication[]): (Publication & { photoAvant: string; photoApres: string }) | null {
-  const trouvee = realisations.find((p) => p.type === "REALISATION" && !!p.photoAvant && !!p.photoApres);
+/** Une réalisation avec les deux photos, dans l'ordre du CRM (d'un type de projet, s'il est donné). */
+function premiereAvantApres(realisations: readonly Publication[], typeProjet?: string): (Publication & { photoAvant: string; photoApres: string }) | null {
+  const trouvee = realisations.find((p) => p.type === "REALISATION" && (!typeProjet || p.typeProjet === typeProjet) && !!p.photoAvant && !!p.photoApres);
   return trouvee ? (trouvee as Publication & { photoAvant: string; photoApres: string }) : null;
 }
 
-export function choisirOuverture(realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): ChoixOuverture | null {
-  const reelle = premiereAvantApres(realisations);
+/** La paire d'ambiance d'une ouverture : l'avant, l'après (noms du manifeste) et la légende posée sous l'image. */
+export type PaireOuverture = { avant: string; apres: string; legende: string };
+
+/** La paire de l'accueil (énoncé, § C.1). */
+export const PAIRE_OUVERTURE_ACCUEIL: PaireOuverture = { ...IMAGE_OUVERTURE, legende: LEGENDE_OUVERTURE };
+
+/**
+ * L'image d'une ouverture : la première réalisation publiée qui a ses deux photos — de la pièce (`typeProjet`, le
+ * code du CRM) sur une page de prestation (site 3.0, lot C1), de n'importe quelle pièce sur l'accueil —, sinon la
+ * paire d'ambiance (`paire` : celle de l'accueil par défaut, celle de la prestation sinon, `data/cas-prestations`),
+ * sinon `null` (images non préparées).
+ */
+export function choisirOuverture(realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES, { typeProjet, paire = PAIRE_OUVERTURE_ACCUEIL }: { typeProjet?: string; paire?: PaireOuverture } = {}): ChoixOuverture | null {
+  const reelle = premiereAvantApres(realisations, typeProjet);
   if (reelle) {
     return {
       type: "realisation",
@@ -95,22 +109,25 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
       alt: `Après — ${reelle.titre}`,
       altAvant: `Avant — ${reelle.titre}`,
       preparees: { avant: sourcesPhotoCrm(reelle.photoAvant), apres: sourcesPhotoCrm(reelle.photoApres) },
+      idPublication: reelle.id,
     };
   }
-  const avant = sourcesPhoto(IMAGE_OUVERTURE.avant, manifeste);
-  const apres = sourcesPhoto(IMAGE_OUVERTURE.apres, manifeste);
+  const avant = sourcesPhoto(paire.avant, manifeste);
+  const apres = sourcesPhoto(paire.apres, manifeste);
   if (!avant || !apres) return null;
+  const ambiance = paire.apres === IMAGE_OUVERTURE.apres ? AMBIANCE_OUVERTURE : ambianceDeLImage(paire.apres);
+  const scene = PAIRES_SERIE_2.find((p) => p.avant === paire.avant)?.scene;
   return {
     type: "ambiance",
     avant: avant.src,
     apres: apres.src,
     ratio: `${avant.largeur} / ${avant.hauteur}`,
     etiquette: ETIQUETTE_OUVERTURE,
-    legende: LEGENDE_OUVERTURE,
-    alt: ALT_OUVERTURE,
-    altAvant: ALT_AVANT_OUVERTURE,
+    legende: paire.legende,
+    alt: paire === PAIRE_OUVERTURE_ACCUEIL ? ALT_OUVERTURE : (ambiance?.alt ?? "Pièce rénovée au film, image d'ambiance"),
+    altAvant: paire === PAIRE_OUVERTURE_ACCUEIL ? ALT_AVANT_OUVERTURE : `${scene ?? "La même pièce avant la pose"}. Image d'ambiance.`,
     preparees: { avant, apres },
-    ...(AMBIANCE_OUVERTURE ? { matieres: AMBIANCE_OUVERTURE.surfaces, lienComposition: AMBIANCE_OUVERTURE.lienComposition } : {}),
+    ...(ambiance ? { matieres: ambiance.surfaces, lienComposition: ambiance.lienComposition } : {}),
   };
 }
 
@@ -235,8 +252,8 @@ export function etudeCuisineSimulee(manifeste: ManifesteImages = MANIFESTE_IMAGE
   return etude ? { ...etude, altAvant: ALT_AVANT_ETUDE_CUISINE } : null;
 }
 
-/** Les images « après » des paires d'étude : la cuisine de l'ouverture, la salle de bain, le meuble TV, le dressing (Prestations › Meubles). */
-export const PAIRES_ETUDES = { "salle-de-bain": "etude-salle-de-bain-apres", meubles: "etude-meubles-apres", dressing: "meubles-armoire" } as const;
+/** Les images « après » des paires d'étude de `/realisations` : la salle de bain, le meuble TV (la cuisine : `APRES_ETUDE_CUISINE`). */
+export const PAIRES_ETUDES = { "salle-de-bain": "etude-salle-de-bain-apres", meubles: "etude-meubles-apres" } as const;
 
 /** Les études de cas de l'accueil : les réalisations publiées si le CRM en a, sinon trois paires d'ambiance (mission 19). */
 export function choisirEtudes(realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): ChoixEtudes {
@@ -253,27 +270,4 @@ export function choisirEtudes(realisations: readonly Publication[], manifeste: M
       etudePaire("meubles", "Meubles", "meuble", PAIRES_ETUDES.meubles, manifeste) ?? etudeAmbiance("meubles", "Meubles", "meuble"),
     ],
   };
-}
-
-/* ── L'étude de cas d'une page par pièce (mission 16, partie 5) ───────── */
-
-export type EtudePiece = { mode: "reelle"; etude: EtudeReelle } | { mode: "simulee"; etude: EtudeSimulee };
-
-/**
- * L'étude de cas de la page d'une pièce (`/prestations/<slug>`) : la PREMIÈRE réalisation publiée par le CRM pour ce
- * type de projet (avec sa photo après) ; sinon, depuis la mission 19, la paire d'ambiance de la pièce — la cuisine de
- * l'ouverture, la salle de bain, le dressing pour les meubles (l'image verticale) ; sinon rien.
- */
-export function etudeDeLaPiece(typeProjet: string, pieceId: string | null, realisations: readonly Publication[], manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudePiece | null {
-  const reelle = realisations.find((p) => p.type === "REALISATION" && p.typeProjet === typeProjet && !!p.photoApres);
-  if (reelle) return { mode: "reelle", etude: versEtudeReelle(reelle) };
-  const simulee =
-    pieceId === "cuisine"
-      ? etudeCuisineSimulee(manifeste)
-      : pieceId === "salle-de-bain"
-        ? etudePaire("salle-de-bain", "Salle de bain", "sdb", PAIRES_ETUDES["salle-de-bain"], manifeste)
-        : pieceId === "meubles"
-          ? etudePaire("meubles", "Dressing", "meuble", PAIRES_ETUDES.dressing, manifeste)
-          : null;
-  return simulee ? { mode: "simulee", etude: simulee } : null;
 }

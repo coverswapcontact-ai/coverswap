@@ -1,14 +1,7 @@
-import Link from "next/link";
-import { Cartel } from "@/components/revue/Cartel";
-import { AvantApres } from "@/components/simulation/AvantApres";
+import { CarteAmbiance, resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
 import { Section } from "@/components/simulation/Section";
-import { PAIRES_SERIE_2 } from "@/data/ambiances";
-import { ambianceDeLImage, type AmbianceResolue } from "@/lib/ambiances";
-import type { MatiereCartel } from "@/lib/cartel";
-import { sourcesPhoto, type ManifesteImages, type SourcesPhoto } from "@/lib/images-preparees";
+import type { ManifesteImages, SourcesPhoto } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
-import { avecDepuis } from "@/lib/liens-simulateur";
-import { matiereCartel } from "@/lib/matieres-vedettes";
 
 /**
  * 3. Des cuisines comme la vôtre (site 3.0, lot B6 ; énoncé, § C.1) : six avant / après, chacun nommé par ce que les
@@ -31,45 +24,14 @@ export const CUISINES_ACCUEIL: readonly { nom: string; apres: string }[] = [
 
 export const TAILLES_CUISINES = "(min-width: 1024px) 440px, (min-width: 768px) 50vw, calc(100vw - 32px)";
 
-export type CuisineAccueil = {
-  nom: string;
-  ambiance: AmbianceResolue;
-  altAvant: string;
-  ratio: string;
-  preparees: { avant: SourcesPhoto; apres: SourcesPhoto };
-  /** Les matières posées, une fois chacune (les meubles hauts et bas d'une même référence ne font qu'un cartel). */
-  matieres: { surfaces: string; matiere: MatiereCartel }[];
-  lien: string;
-};
+/** Une cuisine de l'accueil : toujours une paire (l'avant est là), nommée. */
+export type CuisineAccueil = CasAmbiance & { altAvant: string; preparees: { avant: SourcesPhoto; apres: SourcesPhoto } };
 
-const majuscule = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const estUnePaire = (c: CasAmbiance | null): c is CuisineAccueil => !!c?.preparees.avant && !!c.altAvant;
 
-/** Les six cuisines résolues (ambiance, avant, sources préparées, cartels) ; une paire non préparée est sautée. */
+/** Les six cuisines résolues (`resoudreCas` : ambiance, avant, sources préparées, cartels) ; une paire non préparée est sautée. */
 export function cuisinesAccueil(manifeste: ManifesteImages = MANIFESTE_IMAGES): CuisineAccueil[] {
-  return CUISINES_ACCUEIL.flatMap(({ nom, apres }) => {
-    const ambiance = ambianceDeLImage(apres);
-    const paire = PAIRES_SERIE_2.find((p) => p.avant === ambiance?.avant);
-    const sAvant = paire ? sourcesPhoto(paire.avant, manifeste) : null;
-    const sApres = sourcesPhoto(apres, manifeste);
-    if (!ambiance || !paire || !sAvant || !sApres) return [];
-    const parRef = new Map<string, { surfaces: string[]; matiere: MatiereCartel }>();
-    for (const s of ambiance.surfaces) {
-      const deja = parRef.get(s.ref);
-      if (deja) deja.surfaces.push(s.surface);
-      else parRef.set(s.ref, { surfaces: [s.surface], matiere: matiereCartel(s.ref) ?? { id: s.ref, nom: s.nom, famille: s.famille, hex: s.hex } });
-    }
-    return [
-      {
-        nom,
-        ambiance,
-        altAvant: `${paire.scene}. Image d'ambiance.`,
-        ratio: paire.ratio,
-        preparees: { avant: sAvant, apres: sApres },
-        matieres: [...parRef.values()].map((m) => ({ surfaces: majuscule(m.surfaces.join(" et ")), matiere: m.matiere })),
-        lien: avecDepuis(ambiance.lienComposition, "accueil-cuisines"),
-      },
-    ];
-  });
+  return CUISINES_ACCUEIL.map(({ nom, apres }) => resoudreCas(apres, { nom, depuis: "accueil-cuisines" }, manifeste)).filter(estUnePaire);
 }
 
 export function CuisinesCommeLaVotre({ cuisines = cuisinesAccueil() }: { cuisines?: CuisineAccueil[] }) {
@@ -78,29 +40,7 @@ export function CuisinesCommeLaVotre({ cuisines = cuisinesAccueil() }: { cuisine
       <ul className="grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
         {cuisines.map((c) => (
           <li key={c.ambiance.id} className="flex flex-col">
-            <h3 className="font-display text-[24px] leading-tight font-semibold text-encre">{c.nom}</h3>
-            <AvantApres
-              className="mt-3"
-              avant={c.preparees.avant.src}
-              apres={c.preparees.apres.src}
-              alt={c.ambiance.alt}
-              altAvant={c.altAvant}
-              ratio={c.ratio}
-              preparees={{ ...c.preparees, tailles: TAILLES_CUISINES }}
-              sansOutils
-              etiquette="Ambiance · avant / après"
-            />
-            <ul className="mt-4 grid gap-x-4 gap-y-3 sm:grid-cols-2" aria-label={`Matières posées : ${c.nom}`}>
-              {c.matieres.map((m) => (
-                <li key={m.matiere.id}>
-                  <p className="text-[13px] text-encre-2">{m.surfaces}</p>
-                  <Cartel matiere={m.matiere} className="mt-1" />
-                </li>
-              ))}
-            </ul>
-            <Link href={c.lien} className="mt-auto inline-flex self-start pt-3 min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
-              Essayer cette composition chez moi
-            </Link>
+            <CarteAmbiance cas={c} tailles={TAILLES_CUISINES} />
           </li>
         ))}
       </ul>
