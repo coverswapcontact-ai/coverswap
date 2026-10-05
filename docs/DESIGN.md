@@ -1,7 +1,7 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
-Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions) et B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette).
+Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit) et B6 (l'accueil).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -381,6 +381,36 @@ curseur) — le clavier du téléphone le collerait sur le formulaire — et tan
 ouvert : `verrouillerLaPage()` (`Feuille.tsx`) pose `data-feuille-ouverte` sur `<html>`, que le bouton observe. La
 logique est dans `simulation/saisie.ts` (pure). Le bouton « Voir le résultat » de l'écran des matières du simulateur
 ne la prend pas : son action doit rester sous le pouce.
+
+## L'accueil
+
+Lot B6, `src/app/page.tsx` et `src/components/accueil/`, dans l'ordre du tunnel (énoncé, § C.1). Captures de
+référence : `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Ouverture | papier | l'avant / après en pleine largeur (1 152 px au plus, jamais plus haut que `100svh`), titre `titre-0` hors de la photo, principal + « Être rappelé » |
+| — bande | chêne AG13 | |
+| 2. Par où commencer ? | papier | douze pictos de 64 px (80 dès 768), un filet de 3 px à la teinte de la prestation au-dessus de chacun |
+| 3. Des cuisines comme la vôtre | papier-2 | six curseurs, les cartels des matières sous chaque image |
+| 4. Comment on travaille | papier | grands numéros à l'encre, photos étiquetées, preuve de finition, garanties entre filets d'encre, principal |
+| — bande | marbre NE31 | |
+| 5. Le présentoir | papier-2 | pastille « 497 matières », 8 échantillons, secondaire ; il se ferme sur la bande vert profond NF13 |
+| 6. Réalisations | papier | les vraies d'abord, puis la rangée « Ambiances » (étiquette en tête de rangée et sur chaque image) |
+| — bande | terracotta NH12 | |
+| 7. Professionnels | encre | curseur, cartels `encre`, secondaire `sur-encre` |
+| 8. Avis et prix | papier | note Google si elle existe, prix du CRM en `tabular-nums`, zone et garantie |
+| — bande | bleu nuit M9 | |
+| 9. Questions, dernier appel | papier-2, puis encre | `<details>` entre filets d'encre ; principal rouge + deux `sur-encre` |
+
+- **Le titre reste hors de la photo** à toutes les largeurs : les façades vert profond occupent le tiers haut de
+  l'image (meubles hauts) ; un voile d'encre les aurait noircies. Sur téléphone, la photo vient d'abord (ordre visuel),
+  puis la légende, le titre et les deux boutons, tous au premier écran (390 × 660) ; dès 768 px, le titre court sur
+  toute la largeur au-dessus de la photo.
+- Deux bandes ne se suivent jamais : le vert profond ferme le présentoir au lieu de l'ouvrir (il aurait suivi le
+  marbre).
+- Une seule action principale par écran ; le bouton collé « Simuler ma pièce » du téléphone s'efface sur les autres
+  appels, pendant une saisie et tant qu'une feuille est ouverte.
 
 ## Ce qu'on a jeté de la maquette
 

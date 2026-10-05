@@ -73,7 +73,6 @@ describe("metadonneesPage", () => {
 describe("toutes les pages publiques passent par metadonneesPage", () => {
   test("pages statiques : métadonnées complètes", async () => {
     const pages: [string, string][] = [
-      ["/", "@/app/page"],
       ["/simulateur", "@/app/simulateur/page"],
       ["/matieres", "@/app/matieres/page"],
       ["/comment-ca-marche", "@/app/comment-ca-marche/page"],
@@ -90,13 +89,16 @@ describe("toutes les pages publiques passent par metadonneesPage", () => {
     }
   });
 
-  test("pages générées : réalisations, chaque pièce, chaque ville, chaque guide", async () => {
+  test("pages générées : l'accueil, réalisations, chaque pièce, chaque ville, chaque guide", async () => {
     // /realisations lit les publications du CRM pour sa description : CRM injoignable simulé (aucune requête réseau).
     const fetchOrigine = globalThis.fetch;
     globalThis.fetch = (async () => new Response("{}", { status: 503 })) as typeof fetch;
     try {
       const realisations = await import("@/app/realisations/page");
       verifierComplet(await realisations.generateMetadata(), "/realisations");
+      // Site 3.0 (lot B6) : l'accueil choisit son image de partage d'après l'ouverture (une réalisation publiée).
+      const accueil = await import("@/app/page");
+      verifierComplet(await accueil.generateMetadata(), "/");
     } finally {
       globalThis.fetch = fetchOrigine;
     }

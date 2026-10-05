@@ -412,3 +412,102 @@ API de simulation coupées. Captures hors dépôt (`scratchpad/m21/b5g/captures`
 
 **Problèmes** : aucun. Le premier agent du lot s'est arrêté avant la vérification visuelle et le commit ;
 son travail était complet et juste, rien de perdu.
+
+## B6 — l'accueil complet, dans l'ordre C.1 (05-06/10/2026)
+
+**Fait** (neuf sections de `sectionsAccueil()`, bandes de matière entre elles, aucune image régénérée, aucun envoi)
+1. **Ouverture** (`Ouverture.tsx`) : la paire `cuisine-bordeaux-brillante-avant` → `-apres-couleur` (`IMAGE_OUVERTURE`)
+   en pleine largeur (1 152 px au plus, jamais plus haute que `100svh`), curseur, « Ambiance · avant / après », la
+   légende exacte de l'énoncé en `figcaption` ; une réalisation publiée passe d'abord (« Réalisation, <ville> », sa
+   légende = titre et ville). Titre `titre-0` (la promesse d'avant, « Votre cuisine, transformée en une journée. »),
+   principal « Voir ma pièce transformée » (`depuis=accueil-ouverture`), secondaire « Être rappelé ». `ImageObject`
+   (`imageObjetOuverture`) ; `generateMetadata` : l'image de partage suit une réalisation publiée (`partageOuverture`).
+   Sous 768 px, plus d'outils sous l'image (`outilsMobile="aucun"`, nouvelle valeur d'`AvantApres`).
+2. **Par où commencer ?** (`ParOuCommencer.tsx`, serveur) : 5 pièces + 7 éléments (`lib/simulateur/elements.ts`),
+   pictos de 64 / 80 px, filet à la teinte de la prestation ; liens `lienSimuler({ projet, element, choix: true,
+   depuis: "accueil" })`. Montage du simulateur : `decisionAuMontage(…, { choix })` rend `pieceChoisie` (pièce de
+   l'adresse valide, ni `suite=1` ni photo en mémoire) → `marquerPiece` émet `PIECE_CHOISIE` et l'écran Photo s'ouvre ;
+   `?element=` (`lireElementDemande`, `zoneDeLElement`) ouvre la feuille de sa zone à l'écran des matières
+   (`useMatiereDemandee`, une fois). `entonnoir.test.ts` inchangé ; `Simulateur.tsx` 593 → 598 lignes (plafond 600).
+   `HomeClient.tsx` supprimé.
+3. **Des cuisines comme la vôtre** (`CuisinesCommeLaVotre.tsx`) : les six paires nommées, l'après au plus petit ΔE
+   affiché, cartels des matières (une même référence sur deux surfaces = un cartel), « Essayer cette composition chez
+   moi » (`depuis=accueil-cuisines`).
+4. **Comment on travaille** (`CommentOnTravaille.tsx`) : 4 étapes à grand numéro et photo étiquetée (`etape-photo`,
+   `etape-simulation` « Simulation », `echantillons-table`, `pose-mains`), preuve `detail-chant`, 4 garanties (devis
+   `DELAI_REPONSE`), « Simuler ma pièce » `#etapes-simuler`. La phrase sur le covering y vit (seule sur l'accueil).
+5. **Le présentoir** (`Presentoir.tsx`, remplace `MatieresAccueil`) : pastille 497, 8 vedettes en `Echantillon` vers
+   leur fiche, « Voir les 497 matières » ; fermé par la bande NF13.
+6. **Réalisations** (`RealisationsAccueil.tsx` réécrit, `CarteSimulee` gardé pour `/realisations` et les prestations) :
+   les publiées d'abord (`realisationsAccueil`, 3 au plus), puis la rangée « Ambiances » (dressing-vert-tendre,
+   salon-marbre, buffet-…-apres-couleur, amb-cuisine-familiale). Aujourd'hui aucune publiée : « Nos réalisations
+   arrivent ». `InspirationsAccueil` et `TroisFaits` supprimés.
+7. **Professionnels** (`ProAccueil.tsx`, ton encre) : comptoir avant → après bois (D1 + K1), cartels, « Voir l'offre
+   pro » en `sur-encre`.
+8. **Avis et prix** (`Confiance.tsx` → `AvisPrix.tsx`) : `blocAvis` inchangé (le CRM répond `disponible: false` :
+   rien d'affiché), puis `BlocPrix` / `ContenuPrix` (`components/BlocPrix.tsx`, partageable) : tarifs du CRM tels quels
+   (prix `null` masqués, famille sans prix « Sur devis »), repli `PRIX_PLAGE` + `FOURCHETTES` ; zone et garantie.
+9. **Questions** (`QuestionsAccueil.tsx`) : six questions de `data/faq.ts` (`QUESTIONS_ACCUEIL`), `<details>`, un seul
+   `FAQPage` ; puis **le dernier appel** en encre : « Simuler ma pièce » (`accueil-final`), « Être rappelé » et
+   WhatsApp en `sur-encre`.
+- **« Être rappelé »** (`FormulaireRappel.tsx`, client, ajouté à `CLIENTS_ADMIS`) : feuille, prénom, téléphone,
+  créneau (`lib/rappel`), consentement, Turnstile au premier geste, pot de miel ; `/api/contact` avec
+  `formulaire: "coverswap.fr/rappel"` ; la route transmet `rappelCreneau` (validé par `estCreneauRappel`).
+  `CONTACT_ENVOYE` + `RAPPEL_DEMANDE {creneau, depuis}`. **Jamais envoyé en local** (ouvert seulement, champs vérifiés).
+- Bandes (`BANDES_ACCUEIL`) : AG13 après les pictos, NE31 après « Comment on travaille », NF13 fermant le présentoir,
+  NH12 après les réalisations, M9 après avis et prix. Bouton collé : « Simuler ma pièce » (`accueil-colle`),
+  `masquerSurSaisie`, cibles `ouverture-simuler`, `par-ou-commencer`, `etapes-simuler`, `dernier-appel`, pied.
+- `lib/liens-simulateur.ts` (`lienSimuler`, `avecDepuis`) ; `lienSimulerCuisine` gardé pour `/comment-ca-marche`.
+- `matiereCartel(ref)` (`lib/matieres-vedettes.ts`) ; alias de teinte `placard-coulissant` → portes et placards.
+- `docs/SUIVI.md` § 8 réécrit (+ lignes `PIECE_CHOISIE`, `RAPPEL_DEMANDE`, `CONTACT_ENVOYE`), `docs/DESIGN.md`
+  « L'accueil », `data/faq.ts` (commentaire), captures `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
+
+**Décisions prises seul**
+1. **Le titre reste hors de la photo, à toutes les largeurs** (repli prévu par le plan) : sur la capture, les façades
+   NF13 occupent le tiers haut (meubles hauts) ; le voile d'encre les aurait noircies. Téléphone : photo, légende,
+   titre, boutons (le principal tient dans 390 × 660 : 605-653 px) ; dès 768 px, titre pleine largeur au-dessus.
+2. Photo de l'ouverture à la largeur des sections (1 152 px, `max-w-6xl`) plutôt que 1 392 : mêmes bords que l'en-tête
+   et les sections ; et jamais plus haute que l'écran utile (`min(72rem, (100svh − 84px) × 1,5)`).
+3. Les boutons de l'accueil ne fixent plus la pièce (`/simulateur?depuis=…`, libellé « Simuler ma pièce ») : la page
+   parle de toutes les pièces ; les pictos fixent la pièce. `/comment-ca-marche` garde son « Simuler ma cuisine »
+   (`CommentCaMarche`, trois étapes) jusqu'au lot C3, qui prendra `CommentOnTravaille`.
+4. Image de partage : seule une réalisation publiée remplace l'image du site ; une image d'ambiance n'est jamais
+   partagée brute (sans son étiquette) — les images composées et étiquetées viennent en F2. `metadonnees.test.ts` lit
+   donc `generateMetadata()` pour « / ».
+5. La bande vert profond **ferme** le présentoir (en tête, elle suivait la bande de marbre, deux bandes collées).
+6. L'élément ouvre la **feuille** de sa zone à l'écran 3 (lecture de « ouvre d'abord la zone ») ; seulement si la zone
+   est dans la pièce ouverte. `lib/simulateur/elements.ts` tient la table d'E2 (porte d'entrée et placards →
+   `portes-dressing`, réfrigérateur → `facades-cuisine`, commode → `meuble-complet`).
+7. Sans réalisation publiée, la section 6 le dit (« Nos réalisations arrivent ») et son secondaire mène à
+   `/inspirations` ; avec, « Voir les réalisations ».
+8. Avis : section sans titre de tête quand Google n'a pas de note (« Nos prix » porte le titre) ; aucune note écrite.
+9. Six questions de la FAQ existante, telles quelles, plutôt que de nouvelles réponses.
+
+**Tests** : 375 → 391, tous réussis. `accueil.test.ts` réécrit section par section (mêmes intentions : ordre exact,
+un principal par écran compté par classe quelle que soit la balise, honnêteté, LCP, chaque lien qui dit d'où il
+vient) : neuf identifiants, cinq bandes, ouverture (h1 avant `<picture>`, un seul couple `fetchPriority="high"`, aucun
+`lazy`, AVIF ≤ 80 Ko, `100svh`, 1 principal + 1 secondaire, « Ambiance · avant / après », jamais « Simulation »,
+légende exacte, partage et `ImageObject`), 12 pictos `choix=1&depuis=accueil` de 64 px `alt=""`, 6 curseurs et 6
+compositions, 4 étapes, 8 vedettes + 1 secondaire, réelles avant ambiances, pro, prix du CRM tels quels / repli,
+aucun montant écrit dans les sources de l'accueil, **FAQ exigée** (l'ancienne assertion « plus de FAQ » réécrite
+ouvertement : un seul `FAQPage`), dernier appel 1 principal + 2 `sur-encre`, rappel (fermé = un bouton, envoi,
+événements, route), suivi documenté. `elements.test.ts` (3), `reprise.test.ts` (+3 : avec / sans `choix`, photo en
+mémoire, montage), `perf.test.ts` (sections 2 à 9 en `sous-la-ligne`, `IMAGE_OUVERTURE`, − `HomeClient`
++ `FormulaireRappel`, nouveaux composants serveur), `cartes-pieces.test.ts` (− `HomeClient`), `metadonnees.test.ts`
+(« / » par `generateMetadata`). `entonnoir.test.ts` inchangé. Lint et build passent.
+
+**Vérification visuelle** : build local construit comme la CI (`NEXT_PUBLIC_SIMULATE_URL` de production,
+`NEXT_PUBLIC_SANS_EVENEMENTS=1`), `next start -p 3100`, Playwright + Edge à 360, 390 (660 et 844), 768, 1 024 et
+1 440 px, sections différées forcées visibles pour la capture pleine page, prise par tranches de 6 000 px recollées
+(au-delà de 16 384 px d'image, Edge répétait le haut de la page). Aucun débordement à 360 px (`captures.mjs` aussi),
+0 requête coupée, 0 image cassée, LCP = l'« après » de l'ouverture (240 à 310 ms en local, 656 ms à 360 px). Feuille
+de rappel ouverte à 390 px : `data-feuille-ouverte` posé, champs prénom / téléphone / 3 créneaux / consentement, rien
+envoyé. Corrigé après les captures : légende et marges du premier écran (le principal descendait sous 660 px),
+éléments en 3 colonnes sur téléphone (« Réfrigérateur » ne tient pas en 4), cartels en une colonne, liens de
+composition alignés, NF13 déplacée, rangée « Ambiances » collée au bord (`scroll-px-4`), questions et dernier appel
+alignés sur les bords des sections, photo d'ouverture alignée sur l'en-tête.
+
+**Problèmes** : à 768-1 023 px, le titre de 96 px prend trois lignes et la photo commence vers 490 px (lisible, mais
+le premier écran d'une tablette en paysage montre surtout le titre) — à revoir avec les retouches. Vignettes, prix et
+publications lus au CRM de production (GET seulement). Les captures pleine page de `captures.mjs` laissent toujours
+blanches les sections en `content-visibility` (connu depuis B0).

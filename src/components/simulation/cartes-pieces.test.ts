@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, test } from "node:test";
 import { createElement } from "react";
@@ -85,18 +85,20 @@ describe("les photos des pièces : un seul endroit", () => {
     assert.deepEqual(Object.values(PHOTOS_PIECES).sort(), ["piece-cuisine", "piece-meubles", "piece-murs", "piece-pro", "piece-salle-de-bain"]);
   });
 
-  test("le simulateur et l'accueil passent PHOTOS_PIECES ; l'espace client, non (ses cartes restent des dessins)", () => {
+  test("le simulateur passe PHOTOS_PIECES ; l'espace client, non (ses cartes restent des dessins) ; l'accueil n'a plus de cartes (site 3.0 : des pictos)", () => {
     const lire = (f: string) => readFileSync(path.join(process.cwd(), f), "utf8");
-    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/HomeClient.tsx"]) {
+    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx"]) {
       assert.match(lire(f), /<CartesPieces [^\n]*photos=\{PHOTOS_PIECES\}[^\n]*\/>/, f);
       assert.match(lire(f), /from "@\/lib\/images-pieces"/, f);
     }
-    // Premier écran du simulateur : les photos du premier rang en chargement immédiat ; l'accueil (module sous l'ouverture) en lazy.
+    // Premier écran du simulateur : les photos du premier rang en chargement immédiat.
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /<CartesPieces [^\n]*photosImmediates=\{PHOTOS_IMMEDIATES\}/);
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /const PHOTOS_IMMEDIATES = 3;/);
-    assert.ok(!lire("src/components/HomeClient.tsx").includes("photosImmediates"));
+    // Site 3.0 (lot B6) : le module photo de l'accueil (HomeClient) est remplacé par les pictos de « Par où commencer ? ».
+    assert.ok(!existsSync(path.join(process.cwd(), "src/components/HomeClient.tsx")));
+    assert.doesNotMatch(lire("src/components/accueil/ParOuCommencer.tsx"), /CartesPieces/);
     assert.ok(!lire("src/components/espace/CreationEcrans.tsx").includes("photos="));
     // Aucune liste de noms piece-* ailleurs que dans lib/images-pieces.
-    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/HomeClient.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.ok(!/"piece-(cuisine|murs|pro|meubles|salle-de-bain)"/.test(lire(f)), f);
+    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/accueil/ParOuCommencer.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.ok(!/"piece-(cuisine|murs|pro|meubles|salle-de-bain)"/.test(lire(f)), f);
   });
 });

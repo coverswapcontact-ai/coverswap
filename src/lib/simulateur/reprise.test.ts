@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, test } from "node:test";
 import { debuterSondage, decisionAuMontage, etapesCochees, migrerEtat, rapportPhoto, reduireAnalyse, reduireSondage, texteAttente, zoneNonVisible, ATTENTE_PAR_DEFAUT_S, MESSAGE_ANALYSE_SAUTEE, MESSAGE_DELAI, MESSAGE_ECHEC_GENERIQUE, MESSAGE_INJOIGNABLE, MESSAGE_INTROUVABLE, MESSAGE_SANS_PHOTO, REPRISE_MAX_MS, type EtatSimulateur } from "./reprise";
 import { DELAI_RENDU } from "@/lib/offre";
@@ -94,6 +96,40 @@ describe("décision au montage", () => {
     assert.deepEqual(decisionAuMontage(etatV2({ majLe: maintenant - REPRISE_MAX_MS - 1 }), { maintenant }), { ecran: "direct", etape: 1 });
     assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { maintenant }), { ecran: "direct", etape: 1 });
     assert.deepEqual(decisionAuMontage(null), { ecran: "direct", etape: 1 });
+  });
+});
+
+describe("décision au montage : un picto de l'accueil (site 3.0, lot B6)", () => {
+  test("?choix=1 sans photo en mémoire → pièce choisie, écran Photo ; sans choix, rien ne change", () => {
+    const maintenant = Date.now();
+    assert.deepEqual(decisionAuMontage(null, { choix: true, maintenant }), { ecran: "direct", etape: 1, pieceChoisie: true });
+    assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { choix: true, maintenant }), { ecran: "direct", etape: 1, pieceChoisie: true });
+    // Sans `choix` (prestations, villes, anciens liens `?projet=`) : la carte est seulement présélectionnée, comme avant.
+    assert.deepEqual(decisionAuMontage(null, { maintenant }), { ecran: "direct", etape: 1 });
+    assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { maintenant }), { ecran: "direct", etape: 1 });
+    assert.deepEqual(decisionAuMontage(null, { choix: false, maintenant }), { ecran: "direct", etape: 1 });
+  });
+
+  test("une photo en mémoire, un retour du module d'accueil (suite=1) ou un travail en cours passent avant le choix", () => {
+    const maintenant = Date.now();
+    assert.deepEqual(decisionAuMontage(etatV2(), { choix: true, maintenant }), { ecran: "bandeau", etape: 2 }, "photo récente : le bandeau de reprise, rien n'est écrasé");
+    assert.deepEqual(decisionAuMontage(etatV2(), { choix: true, depuisAccueil: true, maintenant }), { ecran: "direct", etape: 2 });
+    assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { choix: true, depuisAccueil: true, maintenant }), { ecran: "direct", etape: 1 });
+    const travail = { travailId: "cmun000000000003", lanceLe: 1, attenteEstimeeS: 75 };
+    assert.deepEqual(decisionAuMontage(etatV2({ travailEnCours: travail, photo: null }), { choix: true, maintenant }), { ecran: "attente", travail });
+    assert.equal(decisionAuMontage(null, { choix: true, reprise: "cmun000000000009", maintenant }).ecran, "attente", "le lien du mail d'abord");
+  });
+
+  test("le simulateur : `choix` seulement pour la pièce de l'adresse, PIECE_CHOISIE émise par marquerPiece au montage et au clic, écran Photo ensuite", () => {
+    const simulateur = readFileSync(path.join(process.cwd(), "src/app/simulateur/_components/Simulateur.tsx"), "utf8");
+    assert.match(simulateur, /choix: parametres\.get\("choix"\) === "1" && projetInitial === demande/);
+    assert.match(simulateur, /setEcran\(decision\.pieceChoisie \? 2 : ecranDepuisEtape\(decision\.etape, repris\)\)/);
+    assert.match(simulateur, /if \(decision\.ecran === "direct" && decision\.pieceChoisie\) marquerPiece\(projetInitial\);/);
+    assert.equal(simulateur.split("const marquerPiece = (id: string) =>").length - 1, 1, "définie une fois");
+    assert.equal(simulateur.split("marquerPiece(").length - 1, 2, "appelée au montage et au clic");
+    // L'élément (`?element=`) : sa zone, si elle est dans la pièce, s'ouvre d'abord à l'écran des matières.
+    assert.match(simulateur, /zoneDemandee\.current = zoneDeLElement\(lireElementDemande\(parametres\.get\("element"\)\), projetInitial\);/);
+    assert.match(simulateur, /useMatiereDemandee\([^)]*, zoneDemandee, setZoneOuverte\);/);
   });
 });
 

@@ -1,54 +1,52 @@
-import { LegendeMatieres } from "@/components/ambiances/LegendeMatieres";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
-import { ANCRES_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, lienSimulerCuisine } from "./sections";
+import { FormulaireRappel } from "./FormulaireRappel";
+import { ANCRES_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, lienSimulerAccueil } from "./sections";
 import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
 
 /**
- * 1. L'ouverture (mission 16, partie 3) : l'écran utile entier (jamais
- * `100vh` : `100svh` moins l'en-tête de 60 px), le curseur avant / après et
- * UN bouton. Sur téléphone, l'image d'abord, puis le titre, la ligne et le
- * bouton, le tout au premier écran (390 × 660) ; à partir de 768 px, le texte
- * à gauche et l'image à droite, bornée pour que l'image et ses outils tiennent
- * dans la hauteur de l'écran. Dans le document, le titre et le bouton viennent
- * AVANT l'image (lecteurs d'écran, clavier : le bouton est le premier arrêt
- * après l'en-tête) ; seul l'ordre visuel du téléphone met l'image en haut.
- * L'image « avant » est le LCP (`fetchpriority="high"`, `srcset` + `sizes` :
- * AVIF préparé pour la simulation, WebP réduit par le CRM pour une
- * réalisation). Ce que montre l'image est décidé par `choisirOuverture`
- * (`etudes.ts`) : une réalisation publiée, sinon la paire d'ambiance étiquetée.
- * Mission 19 : l'ambiance porte ses étiquettes matière, côté « après »
- * seulement ; sa légende vient sous l'image (ordinateur) ou après le bouton
- * (téléphone : le premier écran 390 × 660 garde image, titre et bouton).
- * Composant serveur (seul le curseur est client). Mission 16 (partie 6) : la
- * page d'accueil précharge l'« avant » (`prechargementOuverture`, même
- * `srcset`, mêmes `sizes`) ; ce composant, lui, ne précharge rien.
+ * 1. L'ouverture (site 3.0, lot B6 ; énoncé, § C.1) : l'avant / après en pleine largeur, avec son curseur, son
+ * étiquette (« Ambiance · avant / après », ou « Réalisation, <ville> ») et sa légende ; la promesse en très grand
+ * (`titre-0`, Playfair 900) ; UNE action principale, « Voir ma pièce transformée » (`depuis=accueil-ouverture`), et
+ * une secondaire, « Être rappelé » (une feuille, `FormulaireRappel`).
+ *
+ * Mise en page : dans le document, le titre et les boutons viennent AVANT l'image (lecteurs d'écran, clavier : le
+ * bouton est le premier arrêt après l'en-tête). Sur téléphone, l'image passe en haut (`max-md:order-first`), le titre
+ * vient sous elle ; dès 768 px, le titre court sur toute la largeur au-dessus de la photo. Le plan prévoyait le titre
+ * posé dans le tiers haut de la photo, sur un voile d'encre : les façades vert profond NF13 occupent ce tiers (meubles
+ * hauts), le voile les aurait noircies — le titre reste donc hors de la photo à toutes les largeurs.
+ *
+ * L'image « avant » est le LCP (`fetchpriority="high"`, AVIF préparé ; WebP réduit par le CRM pour une réalisation) ;
+ * la page d'accueil la précharge (`prechargementsOuverture`, mêmes `srcset` et `sizes`). Composant serveur (le curseur
+ * et la feuille de rappel sont clients). Jamais `100vh` : la photo ne dépasse pas `100svh` (`LARGEUR_OUVERTURE`).
  */
-
-/** Largeur maximale de l'image pour que image + outils (52 px) tiennent dans l'écran utile, marges comprises. */
-function largeurMax(ratio: string): string {
-  const [l, h] = ratio.split("/").map((v) => Number(v.trim()));
-  const rapport = l > 0 && h > 0 ? l / h : 3 / 2;
-  return `calc((100svh - 60px - 5rem - 52px) * ${Math.round(rapport * 1000) / 1000})`;
-}
+/**
+ * La largeur du bloc : toute la largeur de la page (1 152 px au plus, celle de l'en-tête et des sections), mais jamais une photo plus haute que l'écran utile — `100svh`
+ * moins l'en-tête (60 px) et un peu d'air, multiplié par le rapport de la photo (3 / 2). Le titre et la photo gardent
+ * les mêmes bords.
+ */
+export const LARGEUR_OUVERTURE = "min(72rem, calc((100svh - 84px) * 1.5))";
 
 export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
   return (
-    <section aria-labelledby="titre-accueil" className="bg-fond px-4 pt-4 pb-10 md:flex md:min-h-[calc(100svh-60px)] md:items-center md:px-6 md:py-10">
-      <div className="mx-auto grid w-full max-w-6xl gap-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-center md:gap-10">
-        <div>
-          <h1 id="titre-accueil" className="titre-1 text-encre">
+    <section aria-labelledby="titre-accueil" className="px-4 pt-4 pb-2 md:px-6 md:pt-10 md:pb-6">
+      <div className="mx-auto flex w-full flex-col" style={{ maxWidth: LARGEUR_OUVERTURE }}>
+        <div className="mt-4 md:mt-0">
+          <h1 id="titre-accueil" className="titre-0 max-w-[15ch] text-balance text-encre md:max-w-none">
             {TITRE_ACCUEIL}
           </h1>
-          <p className="texte-2 mt-3 max-w-md">{LIGNE_ACCUEIL}</p>
-          <div id={ANCRES_ACCUEIL.boutonOuverture} className="mt-6">
-            <Lien href={lienSimulerCuisine("accueil-ouverture")} className="w-full md:w-auto">
-              Simuler ma cuisine
-            </Lien>
+          <div className="mt-3 flex flex-col gap-4 md:mt-6 md:flex-row md:items-center md:justify-between md:gap-10">
+            <p className="texte max-w-md text-encre-2">{LIGNE_ACCUEIL}</p>
+            <div id={ANCRES_ACCUEIL.boutonOuverture} className="flex flex-col gap-3 sm:flex-row md:shrink-0">
+              <Lien href={lienSimulerAccueil("accueil-ouverture")} className="w-full sm:w-auto">
+                Voir ma pièce transformée
+              </Lien>
+              <FormulaireRappel depuis="accueil-ouverture" className="w-full sm:w-auto" />
+            </div>
           </div>
         </div>
         {choix ? (
-          <div className="w-full max-md:order-first md:ml-auto" style={{ maxWidth: largeurMax(choix.ratio) }}>
+          <figure className="m-0 w-full max-md:order-first md:mt-10">
             <AvantApres
               avant={choix.avant}
               apres={choix.apres}
@@ -57,17 +55,11 @@ export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
               ratio={choix.ratio}
               preparees={{ ...choix.preparees, tailles: TAILLES_OUVERTURE }}
               priorite
-              outilsMobile="comparer"
+              outilsMobile="aucun"
               etiquette={choix.etiquette}
-              matieres={choix.matieres}
             />
-          </div>
-        ) : null}
-        {/* La légende des matières : sous l'image sur ordinateur ; sur téléphone, après le bouton (le premier écran garde image, titre et bouton). */}
-        {choix?.matieres && choix.lienComposition ? (
-          <div className="w-full max-md:order-last md:col-start-2 md:-mt-4 md:ml-auto" style={{ maxWidth: largeurMax(choix.ratio) }}>
-            <LegendeMatieres matieres={choix.matieres} lienComposition={choix.lienComposition} />
-          </div>
+            <figcaption className="mt-2 max-w-3xl text-[14px] leading-snug text-encre-2 md:mt-3 md:text-[15px]">{choix.legende}</figcaption>
+          </figure>
         ) : null}
       </div>
     </section>

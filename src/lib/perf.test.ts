@@ -10,14 +10,16 @@ import sharp from "sharp";
 import nextConfig from "../../next.config";
 import { FORMAT_CAPTURE, LARGEUR_CONTROLE, LARGEURS_CAPTURES, PAGES_CAPTURES, echelle, hotesCrm, lireOptions, nomCapture, nomDeChemin, requeteCoupee } from "../../scripts/captures.mjs";
 import { comparerCaptures, lireNomCapture, resumeMarkdown } from "../../scripts/comparer-captures.mjs";
-import { CommentCaMarche } from "@/components/accueil/CommentCaMarche";
-import { ContenuConfiance } from "@/components/accueil/Confiance";
-import { DernierAppel } from "@/components/accueil/DernierAppel";
-import { TAILLES_OUVERTURE, adresseMoyenne, choisirEtudes, choisirOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
-import { MatieresAccueil } from "@/components/accueil/MatieresAccueil";
+import { ContenuAvisPrix } from "@/components/accueil/AvisPrix";
+import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
+import { CuisinesCommeLaVotre } from "@/components/accueil/CuisinesCommeLaVotre";
+import { IMAGE_OUVERTURE, TAILLES_OUVERTURE, adresseMoyenne, choisirOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import { Ouverture } from "@/components/accueil/Ouverture";
+import { ParOuCommencer } from "@/components/accueil/ParOuCommencer";
+import { Presentoir } from "@/components/accueil/Presentoir";
+import { ProAccueil } from "@/components/accueil/ProAccueil";
+import { QuestionsAccueil } from "@/components/accueil/QuestionsAccueil";
 import { RealisationsAccueil } from "@/components/accueil/RealisationsAccueil";
-import { TroisFaits } from "@/components/accueil/TroisFaits";
 import { Section } from "@/components/simulation/Section";
 import { differer } from "./differer";
 import { urlEvenements } from "./evenements-site";
@@ -58,7 +60,6 @@ const SOURCES = fichiers("src");
 const CLIENTS_ADMIS: Record<string, string> = {
   "src/app/simulateur/_components/": "le simulateur (mission 15)",
   "src/components/espace/": "l'espace client (hors mission 16 : importé sans y écrire)",
-  "src/components/HomeClient.tsx": "le module de simulation de l'accueil (SimulationSection)",
   "src/components/MenuMobile.tsx": "le menu du téléphone",
   "src/components/SuiviParcours.tsx": "les pages vues, sans cookie",
   "src/components/OppositionMesure.tsx": "« Ne pas compter mes visites » : lit et écrit le refus dans le stockage local (mission 17)",
@@ -81,6 +82,7 @@ const CLIENTS_ADMIS: Record<string, string> = {
   "src/app/pro/_components/FormulairePro.tsx": "formulaire (/pro)",
   "src/app/matieres/_components/Matieres.tsx": "le catalogue : familles, recherche, favoris, matière en grand",
   "src/components/accueil/BoutonWhatsApp.tsx": "le clic compté (WHATSAPP_CLIQUE)",
+  "src/components/accueil/FormulaireRappel.tsx": "formulaire : « Être rappelé » de l'accueil, dans une feuille (site 3.0, lot B6)",
   "src/components/HorsEspaceClient.tsx": "lit l'adresse (usePathname) ; ses enfants restent serveur",
   "src/components/HorsSimulateur.tsx": "lit l'adresse (usePathname) ; ses enfants restent serveur",
   "src/components/ScrollToTop.tsx": "remet la page en haut à chaque navigation",
@@ -106,7 +108,7 @@ describe("JavaScript client : « use client » sur la liste blanche seulement", 
     assert.ok(!estClient(cartes));
     assert.match(cartes, /onClick=\{onChoisir \? \(\) => onChoisir\(p\.id\) : undefined\}/, "un bouton sans onChoisir n'a pas de gestionnaire");
     // Les composants de page qui n'ont pas d'état restent serveur.
-    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/Confiance.tsx", "src/components/Logo.tsx", "src/components/revue/Cartel.tsx", "src/components/revue/BandeMatiere.tsx", "src/components/revue/GrandNumero.tsx", "src/components/revue/Pastille497.tsx", "src/components/revue/Echantillon.tsx"]) assert.ok(!estClient(lire(f)), f);
+    for (const f of ["src/components/EnteteSite.tsx", "src/components/PiedDePage.tsx", "src/components/simulation/Section.tsx", "src/components/simulation/Lien.tsx", "src/components/simulation/Photo.tsx", "src/components/simulation/Bouton.tsx", "src/components/accueil/Ouverture.tsx", "src/components/accueil/AvisPrix.tsx", "src/components/accueil/ParOuCommencer.tsx", "src/components/accueil/CuisinesCommeLaVotre.tsx", "src/components/accueil/CommentOnTravaille.tsx", "src/components/accueil/Presentoir.tsx", "src/components/accueil/RealisationsAccueil.tsx", "src/components/accueil/ProAccueil.tsx", "src/components/accueil/QuestionsAccueil.tsx", "src/components/accueil/DernierAppel.tsx", "src/components/BlocPrix.tsx", "src/components/Logo.tsx", "src/components/revue/Cartel.tsx", "src/components/revue/BandeMatiere.tsx", "src/components/revue/GrandNumero.tsx", "src/components/revue/Pastille497.tsx", "src/components/revue/Echantillon.tsx"]) assert.ok(!estClient(lire(f)), f);
   });
 });
 
@@ -206,13 +208,13 @@ describe("l'ouverture : l'« avant » préchargé sur / seulement", () => {
     const [telephone, large, ...rien] = prechargementsOuverture(choix);
     assert.ok(telephone && large);
     assert.deepEqual(rien, []);
-    const avant = sourcesPhoto("ouverture-cuisine-avant")!;
-    const v = MANIFESTE_IMAGES["ouverture-cuisine-avant"].empreinte;
+    const avant = sourcesPhoto(IMAGE_OUVERTURE.avant)!;
+    const v = MANIFESTE_IMAGES[IMAGE_OUVERTURE.avant].empreinte;
     const plafonne = plafonnerSrcset(avant.avif!);
     assert.ok(!plafonne.includes("1536w") && plafonne.includes("960w"));
     assert.deepEqual(telephone.options, { as: "image", fetchPriority: "high", referrerPolicy: "no-referrer", imageSrcSet: plafonne, imageSizes: TAILLES_OUVERTURE, type: "image/avif", media: MEDIA_TELEPHONE });
     assert.deepEqual(large.options, { as: "image", fetchPriority: "high", referrerPolicy: "no-referrer", imageSrcSet: avant.avif, imageSizes: TAILLES_OUVERTURE, type: "image/avif", media: MEDIA_ECRAN_LARGE });
-    assert.equal(telephone.href, `/images/prep/ouverture-cuisine-avant-960.avif?v=${v}`);
+    assert.equal(telephone.href, `/images/prep/${IMAGE_OUVERTURE.avant}-960.avif?v=${v}`);
     // Le <picture> de l'ouverture annonce les mêmes séries, sizes et media : le préchargement sert la même image.
     const html = renderToStaticMarkup(createElement(Ouverture, { choix }));
     assert.ok(html.includes(`<source media="${MEDIA_TELEPHONE}" type="image/avif" srcSet="${plafonne}" sizes="${TAILLES_OUVERTURE}"/>`));
@@ -271,20 +273,23 @@ describe("CSS et rendu différé", () => {
     assert.match(css, /@utility sous-la-ligne \{\s+content-visibility: auto;\s+contain-intrinsic-size: auto 640px;\s+\}/);
   });
 
-  test("Section differee → sous-la-ligne ; les sections 3 à 8 de l'accueil le sont, pas l'ouverture ni le module", () => {
+  test("Section differee → sous-la-ligne ; les sections 2 à 9 de l'accueil le sont (site 3.0, lot B6), pas l'ouverture", () => {
     assert.match(renderToStaticMarkup(createElement(Section, { differee: true, titre: "T" })), /<section[^>]* class="[^"]*\bsous-la-ligne\b/);
     assert.doesNotMatch(renderToStaticMarkup(createElement(Section, { titre: "T" })), /sous-la-ligne/);
     const racine = (html: string) => html.slice(0, html.indexOf(">"));
     for (const [nom, element] of [
-      ["trois faits", createElement(TroisFaits)],
-      ["matières", createElement(MatieresAccueil)],
-      ["réalisations", createElement(RealisationsAccueil, { choix: choisirEtudes([]) })],
-      ["comment ça marche", createElement(CommentCaMarche, { depuis: "accueil-etapes" })],
-      ["confiance", createElement(ContenuConfiance, { avis: null })],
-      ["dernier appel", createElement(DernierAppel)],
+      ["2. par où commencer", createElement(ParOuCommencer)],
+      ["3. des cuisines comme la vôtre", createElement(CuisinesCommeLaVotre)],
+      ["4. comment on travaille", createElement(CommentOnTravaille, { depuis: "accueil-etapes", preuve: true })],
+      ["5. le présentoir", createElement(Presentoir)],
+      ["6. réalisations", createElement(RealisationsAccueil, { reelles: [] })],
+      ["7. professionnels", createElement(ProAccueil)],
+      ["8. avis et prix", createElement(ContenuAvisPrix, { avis: null, tarifs: null })],
     ] as const) assert.match(racine(renderToStaticMarkup(element)), /sous-la-ligne/, nom);
+    // 9. Les questions, puis le dernier appel : deux sections, différées toutes deux (le balisage FAQPage les précède).
+    const questions = renderToStaticMarkup(createElement(QuestionsAccueil));
+    assert.equal((questions.match(/<section[^>]* class="[^"]*\bsous-la-ligne\b/g) ?? []).length, 2, "9. questions et dernier appel");
     assert.doesNotMatch(renderToStaticMarkup(createElement(Ouverture, { choix: choisirOuverture([]) })), /sous-la-ligne/);
-    assert.doesNotMatch(lire("src/components/HomeClient.tsx"), /differee/, "le module de simulation est au deuxième écran");
     // Jamais sur une section qui porte un élément fixe ou collant (la barre des familles de /matieres).
     assert.doesNotMatch(lire("src/app/matieres/page.tsx"), /differee/);
   });

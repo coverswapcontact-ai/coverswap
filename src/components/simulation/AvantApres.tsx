@@ -39,7 +39,9 @@ import { PleinEcran } from "./PleinEcran";
  *  - `priorite` : l'image du premier écran (LCP) — « avant » en `eager` +
  *    `fetchpriority="high"`, « après » en `eager` ;
  *  - `outilsMobile="comparer"` : sous 768 px, seul « Comparer » reste (l'image
- *    occupe déjà l'écran) ;
+ *    occupe déjà l'écran) ; `"aucun"` (site 3.0, lot B6 : l'ouverture) : sous
+ *    768 px, plus d'outils du tout — la poignée suffit, et le titre et le
+ *    bouton remontent dans le premier écran ;
  *  - `etiquette` : la pastille « Simulation » ou « Réalisation, <ville> » en bas
  *    à gauche de l'image (les pastilles « Avant » / « Après » sont en haut).
  *
@@ -59,7 +61,7 @@ function ImageCadre({ src, sources, tailles, alt, ...props }: ProprietesImage) {
   return <ImagePreparee sources={sources} tailles={tailles} alt={alt} {...props} />;
 }
 
-export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer" | "aucun"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
@@ -79,13 +81,13 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
   }, []);
 
   const outils = sansOutils ? null : (
-    <div className="mt-2 flex flex-wrap items-center gap-2">
+    <div className={`mt-2 flex flex-wrap items-center gap-2${outilsMobile === "aucun" ? " max-md:hidden" : ""}`}>
       {avant ? (
         <button type="button" onClick={() => setPosition((p) => (p > 50 ? 0 : 100))} className="min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2">
           Comparer
         </button>
       ) : null}
-      <button type="button" onClick={() => setPleinEcran(true)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile === "comparer" ? " max-md:hidden" : ""}`}>
+      <button type="button" onClick={() => setPleinEcran(true)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile !== "tous" ? " max-md:hidden" : ""}`}>
         Plein écran
       </button>
       <PleinEcran ouvert={pleinEcran} onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />

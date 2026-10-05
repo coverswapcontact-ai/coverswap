@@ -1,4 +1,5 @@
 import revetements from "@/data/revetements.json";
+import type { MatiereCartel } from "./cartel";
 
 /**
  * Les huit matières montrées sur l'accueil (mission 16, partie 3) : huit
@@ -48,4 +49,14 @@ export function referenceDeLAdresse<T extends { id: string }>(ref: string | null
   const id = ref?.trim();
   if (!id) return null;
   return catalogue.find((r) => r.id === id) ?? null;
+}
+
+/**
+ * Site 3.0 (lot B6) : le cartel d'une référence lu dans le catalogue (nom, famille, finition, couleur), pour un
+ * échantillon, une bande de matière ou la légende d'une ambiance ; `null` si elle n'y est plus. Côté serveur : le
+ * catalogue entier ne part pas dans le navigateur.
+ */
+export function matiereCartel(ref: string, catalogue: readonly (Reference & { finition?: string; hex?: string })[] = revetements as (Reference & { finition?: string; hex?: string })[]): MatiereCartel | null {
+  const r = catalogue.find((x) => x.id === ref);
+  return r ? { id: r.id, nom: r.nom, famille: r.famille, ...(r.finition ? { finition: r.finition } : {}), ...(r.hex ? { hex: r.hex.toUpperCase() } : {}) } : null;
 }

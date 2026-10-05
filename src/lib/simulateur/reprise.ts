@@ -184,8 +184,12 @@ export type DecisionMontage =
   | { ecran: "attente"; travail: TravailEnCours; parcoursId?: string }
   /** Un parcours récent existe : proposer de le reprendre, sans écraser. */
   | { ecran: "bandeau"; etape: 2 | 3 }
-  /** Repartir directement à l'étape voulue (arrivée depuis l'accueil, ou rien à reprendre). */
-  | { ecran: "direct"; etape: 1 | 2 | 3 };
+  /**
+   * Repartir directement à l'étape voulue (arrivée depuis l'accueil, ou rien à reprendre). `pieceChoisie` (site 3.0,
+   * lot B6) : la pièce de l'adresse a été CHOISIE par un picto de l'accueil (`?choix=1`) — le simulateur émet
+   * `PIECE_CHOISIE` et ouvre l'écran Photo.
+   */
+  | { ecran: "direct"; etape: 1 | 2 | 3; pieceChoisie?: true };
 
 const TRAVAIL_ID = /^[a-z0-9]{10,40}$/i;
 const PARCOURS_ID = /^[0-9a-fA-F-]{16,64}$/;
@@ -196,15 +200,17 @@ const PARCOURS_ID = /^[0-9a-fA-F-]{16,64}$/;
  * Ouvert sur un autre appareil, sans mémoire locale, le site adopte ce parcours
  * avant de sonder — sinon il sonderait avec un parcours neuf et lirait 404.
  */
-export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; depuisAccueil?: boolean; maintenant?: number } = {}): DecisionMontage {
+export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; depuisAccueil?: boolean; choix?: boolean; maintenant?: number } = {}): DecisionMontage {
   const maintenant = options.maintenant ?? Date.now();
   if (options.reprise && TRAVAIL_ID.test(options.reprise)) {
     const rendu = etat?.rendus.find((r) => r.travailId === options.reprise);
     const parcoursId = options.p && PARCOURS_ID.test(options.p) ? options.p : undefined;
     return { ecran: "attente", travail: { travailId: options.reprise, lanceLe: rendu?.le ?? maintenant, attenteEstimeeS: 0 }, ...(parcoursId ? { parcoursId } : {}) };
   }
+  if (etat?.travailEnCours) return { ecran: "attente", travail: etat.travailEnCours };
+  // `choix` : une pièce valide choisie sur l'accueil (le simulateur vérifie la pièce), ni `suite=1` ni photo en mémoire.
+  if (options.choix && !options.depuisAccueil && !etat?.photo) return { ecran: "direct", etape: 1, pieceChoisie: true };
   if (!etat) return { ecran: "direct", etape: 1 };
-  if (etat.travailEnCours) return { ecran: "attente", travail: etat.travailEnCours };
   const dernier = etat.rendus[etat.rendus.length - 1];
   const etape: 2 | 3 | 1 = dernier?.urlApres ? 3 : etat.photo ? 2 : 1;
   if (etape === 1) return { ecran: "direct", etape: 1 };

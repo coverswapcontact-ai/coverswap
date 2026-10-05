@@ -133,6 +133,7 @@ const ALIAS: Readonly<Record<string, IdTeintePrestation>> = {
   placards: "portes-placards",
   "porte-interieure": "portes-placards",
   "porte-entree": "portes-placards",
+  "placard-coulissant": "portes-placards",
 };
 
 /** La teinte d'une prestation (slug de page, pièce du simulateur, élément), ou `null` (vitrages, inconnu). */

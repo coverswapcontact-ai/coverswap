@@ -1,10 +1,12 @@
 import type { MatiereCalque } from "@/components/ambiances/CalqueMatieres";
+import { PAIRES_SERIE_2 } from "@/data/ambiances";
 import { ambianceDeLImage } from "@/lib/ambiances";
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
 import { ALT_PIECES, PHOTOS_PIECES } from "@/lib/images-pieces";
 import { sourcesPhoto, type ManifesteImages, type SourcesImage, type SourcesPhoto, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { DUREE_POSE_TEXTE, fourchette } from "@/lib/offre";
+import { urlAbsolue, type ImagePartage } from "@/lib/metadonnees";
 import { sourcesPhotoCrm, type Publication } from "@/lib/publications";
 
 export type { EtudeReelle } from "@/lib/etude-de-cas";
@@ -15,9 +17,11 @@ export type { EtudeReelle } from "@/lib/etude-de-cas";
  *  - l'ouverture prend la PREMIÈRE réalisation publiée par le CRM qui a une
  *    photo avant ET une photo après (étiquette « Réalisation, <ville> »), en
  *    WebP réduit par le CRM (`sourcesPhotoCrm` : le LCP n'est pas la photo
- *    entière) ; sinon la paire d'ambiance de l'ouverture (mission 19 : deux
- *    images générées et calées, étiquette « Ambiance » — « Simulation » est
- *    réservé aux rendus du moteur —, AVIF préparé, étiquettes matière) ;
+ *    entière) ; sinon (site 3.0, lot B6) la paire d'ambiance de l'énoncé, la
+ *    cuisine bordeaux brillante passée en Deep Green NF13 (`IMAGE_OUVERTURE`),
+ *    étiquetée « Ambiance · avant / après » — « Simulation » est réservé aux
+ *    rendus du moteur —, AVIF préparé, avec sa légende exacte. La légende,
+ *    l'`ImageObject` et l'image de partage suivent l'image retenue ;
  *  - « Réalisations » montre jusqu'à trois réalisations publiées (avec leur
  *    photo après ; prix et durée publiés, sinon habituels libellés comme tels :
  *    `lib/etude-de-cas`) ; sinon trois études SIMULÉES : la cuisine de
@@ -27,8 +31,13 @@ export type { EtudeReelle } from "@/lib/etude-de-cas";
  *    jamais un prix réel inventé, jamais une ville.
  */
 
-const AVANT_OUVERTURE = "ouverture-cuisine-avant";
-const APRES_OUVERTURE = "ouverture-cuisine-apres";
+/** Site 3.0 (lot B6) : la paire de l'ouverture quand aucune réalisation n'est publiée (énoncé, § C.1). */
+export const IMAGE_OUVERTURE = { avant: "cuisine-bordeaux-brillante-avant", apres: "cuisine-bordeaux-brillante-apres-couleur" } as const;
+/** La légende de l'ouverture, exacte (énoncé, § C.1). */
+export const LEGENDE_OUVERTURE = "Cuisine des années 2000, façades bordeaux brillantes → Deep Green NF13, plan Pale Oak AG13. Posé en une journée.";
+export const ETIQUETTE_OUVERTURE = "Ambiance · avant / après";
+/** La cuisine de l'ouverture de la mission 19 : elle reste l'étude de cas cuisine (`/realisations`, `/prestations/cuisine`) jusqu'aux lots C. */
+const APRES_ETUDE_CUISINE = "ouverture-cuisine-apres";
 /** Le cadre d'une réalisation publiée à l'ouverture (ses photos n'ont pas de dimensions connues) : celui des images d'ambiance. */
 export const RATIO_REALISATION = "3 / 2";
 
@@ -37,12 +46,18 @@ export const RATIO_REALISATION = "3 / 2";
  * plein écran. Mission 19 : tiré de l'ambiance (`data/ambiances`, la scène et chaque matière) ; l'« avant » dit ce
  * qu'on voit sur la nouvelle image.
  */
-const AMBIANCE_OUVERTURE = ambianceDeLImage(APRES_OUVERTURE);
+const AMBIANCE_OUVERTURE = ambianceDeLImage(IMAGE_OUVERTURE.apres);
 export const ALT_OUVERTURE = AMBIANCE_OUVERTURE?.alt ?? "Cuisine rénovée au film, image d'ambiance";
-export const ALT_AVANT_OUVERTURE = "La même cuisine avant la pose : façades en bois orangé brillant, plan de travail en granit";
+const SCENE_AVANT_OUVERTURE = PAIRES_SERIE_2.find((p) => p.avant === IMAGE_OUVERTURE.avant)?.scene;
+export const ALT_AVANT_OUVERTURE = `${SCENE_AVANT_OUVERTURE ?? "La même cuisine avant la pose"}. Image d'ambiance.`;
+/** L'« avant » de l'étude de cas cuisine (mission 19). */
+export const ALT_AVANT_ETUDE_CUISINE = "La même cuisine avant la pose : façades en bois orangé brillant, plan de travail en granit";
 
-/** L'attribut `sizes` de l'image de l'ouverture : le même pour le `<picture>` et pour son préchargement. */
-export const TAILLES_OUVERTURE = "(min-width: 1152px) 672px, (min-width: 768px) 58vw, 100vw";
+/**
+ * L'attribut `sizes` de l'image de l'ouverture : le même pour le `<picture>` et pour son préchargement. Site 3.0 : la
+ * photo prend toute la largeur (gouttières de 16 px, 24 px dès 768 px), jusqu'à 1 152 px.
+ */
+export const TAILLES_OUVERTURE = "(min-width: 1200px) 1152px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
 export type ChoixOuverture = {
   /** « ambiance » (mission 19, ex-« simulation ») : la paire générée de l'ouverture, avant la première réalisation publiée. */
@@ -51,6 +66,8 @@ export type ChoixOuverture = {
   apres: string;
   ratio: string;
   etiquette: string;
+  /** Ce que montre l'image, sous elle : la légende exacte de l'énoncé, ou le titre et la ville d'une réalisation. */
+  legende: string;
   alt: string;
   altAvant: string;
   preparees: { avant: SourcesImage; apres: SourcesImage };
@@ -74,25 +91,48 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
       apres: reelle.photoApres,
       ratio: RATIO_REALISATION,
       etiquette: reelle.ville ? `Réalisation, ${reelle.ville}` : "Réalisation",
+      legende: reelle.ville ? `${reelle.titre}, ${reelle.ville}.` : `${reelle.titre}.`,
       alt: `Après — ${reelle.titre}`,
       altAvant: `Avant — ${reelle.titre}`,
       preparees: { avant: sourcesPhotoCrm(reelle.photoAvant), apres: sourcesPhotoCrm(reelle.photoApres) },
     };
   }
-  const avant = sourcesPhoto(AVANT_OUVERTURE, manifeste);
-  const apres = sourcesPhoto(APRES_OUVERTURE, manifeste);
+  const avant = sourcesPhoto(IMAGE_OUVERTURE.avant, manifeste);
+  const apres = sourcesPhoto(IMAGE_OUVERTURE.apres, manifeste);
   if (!avant || !apres) return null;
   return {
     type: "ambiance",
     avant: avant.src,
     apres: apres.src,
     ratio: `${avant.largeur} / ${avant.hauteur}`,
-    etiquette: "Ambiance",
+    etiquette: ETIQUETTE_OUVERTURE,
+    legende: LEGENDE_OUVERTURE,
     alt: ALT_OUVERTURE,
     altAvant: ALT_AVANT_OUVERTURE,
     preparees: { avant, apres },
     ...(AMBIANCE_OUVERTURE ? { matieres: AMBIANCE_OUVERTURE.surfaces, lienComposition: AMBIANCE_OUVERTURE.lienComposition } : {}),
   };
+}
+
+/**
+ * Site 3.0 (lot B6) : l'image de partage suit l'image retenue — la photo « après » d'une réalisation publiée (WebP de
+ * 1 600 px du CRM, au cadre 3 / 2 de l'ouverture). Une image d'ambiance n'est JAMAIS partagée telle quelle : elle n'y
+ * porterait pas son étiquette « Ambiance » ; l'accueil garde l'image de partage du site jusqu'aux images composées et
+ * étiquetées du lot F2 (`null` : celle par défaut).
+ */
+export function partageOuverture(choix: ChoixOuverture | null): ImagePartage | null {
+  if (choix?.type !== "realisation") return null;
+  return { url: `${choix.apres}?l=1600`, largeur: 1600, hauteur: 1067, alt: choix.legende };
+}
+
+/**
+ * L'`ImageObject` (schema.org) de l'image de l'ouverture : son adresse, sa légende (celle affichée) et ce qu'elle est
+ * (« Réalisation » ou « Ambiance · avant / après », comme l'étiquette posée dessus). `null` sans image.
+ */
+export function imageObjetOuverture(choix: ChoixOuverture | null): Record<string, unknown> | null {
+  if (!choix) return null;
+  const adresse = choix.apres.startsWith("http") ? choix.apres : urlAbsolue(choix.apres);
+  return { "@context": "https://schema.org", "@type": "ImageObject", contentUrl: adresse, caption: choix.legende, description: `${choix.etiquette}. ${choix.alt}` };
 }
 
 /**
@@ -147,7 +187,7 @@ export type EtudeSimulee = {
   alt: string;
   /** Le texte de l'« avant » d'une paire. */
   altAvant?: string;
-  /** La fourchette d'`offre.ts` (« 1 200 € à 3 500 € », « dès 250 € »). */
+  /** La fourchette d'`offre.ts` (`fourchette(cle)` : « … € à … € », « dès … € »). */
   prix: string;
   /** La durée de pose d'`offre.ts` (« une journée »). */
   duree: string;
@@ -191,8 +231,8 @@ function etudePaire(id: EtudeSimulee["id"], titre: string, cle: "cuisine" | "sdb
 
 /** La cuisine de l'ouverture (avant / après) : depuis la mission 19, deux images d'ambiance générées et calées (« Ambiance »), si elles sont préparées. */
 export function etudeCuisineSimulee(manifeste: ManifesteImages = MANIFESTE_IMAGES): EtudeSimulee | null {
-  const etude = etudePaire("cuisine", "Cuisine", "cuisine", APRES_OUVERTURE, manifeste);
-  return etude ? { ...etude, altAvant: ALT_AVANT_OUVERTURE } : null;
+  const etude = etudePaire("cuisine", "Cuisine", "cuisine", APRES_ETUDE_CUISINE, manifeste);
+  return etude ? { ...etude, altAvant: ALT_AVANT_ETUDE_CUISINE } : null;
 }
 
 /** Les images « après » des paires d'étude : la cuisine de l'ouverture, la salle de bain, le meuble TV, le dressing (Prestations › Meubles). */

@@ -1,5 +1,6 @@
 import type { EtatSimulateur, Selection } from "./reprise";
 import type { PieceSimulateur } from "./zones";
+import { elementPrecis, type IdElement } from "./elements";
 
 /**
  * La matière présélectionnée (mission 16, partie 4) : `/simulateur?ref=<ref>` (bouton « Essayer sur ma photo » de
@@ -66,4 +67,13 @@ export function appliquerComposition(
     posees += 1;
   }
   return posees > 0 ? suivantes : null;
+}
+
+/**
+ * Site 3.0, lot B6 : l'élément précis demandé par `?element=` (un picto de l'accueil : « Plan de travail »,
+ * « Réfrigérateur »…), s'il est connu (`elements.ts`), sinon rien. Sa zone s'ouvre d'abord à l'écran des matières
+ * (`useMatiereDemandee`), seulement si elle appartient à la pièce ouverte (`zoneDeLElement`).
+ */
+export function lireElementDemande(valeur: string | null | undefined): IdElement | null {
+  return elementPrecis(valeur?.trim())?.id ?? null;
 }

@@ -26,8 +26,9 @@ export const FAQ_GARANTIE: QuestionReponse = {
  * Questions fréquentes — vraies réponses, sans promesse invérifiable.
  * Servies sur /comment-ca-marche (#faq) : les objections de « Vos questions »
  * en reprennent trois (ci-dessus), la FAQ repliée montre les autres, et le
- * balisage FAQPage porte chaque question une fois (mission 16, partie 5) ;
- * l'accueil ne les montre plus (partie 3).
+ * balisage FAQPage porte chaque question une fois (mission 16, partie 5).
+ * Site 3.0 (lot B6) : l'accueil en reprend six (`QUESTIONS_ACCUEIL`), avec son
+ * propre balisage FAQPage.
  */
 export const FAQ_GENERALE: QuestionReponse[] = [
   {
@@ -72,4 +73,23 @@ export const FAQ_SIMULATEUR: QuestionReponse[] = [
     q: "Que deviennent mes photos ?",
     a: "Elles servent uniquement à produire le rendu et à préparer votre devis. Une simulation sans demande de devis est effacée après 30 jours. Le détail est dans notre politique de confidentialité.",
   },
+];
+
+const question = (liste: QuestionReponse[], q: string): QuestionReponse => {
+  const trouvee = liste.find((x) => x.q === q);
+  if (!trouvee) throw new Error(`Question absente de la FAQ : ${q}`);
+  return trouvee;
+};
+
+/**
+ * « Questions avant de se lancer » (site 3.0, lot B6) : six questions de la FAQ, telles quelles (une seule source),
+ * dans l'ordre où on se les pose — la durée, le retrait, l'eau et la chaleur, les coordonnées, la garantie, la zone.
+ */
+export const QUESTIONS_ACCUEIL: QuestionReponse[] = [
+  question(FAQ_GENERALE, "Combien de temps dure la pose ?"),
+  FAQ_RETRAIT,
+  FAQ_EAU_CHALEUR,
+  question(FAQ_SIMULATEUR, "Dois-je laisser mes coordonnées pour essayer ?"),
+  FAQ_GARANTIE,
+  question(FAQ_GENERALE, "Où intervenez-vous ?"),
 ];

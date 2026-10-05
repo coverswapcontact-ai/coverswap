@@ -17,7 +17,8 @@ import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/
 import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
 import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, urlEchantillon, urlVignette, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
 import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
-import { lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
+import { lireElementDemande, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
+import { zoneDeLElement } from "@/lib/simulateur/elements";
 import { getProject } from "@/lib/simulateur/projets";
 import { ATTENTE_PAR_DEFAUT_S, ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
@@ -75,6 +76,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   const emetteur = useRef<Emetteur>(creerEmetteur((type, meta) => envoyerEvenement(type, meta)));
   /** Mission 16 (partie 3) : le bouton qui a amené ici (`?depuis=accueil-ouverture`…), repris dans le meta de PIECE_CHOISIE. */
   const depuisLien = useRef<string | null>(null);
+  const zoneDemandee = useRef<string | null>(null); // lot B6 : la zone de `?element=`, ouverte d'abord à l'écran 3
   /** Mission 16 (partie 4) : ESTIMATION_VUE part une fois par simulation — « Nouvelle simulation » la réarme, comme les étapes de l'entonnoir (`emetteur.reinitialiser`). */
   const estimationVue = useRef(false);
 
@@ -83,6 +85,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   const captchaActif = !!TURNSTILE_SITE_KEY;
   const enAttente = !!etat.travailEnCours;
   const mettreAJour = useCallback((maj: Partial<EtatSimulateur>) => setEtat((e) => ({ ...e, ...maj })), []);
+  const marquerPiece = (id: string) => emetteur.current.marquer("PIECE_CHOISIE", { projet: id, ...(depuisLien.current ? { depuis: depuisLien.current } : {}) });
 
   /* ── Reprise de l'état local + pièce demandée dans l'adresse ── */
   useEffect(() => {
@@ -101,7 +104,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       // Une génération en cours fige la pièce : l'adresse ne la change pas (les choix serviraient encore à « Réessayer »).
       const projetInitial = !base.travailEnCours && demande && zones.pieces.some((p) => p.id === demande) ? demande : base.projet;
       const memeProjet = projetInitial === base.projet;
-      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil });
+      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil, choix: parametres.get("choix") === "1" && projetInitial === demande });
+      zoneDemandee.current = zoneDeLElement(lireElementDemande(parametres.get("element")), projetInitial);
       const parcoursId = (decision.ecran === "attente" && decision.parcoursId) || base.parcoursId || obtenirParcoursId() || crypto.randomUUID();
       adopterParcoursId(parcoursId);
       // Mission 17 (partie B) : la naissance du parcours ne bouge pas tant que c'est le même (7 jours au plus, `lireEtat`).
@@ -115,7 +119,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         setBandeau(decision.etape);
         setEcran(1);
       } else {
-        setEcran(ecranDepuisEtape(decision.etape, repris));
+        setEcran(decision.pieceChoisie ? 2 : ecranDepuisEtape(decision.etape, repris));
       }
       if (depuisAccueil) {
         // Le module d'accueil vient d'émettre PIECE_CHOISIE et PHOTO_CHARGEE : ici, elles comptent comme déjà émises (jamais deux fois par parcours).
@@ -127,6 +131,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       chargerFavoris();
       setCharge(true);
       envoyerEvenement("PAGE_VUE", { projet: projetInitial, reprise: !!memoire?.photo, travail_en_cours: !!repris.travailEnCours });
+      if (decision.ecran === "direct" && decision.pieceChoisie) marquerPiece(projetInitial);
     })();
     return () => {
       annule = true;
@@ -179,7 +184,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     },
   });
 
-  /* ── Écran 1 : la pièce ── */
+  /* ── Écran 1 : la pièce (PIECE_CHOISIE par `marquerPiece`, au clic ou au montage pour un picto de l'accueil) ── */
   const choisirPiece = (id: string) => {
     const transition = reduireEcran(ecran, { type: "piece-choisie", projet: id, projetPrecedent: etat.projet }, etat);
     // Autre pièce : ses matières ne valent plus, et l'analyse non plus (elle a été faite pour l'autre pièce ; `useAnalyse` la redemande, le CRM répond aussitôt s'il la connaît).
@@ -187,7 +192,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     setPieceChoisie(true);
     setBandeau(null);
     effacerEchec();
-    emetteur.current.marquer("PIECE_CHOISIE", { projet: id, ...(depuisLien.current ? { depuis: depuisLien.current } : {}) });
+    marquerPiece(id);
     setEcran(transition.ecran);
   };
 
@@ -238,7 +243,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   };
 
   /* ── Écran 3 : les matières ── */
-  useMatiereDemandee(ecran === 3 && !!etat.photo && !enAttente && !echecGeneration, etat, piece, mettreAJour);
+  useMatiereDemandee(ecran === 3 && !!etat.photo && !enAttente && !echecGeneration, etat, piece, mettreAJour, zoneDemandee, setZoneOuverte);
   const selectionsActives = piece.zones.map((z) => ({ zone: z, sel: etat.selections[z.id] ?? null })).filter((x) => x.sel);
   const films: FilmChoisi[] = selectionsActives.map(({ zone, sel }) => ({ zone: zone.id, libelle: zone.libelle, nom: sel!.nom, image: urlVignette(sel!.ref) }));
   const raisonBloque = selectionsActives.length === 0 ? "Choisissez au moins une matière" : captchaActif && !jetonCaptcha ? "Vérification anti-robot en cours…" : null;

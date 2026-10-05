@@ -170,3 +170,8 @@ export function BreadcrumbSchema({ items }: { items: { name: string; url: string
     />
   );
 }
+
+/** Site 3.0 (lot B6) : une donnée structurée déjà écrite par la page (l'`ImageObject` de l'ouverture de l'accueil). */
+export function DonneesStructurees({ data }: { data: Record<string, unknown> | null }) {
+  return data ? <Script data={data} /> : null;
+}

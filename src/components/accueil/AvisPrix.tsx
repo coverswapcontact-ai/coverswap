@@ -1,12 +1,14 @@
 import Link from "next/link";
+import { ContenuPrix } from "@/components/BlocPrix";
 import { Section } from "@/components/simulation/Section";
 import { ORDRE_AVIS, blocAvis, chargerAvisGoogle, formaterMoisAvis, formaterNote, type AvisGoogle, type BlocAvis } from "@/lib/avis-google";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { LIEN_ZONES } from "@/lib/navigation";
 import { GARANTIE_ANS } from "@/lib/offre";
+import { chargerTarifs, type TarifsSite } from "@/lib/tarifs-site";
 
 /**
- * 7. Confiance (mission 16, partie 3). Le bloc « Note Google » (note sur 5,
+ * La confiance (mission 16, partie 3 ; site 3.0, lot B6 : la section « Avis et prix »). Le bloc « Note Google » (note sur 5,
  * nombre d'avis EXACTS, trois extraits au plus, mois) n'est rendu QUE si le
  * CRM a lu une note et un nombre chez Google (`blocAvis`) ; sinon il n'existe
  * pas — aucun chiffre écrit à la main.
@@ -57,20 +59,20 @@ function ExtraitAvis({ a }: { a: AvisGoogle }) {
   );
 }
 
-export function ContenuConfiance({ avis }: { avis: BlocAvis | null }) {
+/**
+ * 8. Avis et prix (site 3.0, lot B6 ; énoncé, § C.1) : la note Google (`blocAvis`, inchangé : seulement si le CRM a lu
+ * une note ET un nombre), puis les prix (`ContenuPrix`, les tarifs du CRM tels quels), puis la zone et la garantie.
+ */
+export function ContenuAvisPrix({ avis, tarifs }: { avis: BlocAvis | null; tarifs: TarifsSite | null }) {
   return (
-    <Section
-      id="confiance"
-      large
-      differee
-      surtitre={avis ? "Note Google" : undefined}
-      titre={avis ? `${formaterNote(avis.note)} sur 5` : undefined}
-      intro={avis ? `D'après ${avis.nombre.toLocaleString("fr-FR")} avis Google.` : undefined}
-    >
+    <Section id="avis-prix" large differee>
       {avis ? (
-        <div className="mb-10">
+        <div className="mb-14 md:mb-16">
+          <p className="surtitre">Note Google</p>
+          <h2 className="titre-2 mt-2 text-encre">{`${formaterNote(avis.note)} sur 5`}</h2>
+          <p className="texte-2 mt-3">{`D'après ${avis.nombre.toLocaleString("fr-FR")} avis Google.`}</p>
           {avis.avis.length > 0 ? (
-            <ul className="grid gap-5 md:grid-cols-3">
+            <ul className="mt-8 grid gap-5 md:grid-cols-3">
               {avis.avis.map((a, i) => (
                 <li key={`${a.auteur}-${i}`}>
                   <ExtraitAvis a={a} />
@@ -84,8 +86,10 @@ export function ContenuConfiance({ avis }: { avis: BlocAvis | null }) {
           </p>
         </div>
       ) : null}
-      <dl className="grid gap-4 md:grid-cols-2 md:gap-10">
-        <div className="border-t border-trait pt-4">
+      <h2 className="titre-2 text-encre">Nos prix</h2>
+      <ContenuPrix tarifs={tarifs} className="mt-3" />
+      <dl className="mt-12 grid gap-4 md:grid-cols-2 md:gap-10">
+        <div className="border-t border-encre pt-4">
           <dt className="text-[13.5px] text-encre-2">Zone d&apos;intervention</dt>
           <dd className="mt-1">
             <Link href={LIEN_ZONES.href} className="inline-flex min-h-[44px] items-center text-[17px] font-medium text-encre underline underline-offset-4">
@@ -93,7 +97,7 @@ export function ContenuConfiance({ avis }: { avis: BlocAvis | null }) {
             </Link>
           </dd>
         </div>
-        <div className="border-t border-trait pt-4">
+        <div className="border-t border-encre pt-4">
           <dt className="text-[13.5px] text-encre-2">Garantie</dt>
           <dd className="mt-1 flex min-h-[44px] items-center text-[17px] font-medium text-encre">{LIGNE_GARANTIE}</dd>
         </div>
@@ -102,6 +106,7 @@ export function ContenuConfiance({ avis }: { avis: BlocAvis | null }) {
   );
 }
 
-export async function Confiance() {
-  return <ContenuConfiance avis={blocAvis(await chargerAvisGoogle())} />;
+export async function AvisPrix() {
+  const [avis, tarifs] = await Promise.all([chargerAvisGoogle(), chargerTarifs()]);
+  return <ContenuAvisPrix avis={blocAvis(avis)} tarifs={tarifs} />;
 }

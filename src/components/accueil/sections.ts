@@ -1,23 +1,25 @@
+import { lienSimuler } from "@/lib/liens-simulateur";
 import { DUREE_POSE_TEXTE, PRIX_PLAGE } from "@/lib/offre";
 
 /**
- * L'accueil (mission 16, partie 3) : huit sections, dans cet ordre, rien
- * d'autre (énoncé § 3) ; mission 19 : neuf, avec la rangée « Inspirations » après les réalisations. `page.tsx` rend EXACTEMENT cette liste : une section
- * ajoutée ailleurs ne compile pas (`Record<IdSectionAccueil, …>`), une section
- * retirée d'ici disparaît de la page. Module pur (testé sans React).
+ * L'accueil du site 3.0 (lot B6), dans l'ordre du tunnel de vente (énoncé, § C.1) : il DÉCOUVRE (ouverture), il SE
+ * PROJETTE (par où commencer, des cuisines comme la sienne), il est RASSURÉ (comment on travaille, le présentoir,
+ * les réalisations, les professionnels, avis et prix, les questions), il DEMANDE (le dernier appel, dans la section
+ * des questions). `page.tsx` rend EXACTEMENT cette liste : une section ajoutée ailleurs ne compile pas
+ * (`Record<IdSectionAccueil, …>`), une section retirée d'ici disparaît de la page. Module pur (testé sans React).
  */
-export type IdSectionAccueil = "ouverture" | "essayer" | "faits" | "matieres" | "realisations" | "inspirations" | "comment" | "confiance" | "dernier-appel";
+export type IdSectionAccueil = "ouverture" | "par-ou-commencer" | "cuisines" | "comment" | "presentoir" | "realisations" | "pro" | "avis-prix" | "questions";
 
 export const SECTIONS_ACCUEIL: readonly { id: IdSectionAccueil; nom: string }[] = [
   { id: "ouverture", nom: "Ouverture" },
-  { id: "essayer", nom: "Essayez sur votre photo" },
-  { id: "faits", nom: "Trois faits" },
-  { id: "matieres", nom: "Matières" },
+  { id: "par-ou-commencer", nom: "Par où commencer ?" },
+  { id: "cuisines", nom: "Des cuisines comme la vôtre" },
+  { id: "comment", nom: "Comment on travaille" },
+  { id: "presentoir", nom: "Le présentoir" },
   { id: "realisations", nom: "Réalisations" },
-  { id: "inspirations", nom: "Inspirations" },
-  { id: "comment", nom: "Comment ça marche" },
-  { id: "confiance", nom: "Confiance" },
-  { id: "dernier-appel", nom: "Dernier appel" },
+  { id: "pro", nom: "Professionnels" },
+  { id: "avis-prix", nom: "Avis et prix" },
+  { id: "questions", nom: "Questions, puis le dernier appel" },
 ];
 
 /** La liste des sections de l'accueil, dans l'ordre. */
@@ -25,7 +27,20 @@ export function sectionsAccueil(): { id: IdSectionAccueil; nom: string }[] {
   return SECTIONS_ACCUEIL.map((s) => ({ ...s }));
 }
 
-/** La phrase de l'ouverture et du dernier appel (7 mots au plus). */
+/**
+ * Les bandes de matière (énoncé, phase B, « La couleur ») qui séparent les grandes sections : la référence du
+ * catalogue et la section APRÈS laquelle elle se pose (le vert profond ferme le présentoir, dedans). Chêne, marbre,
+ * vert profond, terracotta, bleu nuit.
+ */
+export const BANDES_ACCUEIL: readonly { ref: string; apres: IdSectionAccueil | "dans-presentoir"; nom: string }[] = [
+  { ref: "AG13", apres: "par-ou-commencer", nom: "chêne" },
+  { ref: "NE31", apres: "comment", nom: "marbre" },
+  { ref: "NF13", apres: "dans-presentoir", nom: "vert profond" },
+  { ref: "NH12", apres: "realisations", nom: "terracotta" },
+  { ref: "M9", apres: "avis-prix", nom: "bleu nuit" },
+];
+
+/** La promesse de l'ouverture et du dernier appel (7 mots au plus). */
 export const TITRE_ACCUEIL = `Votre cuisine, transformée en ${DUREE_POSE_TEXTE}.`;
 export const LIGNE_ACCUEIL = "Sans travaux, sans remplacer vos meubles. Réversible.";
 
@@ -34,26 +49,34 @@ export const TITRE_META_ACCUEIL = `CoverSwap — Votre cuisine transformée en $
 export const DESCRIPTION_META_ACCUEIL = `Covering adhésif à Montpellier : votre cuisine rénovée en ${DUREE_POSE_TEXTE}, sans travaux. ${PRIX_PLAGE} fourni et posé. Simulation gratuite sur votre photo.`;
 
 /**
- * D'où vient un clic sur « Simuler ma cuisine » : l'ouverture, le bouton collé du téléphone, « Comment ça marche », le
- * dernier appel. Porté par `?depuis=` et repris par le simulateur dans le meta de PIECE_CHOISIE.
+ * D'où vient un clic vers le simulateur depuis l'accueil : l'ouverture, le bouton collé du téléphone, « Comment on
+ * travaille », le dernier appel ; site 3.0 (lot B6) : les pictos de « Par où commencer ? » (`accueil`) et les
+ * compositions de « Des cuisines comme la vôtre » (`accueil-cuisines`). Porté par `?depuis=` et repris par le
+ * simulateur dans le meta de PIECE_CHOISIE (docs/SUIVI.md).
  */
-export type DepuisAccueil = "accueil-ouverture" | "accueil-colle" | "accueil-etapes" | "accueil-final";
+export type DepuisAccueil = "accueil-ouverture" | "accueil-colle" | "accueil-etapes" | "accueil-final" | "accueil" | "accueil-cuisines";
 
+/** « Simuler ma pièce » (ouverture, étapes, dernier appel, bouton collé) : le simulateur à l'écran 1, sans pièce imposée. */
+export function lienSimulerAccueil(depuis: DepuisAccueil): string {
+  return lienSimuler({ depuis });
+}
+
+/** Mission 16 : le lien « Simuler ma cuisine » d'avant le site 3.0, gardé tel quel pour `/comment-ca-marche` (lot C3). */
 export function lienSimulerCuisine(depuis?: DepuisAccueil): string {
-  return `/simulateur?projet=cuisine${depuis ? `&depuis=${depuis}` : ""}`;
+  return lienSimuler({ projet: "cuisine", depuis });
 }
 
 /**
  * Les ancres que le bouton collé du téléphone surveille : il n'apparaît qu'une fois le bouton de l'ouverture sorti de
- * l'écran, et s'efface tant qu'un autre bouton principal est à l'écran (le module de simulation, « Comment ça marche »,
- * le dernier appel) ou que le pied de page l'est (il cacherait les liens du bas).
+ * l'écran, et s'efface tant qu'un autre appel est à l'écran (les pictos de « Par où commencer ? », le bouton de
+ * « Comment on travaille », le dernier appel) ou que le pied de page l'est (il cacherait les liens du bas).
  */
 export const ANCRES_ACCUEIL = {
   boutonOuverture: "ouverture-simuler",
-  simulation: "simulation",
+  parOuCommencer: "par-ou-commencer",
   boutonEtapes: "etapes-simuler",
   dernierAppel: "dernier-appel",
   pied: "pied-de-page",
 } as const;
 
-export const CIBLES_BOUTON_COLLE: string[] = [ANCRES_ACCUEIL.boutonOuverture, ANCRES_ACCUEIL.simulation, ANCRES_ACCUEIL.boutonEtapes, ANCRES_ACCUEIL.dernierAppel, ANCRES_ACCUEIL.pied];
+export const CIBLES_BOUTON_COLLE: string[] = [ANCRES_ACCUEIL.boutonOuverture, ANCRES_ACCUEIL.parOuCommencer, ANCRES_ACCUEIL.boutonEtapes, ANCRES_ACCUEIL.dernierAppel, ANCRES_ACCUEIL.pied];
