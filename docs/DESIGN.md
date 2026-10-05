@@ -37,14 +37,14 @@ Maps ».
 | `accent` | `#B3261E` | le rouge CoverSwap, celui du logo : **les actions seulement** (boutons principaux, lien « Simuler », pastille « 497 matières ») et la marque |
 | `accent-survol` | `#8F1E18` | le rouge au survol et à l'appui |
 | `sur-encre-2` | `#A99C8E` | le texte secondaire posé sur l'encre |
-| `alerte-fond`, `alerte-texte` | `#F3E1CC`, `#7A3A14` | erreurs et avertissements : brun, pas rouge (ils remplacent `accent-fond` et `accent-texte` au lot B2) |
+| `alerte-fond`, `alerte-texte` | `#F3E1CC`, `#7A3A14` | erreurs et avertissements : brun, pas rouge (ils ont remplacé `accent-fond` et `accent-texte` au lot B2) |
 | `succes`, `succes-fond` | `#2E6741`, `#E1EAD8` | une confirmation (ex-`ok-texte`, `ok-fond`) |
 | `encre-survol` | `#3B322B` | l'encre au survol des boutons encre |
 | `sombre` | `#120E0C` | les feuilles sombres et le plein écran |
 | `blanc` | `#FFFFFF` | le texte posé sur le rouge ; les cartes |
 
-Les deux anciens jetons `accent-fond` (`#FBE9E7`) et `accent-texte` (`#8F1D12`) restent le temps du lot B2, qui les
-renomme dans les 16 fichiers qui les emploient.
+Les deux anciens jetons `accent-fond` (`#FBE9E7`) et `accent-texte` (`#8F1D12`) ont disparu au lot B2 (voir « Le rouge
+réservé aux actions »).
 
 ### Contrastes mesurés
 
@@ -137,3 +137,51 @@ l'encre serait invisible.
 rouge, en Playfair 900. `espace/Illustrations.tsx` le réexporte pour l'espace client. Les fichiers `public/logo.png`
 et `public/og-image.jpg` n'ont pas été refaits au lot B1 (rouge et polices d'avant) : l'image de partage est
 recomposée au lot F2.
+
+## Le rouge réservé aux actions
+
+Lot B2. Le rouge CoverSwap (`accent`, `#B3261E`) sert à convertir, et à rien d'autre. Les fonds d'interface restent
+papier et encre.
+
+### Où il apparaît
+
+- **Le bouton principal** : `classesBouton("principal")` de `src/components/simulation/Bouton.tsx`, partagé par
+  `Bouton` (`<button>`) et `Lien` (`<a>`). Fond rouge, texte blanc (6,54:1), `accent-survol` (`#8F1E18`, 8,87:1) au
+  survol et à l'appui ; désactivé, il passe au trait avec sa raison écrite dessous. **Un seul par écran** (testé sur
+  les écrans du tunnel). Ses teintes seules (`TEINTE_PRINCIPALE`) habillent un libellé-bouton qui a sa propre forme :
+  « Prendre une photo » de l'écran Photo du simulateur, qui repasse au contour quand « Garder cette photo » devient
+  l'action principale.
+- **Le lien « Simuler »** de l'en-tête (`EnteteSite.tsx`) : texte rouge en gras sur le papier (5,62:1) avec sa
+  flèche, plus sombre et souligné au survol. Un lien, pas un bouton : le bouton principal reste celui de la page.
+- **La pastille « 497 matières »** (`revue/Pastille497.tsx`, lot B3).
+- **La marque** : le logo (`Logo.tsx`), losange et « Swap ».
+
+Nulle part ailleurs : ni un titre, ni un grand numéro, ni un surtitre, ni une sélection, ni un favori, ni une erreur.
+`src/app/theme.test.ts` (« le rouge réservé aux actions ») relit toutes les sources `.ts`/`.tsx` hors tests et hors
+espace client et échoue si une classe au rouge (`bg-`, `text-`, `border-`, `ring-`, `outline-`, `fill-`,
+`stroke-`… `accent`), `--color-accent`, `#B3261E` ou `#8F1E18` paraît hors de ces quatre fichiers. L'espace client
+(`src/components/espace/`) y entre au lot C6, quand ses couleurs écrites en dur passent aux jetons.
+
+### Les boutons
+
+| Variante | Classes | Où |
+|---|---|---|
+| `principal` | `bg-accent text-blanc hover:bg-accent-survol` | l'action de l'écran (simuler, envoyer, recevoir le devis) |
+| `secondaire` | contour `border-encre text-encre`, plein à l'encre au survol | une seconde action sur le papier (WhatsApp, plein écran, favoris) |
+| `sur-encre` | contour `border-fond text-fond`, `hover:bg-fond/10`, focus au papier | une action posée sur un bloc encre : dernier appel, pied de page, WhatsApp sur l'encre (à partir de B5 / B6) |
+| `discret` | lien souligné en gris chaud | un retour, une action mineure |
+
+Tous font 48 px de haut au moins (cible tactile ≥ 44 px). `BoutonWhatsApp` prend `variante="sur-encre"` sur
+l'encre, `secondaire` ailleurs.
+
+### Ce qui n'est pas rouge
+
+- **Erreurs et avertissements** : le brun, `bg-alerte-fond text-alerte-texte` (6,74:1), bordure
+  `border-alerte-texte/40` ; une zone refusée par l'analyse du simulateur prend `border-alerte-texte`. Une erreur ne
+  doit pas ressembler à une action.
+- **Sélections** (carte de pièce choisie, zone choisie, filtre actif, unité, créneau) : l'encre, en contour
+  (`border-encre ring-1 ring-encre`) ou en plein (`bg-encre text-blanc`).
+- **Favoris** : le cœur plein à l'encre (`text-encre`), vide en gris chaud ; dans un bouton secondaire il prend la
+  couleur du texte du bouton (encre, blanc au survol).
+- **Liens de texte** (pages légales, désinscription, opposition à la mesure) : `text-encre underline`, gris chaud au
+  survol.

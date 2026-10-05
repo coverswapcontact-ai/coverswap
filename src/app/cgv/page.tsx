@@ -147,7 +147,7 @@ export default function CGV() {
           <Article numero={10} titre="Données personnelles">
             <p>
               Les données nécessaires au devis et à l&apos;intervention sont traitées comme décrit dans notre{" "}
-              <Link href="/politique-confidentialite" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/politique-confidentialite" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 politique de confidentialité
               </Link>
               . Les photos du chantier ne sont jamais publiées sans votre accord écrit.
@@ -158,7 +158,7 @@ export default function CGV() {
             <p>
               En cas de réclamation, écrivez d&apos;abord à {SITE.email}. Sans réponse satisfaisante sous deux mois, un consommateur peut saisir
               gratuitement le médiateur de la consommation indiqué dans nos{" "}
-              <Link href="/mentions-legales" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/mentions-legales" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 mentions légales
               </Link>
               , ou la plateforme européenne de règlement en ligne des litiges. À défaut d&apos;accord amiable, le litige relève des tribunaux

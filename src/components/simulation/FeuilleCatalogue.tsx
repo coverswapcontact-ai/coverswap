@@ -131,7 +131,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
     <>
       <Feuille ouverte={ouverte} onFermer={onFermer} titre={consultation ? "Le catalogue Cover Styl'" : `Matière pour : ${zone.libelle}`} sousTitre="Touchez un échantillon pour le voir en grand." libelleFermer="Retour" entete={entete}>
         {probleme ? (
-          <p className="mt-3 rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[15px] text-accent-texte" role="alert">
+          <p className="mt-3 rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[15px] text-alerte-texte" role="alert">
             Le catalogue ne s&apos;est pas chargé. Vérifiez votre réseau, puis rouvrez-le.
           </p>
         ) : !catalogue ? (
@@ -223,7 +223,7 @@ export function FeuilleCatalogue({ ouverte, onFermer, zone, autresZones = [], ch
             ) : null}
             {consultation ? null : (
               <Bouton variante="secondaire" plein onClick={() => onFavori(agrandie.id)} aria-pressed={favoris.includes(agrandie.id)}>
-                <span className={favoris.includes(agrandie.id) ? "text-accent" : "text-encre-2"}>
+                <span className={favoris.includes(agrandie.id) ? undefined : "text-encre-2"}>
                   <IconeCoeur plein={favoris.includes(agrandie.id)} />
                 </span>
                 {favoris.includes(agrandie.id) ? "Dans mes favoris" : "Ajouter à mes favoris"}

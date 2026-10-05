@@ -416,7 +416,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       {/* Une seule région d'annonce : le `role="alert"` (assertif) — pas de `aria-live` autour, sinon le message est lu deux fois. */}
       <div className="min-h-[8px]">
         {erreur ? (
-          <div role="alert" className="mt-4 rounded-[var(--rayon-sm)] border border-accent/40 bg-accent-fond px-4 py-3 text-[14.5px] leading-relaxed text-accent-texte">
+          <div role="alert" className="mt-4 rounded-[var(--rayon-sm)] border border-alerte-texte/40 bg-alerte-fond px-4 py-3 text-[14.5px] leading-relaxed text-alerte-texte">
             {erreur}
           </div>
         ) : null}

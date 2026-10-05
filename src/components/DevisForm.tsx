@@ -248,7 +248,7 @@ export default function DevisForm({
         <Turnstile action="devis" theme="light" onToken={setJetonCaptcha} actif={touche} />
 
         {error && (
-          <p role="alert" className="rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
+          <p role="alert" className="rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[14.5px] text-alerte-texte">
             {error}
           </p>
         )}

@@ -11,7 +11,7 @@ import { Photo } from "./Photo";
  * partagées par le simulateur, le module d'accueil et l'espace client. Une
  * carte = le dessin au trait fin de la pièce (`espace/Illustrations`), le
  * libellé et la description venus du CRM. Le dessin est en gris léger, et
- * passe en couleur avec le trait d'accent quand la carte est choisie. Jamais
+ * passe en couleur avec le trait d'encre quand la carte est choisie. Jamais
  * un emoji. Hauteur fixe : les cartes ne font pas bouger la page. Des boutons
  * `aria-pressed` dans un groupe (pas un `radiogroup` : choisir une carte fait
  * avancer le parcours, les flèches n'auraient pas leur sens de radio).
@@ -62,7 +62,7 @@ export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce",
         const choisie = valeur === p.id;
         const photo = photoDePiece(photos, p.id);
         const avecPhoto = photo !== null && imagePreparee(photo);
-        const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-accent ring-1 ring-accent" : "border-trait hover:border-encre-2"}`;
+        const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-encre ring-1 ring-encre" : "border-trait hover:border-encre-2"}`;
         const lien = liens && Object.prototype.hasOwnProperty.call(liens, p.id) ? liens[p.id] : undefined;
         const contenu = (
           <>

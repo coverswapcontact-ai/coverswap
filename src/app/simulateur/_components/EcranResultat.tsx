@@ -170,7 +170,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
         </Bouton>
       </div>
       {partage === "erreur" ? (
-        <p role="alert" className="text-[14px] text-accent-texte">
+        <p role="alert" className="text-[14px] text-alerte-texte">
           Le rendu n&apos;a pas pu être récupéré : réessayez dans un instant.
         </p>
       ) : null}

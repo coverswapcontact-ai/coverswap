@@ -16,8 +16,6 @@
   --color-trait: #D9CDBD; /* filets et bordures, jamais du texte */
   --color-accent: #B3261E; /* le rouge CoverSwap : les actions seulement (5,62:1 sur le papier, 6,54:1 sous du blanc) */
   --color-accent-survol: #8F1E18; /* le rouge au survol / à l'appui (8,87:1 sous du blanc) */
-  --color-accent-fond: #FBE9E7; /* repris par alerte-fond au lot B2 */
-  --color-accent-texte: #8F1D12; /* repris par alerte-texte au lot B2 */
   --color-alerte-fond: #F3E1CC; /* erreurs et avertissements : brun, pas rouge */
   --color-alerte-texte: #7A3A14; /* 6,74:1 sur alerte-fond, 7,39:1 sur le papier */
   --color-succes: #2E6741; /* 5,41:1 sur succes-fond, 5,76:1 sur le papier */

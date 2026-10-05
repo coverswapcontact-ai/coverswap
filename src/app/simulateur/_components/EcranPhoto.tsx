@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Bouton, FOCUS_FICHIER } from "@/components/simulation/Bouton";
+import { Bouton, FOCUS_FICHIER, TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { CuisineDeFace } from "@/components/espace/Illustrations";
 import type { ProjectType } from "@/lib/simulateur/projets";
 
@@ -47,6 +47,8 @@ const CONSEILS = [
 ];
 
 const ENTREE = "sr-only";
+/** Contour à l'encre : « Choisir dans mes photos », et « Reprendre une photo » quand « Garder cette photo » est l'action principale (un seul rouge par écran). */
+const CONTOUR_FICHIER = "border border-encre bg-white text-encre hover:bg-fond-2";
 const BOUTON_FICHIER = `flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-[var(--rayon-sm)] text-[16px] font-medium transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${FOCUS_FICHIER}`;
 
 export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder }: { projet: ProjectType; photo: string | null; /** `aspect-ratio` de la photo en mémoire, null si inconnu. */ rapport: string | null; occupe: boolean; onFichier: (file: File) => void; onGarder: () => void }) {
@@ -95,7 +97,7 @@ export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder
 
       <div className={`rounded-[var(--rayon-md)] border-2 border-dashed p-3 transition-colors duration-[var(--duree-courte)] sm:p-4 ${survol ? "border-encre bg-white" : "border-trait"}`} aria-busy={occupe}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className={`${BOUTON_FICHIER} bg-encre text-blanc hover:bg-encre-survol ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+          <label className={`${BOUTON_FICHIER} ${photo ? CONTOUR_FICHIER : TEINTE_PRINCIPALE} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />
               <circle cx="12" cy="13" r="3" />
@@ -103,7 +105,7 @@ export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder
             {occupe ? "Préparation de la photo…" : photo ? "Reprendre une photo" : "Prendre une photo"}
             <input ref={appareil} type="file" accept="image/*" capture="environment" className={ENTREE} disabled={occupe} onChange={prendre} />
           </label>
-          <label className={`${BOUTON_FICHIER} border border-encre bg-white text-encre hover:bg-fond-2 ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+          <label className={`${BOUTON_FICHIER} ${CONTOUR_FICHIER} ${occupe ? "pointer-events-none opacity-60" : ""}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="9" cy="9" r="2" />

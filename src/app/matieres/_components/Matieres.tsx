@@ -235,7 +235,7 @@ export function Matieres({ premieres, familles, vueDans = {} }: { premieres: Mat
                   Essayer sur ma photo
                 </Lien>
                 <Bouton variante="secondaire" plein aria-pressed={favoris.includes(agrandie.id)} onClick={() => basculerFavori(agrandie.id)}>
-                  <span className={favoris.includes(agrandie.id) ? "text-accent" : ""}>
+                  <span>
                     <IconeCoeur plein={favoris.includes(agrandie.id)} />
                   </span>
                   {favoris.includes(agrandie.id) ? "Dans mes favoris" : "Ajouter à mes favoris"}

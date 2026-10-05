@@ -95,7 +95,7 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
       </div>
 
       {messageRefus ? (
-        <p role="alert" className="rounded-[var(--rayon-sm)] border border-accent/40 bg-accent-fond px-4 py-3 text-[14.5px] leading-relaxed text-accent-texte">
+        <p role="alert" className="rounded-[var(--rayon-sm)] border border-alerte-texte/40 bg-alerte-fond px-4 py-3 text-[14.5px] leading-relaxed text-alerte-texte">
           {messageRefus}
         </p>
       ) : null}
@@ -108,7 +108,7 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
           const bloque = !sel && plafond;
           const raison = nonVisible ? "Non visible sur la photo" : bloque ? `${zonesMax} zones au plus par rendu` : null;
           return (
-            <li key={zone.id} className={`rounded-[var(--rayon-md)] border bg-white p-3 transition-colors duration-[var(--duree-courte)] ${refusee ? "border-accent" : sel ? "border-encre" : "border-trait"} ${nonVisible ? "opacity-60" : ""}`}>
+            <li key={zone.id} className={`rounded-[var(--rayon-md)] border bg-white p-3 transition-colors duration-[var(--duree-courte)] ${refusee ? "border-alerte-texte" : sel ? "border-encre" : "border-trait"} ${nonVisible ? "opacity-60" : ""}`}>
               <div className="flex min-h-[56px] items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {sel ? (

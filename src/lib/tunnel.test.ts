@@ -12,6 +12,7 @@ import { Rappel } from "@/app/simulateur/_components/Rappel";
 import { ARGUMENTS_PRO, LIGNE_PRO, REFERENCES_PRO, SOURCE_FORMULAIRE_PRO, TITRE_PRO } from "@/app/pro/contenu";
 import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, LIEN_DEVIS_EN_LIGNE, TITRE_DEVIS_EN_LIGNE } from "@/app/comment-ca-marche/devis-en-ligne";
 import ContenuPrestation from "@/components/ContenuPrestation";
+import { classesBouton, TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { getPrestation } from "@/data/prestations";
 import { resolveSource } from "./crm";
 import { estimer } from "./estimation";
@@ -32,7 +33,8 @@ import { messageWhatsAppSimulation } from "./whatsapp";
 
 const SRC = join(process.cwd(), "src");
 const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8");
-const principaux = (html: string) => (html.match(/class="[^"]*bg-encre text-blanc hover:bg-encre-survol/g) ?? []).length;
+/** Les boutons principaux d'un écran rendu : les éléments qui portent les teintes de `classesBouton("principal")` (le rouge depuis le lot B2). */
+const principaux = (html: string) => [...html.matchAll(/class="([^"]*)"/g)].filter(([, classes]) => classes.includes(TEINTE_PRINCIPALE)).length;
 
 const TARIFS: TarifsSite = {
   version: 1,
@@ -209,6 +211,7 @@ describe("écrans du tunnel (rendus)", () => {
     // Façades seules : la taille change le chiffre, on la demande.
     const html = rendre({ ...RENDU, references: [RENDU.references[0]] });
     assert.equal(principaux(html), 1);
+    assert.ok(html.includes(`class="${classesBouton("principal")}`), "le principal est le bouton du site (classesBouton)");
     assert.match(html, />Recevoir mon devis<\/button>/);
     assert.match(html, /wa\.me\/33670352869\?text=Bonjour%2C%20je%20viens%20de%20simuler%20ma%20cuisine/);
     assert.match(html, /Quelle taille \?/);
@@ -229,6 +232,7 @@ describe("écrans du tunnel (rendus)", () => {
     assert.match(html, /Copier le lien/);
     assert.match(html, /Lucas vous appelle demain à 10 h\./);
     assert.equal(principaux(html), 1);
+    assert.ok(html.includes(`class="${classesBouton("principal")}`), "le principal est le bouton du site (classesBouton)");
     const sansLien = renderToStaticMarkup(createElement(EspacePret, { lienEspace: null, phraseRappel: null, messageWhatsApp: "Bonjour", onRecommencer: () => undefined }));
     assert.match(sansLien, /Demande bien reçue/);
     assert.match(sansLien, /Nous vous rappelons pour finaliser\./);

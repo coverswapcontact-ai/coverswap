@@ -187,7 +187,7 @@ export default function PolitiqueConfidentialite() {
             <p>
               Vous pouvez vous désinscrire de nos e-mails par le lien présent en bas de chaque message. Si vous estimez que vos droits ne sont
               pas respectés, vous pouvez introduire une réclamation auprès de la CNIL (3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 —{" "}
-              <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 cnil.fr
               </a>
               ).
@@ -259,11 +259,11 @@ export default function PolitiqueConfidentialite() {
             <p>
               Le site s&apos;adresse à des personnes majeures. Cette politique peut évoluer ; la date en haut de page indique sa dernière version.
               Voir aussi les{" "}
-              <Link href="/mentions-legales" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/mentions-legales" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 mentions légales
               </Link>{" "}
               et les{" "}
-              <Link href="/cgv" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/cgv" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 conditions générales de vente
               </Link>
               .

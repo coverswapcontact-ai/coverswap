@@ -185,7 +185,7 @@ export function SimulationSection({ pieces }: { pieces: PieceCarte[] }) {
           </div>
         )}
         {error ? (
-          <p role="alert" className="mt-4 rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
+          <p role="alert" className="mt-4 rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[14.5px] text-alerte-texte">
             {error}
           </p>
         ) : null}

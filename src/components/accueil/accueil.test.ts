@@ -448,6 +448,13 @@ describe("8. Dernier appel", () => {
     assert.doesNotMatch(lire("src/lib/evenements-site.ts"), /dataLayer|VERS_DATALAYER|@\/lib\/analytics/);
     assert.match(lire("src/components/accueil/BoutonWhatsApp.tsx"), /envoyerEvenement\("WHATSAPP_CLIQUE", \{ depuis \}\)/);
   });
+
+  test("site 3.0 (lot B2) : WhatsApp en secondaire sur le papier, en sur-encre posé sur l'encre ; jamais rouge", () => {
+    assert.ok(rendre(createElement(BoutonWhatsApp, { depuis: "accueil-final" })).includes(`class="${classesBouton("secondaire")}"`));
+    const surEncre = rendre(createElement(BoutonWhatsApp, { depuis: "accueil-final", variante: "sur-encre" }));
+    assert.ok(surEncre.includes(`class="${classesBouton("sur-encre")}"`));
+    assert.doesNotMatch(surEncre, /accent/);
+  });
 });
 
 describe("2. Essayez sur votre photo", () => {

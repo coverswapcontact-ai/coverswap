@@ -151,3 +151,61 @@ Lint et build passent.
 **Problèmes** : les captures pleine page à 1 440 px laissent blanches les sections en `content-visibility: auto`
 de l'accueil (déjà le cas en B0, pas lié à ce lot : à regarder avec `--etat-resultat` en G1) ; Chromium de Playwright
 toujours absent (Edge sert).
+
+## B2 — le rouge réservé aux actions (05/10/2026)
+
+**Fait**
+- `components/simulation/Bouton.tsx` : `principal` passe au rouge (`bg-accent text-blanc hover:bg-accent-survol`,
+  aussi à l'appui), `secondaire` reste le contour à l'encre, nouvelle variante **`sur-encre`** (`border-fond
+  text-fond hover:bg-fond/10`, focus au papier) pour les blocs encre ; 48 px gardés. Les teintes du principal sont
+  exportées (`TEINTE_PRINCIPALE`) pour un libellé-bouton qui a sa propre forme.
+- Erreurs au brun dans 10 fichiers : `bg-accent-fond` → `bg-alerte-fond`, `text-accent-texte` → `text-alerte-texte`,
+  `border-accent/40` → `border-alerte-texte/40` (FormulairePro, DevisForm, HomeClient, Simulateur, EcranMatieres,
+  EcranResultat, EcranAttente, FeuilleCatalogue, Desinscription) ; zone refusée de l'écran Matières en
+  `border-alerte-texte`. Les jetons `accent-fond` et `accent-texte` sont retirés de `@theme` (globals.css 191 lignes).
+- Sélections et favoris à l'encre : carte de pièce choisie (`border-encre ring-1 ring-encre`), cœur des tuiles
+  (`text-encre`), cœur des boutons « Ajouter à mes favoris » (`/matieres`, feuille du catalogue) à la couleur du
+  bouton.
+- En-tête : « Simuler » devient un **lien rouge** en gras avec sa flèche (comme la maquette), plus un bouton
+  secondaire ; le principal de l'écran reste celui de la page.
+- Écran Photo du simulateur : « Prendre une photo » prend le rouge du principal ; quand une photo est déjà là,
+  « Garder cette photo » est le principal et « Reprendre une photo » passe au contour (un seul rouge).
+- `BoutonWhatsApp` accepte `variante="sur-encre"` (dernier appel sur l'encre, B5 / B6), `secondaire` par défaut.
+- `docs/DESIGN.md` : section « Le rouge réservé aux actions » (où il apparaît, les quatre variantes de bouton, ce qui
+  n'est pas rouge).
+
+**Vérification visuelle** (build local construit comme la CI, `next start -p 3100`, Edge) : accueil, simulateur,
+`/pro`, `/matieres` à 390 et 1 440 px ; aucun débordement à 360 px ; 0 requête coupée. Écran Photo du simulateur
+(carte Cuisine cliquée) et **erreur du formulaire `/pro`** à 390 et 1 440 px : formulaire rempli de valeurs d'essai,
+envoi coupé dans le navigateur (2 `POST /api/contact` arrêtés par Playwright avant de partir, rien n'a atteint le
+serveur) → « Connexion interrompue… » en brun sur `alerte-fond`, au-dessus du bouton rouge. Le rouge ne se voit plus
+que sur les boutons principaux, « Simuler » et le logo.
+
+**Décisions prises seul**
+1. Les liens de texte des pages légales, de la désinscription (adresse e-mail) et de l'opposition à la mesure
+   étaient en `text-accent-texte` sans être des erreurs : ils passent en `text-encre underline` (gris chaud au
+   survol), la forme des autres liens du site, plutôt qu'au brun d'alerte qui les ferait lire comme des avertissements.
+2. Zone refusée par l'analyse (`EcranMatieres`) : brun d'alerte plutôt qu'encre (le plan la rangeait parmi les
+   sélections), parce que c'est un refus, et que l'encre est déjà la bordure d'une zone choisie.
+3. « Simuler » de l'en-tête en lien rouge (texte), pas en bouton plein : l'énoncé dit « lien », la maquette le
+   dessine ainsi, et un bouton plein ferait deux principaux par écran.
+4. Le libellé-bouton « Prendre une photo » passe au rouge par `TEINTE_PRINCIPALE` (exportée de `Bouton.tsx`) pour que
+   le rouge reste écrit dans les seuls fichiers permis.
+5. Les boutons « Choisir » de chaque zone (écran Matières) restent en encre plein : il y en a un par zone, ce ne sont
+   pas l'action de l'écran.
+6. Le test « rouge réservé » relit les `.ts` et `.tsx` (pas seulement les `.tsx`), cherche aussi `--color-accent`,
+   `#B3261E` et `#8F1E18`, et liste `revue/Pastille497.tsx` (lot B3) dès maintenant.
+
+**Tests** : 299 → 306, tous réussis. `theme.test.ts` 14 → 19 (rouge réservé sur 4 fichiers ; le motif lui-même ;
+le rouge des fichiers permis ; erreurs au brun, anciens jetons absents, `alerte-texte`/`alerte-fond` ≥ 4,5:1 ;
+sélections et favoris à l'encre) ; le plancher de couleurs de `@theme` passe de 18 à 16 (les deux jetons retirés).
+`lien.test.ts` : principal `bg-accent`/`text-blanc`/`hover:bg-accent-survol`, secondaire `border-encre`, `sur-encre`
+`border-fond`/`text-fond`/`hover:bg-fond/10`, rouge absent des trois autres variantes, toujours ni hexadécimal, ni
+`bg-rouge`, ni `text-white` ; `sur-encre` ajouté aux classes partagées et à la cible de 44 px. `tunnel.test.ts` :
+`principaux()` compte les éléments qui portent les teintes de `classesBouton("principal")`, et chaque écran contient
+bien `classesBouton("principal")` (toujours un seul principal). `accueil.test.ts` : + WhatsApp en `sur-encre`.
+Lint et build passent.
+
+**Problèmes** : `espace/Illustrations.tsx` dessine encore le cadre « Toute la zone visible » (conseils de l'écran
+Photo) en rouge `#CC0000` écrit en dur : hors champ du test jusqu'au lot C6 / E2, qui remplacent ses couleurs.
+`HomeClient.tsx` garde son libellé-bouton de fichier en encre plein (il disparaît en B6).

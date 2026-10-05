@@ -81,7 +81,7 @@ export default function MentionsLegales() {
           <Section titre="Données personnelles et cookies">
             <p>
               Le traitement de vos données et l&apos;usage des cookies sont décrits dans notre{" "}
-              <Link href="/politique-confidentialite" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/politique-confidentialite" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 politique de confidentialité
               </Link>
               . Le site ne dépose aucun cookie de mesure d&apos;audience ni de publicité.
@@ -97,7 +97,7 @@ export default function MentionsLegales() {
             <p className="text-sm text-encre-2">[À compléter après adhésion : nom du médiateur, adresse postale et site de saisie en ligne.]</p>
             <p>
               Vous pouvez également utiliser la plateforme européenne de règlement en ligne des litiges :{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 ec.europa.eu/consumers/odr
               </a>
               .
@@ -107,7 +107,7 @@ export default function MentionsLegales() {
           <Section titre="Conditions de vente et droit applicable">
             <p>
               Les prestations proposées sont soumises à nos{" "}
-              <Link href="/cgv" className="text-accent-texte underline underline-offset-4 hover:text-encre">
+              <Link href="/cgv" className="text-encre underline underline-offset-4 hover:text-encre-2">
                 conditions générales de vente
               </Link>
               . Le site et les présentes mentions sont régis par le droit français.

@@ -91,7 +91,7 @@ function FormulairePrevenir({ onPrevenir }: { onPrevenir: NonNullable<Props["onP
         <span>{TEXTE_CONSENTEMENT_PREVENIR}</span>
       </label>
       {etat.type === "erreur" ? (
-        <p role="alert" className="text-[13.5px] text-accent-texte">
+        <p role="alert" className="text-[13.5px] text-alerte-texte">
           {etat.message}
         </p>
       ) : null}

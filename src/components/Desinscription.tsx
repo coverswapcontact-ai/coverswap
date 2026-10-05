@@ -42,7 +42,7 @@ export default function Desinscription({ base, lien }: { base: string; lien: { e
             <h1 className="text-[19px] font-semibold">Ce lien est incomplet</h1>
             <p>
               Écrivez-nous à{" "}
-              <a href={`mailto:${SITE.email}?subject=D%C3%A9sinscription`} className="font-medium text-accent-texte underline underline-offset-2">
+              <a href={`mailto:${SITE.email}?subject=D%C3%A9sinscription`} className="font-medium text-encre underline underline-offset-2 hover:text-encre-2">
                 {SITE.email}
               </a>
               &nbsp;: nous retirons votre adresse de nos relances.
@@ -66,7 +66,7 @@ export default function Desinscription({ base, lien }: { base: string; lien: { e
               Me désinscrire
             </Bouton>
             {erreur ? (
-              <p className="text-[15px] text-accent-texte" role="alert">
+              <p className="text-[15px] text-alerte-texte" role="alert">
                 {erreur}
               </p>
             ) : null}

@@ -91,7 +91,7 @@ describe("site 3.0 : les jetons, une seule source", () => {
   test("lireJetons() rend exactement les couleurs hexadécimales du bloc @theme, et rien d'autre", () => {
     const bloc = CSS.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
     const declarees = [...bloc.matchAll(/--color-([a-z0-9-]+):\s*#/g)].map((m) => m[1]);
-    assert.ok(declarees.length >= 18, `${declarees.length} couleurs`);
+    assert.ok(declarees.length >= 16, `${declarees.length} couleurs`); // 18 au lot B1, moins accent-fond et accent-texte (lot B2)
     assert.deepEqual(Object.keys(JETONS).sort(), declarees.sort());
     assert.deepEqual(lireJetons("@theme {\n  --color-x: #abcdef;\n  --font-y: serif;\n  --rayon-z: 4px;\n}\n"), { x: "#ABCDEF" });
     assert.throws(() => lireJetons("body { color: red; }"), /@theme/);
@@ -215,5 +215,58 @@ describe("composants et pages (hors espace client) : plus rien du thème sombre"
     for (const retire of ["Header", "Footer", "HeroVideo", "ScrollReveal", "TextureBackground", "WhatsAppButton"]) {
       assert.ok(!presents.has(`components/${retire}.tsx`), `${retire}.tsx existe encore`);
     }
+  });
+});
+
+describe("site 3.0, lot B2 : le rouge réservé aux actions", () => {
+  /** Le rouge s'écrit dans ces fichiers seulement : les boutons, le lien « Simuler » de l'en-tête, la pastille « 497 matières » (lot B3) et la marque. */
+  const PERMIS = ["components/simulation/Bouton.tsx", "components/EnteteSite.tsx", "components/revue/Pastille497.tsx", "components/Logo.tsx"];
+  /** Une classe Tailwind au rouge (`bg-accent`, `hover:text-accent-survol`, `ring-accent/40`…), sa variable CSS ou sa valeur. */
+  const ROUGE = /(?<![\w-])(?:bg|text|border(?:-[trblxy])?|ring|outline|fill|stroke|decoration|from|via|to|shadow|divide|caret|placeholder)-accent(?![\w])|--color-accent|#B3261E|#8F1E18/i;
+  const SOURCES = [...fichiers(SRC, ".tsx"), ...fichiers(SRC, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f) && !nom(f).startsWith("components/espace/"));
+
+  test(`${SOURCES.length} sources (hors espace client et tests) : le rouge n'apparaît que dans ${PERMIS.length} fichiers`, () => {
+    assert.ok(SOURCES.length > 100, `${SOURCES.length} sources`);
+    const constats: string[] = [];
+    for (const f of SOURCES) {
+      if (PERMIS.includes(nom(f))) continue;
+      lire(f).split("\n").forEach((ligne, i) => {
+        if (ROUGE.test(ligne)) constats.push(`${nom(f)}:${i + 1} ${ligne.trim().slice(0, 120)}`);
+      });
+    }
+    assert.deepEqual(constats, []);
+  });
+
+  test("le motif attrape les classes au rouge et laisse passer le reste", () => {
+    for (const oui of ['"bg-accent text-blanc"', "hover:bg-accent-survol", '"border-accent ring-1 ring-accent"', "text-accent", "ring-accent/40", "border-l-accent", "var(--color-accent)", "#b3261e"]) assert.match(oui, ROUGE, oui);
+    for (const non of ["accent-[var(--color-encre)]", '"mur-accent"', "text-alerte-texte", "bg-alerte-fond", "border-alerte-texte/40", "une couleur d'accent"]) assert.doesNotMatch(non, ROUGE, non);
+  });
+
+  test("le rouge des fichiers permis : le bouton principal, le lien « Simuler », la marque", () => {
+    assert.match(lire(join(SRC, "components", "simulation", "Bouton.tsx")), /TEINTE_PRINCIPALE = "bg-accent text-blanc hover:bg-accent-survol/);
+    const entete = lire(join(SRC, "components", "EnteteSite.tsx"));
+    assert.match(entete, /const LIEN_ROUGE = "[^"]*\btext-accent\b[^"]*\bhover:text-accent-survol\b/);
+    assert.match(entete, /<Link href=\{LIEN_SIMULER\.href\} className=\{LIEN_ROUGE\}>/);
+    assert.doesNotMatch(entete, /bg-accent/, "l'en-tête n'a pas de bouton rouge plein (le principal est celui de la page)");
+  });
+
+  test("les erreurs passent au brun (alerte-*) : les anciens jetons ont disparu, le contraste tient 4,5:1", () => {
+    const JETONS = lireJetons();
+    assert.ok(!("accent-fond" in JETONS) && !("accent-texte" in JETONS), "accent-fond / accent-texte encore dans @theme");
+    for (const f of SOURCES) assert.doesNotMatch(lire(f), /accent-fond|accent-texte|border-accent\//, nom(f));
+    const rapport = contraste(JETONS["alerte-texte"], JETONS["alerte-fond"]);
+    assert.ok(rapport >= 4.5, `alerte-texte sur alerte-fond : ${rapport}`);
+    // Le brun n'est pas le rouge : une erreur ne se confond pas avec une action.
+    assert.notEqual(JETONS["alerte-texte"], JETONS.accent);
+    assert.notEqual(JETONS["alerte-fond"], JETONS.accent);
+    // Chaque message d'erreur des formulaires et du simulateur prend le brun.
+    for (const f of ["app/pro/_components/FormulairePro.tsx", "components/DevisForm.tsx", "app/simulateur/_components/Simulateur.tsx", "components/simulation/FeuilleCatalogue.tsx"]) {
+      assert.match(lire(join(SRC, f)), /role="alert" className="[^"]*\bbg-alerte-fond\b[^"]*\btext-alerte-texte\b|className="[^"]*\bbg-alerte-fond\b[^"]*\btext-alerte-texte\b[^"]*" role="alert"/, f);
+    }
+  });
+
+  test("sélections et favoris à l'encre", () => {
+    assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /choisie \? "border-encre ring-1 ring-encre"/);
+    assert.match(lire(join(SRC, "components", "simulation", "ElementsCatalogue.tsx")), /favori \? "text-encre" : "text-encre-2"/);
   });
 });

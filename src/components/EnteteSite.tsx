@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { Lien } from "@/components/simulation/Lien";
 import { ENTREES_MENU, LIEN_SIMULER } from "@/lib/navigation";
 import MenuMobile from "./MenuMobile";
 
@@ -10,9 +9,10 @@ import MenuMobile from "./MenuMobile";
  *    seulement, premier arrêt de la page) ; le logo à gauche ; à droite, à
  *    partir de 768 px, les quatre entrées du menu (`lib/navigation`) et
  *    « Simuler » ; sur mobile, « Simuler » et un bouton « Menu » qui ouvre une
- *    feuille. « Simuler » est en secondaire : le bouton principal de l'écran
- *    est celui de la page (un seul par écran). Collé en haut (`sticky`, pas
- *    `fixed`), 60 px, un trait dessous, sans ombre ni verre, sans sous-menu ;
+ *    feuille. « Simuler » est un lien rouge (site 3.0, lot B2 : le rouge des
+ *    actions), pas un bouton : le bouton principal de l'écran reste celui de
+ *    la page (un seul par écran). Collé en haut (`sticky`, pas `fixed`),
+ *    60 px, un trait dessous, sans ombre ni verre, sans sous-menu ;
  *  - `compact` (le simulateur) : le logo et « Accueil », dans le flux.
  * Composant serveur : seul le menu mobile est client.
  */
@@ -25,6 +25,9 @@ function LienLogo() {
     </Link>
   );
 }
+
+/** Le lien « Simuler » : le rouge sur le papier (5,62:1), en gras ; plus sombre au survol. */
+const LIEN_ROUGE = "inline-flex min-h-[44px] items-center gap-1.5 rounded-[var(--rayon-sm)] px-2 text-[15px] font-bold text-accent underline-offset-4 transition-colors duration-[var(--duree-courte)] hover:text-accent-survol hover:underline";
 
 export default function EnteteSite({ compact = false }: { compact?: boolean }) {
   if (compact) {
@@ -63,9 +66,10 @@ export default function EnteteSite({ compact = false }: { compact?: boolean }) {
                 ))}
               </ul>
             </nav>
-            <Lien href={LIEN_SIMULER.href} variante="secondaire">
+            <Link href={LIEN_SIMULER.href} className={LIEN_ROUGE}>
               {LIEN_SIMULER.libelle}
-            </Lien>
+              <span aria-hidden>→</span>
+            </Link>
             <MenuMobile />
           </div>
         </div>
