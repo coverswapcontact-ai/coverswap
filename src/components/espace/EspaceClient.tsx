@@ -236,7 +236,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
     else if (vue === "simulations") contenu = <EtapeSimulations etat={etat} client={client} jeton={jeton} onEtat={appliquerEtat} recharger={() => charger()} aller={aller} />;
     else if (vue === "devis") {
       const verrou = onglet("DEVIS");
-      if (etat.devis || etat.devisProposes?.length) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} onCoordonnees={() => aller("coordonnees")} />;
+      if (etat.devis || etat.devisProposes?.length || etat.devisASigner?.length) contenu = <EtapeDevis etat={etat} client={client} onEtat={appliquerEtat} onSuite={() => aller("paiement")} onCoordonnees={() => aller("coordonnees")} />;
       else if (verrou?.verrouillee)
         contenu = <Verrou titre="Votre devis" raison={verrou.raison ?? "Validez une simulation pour recevoir votre devis."} action={{ libelle: etat.simulations.length ? "Voir mes simulations" : "Créer ma simulation", onClick: () => aller("simulations") }} />;
       else contenu = <DevisEnPreparation etat={etat} client={client} onSimulations={() => aller("simulations")} />;
@@ -316,7 +316,7 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
 
 function BarreOnglets({ etat, vue, aller }: { etat: Etat; vue: Vue; aller: (vue: Vue) => void }) {
   const parCle = new Map(etat.etapes.map((e) => [e.cle, e]));
-  const suivante = prochainPas(etat).vue;
+  const suivante = pasDuProjet(etat).vue;
   return (
     <nav aria-label="Les étapes de votre projet" className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E3DFD8] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
       <ul className="mx-auto grid max-w-xl grid-cols-5">
@@ -418,7 +418,7 @@ function ChoixFamille({ etat, client, prestations, onEtat, onSuite }: { etat: Et
 /* ── L'accueil d'un projet : la prochaine étape, rien d'autre ─────── */
 
 function AccueilProjet({ etat, aller, plusieurs, onNouveau }: { etat: Etat; aller: (vue: Vue) => void; plusieurs: boolean; onNouveau: () => void }) {
-  const pas = prochainPas(etat);
+  const pas = pasDuProjet(etat);
   const Icone = ONGLETS.find((o) => o.vue === pas.vue)?.Icone ?? IconeSimulation;
   // Tout tient entre l'en-tête et la barre d'onglets, même sur un petit iPhone avec les barres de Safari.
   return (
@@ -452,6 +452,14 @@ function AccueilProjet({ etat, aller, plusieurs, onNouveau }: { etat: Etat; alle
 }
 
 type Pas = { phrase: string; bouton: string; vue: VueProjet };
+
+/**
+ * Mission 18 (B7) : la prochaine étape est calculée par le CRM (`etat.prochainPas` : un avenant à signer passe devant le
+ * reste) ; le calcul du site ne sert plus qu'à un état gardé d'avant (ou à un CRM d'avant).
+ */
+function pasDuProjet(etat: Etat): Pas {
+  return etat.prochainPas ?? prochainPas(etat);
+}
 
 function prochainPas(etat: Etat): Pas {
   const mots = motsDe(etat);

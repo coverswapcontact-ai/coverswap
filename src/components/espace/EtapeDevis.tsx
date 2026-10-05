@@ -6,6 +6,7 @@ import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Signature, type SignatureRef } from "./Signature";
 import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
+import { devisDeLOnglet, enteteDesDevis, precisionAccord } from "@/lib/espace/devis";
 
 /**
  * Onglet Devis — lisible sur un téléphone : ce qui est inclus, le prix,
@@ -21,10 +22,14 @@ const UNITES: Record<string, string> = { ml: "m", jour: "jour", forfait: "forfai
 const quantite = (q: number, unite: string) => (unite === "forfait" ? "Forfait" : `${String(Math.round(q * 100) / 100).replace(".", ",")} ${UNITES[unite] ?? unite}${unite === "jour" && q > 1 ? "s" : ""}`);
 
 export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { etat: Etat; client: Client; onEtat: (etat: Etat) => void; onSuite: () => void; onCoordonnees?: () => void }) {
-  // Mission 11 : plusieurs devis proposés → il en choisit un, côte à côte ; une fois l'accord donné, seul le devis signé reste.
-  const proposes = useMemo(() => (etat.devis?.accepte ? [etat.devis] : etat.devisProposes?.length ? etat.devisProposes : etat.devis ? [etat.devis] : []), [etat.devis, etat.devisProposes]);
+  // Mission 11 : plusieurs devis proposés → il en choisit un, côte à côte ; une fois l'accord donné, le devis signé reste.
+  // Mission 18 (B7) : ce qui se signe vient du CRM (`devisASigner`) — signé, un avenant (ou un nouveau devis) s'affiche à
+  // côté du devis signé et se signe ici ; le devis d'origine reste valable.
+  const selection = useMemo(() => devisDeLOnglet(etat), [etat]);
+  const proposes = selection.liste;
   const plusieurs = proposes.length > 1;
-  const [choisiId, setChoisiId] = useState<string | null>(plusieurs ? null : (proposes[0]?.id ?? null));
+  const entete = enteteDesDevis(selection);
+  const [choisiId, setChoisiId] = useState<string | null>(selection.ouvert?.id ?? null);
   const devis = proposes.find((d) => d.id === choisiId) ?? (plusieurs ? null : (proposes[0] ?? null));
   const apercu = Boolean(client.apercu);
   const [coord, setCoord] = useState({ nom: etat.coordonnees.nom || "", adresse: etat.coordonnees.adresse, codePostal: etat.coordonnees.codePostal, ville: etat.coordonnees.ville, email: etat.coordonnees.email ?? "" });
@@ -60,7 +65,8 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
     setOccupe(true);
     setProbleme(null);
     try {
-      const { espace } = await client.envoyerJson<{ espace: Etat }>("/accord/retrait", "POST", {});
+      // Mission 18 (B7) : le devis nommé (l'accord d'un avenant se retire seul, le devis d'origine reste signé).
+      const { espace } = await client.envoyerJson<{ espace: Etat }>("/accord/retrait", "POST", devis ? { documentId: devis.id } : {});
       onEtat(espace);
       setAccepte(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,7 +86,8 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
       const { espace } = await client.envoyerJson<{ espace: Etat }>("/accord", "POST", { documentId: devis.id, nom: nom.trim(), accepte, signature: signature.current?.image() ?? undefined });
       onEtat(espace);
       window.scrollTo({ top: 0, behavior: "smooth" });
-      onSuite();
+      // Un avenant signé : il reste sur ses devis (le paiement suit le devis d'origine).
+      if (!selection.avenant) onSuite();
     } catch (e) {
       setProbleme(e instanceof Error ? e.message : "Réessayez dans un instant.");
     } finally {
@@ -108,8 +115,8 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
   const choix = plusieurs ? (
     <Carte className="space-y-3">
       <div>
-        <Surtitre ton="rouge">{proposes.length} devis vous sont proposés</Surtitre>
-        <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">Comparez, puis donnez votre accord sur celui qui vous convient. Un seul sera retenu.</p>
+        <Surtitre ton={selection.aSigner.length ? "rouge" : "vert"}>{entete.surtitre}</Surtitre>
+        <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">{entete.phrase}</p>
       </div>
       <ul className="grid grid-cols-2 gap-2.5">
         {proposes.map((d) => {
@@ -117,7 +124,10 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
           return (
             <li key={d.id}>
               <button type="button" aria-pressed={actif} onClick={() => setChoisiId(d.id)} className={cx("flex min-h-[124px] w-full flex-col justify-between rounded-2xl border-2 p-3 text-left", actif ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9] bg-white active:bg-[#F2F0EC]")}>
-                <span className="block text-[13px] text-[#6B665F]">Devis n° {d.numero}</span>
+                <span className="block text-[13px] text-[#6B665F]">
+                  Devis n° {d.numero}
+                  {d.accepte ? <span className="ml-1.5 font-semibold text-[#1F7A4D]">· Signé</span> : null}
+                </span>
                 <span className="mt-1 block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{d.libelle || d.objet}</span>
                 <span className="mt-2 block font-display text-[22px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{euros(d.total)}</span>
               </button>
@@ -279,7 +289,7 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
             </span>
             <span className="text-[16px] leading-snug text-[#1A1A1A]">
               J&apos;accepte le devis n° {devis.numero}{devis.libelle ? ` «\u00a0${devis.libelle}\u00a0»` : ""} d&apos;un montant de <strong className="font-semibold">{euros(devis.total)}</strong>. Mon accord vaut signature.
-              {plusieurs ? " Les autres devis proposés ne seront pas retenus." : ""}
+              {precisionAccord(selection)}
             </span>
           </button>
 
