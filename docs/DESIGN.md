@@ -199,8 +199,9 @@ papier et encre.
   les écrans du tunnel). Ses teintes seules (`TEINTE_PRINCIPALE`) habillent un libellé-bouton qui a sa propre forme :
   « Prendre une photo » de l'écran Photo du simulateur, qui repasse au contour quand « Garder cette photo » devient
   l'action principale.
-- **Le lien « Simuler »** de l'en-tête (`EnteteSite.tsx`) : texte rouge en gras sur le papier (5,62:1) avec sa
-  flèche, plus sombre et souligné au survol. Un lien, pas un bouton : le bouton principal reste celui de la page.
+- **Le lien « Simuler ma pièce »** de l'en-tête (`EnteteSite.tsx`, lot B5) : texte rouge en gras sur le papier
+  (5,62:1) avec sa flèche dès 640 px, plus sombre et souligné au survol. Un lien, pas un bouton : le bouton principal
+  reste celui de la page (voir « Le gabarit »).
 - **La pastille « 497 matières »** (`revue/Pastille497.tsx`, lot B3).
 - **La marque** : le logo (`Logo.tsx`), losange et « Swap ».
 
@@ -339,6 +340,47 @@ Une idée par section, de l'air (64 px, 96 px dès 768 px), largeur de lecture o
 
 Sur l'encre, les liens nus passent au papier et le contour de focus aussi (globals.css). Le dernier appel et le pied de
 page sont en encre (lots B5 / B6), jamais en rouge. L'ancien `fond="fond-2"` vaut `ton="papier-2"`.
+
+## Le gabarit
+
+Lot B5. Ce qui entoure toutes les pages (hors simulateur, qui garde son en-tête `compact`). Testé par
+`src/components/gabarit.test.ts`.
+
+### L'en-tête — `EnteteSite.tsx` (serveur)
+
+- Collé en haut (`sticky`), **60 px** plus le filet, le papier et son grain (`.papier`), un **filet d'encre** dessous ;
+  ni ombre, ni verre, ni sous-menu. Le lien d'évitement « Aller au contenu » reste le premier arrêt du clavier.
+- À gauche le `Logo`. À droite, dès **1 024 px**, le menu en **petites capitales** à l'encre (13 px, espacées de
+  0,08 em, soulignées au survol, cibles de 44 px) : Matières, Inspirations, Réalisations, Comment ça marche, Pro
+  (`ENTREES_MENU` de `lib/navigation.ts`, seule liste lue par l'en-tête, le menu du téléphone et le pied).
+- Puis le **lien rouge « Simuler ma pièce »** vers `/simulateur?depuis=entete` (`LIEN_SIMULER`) : la valeur `entete`
+  part avec `PIECE_CHOISIE` (docs/SUIVI.md). Sous 640 px, 14 px sans la flèche : avec le logo et « Menu », il tient
+  sur une ligne dès 360 px.
+- Sous 1 024 px, le menu laisse la place au bouton **« MENU »** (mêmes petites capitales) : cinq entrées en
+  capitales, le logo et le lien ne tiennent pas sur une ligne à 768 px. Le menu d'ordinateur et le bouton basculent
+  au même seuil (`lg`), jamais les deux, jamais aucun.
+
+### Le menu du téléphone — `MenuMobile.tsx` (client)
+
+Une `Feuille` : les cinq entrées et le contact en petites capitales (15 px) entre des filets d'encre, puis, au pied
+de la feuille, le bouton principal rouge « Simuler ma pièce » (même adresse, `depuis=entete`). Chaque lien ferme la
+feuille avant de naviguer (`useLiensDeFeuille`). L'espace client reste au pied de page, pas au menu.
+
+### Le pied de page — `PiedDePage.tsx` (serveur)
+
+`<footer id="pied-de-page">` en ton encre (`ton-encre bg-encre text-fond`, sans grain). « Une question ? » en
+Playfair, le téléphone et l'e-mail au papier (15,42:1) ; les liens (inchangés : `LIENS_PIED`, réseaux, pages
+légales) et le secondaire en `sur-encre-2` (6,69:1), au papier et soulignés au survol ; jamais le gris chaud
+(2,92:1) ni l'encre en texte ; filets au papier à 20 %. Le focus passe au papier (`.ton-encre :focus-visible`).
+
+### Le bouton collé — `simulation/BoutonColle.tsx`
+
+Option **`masquerSurSaisie`**, prise par **l'accueil seul** : le bouton s'efface tant qu'un champ de saisie a le
+focus (texte, téléphone, e-mail, nombre, zone de texte, liste, élément éditable ; pas une case, un bouton ou un
+curseur) — le clavier du téléphone le collerait sur le formulaire — et tant qu'une feuille ou un plein écran modal est
+ouvert : `verrouillerLaPage()` (`Feuille.tsx`) pose `data-feuille-ouverte` sur `<html>`, que le bouton observe. La
+logique est dans `simulation/saisie.ts` (pure). Le bouton « Voir le résultat » de l'écran des matières du simulateur
+ne la prend pas : son action doit rester sous le pouce.
 
 ## Ce qu'on a jeté de la maquette
 

@@ -366,3 +366,49 @@ débordement à 360 px après la correction de la rangée de filtres ; 0 requêt
 **Problèmes** : `/inspirations` passe à 52 cartes (18 800 px de haut à 1 440 px) : la page sera repensée en C4. Les
 vignettes du CRM ne s'affichent pas sur le build local (adresse du CRM absente en local, comme en B3). Le picto
 `plan-parallele` attend que le CRM publie le format couloir.
+
+## B5 — le gabarit (05/10/2026)
+
+**Fait** (repris d'un agent arrêté en cours de lot : son travail relu et gardé, une référence de test corrigée,
+DESIGN.md complété)
+- `EnteteSite.tsx` : 60 px plus le filet, `.papier` (le grain), filet d'encre dessous ; `Logo` ; dès 1 024 px le menu
+  en petites capitales à l'encre (Matières, Inspirations, Réalisations, Comment ça marche, Pro) ; lien rouge
+  « Simuler ma pièce » → `/simulateur?depuis=entete` (flèche dès 640 px, 14 px dessous pour tenir à 360 px).
+- `MenuMobile.tsx` : bouton « MENU » en petites capitales (sous 1 024 px), feuille aux entrées en petites capitales
+  entre filets d'encre, bouton principal « Simuler ma pièce » au pied de la feuille (ferme puis navigue).
+- `PiedDePage.tsx` : `ton-encre bg-encre`, liens inchangés, texte au papier et `sur-encre-2`, filets `fond/20`,
+  « Une question ? » en Playfair.
+- `BoutonColle.tsx` : option `masquerSurSaisie` (focus dans un champ, ou `data-feuille-ouverte` posé sur `<html>` par
+  `verrouillerLaPage()`), logique pure dans `simulation/saisie.ts` ; prise par l'accueil seul, l'écran Matières du
+  simulateur inchangé.
+- `lib/navigation.ts` : `ENTREES_MENU` à cinq entrées, `LIEN_INSPIRATIONS` retiré (le pied le garde par le menu),
+  `LIEN_SIMULER` = « Simuler ma pièce », `depuis=entete`. `docs/SUIVI.md` : la valeur `entete` ajoutée, rien retiré.
+- `docs/DESIGN.md` : section « Le gabarit », lien « Simuler ma pièce ».
+
+**Décisions prises seul**
+1. Inspirations entre au menu (cinq entrées, l'ordre de la consigne) : le test « le menu garde ses quatre entrées »
+   devient « cinq entrées, dans l'ordre », et celui du pied exige la liste exacte, sans doublon.
+2. Le menu d'ordinateur passe de 768 à 1 024 px : cinq entrées en capitales, le logo et le lien ne tiennent pas à
+   768 px. Entre 768 et 1 023 px, le bouton « MENU » comme au téléphone.
+3. Le menu du téléphone porte le bouton principal rouge « Simuler ma pièce » (même `depuis=entete`) : la feuille
+   recouvre l'en-tête et son lien.
+4. La feuille pose un attribut sur `<html>` (plutôt qu'un contexte React) : le bouton collé l'observe sans lien entre
+   les composants, et les pleins écrans modaux (`PleinEcran`, même verrou) comptent aussi.
+5. Le libellé du bouton collé de l'accueil (« Simuler ma cuisine ») n'est pas changé ici : l'accueil est refait en B6.
+
+**Tests** : 360 → 375, tous réussis. `src/components/gabarit.test.ts` (14) : en-tête (60 px, `.papier`, filet,
+petites capitales, seuil commun du menu et du bouton, lien rouge sans adresse en dur), menu du téléphone (style,
+bouton principal au pied de la feuille), pied en encre (rendu serveur : liens inchangés, aucun `text-encre` ni
+`border-trait`, contrastes ≥ 4,5:1, focus au papier), bouton collé (champs de saisie, feuille ouverte, attribut posé
+et retiré, accueil seul, « Voir le résultat » inchangé). `navigation.test.ts` : cinq entrées, pied exact, `depuis=entete`
+lu par `lireDepuis` et documenté au suivi. `accueil.test.ts` : `masquerSurSaisie` sur la page.
+
+**Vérification visuelle** : build local, `next start -p 3100`, Playwright + Edge à 360, 390, 768, 1 024, 1 280 et
+1 440 px sur l'accueil et `/comment-ca-marche` : en-tête 61 px (60 + filet), filet à l'encre, aucun débordement
+(scrollWidth = largeur), lien rouge 44 px de haut ; menu ouvert à 360 / 390 / 768 (7 liens, attribut posé puis retiré
+à la fermeture) ; focus clavier : contour 3 px à l'encre dans l'en-tête, au papier (#F4EDE2) sur le pied ; bouton
+collé de l'accueil : visible → masqué au focus d'un champ → revenu → masqué menu ouvert → revenu. Requêtes POST et
+API de simulation coupées. Captures hors dépôt (`scratchpad/m21/b5g/captures`).
+
+**Problèmes** : aucun. Le premier agent du lot s'est arrêté avant la vérification visuelle et le commit ;
+son travail était complet et juste, rien de perdu.

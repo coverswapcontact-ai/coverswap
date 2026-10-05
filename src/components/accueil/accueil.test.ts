@@ -88,7 +88,7 @@ describe("les neuf sections, dans l'ordre", () => {
     }
     assert.equal(lienSimulerCuisine(), "/simulateur?projet=cuisine");
     const page = lire("src/app/page.tsx");
-    assert.match(page, /<BoutonColle mobileSeulement cibles=\{CIBLES_BOUTON_COLLE\}>/);
+    assert.match(page, /<BoutonColle mobileSeulement masquerSurSaisie cibles=\{CIBLES_BOUTON_COLLE\}>/);
     assert.match(page, /lienSimulerCuisine\("accueil-colle"\)/);
     assert.deepEqual(CIBLES_BOUTON_COLLE, ["ouverture-simuler", "simulation", "etapes-simuler", "dernier-appel", "pied-de-page"]);
     assert.match(lire("src/components/PiedDePage.tsx"), /<footer id="pied-de-page"/);

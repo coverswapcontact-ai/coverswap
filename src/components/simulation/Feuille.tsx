@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "re
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { apresHistorique, entrerFeuille } from "./historique-feuilles";
+import { ATTRIBUT_FEUILLE_OUVERTE } from "./saisie";
 
 /**
  * Feuille plein écran pour le pouce (mission 15, partie 4 : extraite de
@@ -65,11 +66,16 @@ export function useLiensDeFeuille(ouverte: boolean, fermer: () => void) {
 let verrous = 0;
 let restaurer: (() => void) | null = null;
 
-/** Verrouille la page derrière un panneau (feuille, plein écran modal) ; chaque appel est rendu par `liberer()`. */
+/**
+ * Verrouille la page derrière un panneau (feuille, plein écran modal) ; chaque appel est rendu par `liberer()`.
+ * Tant qu'un panneau est ouvert, `<html>` porte `data-feuille-ouverte` (site 3.0, lot B5) : le bouton collé de
+ * l'accueil (`BoutonColle masquerSurSaisie`) s'efface pendant ce temps.
+ */
 export function verrouillerLaPage() {
   verrous++;
   if (verrous > 1) return;
   const html = document.documentElement;
+  html.setAttribute(ATTRIBUT_FEUILLE_OUVERTE, "");
   const body = document.body;
   const scrollY = window.scrollY;
   const barre = window.innerWidth - html.clientWidth;
@@ -82,6 +88,7 @@ export function verrouillerLaPage() {
   body.style.overflow = "hidden";
   if (barre > 0) body.style.paddingRight = `${barre}px`;
   restaurer = () => {
+    html.removeAttribute(ATTRIBUT_FEUILLE_OUVERTE);
     body.style.position = avant.position;
     body.style.top = avant.top;
     body.style.left = avant.left;

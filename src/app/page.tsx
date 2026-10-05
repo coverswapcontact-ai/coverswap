@@ -66,7 +66,7 @@ export default async function PageAccueil() {
       {sectionsAccueil().map((s) => (
         <Fragment key={s.id}>{sections[s.id]}</Fragment>
       ))}
-      <BoutonColle mobileSeulement cibles={CIBLES_BOUTON_COLLE}>
+      <BoutonColle mobileSeulement masquerSurSaisie cibles={CIBLES_BOUTON_COLLE}>
         <Lien href={lienSimulerCuisine("accueil-colle")} plein>
           Simuler ma cuisine
         </Lien>

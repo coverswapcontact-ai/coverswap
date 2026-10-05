@@ -15,7 +15,7 @@ Le CRM ne reçoit **aucune donnée personnelle** par ce canal : un identifiant d
 | Événement CRM | Quand |
 |---|---|
 | `PAGE_VUE` | chaque page (SuiviParcours), le simulateur avec `projet` |
-| `PIECE_CHOISIE` | une pièce choisie (simulateur ou module d'accueil, `depuis: accueil`) — une fois par parcours ; arrivé par un bouton « Simuler ma cuisine » de l'accueil, le simulateur y ajoute `depuis` lu dans `?depuis=` (`accueil-ouverture`, `accueil-colle`, `accueil-etapes`, `accueil-final` ; minuscules, chiffres et tirets seulement, `lireDepuis`) |
+| `PIECE_CHOISIE` | une pièce choisie (simulateur ou module d'accueil, `depuis: accueil`) — une fois par parcours ; arrivé par un bouton « Simuler ma cuisine » de l'accueil, le simulateur y ajoute `depuis` lu dans `?depuis=` (`accueil-ouverture`, `accueil-colle`, `accueil-etapes`, `accueil-final` ; minuscules, chiffres et tirets seulement, `lireDepuis`). Site 3.0, lot B5 : aussi `entete`, le lien rouge « Simuler ma pièce » de l'en-tête et le bouton du menu du téléphone (`/simulateur?depuis=entete`, `LIEN_SIMULER` de `lib/navigation.ts`) ; sans pièce dans l'adresse, la valeur part avec la pièce choisie à l'écran 1 |
 | `PHOTO_CHARGEE` | photo prête (poids, largeur) — une fois par parcours |
 | `GENERATION_LANCEE` | clic « Voir le résultat » — une fois par génération |
 | `RESULTAT_VU` | rendu affiché (durée, gardé côté CRM ou non) — une fois par génération |
