@@ -55,6 +55,31 @@ describe("sources → prep → manifeste", () => {
   });
 });
 
+describe("la série 2 (site 3.0, lot B4)", () => {
+  const entrees = JSON.parse(readFileSync(path.join(RACINE, "scripts", "bibliotheque", "serie-2.json"), "utf8")) as { nom: string; serie: string }[];
+  const photos = entrees.filter((e) => e.serie !== "pictos").map((e) => e.nom);
+
+  test("ses 62 photos sont des JPEG progressifs réencodés (jamais un PNG copié tel quel), de 400 Ko au plus", async () => {
+    const sources = new Map((await listerSources()).map((s) => [s.nom, s.fichier]));
+    assert.equal(photos.length, 62);
+    for (const nom of photos) {
+      const fichier = sources.get(nom);
+      assert.ok(fichier?.endsWith(`${nom}.jpg`), `${nom} : sources/${nom}.jpg attendu`);
+      const octets = readFileSync(fichier!);
+      assert.deepEqual([octets[0], octets[1]], [0xff, 0xd8], `${nom} : JPEG`);
+      assert.ok(octets.includes(Buffer.from([0xff, 0xc2])), `${nom} : JPEG progressif`);
+      assert.ok(octets.length <= 400 * 1024, `${nom} : ${Math.round(octets.length / 1024)} Ko`);
+    }
+  });
+
+  test("le manifeste : 22 images de la série 1 et 62 de la série 2, rien d'autre (ni originaux, ni essais ratés, ni planches)", () => {
+    const noms = Object.keys(MANIFESTE_IMAGES);
+    assert.equal(noms.length, 84);
+    assert.equal(noms.filter((n) => photos.includes(n)).length, 62);
+    assert.deepEqual(noms.filter((n) => /brut|retouche|rate|planche|essai|-\d$/.test(n)), []);
+  });
+});
+
 describe("les fonds Unsplash gardés", () => {
   const references = () => {
     const code = [...fichiers(path.join(RACINE, "src"), /\.(tsx?|json|mjs)$/), ...fichiers(path.join(RACINE, "scripts"), /\.(m?js|ts)$/)].map((f) => readFileSync(f, "utf8")).join("\n");

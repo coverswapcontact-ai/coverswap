@@ -1,0 +1,1834 @@
+[
+ {
+  "nom": "cuisine-bordeaux-brillante-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-bordeaux-brillante-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-bordeaux-brillante-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-bordeaux-brillante-apres-neutre-3.png",
+  "essai": 3,
+  "avant": "cuisine-bordeaux-brillante-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NE56",
+    "ref": "K6",
+    "nom": "Light Grey",
+    "deltaE": 13,
+    "deltaEAffichee": 5.4,
+    "mesure": "#BABEBF",
+    "statut": "reetiquetee"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 9.6,
+    "deltaEAffichee": 9.6,
+    "mesure": "#77675B",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-bordeaux-brillante-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-bordeaux-brillante-apres-couleur-3.png",
+  "essai": 3,
+  "avant": "cuisine-bordeaux-brillante-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NF13",
+    "ref": "NF13",
+    "nom": "Deep Green",
+    "deltaE": 3.5,
+    "deltaEAffichee": 3.5,
+    "mesure": "#233535",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 9.9,
+    "deltaEAffichee": 9.9,
+    "mesure": "#BBBAB1",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-blanche-jaunie-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-blanche-jaunie-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-blanche-jaunie-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-blanche-jaunie-apres-bois-2.png",
+  "essai": 2,
+  "avant": "cuisine-blanche-jaunie-avant",
+  "composition": {
+   "facades": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 5.8,
+    "deltaEAffichee": 5.8,
+    "mesure": "#C9C0AF",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "U50",
+    "ref": "U50",
+    "nom": "Nero Marquina",
+    "deltaE": 6.1,
+    "deltaEAffichee": 6.1,
+    "mesure": "#1F1915",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-blanche-jaunie-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-blanche-jaunie-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "cuisine-blanche-jaunie-avant",
+  "composition": {
+   "facades": {
+    "prevue": "M9",
+    "ref": "M9",
+    "nom": "Midnight Blue",
+    "deltaE": 6.6,
+    "deltaEAffichee": 6.6,
+    "mesure": "#40424A",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 2.2,
+    "deltaEAffichee": 2.2,
+    "mesure": "#684B33",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-kitchenette-studio-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-kitchenette-studio-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-kitchenette-studio-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-kitchenette-studio-apres-bois-1.png",
+  "essai": 1,
+  "avant": "cuisine-kitchenette-studio-avant",
+  "composition": {
+   "facades": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 2.9,
+    "deltaEAffichee": 2.9,
+    "mesure": "#DBCAB4",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NE31",
+    "ref": "NE31",
+    "nom": "Statuary White",
+    "deltaE": 8.8,
+    "deltaEAffichee": 8.8,
+    "mesure": "#D8CFC8",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-kitchenette-studio-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-kitchenette-studio-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "cuisine-kitchenette-studio-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NH21",
+    "ref": "NH21",
+    "nom": "Soft Green",
+    "deltaE": 7.2,
+    "deltaEAffichee": 7.2,
+    "mesure": "#BBB5A2",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 4.4,
+    "deltaEAffichee": 4.4,
+    "mesure": "#795C42",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-l-hetre-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-l-hetre-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-l-hetre-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-l-hetre-apres-bois-2.png",
+  "essai": 2,
+  "avant": "cuisine-l-hetre-avant",
+  "composition": {
+   "bas": {
+    "prevue": "RM23",
+    "ref": "RM23",
+    "nom": "Royal Blue",
+    "deltaE": 4.3,
+    "deltaEAffichee": 4.3,
+    "mesure": "#252E40",
+    "statut": "fidele"
+   },
+   "hauts": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 6,
+    "deltaEAffichee": 6,
+    "mesure": "#C9BDAA",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NE31",
+    "ref": "NE31",
+    "nom": "Statuary White",
+    "deltaE": 11.9,
+    "deltaEAffichee": 11.9,
+    "mesure": "#BEBFC3",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-l-hetre-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-l-hetre-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "cuisine-l-hetre-avant",
+  "composition": {
+   "bas": {
+    "prevue": "NE83",
+    "ref": "NE83",
+    "nom": "Jade Green",
+    "deltaE": 5.7,
+    "deltaEAffichee": 5.7,
+    "mesure": "#28362B",
+    "statut": "fidele"
+   },
+   "hauts": {
+    "prevue": "NE83",
+    "ref": "NE83",
+    "nom": "Jade Green",
+    "deltaE": 7.9,
+    "deltaEAffichee": 7.9,
+    "mesure": "#3C4E43",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NF99",
+    "ref": "NH38",
+    "nom": "Pietra di Cardoso Nero",
+    "deltaE": 13.4,
+    "deltaEAffichee": 1.6,
+    "mesure": "#7C766B",
+    "statut": "reetiquetee"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-u-pavillon-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-u-pavillon-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-u-pavillon-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-u-pavillon-apres-neutre-1.png",
+  "essai": 1,
+  "avant": "cuisine-u-pavillon-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NH26",
+    "ref": "NH26",
+    "nom": "Grayed Beige",
+    "deltaE": 9.7,
+    "deltaEAffichee": 9.7,
+    "mesure": "#BBB4B0",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NH47",
+    "ref": "NH47",
+    "nom": "Opal Beige",
+    "deltaE": 11.1,
+    "deltaEAffichee": 11.1,
+    "mesure": "#C7CED9",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-u-pavillon-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-u-pavillon-apres-bois-2.png",
+  "essai": 2,
+  "avant": "cuisine-u-pavillon-avant",
+  "composition": {
+   "facades": {
+    "prevue": "AA17",
+    "ref": "NF95",
+    "nom": "Bronzed Ash",
+    "deltaE": 12.8,
+    "deltaEAffichee": 2.5,
+    "mesure": "#887358",
+    "statut": "reetiquetee"
+   },
+   "plan": {
+    "prevue": "RM29",
+    "ref": "RM29",
+    "nom": "Onyx",
+    "deltaE": 9.2,
+    "deltaEAffichee": 9.2,
+    "mesure": "#50545B",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-couloir-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-couloir-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-couloir-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-couloir-apres-neutre-2.png",
+  "essai": 2,
+  "avant": "cuisine-couloir-avant",
+  "composition": {
+   "facades": {
+    "prevue": "RM02",
+    "ref": "RM02",
+    "nom": "Pearl Grey",
+    "deltaE": 11.8,
+    "deltaEAffichee": 11.8,
+    "mesure": "#A7A7A6",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 10.9,
+    "deltaEAffichee": 10.9,
+    "mesure": "#786A5F",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-couloir-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-couloir-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "cuisine-couloir-avant",
+  "composition": {
+   "facades": {
+    "prevue": "M6",
+    "ref": "M6",
+    "nom": "Steel Blue",
+    "deltaE": 4.3,
+    "deltaEAffichee": 4.3,
+    "mesure": "#6A7384",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 9.7,
+    "deltaEAffichee": 9.7,
+    "mesure": "#C2C0BB",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ouverte-bar-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ouverte-bar-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ouverte-bar-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ouverte-bar-apres-bois-3.png",
+  "essai": 3,
+  "avant": "cuisine-ouverte-bar-avant",
+  "composition": {
+   "facades": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 2.8,
+    "deltaEAffichee": 2.8,
+    "mesure": "#6B5542",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "U50",
+    "ref": "U50",
+    "nom": "Nero Marquina",
+    "deltaE": 9.8,
+    "deltaEAffichee": 9.8,
+    "mesure": "#2D2B27",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ouverte-bar-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ouverte-bar-apres-couleur-3.png",
+  "essai": 3,
+  "avant": "cuisine-ouverte-bar-avant",
+  "composition": {
+   "facades": {
+    "prevue": "RM19",
+    "ref": "RM19",
+    "nom": "Olive Green",
+    "deltaE": 10.2,
+    "deltaEAffichee": 10.2,
+    "mesure": "#898564",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "MK15",
+    "ref": "MK15",
+    "nom": "Raw Travertine",
+    "deltaE": 11.4,
+    "deltaEAffichee": 11.4,
+    "mesure": "#A19890",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-merisier-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-merisier-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-merisier-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-merisier-apres-neutre-1.png",
+  "essai": 1,
+  "avant": "cuisine-merisier-avant",
+  "composition": {
+   "facades": {
+    "prevue": "RM01",
+    "ref": "RM01",
+    "nom": "Linen White",
+    "deltaE": 9.1,
+    "deltaEAffichee": 9.1,
+    "mesure": "#D4C9BB",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA17",
+    "ref": "AA17",
+    "nom": "Beige Line Oak",
+    "deltaE": 3.9,
+    "deltaEAffichee": 3.9,
+    "mesure": "#A58B6E",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-merisier-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-merisier-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "cuisine-merisier-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NF02",
+    "ref": "NF02",
+    "nom": "Antique Rose",
+    "deltaE": 5.1,
+    "deltaEAffichee": 5.1,
+    "mesure": "#B18D80",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 6.7,
+    "deltaEAffichee": 6.7,
+    "mesure": "#7F6347",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-grise-brillante-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-grise-brillante-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-grise-brillante-apres-bois",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-grise-brillante-apres-bois-3.png",
+  "essai": 3,
+  "avant": "cuisine-grise-brillante-avant",
+  "composition": {
+   "facades": {
+    "prevue": "AL28",
+    "ref": "AL28",
+    "nom": "Bleach Oak",
+    "deltaE": 8.8,
+    "deltaEAffichee": 8.8,
+    "mesure": "#997F61",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NE71",
+    "ref": "NE71",
+    "nom": "Lombarda Nero",
+    "deltaE": 7.7,
+    "deltaEAffichee": 7.7,
+    "mesure": "#8B8584",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-grise-brillante-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-grise-brillante-apres-couleur-3.png",
+  "essai": 3,
+  "avant": "cuisine-grise-brillante-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NF14",
+    "ref": "NF14",
+    "nom": "Deep Blue",
+    "deltaE": 2.7,
+    "deltaEAffichee": 2.7,
+    "mesure": "#343746",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA17",
+    "ref": "AA17",
+    "nom": "Beige Line Oak",
+    "deltaE": 5.5,
+    "deltaEAffichee": 5.5,
+    "mesure": "#A5947E",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-maison-de-village-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-maison-de-village-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-maison-de-village-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-maison-de-village-apres-neutre-1.png",
+  "essai": 1,
+  "avant": "cuisine-maison-de-village-avant",
+  "composition": {
+   "facades": {
+    "prevue": "M10",
+    "ref": "M10",
+    "nom": "Oat Milk",
+    "deltaE": 5.1,
+    "deltaEAffichee": 5.1,
+    "mesure": "#DDCBB1",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "NE24",
+    "ref": "NE24",
+    "nom": "Raw Grey",
+    "deltaE": 6.8,
+    "deltaEAffichee": 6.8,
+    "mesure": "#958E88",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-maison-de-village-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-maison-de-village-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "cuisine-maison-de-village-avant",
+  "composition": {
+   "facades": {
+    "prevue": "RM21",
+    "ref": "RM21",
+    "nom": "Army Green",
+    "deltaE": 4.1,
+    "deltaEAffichee": 4.1,
+    "mesure": "#535843",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 3,
+    "deltaEAffichee": 3,
+    "mesure": "#66513F",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ilot-maison-avant",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ilot-maison-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ilot-maison-apres-neutre",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ilot-maison-apres-neutre-2.png",
+  "essai": 2,
+  "avant": "cuisine-ilot-maison-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NE56",
+    "ref": "NE56",
+    "nom": "Egg White",
+    "deltaE": 10.6,
+    "deltaEAffichee": 10.6,
+    "mesure": "#C3CBCD",
+    "statut": "fidele"
+   },
+   "ilot": {
+    "prevue": "K1",
+    "ref": "K1",
+    "nom": "Black Mat",
+    "deltaE": 2.3,
+    "deltaEAffichee": 2.3,
+    "mesure": "#272827",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 10.1,
+    "deltaEAffichee": 10.1,
+    "mesure": "#77695B",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "cuisine-ilot-maison-apres-couleur",
+  "serie": "quotidien",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "cuisine-ilot-maison-apres-couleur-5.png",
+  "essai": 5,
+  "avant": "cuisine-ilot-maison-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NH26",
+    "ref": "NH26",
+    "nom": "Grayed Beige",
+    "deltaE": 10.7,
+    "deltaEAffichee": 10.7,
+    "mesure": "#B5B1AB",
+    "statut": "fidele"
+   },
+   "ilot": {
+    "prevue": "NF13",
+    "ref": "NF13",
+    "nom": "Deep Green",
+    "deltaE": 4.4,
+    "deltaEAffichee": 4.4,
+    "mesure": "#202B28",
+    "statut": "fidele"
+   },
+   "plan": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 10,
+    "deltaEAffichee": 10,
+    "mesure": "#BAB6AC",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-petit-meuble-vasque-avant",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-petit-meuble-vasque-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-petit-meuble-vasque-apres-bois",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-petit-meuble-vasque-apres-bois-1.png",
+  "essai": 1,
+  "avant": "sdb-petit-meuble-vasque-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 4.7,
+    "deltaEAffichee": 4.7,
+    "mesure": "#675745",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-petit-meuble-vasque-apres-couleur",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-petit-meuble-vasque-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "sdb-petit-meuble-vasque-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "NE83",
+    "ref": "NE83",
+    "nom": "Jade Green",
+    "deltaE": 4.8,
+    "deltaEAffichee": 4.8,
+    "mesure": "#2E4236",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-double-vasque-wenge-avant",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-double-vasque-wenge-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-double-vasque-wenge-apres-neutre",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-double-vasque-wenge-apres-neutre-2.png",
+  "essai": 2,
+  "avant": "sdb-double-vasque-wenge-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "RM26",
+    "ref": "RM26",
+    "nom": "Creamy White",
+    "deltaE": 6.4,
+    "deltaEAffichee": 6.4,
+    "mesure": "#E0DAD0",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-double-vasque-wenge-apres-bois",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-double-vasque-wenge-apres-bois-1.png",
+  "essai": 1,
+  "avant": "sdb-double-vasque-wenge-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 8.7,
+    "deltaEAffichee": 8.7,
+    "mesure": "#BEB29D",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-baignoire-tablier-avant",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-baignoire-tablier-avant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-baignoire-tablier-apres-neutre",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-baignoire-tablier-apres-neutre-1.png",
+  "essai": 1,
+  "avant": "sdb-baignoire-tablier-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "NH22",
+    "ref": "NH22",
+    "nom": "Warm Gray",
+    "deltaE": 6.6,
+    "deltaEAffichee": 6.6,
+    "mesure": "#C8C0B3",
+    "statut": "fidele"
+   },
+   "tablier": {
+    "prevue": "NH22",
+    "ref": "NH22",
+    "nom": "Warm Gray",
+    "deltaE": 6.2,
+    "deltaEAffichee": 6.2,
+    "mesure": "#C8C1B6",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "sdb-baignoire-tablier-apres-couleur",
+  "serie": "quotidien",
+  "piece": "salle-de-bain",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "sdb-baignoire-tablier-apres-couleur-1.png",
+  "essai": 1,
+  "avant": "sdb-baignoire-tablier-avant",
+  "composition": {
+   "meuble": {
+    "prevue": "NF13",
+    "ref": "NF13",
+    "nom": "Deep Green",
+    "deltaE": 2.4,
+    "deltaEAffichee": 2.4,
+    "mesure": "#2B3B36",
+    "statut": "fidele"
+   },
+   "tablier": {
+    "prevue": "NF13",
+    "ref": "NF13",
+    "nom": "Deep Green",
+    "deltaE": 4.8,
+    "deltaEAffichee": 4.8,
+    "mesure": "#33423D",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "placard-coulissant-chambre-avant",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "placard-coulissant-chambre-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "placard-coulissant-chambre-apres-bois",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "placard-coulissant-chambre-apres-bois-1.png",
+  "essai": 1,
+  "avant": "placard-coulissant-chambre-avant",
+  "composition": {
+   "portes": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 4.3,
+    "deltaEAffichee": 4.3,
+    "mesure": "#775D45",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "placard-coulissant-chambre-apres-couleur",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "placard-coulissant-chambre-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "placard-coulissant-chambre-avant",
+  "composition": {
+   "portes": {
+    "prevue": "NH28",
+    "ref": "NH28",
+    "nom": "Dry Branch",
+    "deltaE": 2.3,
+    "deltaEAffichee": 2.3,
+    "mesure": "#A49788",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "portes-couloir-avant",
+  "serie": "quotidien",
+  "piece": "portes",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "portes-couloir-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "portes-couloir-apres-bois",
+  "serie": "quotidien",
+  "piece": "portes",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "portes-couloir-apres-bois-2.png",
+  "essai": 2,
+  "avant": "portes-couloir-avant",
+  "composition": {
+   "portes": {
+    "prevue": "D1",
+    "ref": "D1",
+    "nom": "Classic Walnut",
+    "deltaE": 5.1,
+    "deltaEAffichee": 5.1,
+    "mesure": "#5C4B3D",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "portes-couloir-apres-couleur",
+  "serie": "quotidien",
+  "piece": "portes",
+  "format": "1024x1536",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "portes-couloir-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "portes-couloir-avant",
+  "composition": {
+   "portes": {
+    "prevue": "NF04",
+    "ref": "NF04",
+    "nom": "Bordeaux Red",
+    "deltaE": 6.3,
+    "deltaEAffichee": 6.3,
+    "mesure": "#562528",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "buffet-salle-a-manger-avant",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "buffet-salle-a-manger-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "buffet-salle-a-manger-apres-neutre",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "buffet-salle-a-manger-apres-neutre-2.png",
+  "essai": 2,
+  "avant": "buffet-salle-a-manger-avant",
+  "composition": {
+   "facades": {
+    "prevue": "NH29",
+    "ref": "NH29",
+    "nom": "Bird Nest",
+    "deltaE": 5.1,
+    "deltaEAffichee": 5.1,
+    "mesure": "#766453",
+    "statut": "fidele"
+   },
+   "dessus": {
+    "prevue": "AA14",
+    "ref": "AA14",
+    "nom": "Original Oak",
+    "deltaE": 7.6,
+    "deltaEAffichee": 7.6,
+    "mesure": "#806550",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "buffet-salle-a-manger-apres-couleur",
+  "serie": "quotidien",
+  "piece": "meubles",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "buffet-salle-a-manger-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "buffet-salle-a-manger-avant",
+  "composition": {
+   "facades": {
+    "prevue": "RM16",
+    "ref": "RM16",
+    "nom": "Honey Mustard",
+    "deltaE": 8.7,
+    "deltaEAffichee": 8.7,
+    "mesure": "#DEB57D",
+    "statut": "fidele"
+   },
+   "dessus": {
+    "prevue": "AG13",
+    "ref": "AG13",
+    "nom": "Pale Oak",
+    "deltaE": 8.6,
+    "deltaEAffichee": 8.6,
+    "mesure": "#C9B6A4",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "pro-comptoir-accueil-avant",
+  "serie": "quotidien",
+  "piece": "pro",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "simulateur-exemple"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "pro-comptoir-accueil-avant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "pro-comptoir-accueil-apres-bois",
+  "serie": "quotidien",
+  "piece": "pro",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "pro-comptoir-accueil-apres-bois-2.png",
+  "essai": 2,
+  "avant": "pro-comptoir-accueil-avant",
+  "composition": {
+   "facade": {
+    "prevue": "D1",
+    "ref": "D1",
+    "nom": "Classic Walnut",
+    "deltaE": 0.7,
+    "deltaEAffichee": 0.7,
+    "mesure": "#634735",
+    "statut": "fidele"
+   },
+   "dessus": {
+    "prevue": "K1",
+    "ref": "K1",
+    "nom": "Black Mat",
+    "deltaE": 7.6,
+    "deltaEAffichee": 7.6,
+    "mesure": "#3B3938",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "pro-comptoir-accueil-apres-couleur",
+  "serie": "quotidien",
+  "piece": "pro",
+  "format": "1536x1024",
+  "usages": [
+   "avant-apres",
+   "inspirations"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "pro-comptoir-accueil-apres-couleur-2.png",
+  "essai": 2,
+  "avant": "pro-comptoir-accueil-avant",
+  "composition": {
+   "facade": {
+    "prevue": "RM20",
+    "ref": "RM20",
+    "nom": "Sage Green",
+    "deltaE": 4.9,
+    "deltaEAffichee": 4.9,
+    "mesure": "#5F655B",
+    "statut": "fidele"
+   },
+   "dessus": {
+    "prevue": "NE31",
+    "ref": "NE31",
+    "nom": "Statuary White",
+    "deltaE": 11.7,
+    "deltaEAffichee": 11.7,
+    "mesure": "#BEC4CE",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "detail-chant",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "detail-chant-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": {
+   "facades": {
+    "prevue": "RM20",
+    "ref": "RM20",
+    "nom": "Sage Green",
+    "deltaE": 6.7,
+    "deltaEAffichee": 6.7,
+    "mesure": "#656E69",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "pose-mains",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "pose-mains-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": {
+   "facades": {
+    "prevue": "AG13",
+    "ref": "AF02",
+    "nom": "Beige Pine",
+    "deltaE": 13.7,
+    "deltaEAffichee": 1.7,
+    "mesure": "#C4A484",
+    "statut": "reetiquetee"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "echantillons-table",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "echantillons-table-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "mesure-visite",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "mesure-visite-3.png",
+  "essai": 3,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "usure-detail",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "usure-detail-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "outils-pose",
+  "serie": "enrichissement",
+  "piece": null,
+  "format": "1536x1024",
+  "usages": [
+   "comment-ca-marche",
+   "pages",
+   "blog"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "outils-pose-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "amb-cuisine-familiale",
+  "serie": "ambiances",
+  "piece": "cuisine",
+  "format": "1536x1024",
+  "usages": [
+   "inspirations",
+   "pages"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "amb-cuisine-familiale-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": {
+   "bas": {
+    "prevue": "M9",
+    "ref": "M9",
+    "nom": "Midnight Blue",
+    "deltaE": 6,
+    "deltaEAffichee": 6,
+    "mesure": "#3A404A",
+    "statut": "fidele"
+   },
+   "hauts": {
+    "prevue": "AG13",
+    "ref": "AL26",
+    "nom": "Beige Brown Ash",
+    "deltaE": 13,
+    "deltaEAffichee": 1.4,
+    "mesure": "#D8AE82",
+    "statut": "reetiquetee"
+   },
+   "plan": {
+    "prevue": "NE31",
+    "ref": "NE31",
+    "nom": "Statuary White",
+    "deltaE": 5.6,
+    "deltaEAffichee": 5.6,
+    "mesure": "#E0DBDE",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "amb-couloir-portes",
+  "serie": "ambiances",
+  "piece": "portes",
+  "format": "1024x1536",
+  "usages": [
+   "inspirations",
+   "pages"
+  ],
+  "etiquette": "Ambiance",
+  "fichier": "amb-couloir-portes-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": {
+   "portes": {
+    "prevue": "NF13",
+    "ref": "NF13",
+    "nom": "Deep Green",
+    "deltaE": 8.4,
+    "deltaEAffichee": 8.4,
+    "mesure": "#3E4B48",
+    "statut": "fidele"
+   }
+  },
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-porte-interieure",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-porte-interieure-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-placard-coulissant",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-placard-coulissant-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-plan-de-travail",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-plan-de-travail-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-commode",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-commode-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-meuble-vasque",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-meuble-vasque-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-porte-entree",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-porte-entree-1.png",
+  "essai": 1,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-refrigerateur",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-refrigerateur-2.png",
+  "essai": 2,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ },
+ {
+  "nom": "picto-plan-parallele",
+  "serie": "pictos",
+  "piece": null,
+  "format": "1024x1024",
+  "usages": [
+   "simulateur",
+   "choix-projet"
+  ],
+  "etiquette": null,
+  "fichier": "picto-plan-parallele-4.png",
+  "essai": 4,
+  "avant": null,
+  "composition": null,
+  "statut": "retenue"
+ }
+]

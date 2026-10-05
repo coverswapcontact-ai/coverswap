@@ -181,7 +181,21 @@ export function MursDeFace({ className }: { className?: string }) {
  */
 export const DOSSIER_PICTOS = "/images/pictos";
 export const PICTOS_FAMILLES: Record<string, string> = { CUISINE: "picto-cuisine", SDB: "picto-salle-de-bain", MEUBLES: "picto-mobilier", PRO: "picto-pro", MURS: "picto-murs" };
-export type FormeCuisine = "une-rangee" | "en-l" | "en-u" | "ilot";
+/**
+ * Les pictos d'un élément précis (série 2, lot B4), même style que ceux des familles : porte, placard, plan de travail,
+ * commode, meuble vasque, porte d'entrée, réfrigérateur. Décoratifs, comme les autres.
+ */
+export const PICTOS_ELEMENTS = {
+  "porte-interieure": "picto-porte-interieure",
+  "placard-coulissant": "picto-placard-coulissant",
+  "plan-de-travail": "picto-plan-de-travail",
+  commode: "picto-commode",
+  "meuble-vasque": "picto-meuble-vasque",
+  "porte-entree": "picto-porte-entree",
+  refrigerateur: "picto-refrigerateur",
+} as const;
+/** Les formes de cuisine ; `parallele` (cuisine couloir, `plan-parallele`) ne s'affiche que si le CRM publie ce format. */
+export type FormeCuisine = "une-rangee" | "en-l" | "en-u" | "ilot" | "parallele";
 
 /**
  * Un pictogramme : `<picture>` AVIF puis WebP (128 px, 256 px en haute densité), décoratif (le texte voisin le nomme).
@@ -210,7 +224,7 @@ export function DessinFamille({ famille, className, enSvg }: { famille: string; 
   return <Picto nom={PICTOS_FAMILLES[famille] ?? PICTOS_FAMILLES.CUISINE} className={className} enSvg={enSvg} />;
 }
 
-/** Les plans de cuisine (pour estimer la longueur de meubles) : une rangée, en L, en U, avec îlot. */
+/** Les plans de cuisine (pour estimer la longueur de meubles) : une rangée, en L, en U, avec îlot, en couloir. */
 export function PlanCuisine({ forme, className, enSvg }: { forme: FormeCuisine; className?: string; enSvg?: boolean }) {
   return <Picto nom={`plan-${forme}`} className={className} enSvg={enSvg} />;
 }

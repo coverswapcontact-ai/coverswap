@@ -109,6 +109,16 @@ describe("le manifeste généré", () => {
     assert.deepEqual(noms, [...noms].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0)));
   });
 
+  test("série 2 (lot B4) : 1536 × 1024 ou 1024 × 1536, plafonnées à l'origine (jamais de 1600), chacune avec sa source servie", () => {
+    const serie2 = (JSON.parse(readFileSync(path.join(process.cwd(), "scripts", "bibliotheque", "serie-2.json"), "utf8")) as { nom: string; serie: string }[]).filter((e) => e.serie !== "pictos");
+    for (const { nom } of serie2) {
+      const e = MANIFESTE_IMAGES[nom];
+      assert.ok(e, nom);
+      assert.deepEqual(e.largeurs, e.largeur > e.hauteur ? [480, 960, 1536] : [480, 960, 1024], nom);
+      assert.ok(sourcesPhoto(nom)?.src.includes(`?v=${e.empreinte}`), nom);
+    }
+  });
+
   test("l'empreinte de l'original : écrite après les largeurs, relue telle quelle ; une entrée sans empreinte n'en a pas", () => {
     const texte = texteManifeste({ "alpha-essai": { largeur: 700, hauteur: 500, largeurs: [480, 700], empreinte: "0123456789ab" }, "zeta-essai": { largeur: 300, hauteur: 200, largeurs: [300] } });
     assert.match(texte, /"alpha-essai": \{ largeur: 700, hauteur: 500, largeurs: \[480, 700\], empreinte: "0123456789ab" \},/);

@@ -287,3 +287,82 @@ propres. `perf.test.ts` : les 5 composants dans la liste serveur. Lint et build 
 **Problèmes** : les captures pleine page à 1 440 px laissent toujours blanches les sections en `content-visibility`
 de l'accueil (connu depuis B0) ; les vignettes et échantillons viennent du CRM de production (GET seulement, comme
 en B0) ; le cartel d'une matière blanche (NE31) a un filet très pâle, gardé lisible par le liseré.
+
+## B4 — la bibliothèque série 2 (05/10/2026)
+
+**Fait** (aucune image régénérée, aucun appel d'API : tout vient des images déjà retenues)
+- `scripts/bibliotheque/` (commité, aucun chemin personnel) : `serie-2.json` (les 70 lignes de `bibliotheque.json`,
+  `fichier` réduit au nom, sans `essais`, `avant` ramené au nom de la ligne avant, « Illustration » devenue
+  « Ambiance », pictos sans étiquette), `zones-serie-2.json` (copie de celle du CRM), `reglages.json` (titres,
+  scènes, libellés, zones, ancres et étiquettes réglés à la main, nom de picto).
+- `scripts/bibliotheque.mjs` / `npm run bibliotheque` : réencode les 62 photos en `public/images/sources/<nom>.jpg`
+  (mozjpeg 88, progressif, 4:2:0), rogne les 8 pictos à leur dessin et les centre sur 512 px transparents (456 px de
+  dessin, la marge de la série 1), écrit `src/data/ambiances-serie-2.ts` (FICHIER GÉNÉRÉ), puis lance
+  `preparerImages()` et `npm run pictos`. Relançable : même contenu (sha1) = sauté, contenu différent = arrêt ; sans
+  le dossier de la série (`--dossier`, par défaut `~/coverswap-photos/serie-2`), les images déjà importées suffisent.
+  `--depuis <bibliotheque.json> --zones <…>` refait les entrées ; `--planche [dossier]` écrit les planches de
+  contrôle des étiquettes hors dépôt (étiquettes à leur taille réelle sur une carte de 720 px, pastilles d'honnêteté
+  dessinées). Un réglage qui manque, une zone inconnue ou deux zones qui s'excluent : sortie 1, chaque problème nommé.
+- `src/data/ambiances.ts` reste la seule liste lue par le site : `AMBIANCES = [...série 1, ...série 2]`, plus
+  `PAIRES_SERIE_2` (18 avants, chacun avec son `ratio`, sa scène, « Ambiance · avant / après » et ses 2 après) et
+  `PHOTOS_UTILES` (6, « Ambiance », texte alternatif écrit). Types `PaireAmbiance` et `PhotoUtile`.
+- `Illustrations.tsx` : `PICTOS_ELEMENTS` (7 éléments), `FormeCuisine` gagne `parallele` (picto `plan-parallele`, pas
+  encore proposé par l'estimation : E2, quand le CRM publie ce format).
+- `/inspirations` : `relative` sur la rangée de filtres qui défile. Les radios `sr-only` (en absolu) s'échappaient de
+  la rangée et élargissaient la page à 1 061 px à 360 px de large (défaut d'avant, révélé par les 9 teintes qui
+  remplissent maintenant la rangée) ; testé.
+
+**Intégré** (70 sur 70)
+- 18 avants (cuisine 11, salle de bain 3, meubles 3 dont les portes du couloir, pro 1) : `sources/` + `PAIRES_SERIE_2`,
+  jamais en inspiration seuls.
+- 36 après : ambiances `inspiration: true`, `avant` = leur avant (curseur prêt).
+- 2 ambiances (`amb-cuisine-familiale`, `amb-couloir-portes`) : inspiration.
+- 6 photos utiles : `sources/` + `PHOTOS_UTILES` ; `detail-chant` (RM20) et `pose-mains` (AF02<AG13) sont aussi des
+  ambiances `inspiration: false` (AF02 garde ainsi sa photo).
+- 8 pictos : `pictos/sources/` + 128 / 256 px AVIF / WebP ; `picto-plan-parallele` renommé `plan-parallele`.
+
+**Pas intégré, volontairement** : `originaux/` (28, les bruts d'avant la retouche du 03/10), `essais-rates/` (2),
+`planches/` (39 planches de contrôle), et tous les essais non retenus de `quotidien/`, `enrichissement/`,
+`ambiances/`, `pictos/` : seul le `fichier` de chaque ligne retenue est lu. Aucun écran ne montre encore les paires,
+les photos utiles ni les 7 nouveaux pictos : B6 (accueil), C (pages) et E2 / E3 (simulateur) les branchent.
+
+**Poids ajouté au dépôt** : ≈ 38,6 Mo (sources 10,5 Mo pour 62 JPEG de 93 à 244 Ko, prep 26,1 Mo pour 558 fichiers,
+pictos 2,0 Mo pour 8 sources et 32 sorties). Manifeste : 22 → 84 images.
+
+**Décisions prises seul**
+1. Les données de la série 2 sont générées dans `ambiances-serie-2.ts` et réunies dans `ambiances.ts` (le plan),
+   plutôt que réécrire `ambiances.ts` à la main : `ambiances.ts` reste la source unique que lit le site.
+2. Ordre = celui de la bibliothèque (la bordeaux en premier), pas l'ordre alphabétique : stable, et c'est l'ordre de la
+   direction artistique. « Vue dans » : RM20 gagne `pro-comptoir-accueil-apres-couleur`, D1 `portes-couloir-apres-bois`
+   et `pro-comptoir-accueil-apres-bois`.
+3. `ratio` des paires tiré du format de la bibliothèque (pas un réglage de plus) ; libellés de surface par défaut par
+   clé (« façades », « plan de travail »…), réglés seulement quand il le faut.
+4. `ilot-maison` : `facades` → `meubles-hauts`, `ilot` → `meubles-bas` (le plan) ; l'ancre des façades est prise sur
+   la 2ᵉ zone de mesure (meubles hauts), pas la 1ʳᵉ (meuble bas du pourtour), pour que le point soit sur la zone
+   nommée. Sans ce réglage, le script refuse (`facades-cuisine` exclut `meubles-bas`).
+5. Placement automatique des étiquettes, au-delà du « bord le plus proche » du plan : hors des pastilles d'honnêteté
+   (« Avant », « Après », « Ambiance · avant / après », « Ambiance »), dans l'image, sans chevauchement (un cran de 7 %
+   vers le centre sinon). Revue sur les 10 planches : 5 réglages à la main (plan des 2 cuisines de village sur la
+   crédence, portes du couloir posées sur le sol, plan de la cuisine familiale au-dessus du plan, ancre de l'îlot).
+6. Les pièces `portes` vont en `meubles` (zone `portes-dressing`) ; `pro` en `professionnel` ; les photos utiles à
+   composition en `cuisine` (zone `facades-cuisine`).
+7. Titres et scènes écrits d'après les planches, au ton du site, les teintes en français (« vert profond », « chêne
+   pâle »), sans nom de référence dans le titre.
+
+**Tests** : 341 → 360, tous réussis. `src/lib/bibliotheque.test.ts` (14, depuis les seules entrées commitées) : 70
+lignes et leurs rôles, aucun chemin personnel ni « Illustration », 2 après par avant, 62 au manifeste + 8 pictos
+(512 × 512 avec alpha, 4 sorties), le fichier généré égal à la sortie du script (fins de ligne normalisées), comptes et
+ordre, aucune zone exclusive (table d'exclusions comparée à `ZONES_REPLI`), zones de la table au simulateur, ancres et
+étiquettes hors des pastilles ; fonctions pures (entrées, ancre, placement, refus d'un réglage manquant ou de zones
+exclusives, écriture sans écraser). `ambiances.test.ts` : 14 → 52 inspirations (ni avant, ni photo utile), « Vue
+dans » RM20 / D1, les 5 `prevue` de la série 2, paires et photos utiles, pictos étendus aux 8 nouveaux, rangée de
+filtres `relative`. `images-depot.test.ts` +2 (62 JPEG progressifs ≤ 400 Ko, 84 au manifeste, aucun brut / essai /
+planche). `images-manifeste.test.ts` +1 (largeurs 1536 / 1024 plafonnées, source servie avec son empreinte).
+
+**Vérification visuelle** : planches de contrôle (hors dépôt, `scratchpad/m21/b4/planches`) ; build local, `next start
+-p 3100`, captures Edge 390 et 1 440 px de `/inspirations`, de l'accueil, de `/matieres?ref=D1` et de `/pro` ; aucun
+débordement à 360 px après la correction de la rangée de filtres ; 0 requête coupée.
+
+**Problèmes** : `/inspirations` passe à 52 cartes (18 800 px de haut à 1 440 px) : la page sera repensée en C4. Les
+vignettes du CRM ne s'affichent pas sur le build local (adresse du CRM absente en local, comme en B3). Le picto
+`plan-parallele` attend que le CRM publie le format couloir.

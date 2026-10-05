@@ -23,7 +23,8 @@ function Groupe({ nom, libelle, choix }: { nom: "piece" | "teinte"; libelle: str
   return (
     <fieldset className="min-w-0">
       <legend className="sr-only">{libelle}</legend>
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* `relative` : les boutons radio (`sr-only`, en absolu) restent dans la rangée qui défile, sans élargir la page. */}
+      <div className="relative flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {[{ id: "", libelle: "Tout", nombre: -1 }, ...choix].map((c) => (
           <label key={c.id || "tout"} className={PASTILLE}>
             <input type="radio" name={nom} value={c.id} defaultChecked={c.id === ""} className="sr-only" />
