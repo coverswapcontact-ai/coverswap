@@ -25,7 +25,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - C1, `/prestations/[slug]` : fait (cas, vedettes, prix du CRM, villes, teinte ; `docs/DESIGN.md` « Les pages de prestation »).
 - C2, `/pro` : fait (réalisations PRO d'abord, comptoir en ouverture, lieux de la série 1, teinte K1 + D1, formulaire inchangé).
 - C5, `/realisations` : fait (les vraies d'abord, puis « Avant / après en ambiance », quatre paires).
-- C0, C3, C4, C6, C7 : à venir.
+- C3, `/comment-ca-marche` : fait (étapes de l'accueil, déroulé et délais, en place, entretien, « Quand rénover ? », blocs aux filets).
+- C0, C4, C6, C7 : à venir.
 
 ## Phase D : le catalogue des matières
 
@@ -669,3 +670,61 @@ d'`offre.ts`, jamais une ville — passe dans les tests de `/realisations`).
 
 **Vérification visuelle** : même build, 360 × 660 à 1 440 × 900 : aucun débordement, 0 image cassée, 4 curseurs, un
 seul principal. Captures hors dépôt dans `scratchpad/m21/c2c5/captures`.
+
+## C3 — `/comment-ca-marche` (06/10/2026)
+
+**Fait** (aucune image régénérée, aucun envoi ; `docs/DESIGN.md` « La page Comment ça marche » et « Les blocs aux
+filets », captures `docs/captures/site-3-0/comment-ca-marche-390.jpg` et `comment-ca-marche-1440.jpg`)
+- `page.tsx` réécrit, dans l'ordre : titre ; **`CommentOnTravaille`** de l'accueil (ancre `#comment-ca-marche` gardée,
+  titre « De la photo à la pose », la ligne « Pas de démontage… » en `note`, preuve `detail-chant` et garanties,
+  principal) ; **le déroulé et ses délais** (`#deroule`, six moments : tout de suite, sous 48 h, sur rendez-vous, à la
+  commande, le jour de la pose, le soir même ; `mesure-visite` et `outils-pose`) ; **ce qui reste en place** et ce que
+  vous préparez (`#en-place`) ; **l'entretien** (`#entretien`, quatre gestes, le guide) ; bande de chêne AG13 ; le
+  prix (`#prix`, tableau entre filets) ; « Vos questions » (`#objections`, `#faq`, un seul `FAQPage`) ; l'encart
+  **« Quand rénover ? »** (`#quand-renover`, `usure-detail`) ; le devis en ligne (`#devis`) ; les guides (`#guides`) ;
+  le **dernier appel en encre** (`#dernier-appel` : « Simuler ma pièce », « Être rappelé » `depuis=comment-ca-marche`).
+- Les huit photos : 4 étapes (`etape-photo` « Ambiance », `etape-simulation` « Simulation », `echantillons-table`,
+  `pose-mains`), `detail-chant`, `mesure-visite`, `outils-pose`, `usure-detail` — chacune une fois, les six photos
+  utiles en « Ambiance » ; celles du déroulé et de l'encart décrites par le texte alternatif de la bibliothèque.
+- Textes (`contenu.ts` : `DEROULE`, `RESTE_EN_PLACE`, `A_PREPARER`, `ENTRETIEN`, `QUAND_RENOVER_*`) tirés des guides
+  « Comment se passe une pose » et « Entretenir un revêtement adhésif » et des chiffres d'`offre.ts`.
+- `CommentOnTravaille` : `id`, `intro` (`null` : sans la phrase sur le covering, que la FAQ de la page dit déjà),
+  `note`, `enTete` (section non différée, photo de la première étape prioritaire : c'est le LCP de la page), `depuis`
+  accepte `comment-ca-marche`. L'accueil inchangé.
+- **Cartes blanches harmonisées** (signalé par C1 / C2) : `BlocsPrestation` (surfaces, atouts, étapes, questions) passe
+  aux filets à la teinte de la page (`.filet`), sans fond ni cadre ; étapes à grand numéro ; questions repliées entre
+  filets, comme l'accueil. Vaut pour les prestations, `/pro` (« En détail ») et `/comment-ca-marche`.
+- Retirés : `components/accueil/CommentCaMarche.tsx` (les trois étapes d'avant) et `lienSimulerCuisine`. `docs/SUIVI.md` :
+  valeur `comment-ca-marche` (PIECE_CHOISIE, RAPPEL_DEMANDE, CONTACT_ENVOYE), page décrite à neuf.
+
+**Décisions prises seul**
+1. « Simuler ma pièce » (`/simulateur?depuis=comment-ca-marche`) remplace « Simuler ma cuisine » (`projet=cuisine`) :
+   la page parle de toutes les pièces, comme l'accueil ; « Estimer sur ma photo » prend la même adresse.
+2. Deux principaux (sous les étapes, au dernier appel), comme le plan ; pas de bouton dans le titre (la page se lit).
+   Au téléphone, le premier arrive vers 3 150 px — à revoir avec les retouches si Lucas le veut plus haut.
+3. Les six moments du déroulé suivent le guide de la pose (photo, devis, visite, commande, pose, vérification) ; aucun
+   délai hors d'`offre.ts` : le temps entre la commande et la pose n'est pas promis (« on fixe la date avec vous »).
+4. « Ce qui reste en place » s'en tient à ce que le site dit déjà (rien démonté, poignées et charnières en place, plan
+   habillé sans dépose, carrelage recouvert) ; « Quand rénover ? » dit aussi quand le film ne suffit pas (panneau
+   gonflé), honnêtement.
+5. L'objection « Comment l'entretenir ? » reste (FAQ balisée), la section « L'entretien » détaille sans répéter sa
+   réponse mot pour mot.
+6. Une bande de matière (chêne AG13) entre l'entretien et le prix, pour couper la page.
+
+**Tests** : 398 → 401, tous réussis. `autres-pages.test.ts` « /comment-ca-marche » : le test d'ordre réécrit (les six
+ancres d'avant dans le même ordre, plus `deroule`, `en-place`, `entretien`, `quand-renover`, `dernier-appel` ; deux
+principaux « Simuler ma pièce » `depuis=comment-ca-marche` au lieu de « Simuler ma cuisine » ; `<picture` 3 → 8,
+chaque image une fois) ; « Estimer sur ma photo » à la nouvelle adresse ; + 3 tests : étiquettes (7 « Ambiance », 1
+« Simulation », jamais « Réalisation », photos dans leur section, textes alternatifs, une seule image prioritaire,
+étapes non différées), délais d'`offre.ts` seulement / en place / entretien / encart / dernier appel en encre, filets
+au lieu des cartes (page et `BlocsPrestation`, grand numéro, `CommentCaMarche` retiré). `accueil.test.ts` : l'assertion
+sur `lienSimulerCuisine` remplacée par celle de `depuis=comment-ca-marche`. `tunnel.test.ts` inchangé (passe).
+
+**Vérification visuelle** : build local comme la CI, `next start -p 3100` (arrêté ensuite), Playwright + Edge à
+360 × 660, 390 × 660 / 844, 1 024 et 1 440 px, sections différées forcées : aucun débordement, 0 image cassée, 0 requête
+coupée (rien envoyé), 2 principaux, LCP = la photo de la première étape (188 à 312 ms ; 564 ms à 360 px). Blocs
+restylés regardés sur `/prestations/cuisine` et `/pro`. Corrigé après la première capture : les guides alignés sur les
+autres sections (`large`), la première photo des étapes prioritaire.
+
+**Problèmes** : la page est longue au téléphone (13 800 px : c'est la page qu'on lit). Restent en cartes blanches
+(hors de ce lot) : formulaires, avis, cartes de réalisation, pages zones / CGV / blog.

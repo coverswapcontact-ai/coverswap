@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, test } from "node:test";
 import { createElement } from "react";
@@ -7,13 +7,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { IMAGE_OUVERTURE, LEGENDE_OUVERTURE } from "@/components/accueil/etudes";
 import ContenuPrestation, { vueDeLaPrestation } from "@/components/ContenuPrestation";
 import { classesBouton, type VarianteBouton } from "@/components/simulation/Bouton";
-import { PAIRES_SERIE_2 } from "@/data/ambiances";
+import { PAIRES_SERIE_2, PHOTOS_UTILES } from "@/data/ambiances";
 import { CAS_PRESTATIONS, casDeLaPrestation } from "@/data/cas-prestations";
 import { articles } from "@/data/blog-articles";
 import { FAQ_EAU_CHALEUR, FAQ_GARANTIE, FAQ_GENERALE, FAQ_RETRAIT } from "@/data/faq";
 import { PRESTATIONS, getPrestation, lienPiece } from "@/data/prestations";
 import { ZONES, getZoneSlug } from "@/data/zones";
-import { ACOMPTE_POURCENT, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, euros, fourchette } from "@/lib/offre";
+import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE_COURT, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, euros, fourchette } from "@/lib/offre";
 import { ambianceDeLImage } from "@/lib/ambiances";
 import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import type { Publication } from "@/lib/publications";
@@ -21,13 +21,15 @@ import { lireDepuis } from "@/lib/simulateur/entonnoir";
 import { lireComposition, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
 import type { TarifsSite } from "@/lib/tarifs-site";
 import { teintePrestation } from "@/lib/teintes-prestations";
-import { FAQ_RESTANTE, INTRO_GUIDES, OBJECTIONS } from "./comment-ca-marche/contenu";
+import { A_PREPARER, DEROULE, ENTRETIEN, FAQ_RESTANTE, GUIDE_ENTRETIEN, INTRO_GUIDES, OBJECTIONS, QUAND_RENOVER_NON, QUAND_RENOVER_OUI, RESTE_EN_PLACE, SIGNES_RENOVER } from "./comment-ca-marche/contenu";
+import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE } from "./comment-ca-marche/devis-en-ligne";
 
 /**
  * Mission 16 (partie 5) — les autres pages rendues : /realisations (réalisations publiées, sinon études simulées
  * étiquetées ; les cinq pièces → pages par pièce), les pages par pièce (site 3.0, lot C1 : titre court, ouverture
  * avant / après — la réalisation de la pièce d'abord —, cas d'ambiance, vedettes, prix du CRM, villes, teinte, bouton
- * de la pièce, balisage), /comment-ca-marche (procédé, prix, objections, guides), les pages locales (plus de
+ * de la pièce, balisage), /comment-ca-marche (procédé, déroulé et délais, ce qui reste en place, entretien, prix,
+ * objections, « Quand rénover ? », guides ; lot C3), les pages locales (plus de
  * `LocalBusiness` par ville). Le CRM est simulé (`fetch` remplacé) : aucune requête réseau.
  */
 
@@ -405,15 +407,75 @@ describe("/comment-ca-marche", () => {
     return texteHtml(renderToStaticMarkup(createElement(Page)));
   };
 
-  test("procédé, prix, objections, FAQ, devis, guides : dans cet ordre ; « Simuler ma cuisine » en principal", async () => {
+  test("procédé, déroulé, prix, objections, FAQ, quand rénover, devis, guides : dans cet ordre, ancres d'avant gardées ; une seule action principale", async () => {
     const html = await rendre();
-    const ordre = ["comment-ca-marche", "prix", "objections", "faq", "devis", "guides"].map((id) => html.indexOf(`id="${id}"`));
+    // Site 3.0 (lot C3) : les ancres d'avant (comment-ca-marche, prix, objections, faq, devis, guides) restent, dans le
+    // même ordre ; le déroulé, ce qui reste en place, l'entretien, « Quand rénover ? » et le dernier appel s'y glissent.
+    const ordre = ["comment-ca-marche", "deroule", "en-place", "entretien", "prix", "objections", "faq", "quand-renover", "devis", "guides", "dernier-appel"].map((id) => html.indexOf(`id="${id}"`));
     assert.ok(ordre.every((i) => i > 0), JSON.stringify(ordre));
     assert.deepEqual([...ordre].sort((a, b) => a - b), ordre);
     assert.equal(compter(html, "<h1"), 1);
+    // Une seule action, deux fois (sous les étapes, au dernier appel) : « Simuler ma pièce », qui dit d'où elle vient
+    // (avant le lot C3 : « Simuler ma cuisine », /simulateur?projet=cuisine).
     const principaux = boutons(html, "principal");
-    assert.ok(principaux.length === 2 && principaux.every(([href, libelle]) => href === "/simulateur?projet=cuisine" && libelle === "Simuler ma cuisine"), JSON.stringify(principaux));
-    assert.equal(compter(html, "<picture"), 3, "trois étapes avec image");
+    assert.ok(principaux.length === 2 && principaux.every(([href, libelle]) => href === "/simulateur?depuis=comment-ca-marche" && libelle === "Simuler ma pièce"), JSON.stringify(principaux));
+    assert.equal(lireDepuis(new URLSearchParams(principaux[0][0].split("?")[1]).get("depuis")), "comment-ca-marche");
+    assert.ok(html.indexOf(principaux[0][0]) < html.indexOf('id="deroule"'), "le premier principal sous les étapes");
+    // Les huit photos (3 avant le lot C3) : les quatre étapes, la preuve de finition, les deux du déroulé, l'encart.
+    assert.equal(compter(html, "<picture"), 8);
+    const photos = [...html.matchAll(/<picture>[\s\S]*?<\/picture>/g)].map((m) => m[0]);
+    for (const nom of ["etape-photo", "etape-simulation", "echantillons-table", "pose-mains", "detail-chant", "mesure-visite", "outils-pose", "usure-detail"]) assert.equal(photos.filter((p) => p.includes(`/images/prep/${nom}-`)).length, 1, `${nom} : une fois`);
+  });
+
+  test("les six photos utiles, chacune une fois et étiquetée « Ambiance » ; la capture du simulateur seule en « Simulation » ; jamais « Réalisation »", async () => {
+    const html = await rendre();
+    assert.equal(compter(html, ">Ambiance</span>"), 7, "étape 1 et les six photos utiles");
+    assert.equal(compter(html, ">Simulation</span>"), 1);
+    assert.ok(!html.includes(">Réalisation<"));
+    const photos = [...html.matchAll(/<picture>[\s\S]*?<\/picture>/g)].map((m) => m[0]);
+    // Le déroulé : mesure-visite à la visite, outils-pose au jour de la pose ; usure-detail dans « Quand rénover ? ».
+    const section = (id: string) => html.slice(html.indexOf(`id="${id}"`), html.indexOf("</section>", html.indexOf(`id="${id}"`)));
+    assert.ok(section("deroule").includes("/images/prep/mesure-visite-") && section("deroule").includes("/images/prep/outils-pose-"));
+    assert.ok(section("quand-renover").includes("/images/prep/usure-detail-"));
+    for (const nom of ["detail-chant", "echantillons-table", "pose-mains"]) assert.ok(section("comment-ca-marche").includes(`/images/prep/${nom}-`), nom);
+    // Les photos du déroulé et de l'encart sont décrites (texte alternatif de la bibliothèque) : leur étiquette est lue.
+    for (const p of PHOTOS_UTILES.filter((x) => ["mesure-visite", "outils-pose", "usure-detail"].includes(x.image))) assert.ok(html.includes(`alt="${p.alt}"`), p.image);
+    // Pas d'image d'ouverture : la première photo des étapes est au premier écran, c'est le LCP — la seule prioritaire,
+    // et la section des étapes n'est pas différée.
+    assert.equal(compter(html, 'fetchPriority="high"'), 1);
+    assert.ok(photos.find((p) => p.includes('fetchPriority="high"'))!.includes("/images/prep/etape-photo-"));
+    assert.doesNotMatch(html.slice(html.lastIndexOf("<section", html.indexOf('id="comment-ca-marche"') + 20), html.indexOf('id="comment-ca-marche"') + 200), /sous-la-ligne/);
+  });
+
+  test("les délais (d'offre.ts seulement), ce qui reste en place, l'entretien, « Quand rénover ? », le dernier appel en encre", async () => {
+    const html = sansScripts(await rendre());
+    assert.equal(DEROULE.length, 6);
+    assert.deepEqual(DEROULE.filter((e) => e.photo).map((e) => e.photo), ["mesure-visite", "outils-pose"]);
+    for (const e of DEROULE) assert.ok(html.includes(e.quand) && html.includes(e.titre) && html.includes(e.texte), e.titre);
+    for (const delai of [DELAI_RENDU, `Sous ${DELAI_REPONSE_COURT}`, `${VALIDITE_DEVIS_JOURS} jours`, `${ACOMPTE_POURCENT} %`, `La pose, en ${DUREE_POSE_TEXTE}`]) assert.ok(DEROULE.some((e) => `${e.quand} ${e.titre} ${e.texte}`.includes(delai)), delai);
+    // Aucun délai inventé : pas de semaines promises entre la commande et la pose.
+    assert.doesNotMatch(DEROULE.map((e) => e.texte).join(" "), /semaine|\b\d+ jours ouvrés|sous \d+ jours/i);
+    for (const r of RESTE_EN_PLACE) assert.ok(html.includes(r.titre) && html.includes(r.texte), r.titre);
+    for (const a of A_PREPARER) assert.ok(html.includes(a), a);
+    for (const g of ENTRETIEN) assert.ok(html.includes(g.texte), g.titre);
+    assert.ok(html.includes(`href="/blog/${GUIDE_ENTRETIEN}"`) && articles.some((a) => a.slug === GUIDE_ENTRETIEN));
+    const encart = html.slice(html.indexOf('id="quand-renover"'));
+    assert.match(encart, /<h2 class="titre-2 text-encre">Quand rénover \?<\/h2>/);
+    for (const t of [QUAND_RENOVER_OUI, ...SIGNES_RENOVER, QUAND_RENOVER_NON]) assert.ok(encart.includes(t), t.slice(0, 30));
+    // Le dernier appel en encre, « Être rappelé » posé sur l'encre.
+    const dernier = html.slice(html.lastIndexOf("<section", html.indexOf('id="dernier-appel"') + 20));
+    assert.match(dernier, /ton-encre/);
+    assert.match(dernier, />Être rappelé</);
+  });
+
+  test("les filets plutôt que les cartes blanches (lot C3) : ni fond blanc ni cadre sur la page et dans les blocs partagés", async () => {
+    const html = await rendre();
+    assert.doesNotMatch(lire("app/comment-ca-marche/page.tsx"), /bg-white|border-trait/);
+    assert.doesNotMatch(lire("components/BlocsPrestation.tsx"), /bg-white|border border-trait|CARTE_PRESTATION/);
+    assert.ok(compter(html, 'class="filet') >= ETAPES_DEVIS_EN_LIGNE.length + AVANTAGES_DEVIS_EN_LIGNE.length, "étapes et atouts du devis en ligne sous un filet");
+    assert.ok(compter(html, 'class="group filet"') === FAQ_RESTANTE.length, "les questions repliées entre des filets");
+    assert.match(html, /class="grand-numero text-encre" aria-hidden="true">03<\/span>/, "les étapes du devis en ligne portent leur grand numéro");
+    assert.ok(!existsSync(join(SRC, "components", "accueil", "CommentCaMarche.tsx")), "les trois étapes d'avant sont retirées");
   });
 
   test("le prix : au mètre linéaire, ce qui est compris, les fourchettes d'offre.ts, le lien vers l'estimation", async () => {
@@ -423,7 +485,7 @@ describe("/comment-ca-marche", () => {
     for (const cle of ["cuisine", "sdb", "meuble"] as const) assert.ok(html.includes(fourchette(cle)), cle);
     assert.ok(html.includes("Sur devis après visite"));
     assert.ok(html.includes(FOURCHETTES.cuisine.libelle.slice(1)));
-    assert.ok(boutons(html, "secondaire").some(([href, libelle]) => href === "/simulateur?projet=cuisine" && libelle === "Estimer sur ma photo"));
+    assert.ok(boutons(html, "secondaire").some(([href, libelle]) => href === "/simulateur?depuis=comment-ca-marche" && libelle === "Estimer sur ma photo"));
   });
 
   test("les objections : une ligne, deux phrases au plus ; la FAQ générale fondue dedans, sans doublon (un seul FAQPage)", async () => {

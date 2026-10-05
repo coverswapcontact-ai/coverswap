@@ -61,11 +61,6 @@ export function lienSimulerAccueil(depuis: DepuisAccueil): string {
   return lienSimuler({ depuis });
 }
 
-/** Mission 16 : le lien « Simuler ma cuisine » d'avant le site 3.0, gardé tel quel pour `/comment-ca-marche` (lot C3). */
-export function lienSimulerCuisine(depuis?: DepuisAccueil): string {
-  return lienSimuler({ projet: "cuisine", depuis });
-}
-
 /**
  * Les ancres que le bouton collé du téléphone surveille : il n'apparaît qu'une fois le bouton de l'ouverture sorti de
  * l'écran, et s'efface tant qu'un autre appel est à l'écran (les pictos de « Par où commencer ? », le bouton de

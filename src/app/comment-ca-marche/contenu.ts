@@ -1,6 +1,6 @@
 import { FAQ_EAU_CHALEUR, FAQ_GARANTIE, FAQ_GENERALE, FAQ_RETRAIT, type QuestionReponse } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, fourchette } from "@/lib/offre";
+import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, fourchette } from "@/lib/offre";
 
 /**
  * Les textes de « Comment ça marche » (mission 16, partie 5) : le procédé, le prix, les objections, les guides.
@@ -19,6 +19,55 @@ export const INTRO_PAGE = "Cuisine, salle de bain, meubles, locaux professionnel
 
 /** Sous les trois étapes (l'habillage du module de simulation de l'ancien accueil). */
 export const NOTE_ETAPES = "Pas de démontage, pas de poussière, pas de séchage : la pièce sert le soir même. Pendant le rendu, vous pouvez quitter la page : la simulation continue.";
+
+/**
+ * Site 3.0 (lot C3) : le déroulé complet, ses délais, ce qui reste en place, l'entretien, « Quand rénover ? ». Matière :
+ * les guides « Comment se passe une pose » et « Entretenir un revêtement adhésif » (`data/blog-articles.ts`), les
+ * chiffres d'`offre.ts` ; aucun délai qui n'y soit pas écrit (le temps entre la commande et la pose n'est pas promis :
+ * la date se fixe avec le client). Les photos sont des images générées : étiquette « Ambiance », une fois chacune.
+ */
+export type EtapeDeroule = { quand: string; titre: string; texte: string; photo?: string };
+
+export const TITRE_DEROULE = "Le déroulé, et ses délais";
+export const INTRO_DEROULE = "De votre photo à la pièce finie : ce qui se passe, et quand.";
+export const DEROULE: readonly EtapeDeroule[] = [
+  { quand: "Tout de suite", titre: "Votre photo, votre simulation", texte: `Une photo de face, lumière allumée, et les matières de votre choix : le rendu arrive en ${DELAI_RENDU}.` },
+  { quand: `Sous ${DELAI_REPONSE_COURT}`, titre: "Le devis", texte: `On relève les surfaces sur vos photos et on chiffre au mètre linéaire, surface par surface, avec la référence de chaque film. Gratuit, valable ${VALIDITE_DEVIS_JOURS} jours.` },
+  { quand: "Sur rendez-vous", titre: "La visite : échantillons et mesures", texte: "On vient chez vous avec les vrais échantillons : vous choisissez à la lumière de votre pièce. On mesure chaque surface au passage.", photo: "mesure-visite" },
+  { quand: "À la commande", titre: "Le film commandé", texte: `Devis signé et acompte de ${ACOMPTE_POURCENT} % : on commande le film au fabricant et on fixe la date de pose avec vous.` },
+  { quand: "Le jour de la pose", titre: `La pose, en ${DUREE_POSE_TEXTE}`, texte: "On protège la pièce, on nettoie et on dégraisse chaque surface, puis on pose le film à chaud, panneau par panneau, chants compris. Un meuble seul prend quelques heures ; plusieurs pièces, deux jours.", photo: "outils-pose" },
+  { quand: "Le soir même", titre: "La vérification, ensemble", texte: "On passe chaque surface en revue avec vous ; une réserve est notée par écrit, puis reprise. Rien ne sèche : la pièce sert tout de suite." },
+];
+
+/** Ce qui ne bouge pas, et le peu qu'on vous demande de préparer. */
+export const TITRE_EN_PLACE = "Ce qui reste en place";
+export const RESTE_EN_PLACE: readonly { titre: string; texte: string }[] = [
+  { titre: "Vos meubles, leurs portes, leurs tiroirs", texte: "Rien n'est démonté ni emporté : on pose le film sur place, façade par façade." },
+  { titre: "Les poignées et les charnières", texte: "Elles restent où elles sont : on pose autour." },
+  { titre: "Le plan de travail, l'évier, la plaque", texte: "Le plan s'habille sans être déposé ; l'évier et la plaque ne bougent pas." },
+  { titre: "Le carrelage", texte: "Il se recouvre tel quel, sans être cassé." },
+];
+export const A_PREPARER: readonly string[] = [
+  "Vider les tiroirs et dégager les plans de travail.",
+  "Laisser l'accès libre aux surfaces à couvrir.",
+  "Nous signaler un défaut connu du support : un panneau qui gonfle, une peinture qui s'écaille.",
+];
+
+/** L'entretien, en quatre gestes (le guide « Entretenir un revêtement adhésif » donne le détail). */
+export const TITRE_ENTRETIEN = "L'entretien";
+export const ENTRETIEN: readonly { titre: string; texte: string }[] = [
+  { titre: "Au quotidien", texte: "Un chiffon ou une éponge douce, de l'eau tiède, un nettoyant ménager sans solvant." },
+  { titre: "À éviter", texte: "La laine d'acier et les éponges qui grattent, l'acétone, l'alcool à brûler, le nettoyeur vapeur sur les chants." },
+  { titre: "Deux habitudes", texte: "Un dessous-de-plat pour ce qui sort du four, une planche pour couper : comme sur un stratifié." },
+  { titre: "Le premier jour", texte: "Le film adhère complètement en quelques heures : on évite de mouiller les chants le jour de la pose. Dès le lendemain, usage normal." },
+];
+export const GUIDE_ENTRETIEN = "entretenir-revetement-adhesif";
+
+/** L'encart « Quand rénover ? » (après « Vos questions »), avec `usure-detail`. */
+export const TITRE_QUAND_RENOVER = "Quand rénover ?";
+export const QUAND_RENOVER_OUI = "Le bon moment, c'est quand le meuble est sain mais que sa surface a vieilli :";
+export const SIGNES_RENOVER: readonly string[] = ["un blanc qui a jauni, un bois qui a foncé ou viré à l'orange ;", "une couleur ou une finition brillante qui date ;", "des rayures et des marques d'usage en surface."];
+export const QUAND_RENOVER_NON = "Un panneau qui a gonflé à l'eau ou qui s'effrite : le film ne le répare pas, il faut changer la pièce. Un chant qui se décolle, un petit éclat : montrez-les sur votre photo, on vous dit au devis ce qu'on peut reprendre.";
 
 /** Le prix (« Un prix lisible » et « Des prix au mètre linéaire » de l'ancien accueil). */
 export const PRIX_MESURE = `Nous mesurons le film réellement posé et le facturons au mètre linéaire, fourni et posé : ${PRIX_PLAGE}.`;

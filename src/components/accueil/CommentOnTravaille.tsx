@@ -2,8 +2,9 @@ import { GrandNumero } from "@/components/revue/GrandNumero";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
 import { Section } from "@/components/simulation/Section";
+import { lienSimuler } from "@/lib/liens-simulateur";
 import { DELAI_RENDU, DELAI_REPONSE, DUREE_POSE_TEXTE } from "@/lib/offre-legere";
-import { lienSimulerAccueil, type DepuisAccueil } from "./sections";
+import type { DepuisAccueil } from "./sections";
 
 /**
  * 4. Comment on travaille (site 3.0, lot B6 ; énoncé, § C.1) : quatre étapes numérotées en grand (`GrandNumero`, jamais
@@ -14,8 +15,11 @@ import { lienSimulerAccueil, type DepuisAccueil } from "./sections";
  * covering est expliqué (une phrase, `PHRASE_COVERING`). Puis le bouton principal, ancré pour le bouton collé
  * (`etapes-simuler`).
  *
- * Fait pour l'accueil ; `/comment-ca-marche` garde les trois étapes de `CommentCaMarche` jusqu'au lot C3, qui la
- * refait. Composant serveur, sans JavaScript.
+ * Fait pour l'accueil, repris par `/comment-ca-marche` (lot C3) : `id` garde l'ancre de la page (`#comment-ca-marche`),
+ * `intro={null}` retire la phrase sur le covering (la FAQ de la page l'explique déjà : une fois par page), `note` pose
+ * une ligne sous les étapes, `enTete` la rend au premier écran (sans rendu différé, première photo prioritaire), et
+ * `depuis` accepte `comment-ca-marche`.
+ * Composant serveur, sans JavaScript.
  */
 export const PHRASE_COVERING = "Le covering, c'est un film adhésif haute résistance qu'on pose sur vos meubles, vos portes ou vos murs.";
 
@@ -39,9 +43,10 @@ export const GARANTIES: readonly { titre: string; texte: string }[] = [
 
 const TAILLES_ETAPE = "(min-width: 1024px) 330px, (min-width: 640px) 45vw, calc(100vw - 32px)";
 
-export function CommentOnTravaille({ depuis, idBouton, preuve = false, titre = "Comment on travaille" }: { depuis?: DepuisAccueil; idBouton?: string; preuve?: boolean; titre?: string }) {
+export function CommentOnTravaille({ id = "comment-on-travaille", depuis, idBouton, preuve = false, titre = "Comment on travaille", intro = PHRASE_COVERING, note, enTete = false }: { id?: string; /** La section ouvre la page (`/comment-ca-marche`) : rendue tout de suite, la photo de la première étape prioritaire (c'est le LCP). */ enTete?: boolean; depuis?: DepuisAccueil | "comment-ca-marche"; idBouton?: string; preuve?: boolean; titre?: string; /** `null` : pas de phrase sous le titre. */ intro?: string | null; /** Une ligne sous les étapes (`/comment-ca-marche`). */ note?: string }) {
+  const lien = lienSimuler({ depuis: depuis ?? "accueil-etapes" });
   return (
-    <Section id="comment-on-travaille" large differee titre={titre} intro={PHRASE_COVERING}>
+    <Section id={id} large differee={!enTete} titre={titre} intro={intro ?? undefined}>
       <ol className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
         {ETAPES_TRAVAIL.map((etape, i) => (
           <li key={etape.image} className="flex flex-col">
@@ -49,11 +54,12 @@ export function CommentOnTravaille({ depuis, idBouton, preuve = false, titre = "
               <GrandNumero valeur={i + 1} />
               <h3 className="font-display text-[22px] leading-tight font-semibold text-encre">{etape.titre}</h3>
             </div>
-            <Photo nom={etape.image} alt="" ratio="3 / 2" tailles={TAILLES_ETAPE} etiquette={etape.etiquette} className="mt-4 rounded-[var(--rayon-md)]" />
+            <Photo nom={etape.image} alt="" ratio="3 / 2" tailles={TAILLES_ETAPE} priorite={enTete && i === 0} etiquette={etape.etiquette} className="mt-4 rounded-[var(--rayon-md)]" />
             <p className="texte-2 mt-3">{etape.texte}</p>
           </li>
         ))}
       </ol>
+      {note ? <p className="texte-2 mt-10 max-w-2xl">{note}</p> : null}
       {preuve ? (
         <div className="mt-14 grid gap-8 md:mt-16 md:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] md:items-center md:gap-12">
           <figure className="m-0">
@@ -73,13 +79,13 @@ export function CommentOnTravaille({ depuis, idBouton, preuve = false, titre = "
               ))}
             </dl>
             <div id={idBouton} className="mt-6">
-              <Lien href={lienSimulerAccueil(depuis ?? "accueil-etapes")}>Simuler ma pièce</Lien>
+              <Lien href={lien}>Simuler ma pièce</Lien>
             </div>
           </div>
         </div>
       ) : (
         <div id={idBouton} className="mt-10">
-          <Lien href={lienSimulerAccueil(depuis ?? "accueil-etapes")}>Simuler ma pièce</Lien>
+          <Lien href={lien}>Simuler ma pièce</Lien>
         </div>
       )}
     </Section>

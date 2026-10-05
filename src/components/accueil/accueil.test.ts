@@ -35,7 +35,7 @@ import { Presentoir } from "./Presentoir";
 import { ProAccueil } from "./ProAccueil";
 import { QuestionsAccueil } from "./QuestionsAccueil";
 import { AMBIANCES_ACCUEIL, RealisationsAccueil, realisationsAccueil } from "./RealisationsAccueil";
-import { ANCRES_ACCUEIL, BANDES_ACCUEIL, CIBLES_BOUTON_COLLE, DESCRIPTION_META_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, TITRE_META_ACCUEIL, lienSimulerAccueil, lienSimulerCuisine, sectionsAccueil, type DepuisAccueil } from "./sections";
+import { ANCRES_ACCUEIL, BANDES_ACCUEIL, CIBLES_BOUTON_COLLE, DESCRIPTION_META_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, TITRE_META_ACCUEIL, lienSimulerAccueil, sectionsAccueil, type DepuisAccueil } from "./sections";
 
 /**
  * L'accueil du site 3.0 (lot B6 ; énoncé, § C.1), réécrit section par section avec les intentions de la mission 16 :
@@ -123,9 +123,10 @@ describe("les neuf sections, dans l'ordre de l'énoncé (§ C.1)", () => {
       assert.equal(lienSimulerAccueil(d), `/simulateur?depuis=${d}`);
       assert.equal(lireDepuis(new URLSearchParams(lienSimulerAccueil(d).split("?")[1]).get("depuis")), d);
     }
-    // /comment-ca-marche garde « Simuler ma cuisine » jusqu'au lot C3.
-    assert.equal(lienSimulerCuisine("accueil-etapes"), "/simulateur?projet=cuisine&depuis=accueil-etapes");
-    assert.equal(lienSimulerCuisine(), "/simulateur?projet=cuisine");
+    // Site 3.0, lot C3 : /comment-ca-marche ne garde plus « Simuler ma cuisine » (`lienSimulerCuisine` retiré) ; ses
+    // boutons disent d'où ils viennent, comme ceux de l'accueil.
+    assert.equal(lienSimuler({ depuis: "comment-ca-marche" }), "/simulateur?depuis=comment-ca-marche");
+    assert.equal(lireDepuis("comment-ca-marche"), "comment-ca-marche");
     assert.equal(lienSimuler(), "/simulateur");
     assert.equal(lienSimuler({ projet: "cuisine", element: "plan-de-travail", choix: true, depuis: "accueil" }), "/simulateur?projet=cuisine&element=plan-de-travail&choix=1&depuis=accueil");
     assert.equal(lienSimuler({ choix: true }), "/simulateur", "pas de choix sans pièce");

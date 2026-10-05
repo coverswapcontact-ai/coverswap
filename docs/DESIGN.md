@@ -1,7 +1,8 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`) et C5 (`/realisations`).
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets) et C5
+(`/realisations`).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -490,6 +491,41 @@ les images d'ambiance ensuite, dans une section à part :
 - Chaque paire : titre, curseur, cartels (filet à la teinte ; D1 pour le pro), **prix habituel** d'`offre.ts` libellé
   comme tel (« Prix habituel : … fourni et posé », « Sur devis » pour le pro, jamais le prix d'un chantier), « Essayer
   cette composition chez moi » (`depuis=realisations`).
+
+## La page Comment ça marche
+
+Lot C3, `src/app/comment-ca-marche/page.tsx`, textes dans `contenu.ts` (énoncé, § C.2). La page qui rassure : le procédé,
+les délais, ce qui reste en place, l'entretien, le prix, les objections ; une seule action, « Simuler ma pièce »
+(`depuis=comment-ca-marche`), sous les étapes et au dernier appel. Captures de référence :
+`docs/captures/site-3-0/comment-ca-marche-390.jpg` et `comment-ca-marche-1440.jpg`.
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Titre | papier | « Comment ça marche », une phrase |
+| 2. De la photo à la pose (`#comment-ca-marche`) | papier | `CommentOnTravaille enTete` : les quatre étapes de l'accueil (photo de la première prioritaire, section non différée), la ligne « pas de démontage… », la preuve de finition `detail-chant`, les garanties, le principal |
+| 3. Le déroulé, et ses délais (`#deroule`) | papier-2 | six moments entre filets d'encre : le quand en petites capitales, le titre en Playfair, `mesure-visite` à la visite, `outils-pose` au jour de la pose (à droite dès 1 024 px) |
+| 4. Ce qui reste en place (`#en-place`) | papier | quatre choses qui ne bougent pas, puis « Ce que vous préparez » |
+| 5. L'entretien (`#entretien`) | papier-2 | quatre gestes, le guide ; puis la bande de chêne AG13 |
+| 6. Le prix (`#prix`) | papier | le tableau des ordres de grandeur entre filets d'encre, chiffres en `tabular-nums` |
+| 7. Vos questions (`#objections`, `#faq`) | papier-2 | les objections entre filets, puis la FAQ repliée ; un seul `FAQPage` |
+| 8. Quand rénover ? (`#quand-renover`) | papier | l'encart entre deux filets d'encre : `usure-detail`, les signes, et quand le film ne suffit pas |
+| 9. Le devis en ligne (`#devis`) | papier-2 | étapes à grand numéro et atouts sous filets |
+| 10. Pour aller plus loin (`#guides`) | papier | les guides entre filets |
+| 11. Dernier appel | encre | principal rouge, « Être rappelé » en `sur-encre` |
+
+- **Chaque photo une fois** : les six photos utiles (« Ambiance ») et la capture du simulateur (« Simulation ») ; les
+  photos du déroulé et de l'encart sont décrites (texte de la bibliothèque), celles des étapes sont décoratives.
+- **Aucun délai inventé** : ceux d'`offre.ts` (rendu, devis, validité, acompte, pose) ; le temps entre la commande et la
+  pose n'est pas promis (la date se fixe avec le client).
+
+### Les blocs aux filets — `BlocsPrestation.tsx`
+
+Les cartes blanches encadrées des pages de prestation, de `/pro` et de `/comment-ca-marche` (surfaces, atouts, étapes,
+questions) détonnaient avec les filets : chaque bloc se pose désormais **sous un filet** (`.filet`, la teinte de la
+page, l'encre sans teinte), sans fond ni cadre ; les étapes portent leur **grand numéro** (comme « Comment on
+travaille ») ; les questions se replient entre des filets, comme celles de l'accueil. Restent en carte blanche, pour
+l'instant : les formulaires (`DevisForm`, `FormulairePro`), les avis, les cartes de réalisation et les pages hors
+tunnel (zones, CGV, blog).
 
 ## Ce qu'on a jeté de la maquette
 
