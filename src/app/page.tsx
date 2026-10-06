@@ -36,7 +36,7 @@ export const revalidate = 300;
 export async function generateMetadata(): Promise<Metadata> {
   const { realisations } = await chargerPublications();
   const image = partageOuverture(choisirOuverture(realisations));
-  return metadonneesPage({ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "/", ...(image ? { image } : {}) });
+  return metadonneesPage({ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "/", image });
 }
 
 /** La bande de matière posée après une section (la référence du catalogue, `BANDES_ACCUEIL`). */

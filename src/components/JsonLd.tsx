@@ -1,6 +1,7 @@
 import { ENTREPRISE } from "@/lib/entreprise";
 import { ZONES } from "@/data/zones";
 import { GARANTIE_ANS, PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
+import { IMAGE_PARTAGE } from "@/lib/partage";
 
 /**
  * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
@@ -37,7 +38,7 @@ export const LOCAL_BUSINESS = {
   currenciesAccepted: "EUR",
   paymentAccepted: "Virement, chèque, espèces",
   slogan: "Rénover sans casser",
-  image: [`${ENTREPRISE.site}/og-image.jpg`],
+  image: [IMAGE_PARTAGE.url],
   logo: `${ENTREPRISE.site}/logo.png`,
   address: ADRESSE,
   geo: { "@type": "GeoCoordinates", latitude: ENTREPRISE.geo.lat, longitude: ENTREPRISE.geo.lng },

@@ -7,6 +7,7 @@ import { Section } from "@/components/simulation/Section";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { TITRE_ZONES, descriptionZones } from "./textes-seo";
 
 /**
  * Zones d'intervention (mission 16, partie 5) : l'index des 8 pages locales, conservé (lien du pied de page et de la
@@ -15,8 +16,8 @@ import { metadonneesPage } from "@/lib/metadonnees";
  */
 export const metadata: Metadata = {
   ...metadonneesPage({
-    titre: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie",
-    description: "CoverSwap intervient à Montpellier, Pérols, Lattes, Mauguio, Castelnau-le-Lez, Béziers, Nîmes, Sète et dans toute la France. Découvrez nos prestations de covering adhésif Cover Styl' par ville.",
+    titre: TITRE_ZONES,
+    description: descriptionZones(ZONES.map((z) => z.ville)),
     chemin: "/zones",
   }),
   keywords: "covering Montpellier, covering Pérols, covering Hérault, covering Occitanie, rénovation cuisine Montpellier, covering adhésif France, zone intervention covering",

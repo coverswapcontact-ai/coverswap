@@ -32,8 +32,8 @@ const BANDE = matiereCartel("AA14");
 
 export const metadata: Metadata = {
   ...metadonneesPage({
-    titre: `Matières Cover Styl' : bois, marbre, béton, couleurs — ${NB_REFERENCES} références | CoverSwap`,
-    description: `Explorez notre catalogue complet de revêtements adhésifs Cover Styl'. Bois, pierre, béton, métal, couleur, textile, paillettes. ${NB_REFERENCES} références disponibles.`,
+    titre: `Films adhésifs Cover Styl' : ${NB_REFERENCES} matières | CoverSwap`,
+    description: `${NB_REFERENCES} films adhésifs Cover Styl' rangés par teinte : bois, marbre, béton, couleurs unies, métal. Chaque référence a sa fiche et s'essaie sur votre photo.`,
     chemin: CHEMIN,
   }),
   keywords: "catalogue cover styl, revêtement adhésif, covering mural, film adhésif décoratif, bois adhésif, marbre adhésif, béton adhésif",

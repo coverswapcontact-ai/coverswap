@@ -20,7 +20,7 @@ import Simulateur from "./_components/Simulateur";
 const DESCRIPTION_SIMULATEUR = `Votre pièce avec une matière Cover Styl', sur votre photo, en ${DELAI_RENDU}. Puis un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`;
 
 export const metadata: Metadata = {
-  ...metadonneesPage({ titre: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap", description: DESCRIPTION_SIMULATEUR, chemin: "/simulateur" }),
+  ...metadonneesPage({ titre: "Simulateur de covering sur votre photo, gratuit | CoverSwap", description: DESCRIPTION_SIMULATEUR, chemin: "/simulateur" }),
   keywords: `simulateur covering, simulation covering cuisine, ${MOTS_CLES_DEVIS_EN_LIGNE}`,
 };
 

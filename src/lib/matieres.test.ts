@@ -248,7 +248,7 @@ describe("la page rendue", () => {
     assert.ok(html.includes('<span>Vue dans une ambiance</span><span class="text-[13px] text-encre-2">49</span>'));
     // La bande de matière ferme le présentoir, après la grille.
     assert.ok(html.indexOf('aria-label="Matière Original Oak · AA14') > debut);
-    assert.match(String(metadata.title && typeof metadata.title === "object" && "absolute" in metadata.title ? metadata.title.absolute : ""), new RegExp(`^Matières Cover Styl' : bois, marbre, béton, couleurs — ${NB_REFERENCES} références`));
+    assert.equal(String(metadata.title && typeof metadata.title === "object" && "absolute" in metadata.title ? metadata.title.absolute : ""), `Films adhésifs Cover Styl' : ${NB_REFERENCES} matières | CoverSwap`, "site 3.0 (lot F2) : 60 caractères au plus (docs/SEO.md)");
   });
 
   test("la matière en grand : PleinEcran + ZoomImage (l'échantillon entier), nom, référence, famille, « Essayer sur ma photo »", () => {

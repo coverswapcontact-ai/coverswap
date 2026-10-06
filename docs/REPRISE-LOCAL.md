@@ -46,7 +46,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 ## Phase F : SEO et performance
 
 - F1, `docs/SEO.md` : fait (carte des intentions, une ligne par page indexée ; image de partage et hôte unique décrits).
-- F2 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
+- F2, métadonnées : fait (titles ≤ 60 et descriptions ≤ 155 partout, image de partage par page, `lib/partage.ts`, `npm run og`).
+- F3 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
 
 ## Phase G : livraison
 
@@ -1491,5 +1492,52 @@ du lead (champ `message` du CRM, déjà transmis par la route).
 4. Mots comptés dans le `<main>` rendu : **`/contact` (205) et `/matieres` (287) sont sous 300**, notés pour F6.
 
 **Tests** : 517, inchangés (documentation seule).
+
+**Problèmes** : aucun.
+
+## F2 — métadonnées (06/10/2026)
+
+**Fait** (aucun appel d'API, aucun envoi)
+- **Titles ≤ 60, descriptions ≤ 155 sur les 540 pages construites**, selon la carte de `docs/SEO.md` : accueil
+  (66 → 59), simulateur (78 → 59), `/matieres` (81 → 53), `/inspirations` (86 → 60), `/realisations` (65 → 50 sans
+  avis, 57 avec), `/comment-ca-marche` (71 → 55), 4 prestations et `/pro` (64-99 → 54-60), `/zones` (69, sans
+  « | CoverSwap » → 54), 8 villes (80-92 → 47-56, plus de majuscule à chaque mot), bois et pierre (titres « produit »),
+  12 guides (`titreSeo`, « | CoverSwap » au lieu de « | Blog CoverSwap » : 52-90 → 44-59). Descriptions réécrites
+  pour tenir sans coupe : `/matieres`, `/inspirations` (nombre de cartes compté), `/pro`, salle de bain (164, coupée à
+  147), `/zones`, villes (`app/zones/textes-seo.ts`, Castelnau-le-Lez 158 → 149), trois guides.
+  `LONGUEUR_MAX_DESCRIPTION` 160 → 155, `LONGUEUR_MAX_TITRE` = 60 (`lib/metadonnees.ts`).
+- **Image de partage par page, une seule source** : `src/lib/partage.ts` (`imagePartage(chemin, reelle?)`, défaut de
+  `metadonneesPage` ; `IMAGE_PARTAGE` y vit, réexporté) ; le gabarit et `LocalBusinessSchema` lisent `IMAGE_PARTAGE`.
+  `partageOuverture` (accueil, prestations, `/pro`) passe par elle ; `/realisations` et les fiches passent leur
+  première réalisation publiée (`realisationPartagee`). `/pro` passe de `metadata` à `generateMetadata` (lit les
+  publications, comme la page).
+- **`scripts/og.mjs`** (`npm run og` = `node --import tsx scripts/og.mjs`) : compose 33 images 1 200 × 630
+  (`public/images/og/<après>.jpg`, 2,8 Mo) depuis les originaux de la bibliothèque, avant | après, pastilles,
+  bandeau « Ambiance · avant / après » ; retire les fichiers orphelins. Regardées : bordeaux, couloir (portrait
+  recadré), armoire (série 1).
+
+**Décisions prises seul**
+1. **Un fichier par paire** (nommé par l'après), pas par page : 33 images pour 57 pages, aucune copie.
+2. **Pages sans avant / après → l'image du site** (`og-image.jpg`, refaite au lot B1 en palette « La Revue ») :
+   vitrages, `/comment-ca-marche`, `/matieres`, `/zones` et villes, contact, pages légales, guides sans paire, fiches
+   et familles sans ambiance à avant (métal, textile, paillettes). `/simulateur` et `/realisations` prennent la
+   bordeaux (le premier exemple du simulateur, la première paire de `/realisations`).
+3. **`og-image.jpg` gardée** (et `generate-assets.mjs` inchangé) : d'anciens partages la citent.
+4. **« avis » au title de `/realisations` seulement si le CRM publie des avis.**
+5. Description salle de bain : « contour de baignoire … résistant » → « baignoire … qui résiste » pour tenir en 155 ;
+   le `ServiceSchema` (qui lit `descriptionSeo`) suit.
+6. Police des images : Segoe UI (Libre Franklin n'est pas installée sur le poste ; aucune police téléchargée).
+
+**Tests** : 517 → 531, tous réussis. Nouveau `src/lib/partage.test.ts` (11) : paire de chaque sorte de page (accueil,
+simulateur, réalisations, prestations, `/pro`, `/inspirations` = sa première carte à avant, famille, fiche, guide),
+pages sans paire, chaque paire est un vrai avant / après de la bibliothèque, réalisation qui remplace, plus aucune
+adresse `og-image.jpg` écrite à la main, fichiers présents en 1 200 × 630 et aucun orphelin, bandeau et pastilles
+dans le script, aucun appel réseau. `metadonnees.test.ts` : l'image de chaque page = `imagePartage(chemin)` et son
+fichier existe (plus l'image unique), titre ≤ 60, description jamais coupée, `/pro` en `generateMetadata`, **les
+497 fiches et les 7 familles vérifiées** ; nouveau bloc (3) : textes d'origine qui tiennent (titres, descriptions des
+prestations, guides, villes, `/zones`, accueil, comment-ça-marche), titres de ville, « avis » de `/realisations`.
+`accueil.test.ts` (titre réécrit, partage de l'ambiance = l'image composée), `matieres.test.ts` (titre) : intention
+gardée. `npx eslint .` et `npm run build` passent ; inventaire du build : 0 page hors limites, chaque `og:image`
+existe.
 
 **Problèmes** : aucun.

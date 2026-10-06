@@ -9,7 +9,7 @@ import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DURE
  * partie 3) ; l'intro de l'index /blog (301 ici) ; la section `#devis` (ancienne /devis, `devis-en-ligne.ts`).
  */
 
-export const TITRE_PAGE = "Comment ça marche — covering adhésif, de la photo à la pose | CoverSwap";
+export const TITRE_PAGE = "Comment ça marche : covering, devis et pose | CoverSwap";
 export const DESCRIPTION_PAGE = `Une photo, une simulation en ${DELAI_RENDU}, un devis ${DELAI_REPONSE}, une journée de pose. ${PRIX_PLAGE} fourni et posé, garantie ${GARANTIE_ANS} ans. Vos questions.`;
 
 /** L'ouverture (l'ouverture provisoire et « Pas de travaux » de l'ancien accueil). */

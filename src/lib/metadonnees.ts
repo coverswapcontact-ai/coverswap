@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import { ENTREPRISE } from "./entreprise";
+import { IMAGE_PARTAGE, imagePartage, type ImagePartage } from "./partage";
 
 /**
  * Les métadonnées d'une page (mission 16, partie 5) : UN helper pour toutes les pages publiques du site. Chaque page
  * a son titre, sa description, son adresse canonique ABSOLUE et son Open Graph complet (titre, description, adresse,
- * image claire) — plus aucune page n'hérite du titre Open Graph du gabarit (`layout.tsx`, qui garde les valeurs par
- * défaut). La description est ramenée à 160 caractères au plus (`couperDescription` : à la fin d'une phrase si
- * possible, sinon au dernier mot, avec « … ») : le texte d'origine reste entier dans la page et le balisage.
+ * image) — plus aucune page n'hérite du titre Open Graph du gabarit (`layout.tsx`, qui garde les valeurs par
+ * défaut). La description est ramenée à 155 caractères au plus (`couperDescription` : à la fin d'une phrase si
+ * possible, sinon au dernier mot, avec « … ») : le texte d'origine reste entier dans la page et le balisage ; site 3.0
+ * (lot F2) : chaque page écrit une description qui tient (testé), la coupe n'est qu'un filet.
+ * L'image : celle de la page par défaut (`imagePartage(chemin)`, `lib/partage` : son avant / après composé et
+ * étiqueté, sinon l'image du site) ; une page qui montre d'abord une réalisation publiée passe la sienne.
  * Module pur (testé : `metadonnees.test.ts`).
  */
 
-export const LONGUEUR_MAX_DESCRIPTION = 160;
+/** Site 3.0 (lot F2) : 155 caractères (160 avant), et 60 pour le titre complet (`docs/SEO.md`). */
+export const LONGUEUR_MAX_DESCRIPTION = 155;
+export const LONGUEUR_MAX_TITRE = 60;
 
-export type ImagePartage = { url: string; largeur: number; hauteur: number; alt?: string };
-
-/** L'image de partage claire du site (`scripts/generate-assets.mjs` : 1200 × 630, fond clair). */
-export const IMAGE_PARTAGE: ImagePartage = { url: `${ENTREPRISE.site}/og-image.jpg`, largeur: 1200, hauteur: 630 };
+export { IMAGE_PARTAGE, imagePartage, type ImagePartage };
 
 /** L'adresse absolue d'un chemin du site (« / » → la racine, sans barre finale). */
 export function urlAbsolue(chemin: string): string {
@@ -46,6 +49,7 @@ export type ProprietesMetadonnees = {
   description: string;
   /** Le chemin de la page (« /matieres ») ou son adresse absolue. */
   chemin: string;
+  /** Par défaut, celle de la page (`imagePartage(chemin)`). */
   image?: ImagePartage;
   /**
    * Site 3.0 (lot D4) : `false` pour une page servie mais tenue hors de l'index (`noindex, follow` : les moteurs
@@ -54,7 +58,7 @@ export type ProprietesMetadonnees = {
   indexer?: boolean;
 };
 
-export function metadonneesPage({ titre, description, chemin, image = IMAGE_PARTAGE, indexer = true }: ProprietesMetadonnees): Metadata {
+export function metadonneesPage({ titre, description, chemin, image = imagePartage(chemin), indexer = true }: ProprietesMetadonnees): Metadata {
   const url = urlAbsolue(chemin);
   const courte = couperDescription(description);
   const partage = { url: image.url, width: image.largeur, height: image.hauteur, alt: image.alt ?? titre };

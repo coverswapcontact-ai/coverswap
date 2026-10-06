@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
   if (!article) return {};
-  return metadonneesPage({ titre: `${article.title} | Blog CoverSwap`, description: article.excerpt, chemin: `/blog/${article.slug}` });
+  return metadonneesPage({ titre: `${article.titreSeo ?? article.title} | CoverSwap`, description: article.excerpt, chemin: `/blog/${article.slug}` });
 }
 
 /**

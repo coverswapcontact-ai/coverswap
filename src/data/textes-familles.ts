@@ -40,7 +40,7 @@ const ENTRETIEN_COURANT = "Un chiffon ou une éponge douce, de l'eau tiède, un 
 export const TEXTES_FAMILLES: Readonly<Record<string, TexteFamille>> = {
   bois: {
     titre: "Bois",
-    titreSeo: "Bois adhésifs Cover Styl' : 267 références | CoverSwap",
+    titreSeo: "Adhésif imitation bois : 267 références | CoverSwap",
     descriptionSeo: "Chêne, noyer, frêne, pin : 267 films adhésifs bois Cover Styl' posés sur vos meubles. Où les poser, l'entretien, les limites, et l'essai sur votre photo.",
     accroche: "Du chêne presque blanc au wengé, 267 bois à poser sur vos meubles sans les changer. On vient avec les échantillons.",
     essayer: "Essayer un bois sur ma photo",
@@ -121,7 +121,7 @@ export const TEXTES_FAMILLES: Readonly<Record<string, TexteFamille>> = {
 
   pierre: {
     titre: "Pierres",
-    titreSeo: "Marbres et pierres adhésifs : 36 références | CoverSwap",
+    titreSeo: "Adhésif effet marbre et pierre : 36 références | CoverSwap",
     descriptionSeo: "Marbres, travertin, granit, terrazzo : 36 films adhésifs Cover Styl' pour plan de travail, crédence, salle de bain. Où les poser, l'entretien, les limites.",
     accroche: "Marbres blancs et noirs, travertin, granits, terrazzos : 36 pierres pour un plan de travail ou une salle de bain, sans le poids.",
     essayer: "Essayer une pierre sur ma photo",

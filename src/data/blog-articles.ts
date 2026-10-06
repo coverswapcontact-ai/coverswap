@@ -50,6 +50,12 @@ type IllustrationArticle =
 export type BlogArticle = IllustrationArticle & {
   slug: string;
   title: string;
+  /**
+   * Site 3.0 (lot F2) : le titre de l'onglet et des résultats, sans « | CoverSwap » (ajouté par la page), quand le
+   * titre de la page ne tient pas en 60 caractères ou vise une autre requête (`docs/SEO.md`, carte des intentions).
+   */
+  titreSeo?: string;
+  /** La description (155 caractères au plus, testé). */
   excerpt: string;
   category: string;
   /** Affichage. */
@@ -83,6 +89,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "cuisine-bordeaux-brillante-renover-sans-changer",
     title: "Cuisine bordeaux brillante : la rénover sans la changer",
+    titreSeo: "Rénover une cuisine bordeaux brillante",
     excerpt: "Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux directions possibles et comment se fait le prix.",
     category: "Cuisine",
     date: C7_TEXTE,
@@ -186,6 +193,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "covering-peinture-remplacement-comparatif",
     title: "Covering, peinture ou remplacement : le vrai comparatif",
+    titreSeo: "Covering, peinture ou remplacement de cuisine",
     excerpt: "Trois façons de changer une cuisine, comparées sur le délai, la poussière, la réversibilité et la durée. Et quand nous déconseillons le covering.",
     category: "Comparatif",
     date: C7_TEXTE,
@@ -238,6 +246,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "prix-renovation-cuisine-covering",
     title: "Combien coûte une rénovation de cuisine par covering ?",
+    titreSeo: "Prix d'un covering de cuisine au mètre linéaire",
     excerpt: "Prix au mètre linéaire, nos tarifs publiés, ce qui fait varier le devis et ce qu'il contient.",
     category: "Prix",
     date: MAJ_TEXTE,
@@ -278,7 +287,8 @@ export const articles: BlogArticle[] = [
   {
     slug: "comment-se-passe-une-pose-de-covering",
     title: "Comment se passe une pose de covering, concrètement",
-    excerpt: "De la première photo à la vérification finale : les étapes réelles d'un chantier de covering, ce que vous préparez, ce que nous faisons, combien de temps ça prend.",
+    titreSeo: "Comment se passe une pose de covering",
+    excerpt: "De la première photo à la vérification finale : les étapes d'un chantier de covering, ce que vous préparez, ce que nous faisons, combien de temps ça prend.",
     category: "Déroulement",
     date: MAJ_TEXTE,
     dateIso: MAJ,
@@ -320,6 +330,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "covering-adhesif-vs-peinture-cuisine",
     title: "Covering adhésif ou peinture : quel choix pour votre cuisine ?",
+    titreSeo: "Covering adhésif ou peinture en cuisine ?",
     excerpt: "Deux façons de changer une cuisine sans la remplacer. Durée du chantier, tenue dans le temps, rendu, prix, réversibilité : la comparaison honnête.",
     category: "Comparatif",
     date: MAJ_TEXTE,
@@ -363,6 +374,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "covering-adhesif-durabilite",
     title: "Covering adhésif : combien de temps ça tient, et à quoi ça résiste ?",
+    titreSeo: "Covering adhésif : combien de temps ça tient ?",
     excerpt: `Eau, chaleur, rayures, soleil : ce que supporte un film Cover Styl' posé dans les règles, ce qui l'abîme, et ce que couvre la garantie de ${GARANTIE_ANS} ans.`,
     category: "Durabilité",
     date: MAJ_TEXTE,
@@ -405,7 +417,8 @@ export const articles: BlogArticle[] = [
   {
     slug: "covering-salle-de-bain-carrelage",
     title: "Recouvrir un carrelage de salle de bain sans le casser",
-    excerpt: "Ce qui se recouvre dans une salle de bain (murs carrelés, meuble vasque, tablier de baignoire), ce qui ne se recouvre pas, et comment le film résiste à l'humidité.",
+    titreSeo: "Recouvrir un carrelage de salle de bain",
+    excerpt: "Ce qui se recouvre dans une salle de bain (murs carrelés, meuble vasque, tablier de baignoire), ce qui ne se recouvre pas, et la tenue à l'humidité.",
     category: "Salle de bain",
     date: MAJ_TEXTE,
     dateIso: MAJ,
@@ -444,7 +457,8 @@ export const articles: BlogArticle[] = [
   {
     slug: "quelle-finition-choisir",
     title: "Quelle finition choisir : bois, pierre, béton, couleur unie ?",
-    excerpt: `Comment choisir parmi les familles du catalogue Cover Styl' selon la pièce, la lumière et l'usage — et pourquoi la teinte se valide toujours sur échantillon.`,
+    titreSeo: "Quelle finition de film adhésif choisir ?",
+    excerpt: `Choisir parmi les familles du catalogue Cover Styl' selon la pièce, la lumière et l'usage, et pourquoi la teinte se valide toujours sur échantillon.`,
     category: "Finitions",
     date: MAJ_TEXTE,
     dateIso: "2025-03-02",
@@ -487,6 +501,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "marbre-bois-beton-quel-covering",
     title: "Quel revêtement pour quelle pièce ?",
+    titreSeo: "Quel revêtement adhésif pour quelle pièce ?",
     excerpt: "Cuisine, salle de bain, chambre, bureau, local professionnel : les finitions qui conviennent à chaque usage, et celles à éviter.",
     category: "Finitions",
     date: MAJ_TEXTE,
@@ -525,6 +540,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "entretenir-revetement-adhesif",
     title: "Entretenir un revêtement adhésif : les bons gestes",
+    titreSeo: "Entretenir un revêtement adhésif",
     excerpt: "Ce qu'il faut faire, et surtout ne pas faire, pour qu'un covering garde son aspect : produits, éponges, chaleur, chocs.",
     category: "Entretien",
     date: MAJ_TEXTE,
@@ -564,6 +580,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "renovation-locataire-covering",
     title: "Rénover en location : le covering, réversible et sans autorisation lourde",
+    titreSeo: "Rénover en location avec un film adhésif",
     excerpt: "Pourquoi le film adhésif convient aux locataires et aux propriétaires bailleurs : retrait sans trace, pose en une journée, logement remis en l'état.",
     category: "Location",
     date: MAJ_TEXTE,

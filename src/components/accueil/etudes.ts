@@ -4,6 +4,7 @@ import { ambianceDeLImage } from "@/lib/ambiances";
 import { sourcesPhoto, type ManifesteImages, type SourcesImage, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { urlAbsolue, type ImagePartage } from "@/lib/metadonnees";
+import { imagePartage } from "@/lib/partage";
 import { sourcesPhotoCrm, type Publication } from "@/lib/publications";
 
 /**
@@ -119,14 +120,13 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
 }
 
 /**
- * Site 3.0 (lot B6) : l'image de partage suit l'image retenue — la photo « après » d'une réalisation publiée (WebP de
- * 1 600 px du CRM, au cadre 3 / 2 de l'ouverture). Une image d'ambiance n'est JAMAIS partagée telle quelle : elle n'y
- * porterait pas son étiquette « Ambiance » ; l'accueil garde l'image de partage du site jusqu'aux images composées et
- * étiquetées du lot F2 (`null` : celle par défaut).
+ * Site 3.0 (lot B6, puis F2) : l'image de partage suit l'image retenue — la photo « après » d'une réalisation publiée
+ * (WebP de 1 600 px du CRM, au cadre 3 / 2 de l'ouverture), sinon l'avant / après de la page `chemin`, composé avec son
+ * bandeau « Ambiance · avant / après » (`imagePartage`, la seule source) : une image d'ambiance n'est JAMAIS partagée
+ * telle quelle, sans son étiquette.
  */
-export function partageOuverture(choix: ChoixOuverture | null): ImagePartage | null {
-  if (choix?.type !== "realisation") return null;
-  return { url: `${choix.apres}?l=1600`, largeur: 1600, hauteur: 1067, alt: choix.legende };
+export function partageOuverture(choix: ChoixOuverture | null, chemin = "/"): ImagePartage {
+  return imagePartage(chemin, choix?.type === "realisation" ? { photo: choix.apres, legende: choix.legende } : null);
 }
 
 /**

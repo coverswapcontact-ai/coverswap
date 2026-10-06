@@ -7,8 +7,9 @@ import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { descriptionVille, titreVille } from "../textes-seo";
 import { ZONES, getZoneSlug, getZoneBySlug } from "@/data/zones";
-import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE, DUREE_POSE_TEXTE, GARANTIE, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, texteOffre } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE, GARANTIE, NB_REFERENCES, texteOffre } from "@/lib/offre";
 
 /**
  * Les pages locales (8 villes, mission 16, partie 5) : adresses et textes conservés, thème clair, bouton principal
@@ -38,8 +39,8 @@ export async function generateMetadata({
 
   return {
     ...metadonneesPage({
-      titre: `Covering Adhésif ${zone.ville} — Rénovation Cuisine & Salle de Bain en 1 Jour | CoverSwap`,
-      description: `Covering adhésif à ${zone.ville} (${zone.codePostal.split(" / ")[0]}) : cuisine, salle de bain, meubles rénovés en ${DUREE_POSE_TEXTE}. Garantie ${GARANTIE_ANS} ans, devis gratuit ${DELAI_REPONSE}, ${PRIX_PLAGE}.`,
+      titre: titreVille(zone.ville),
+      description: descriptionVille(zone.ville, zone.codePostal),
       chemin: `/zones/${getZoneSlug(zone)}`,
     }),
     keywords: `covering ${zone.ville}, rénovation cuisine ${zone.ville}, covering adhésif ${zone.ville}, relooking meubles ${zone.ville}, film adhésif ${zone.ville}, Cover Styl ${zone.ville}, covering Hérault, covering Occitanie`,

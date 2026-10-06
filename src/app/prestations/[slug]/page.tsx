@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { preload } from "react-dom";
-import { prechargementsOuverture } from "@/components/accueil/etudes";
+import { partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import ContenuPrestation, { TAILLES_OUVERTURE_PRESTATION, vueDeLaPrestation } from "@/components/ContenuPrestation";
 import { PRESTATIONS, getPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
@@ -29,7 +29,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = getPrestation(slug);
   if (!p) return {};
-  return metadonneesPage({ titre: `${p.titreSeo} | CoverSwap`, description: p.descriptionSeo, chemin: `/prestations/${p.slug}` });
+  // Site 3.0 (lot F2) : l'image de partage suit l'ouverture (une réalisation de la pièce, sinon son avant / après).
+  const chemin = `/prestations/${p.slug}`;
+  const { realisations } = await chargerPublications();
+  return metadonneesPage({ titre: `${p.titreSeo} | CoverSwap`, description: p.descriptionSeo, chemin, image: partageOuverture(vueDeLaPrestation(p, realisations).ouverture, chemin) });
 }
 
 export default async function PagePrestation({ params }: Props) {

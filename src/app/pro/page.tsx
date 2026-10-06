@@ -8,7 +8,7 @@ import { CarteRealisation } from "@/components/CarteRealisation";
 import { TAILLES_OUVERTURE_PRESTATION } from "@/components/ContenuPrestation";
 import { CarteAmbiance, regrouperMatieres } from "@/components/ambiances/CarteAmbiance";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
-import { prechargementsOuverture } from "@/components/accueil/etudes";
+import { partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Cartel } from "@/components/revue/Cartel";
@@ -45,7 +45,12 @@ export const revalidate = 300;
 
 const PRO = getPrestation("professionnel");
 const URL_PRO = `${ENTREPRISE.site}/pro`;
-export const metadata: Metadata = PRO ? metadonneesPage({ titre: `${PRO.titreSeo} | CoverSwap`, description: PRO.descriptionSeo, chemin: "/pro" }) : {};
+/** Site 3.0 (lot F2) : l'image de partage suit l'ouverture (une réalisation PRO publiée, sinon le comptoir, étiqueté). */
+export async function generateMetadata(): Promise<Metadata> {
+  if (!PRO) return {};
+  const { realisations } = await chargerPublications();
+  return metadonneesPage({ titre: `${PRO.titreSeo} | CoverSwap`, description: PRO.descriptionSeo, chemin: "/pro", image: partageOuverture(vueDuPro(realisations).ouverture, "/pro") });
+}
 
 const TAILLES_REALISATION = "(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw";
 const TAILLES_PAIRE = "(min-width: 1152px) 896px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";

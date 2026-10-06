@@ -101,13 +101,15 @@ describe("les neuf sections, dans l'ordre de l'énoncé (§ C.1)", () => {
     assert.match(rendre(createElement(Presentoir)), /<div role="img" aria-label="Matière Deep Green · NF13[^"]*"[^>]*>.*<\/div><\/section>$/);
   });
 
-  test("métadonnées : titre, description ≤ 155 caractères avec le prix et Montpellier ; l'image de partage suit l'ouverture", () => {
-    assert.equal(TITRE_META_ACCUEIL, "CoverSwap — Votre cuisine transformée en une journée, sans travaux");
+  test("métadonnées : titre ≤ 60, description ≤ 155 caractères avec le prix et Montpellier ; l'image de partage suit l'ouverture", () => {
+    // Site 3.0 (lot F2) : le titre vise « rénover sa cuisine sans travaux » (docs/SEO.md), 60 caractères au plus.
+    assert.equal(TITRE_META_ACCUEIL, "Rénover sa cuisine sans travaux, en une journée | CoverSwap");
+    assert.ok(TITRE_META_ACCUEIL.length <= 60, `${TITRE_META_ACCUEIL.length} caractères`);
     assert.ok(DESCRIPTION_META_ACCUEIL.length <= 155, `${DESCRIPTION_META_ACCUEIL.length} caractères`);
     assert.ok(DESCRIPTION_META_ACCUEIL.includes(PRIX_PLAGE));
     assert.ok(DESCRIPTION_META_ACCUEIL.includes("Montpellier"));
     const page = lire("src/app/page.tsx");
-    assert.match(page, /metadonneesPage\(\{ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "\/", \.\.\.\(image \? \{ image \} : \{\}\) \}\)/);
+    assert.match(page, /metadonneesPage\(\{ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "\/", image \}\)/);
     assert.match(page, /const image = partageOuverture\(choisirOuverture\(realisations\)\);/);
   });
 
@@ -226,7 +228,14 @@ describe("1. Ouverture", () => {
 
   test("une image d'ambiance n'est jamais partagée sans son étiquette ; son ImageObject dit « Ambiance · avant / après »", () => {
     const choix = choisirOuverture([]);
-    assert.equal(partageOuverture(choix), null, "l'image de partage du site, jusqu'aux images étiquetées du lot F2");
+    // Site 3.0 (lot F2) : l'avant / après composé avec son bandeau « Ambiance · avant / après » (scripts/og.mjs), jamais l'après seul.
+    assert.deepEqual(partageOuverture(choix), {
+      url: "https://coverswap.fr/images/og/cuisine-bordeaux-brillante-apres-couleur.jpg",
+      largeur: 1200,
+      hauteur: 630,
+      alt: "Ambiance · avant / après, image d'ambiance : Cuisine en L d'appartement des années 2000, façades bordeaux brillantes, plan de travail gris moucheté",
+    });
+    assert.ok(!partageOuverture(choix).url.includes("/images/prep/"), "jamais une image de la bibliothèque sans son étiquette");
     const objet = imageObjetOuverture(choix);
     assert.equal(objet?.["@type"], "ImageObject");
     assert.equal(objet?.caption, LEGENDE_OUVERTURE);

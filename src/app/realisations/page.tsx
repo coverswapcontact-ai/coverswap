@@ -14,6 +14,7 @@ import { ENTREPRISE } from "@/lib/entreprise";
 import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { imagePartage, realisationPartagee } from "@/lib/partage";
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 import { chargerPublications, libelleProjet, type Publication } from "@/lib/publications";
 import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
@@ -43,7 +44,9 @@ const CHEMIN = "/realisations";
 /** « Simuler ma pièce » de la page (relecture des lots B et C : il partait sans `depuis`). */
 const LIEN_SIMULER = lienSimuler({ depuis: "realisations" });
 
-const TITRE = "Réalisations et avis — covering adhésif à Montpellier | CoverSwap";
+/** Site 3.0 (lot F2) : « avis » au titre seulement quand le CRM en publie (on ne promet pas ce que la page ne montre pas). */
+const TITRE_AVEC_AVIS = "Réalisations et avis : covering à Montpellier | CoverSwap";
+const TITRE_SANS_AVIS = "Réalisations de covering à Montpellier | CoverSwap";
 const SUJET = "Cuisines, salles de bain, meubles et locaux recouverts d'un film Cover Styl'";
 
 /**
@@ -58,7 +61,9 @@ export async function generateMetadata(): Promise<Metadata> {
     realisations.length > 0
       ? `${SUJET} : photos après chantier publiées avec l'accord des clients${avis.length > 0 ? ", et leurs avis" : ""}.`
       : `${SUJET} : des exemples en ambiance, étiquetés comme tels, et nos tarifs.`;
-  return metadonneesPage({ titre: TITRE, description, chemin: CHEMIN });
+  // L'image de partage : la première réalisation publiée qui a sa photo « après », sinon l'avant / après de la page.
+  const image = imagePartage(CHEMIN, realisationPartagee(realisations.find((p) => p.photoApres)));
+  return metadonneesPage({ titre: avis.length > 0 ? TITRE_AVEC_AVIS : TITRE_SANS_AVIS, description, chemin: CHEMIN, image });
 }
 
 const TAILLES_CARTE = "(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw";

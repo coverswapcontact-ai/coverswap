@@ -23,6 +23,7 @@ import { avecDepuis } from "@/lib/liens-simulateur";
 import { lienEssayer, tiroirs, type Matiere } from "@/lib/matieres";
 import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { imagePartage, realisationPartagee } from "@/lib/partage";
 import { NB_REFERENCES } from "@/lib/offre";
 import { chargerPublications } from "@/lib/publications";
 import { baseCrm, urlEchantillon } from "@/lib/simulateur/generation-client";
@@ -69,7 +70,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { famille, ref } = await params;
   const m = ficheDe(famille, ref);
   if (!m) return {};
-  return metadonneesPage({ titre: titreFiche(m), description: descriptionFiche(m, ambiancesDeLaFiche(m.id).length), chemin: lienMatiere(m.id), indexer: estFicheIndexee(m.id) });
+  // Site 3.0 (lot F2) : l'image de partage, la première réalisation publiée qui la porte, sinon l'avant / après de « Vue dans ».
+  const chemin = lienMatiere(m.id);
+  const { realisations } = await chargerPublications();
+  const image = imagePartage(chemin, realisationPartagee(realisationsDeLaMatiere(m.id, realisations)[0]));
+  return metadonneesPage({ titre: titreFiche(m), description: descriptionFiche(m, ambiancesDeLaFiche(m.id).length), chemin, image, indexer: estFicheIndexee(m.id) });
 }
 
 export default async function PageFiche({ params }: Props) {

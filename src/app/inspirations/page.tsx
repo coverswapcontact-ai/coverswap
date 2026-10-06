@@ -30,9 +30,9 @@ import { cartesInspirations } from "./_components/ordre";
  */
 const CHEMIN = "/inspirations";
 const LIEN_SIMULER = lienSimuler({ depuis: "inspirations" });
-const TITRE = "Inspirations : cuisines, salles de bain, meubles et locaux en film adhésif | CoverSwap";
-const DESCRIPTION =
-  "Des ambiances composées avec les vraies matières Cover Styl' : chaque photo dit ses références, surface par surface. Filtrez par pièce et par teinte, puis essayez la composition chez vous.";
+const TITRE = "Inspirations covering : cuisines, bains, meubles | CoverSwap";
+/** Site 3.0 (lot F2) : 155 caractères au plus, le nombre de cartes compté (jamais écrit à la main). */
+const DESCRIPTION = `${cartesInspirations().length} pièces composées avec les vraies matières Cover Styl', chaque surface avec sa référence. Filtrez par pièce et par teinte, puis essayez chez vous.`;
 
 export const metadata: Metadata = metadonneesPage({
   titre: TITRE,

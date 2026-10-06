@@ -11,6 +11,7 @@ import HorsSimulateur from "@/components/HorsSimulateur";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
+import { IMAGE_PARTAGE } from "@/lib/partage";
 /**
  * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900, droit et italique) et Libre Franklin pour le texte,
  * en polices variables téléchargées au build et servies par le site (next/font) : aucun appel à Google Fonts depuis
@@ -54,11 +55,12 @@ export const metadata: Metadata = {
     siteName: "CoverSwap",
     locale: "fr_FR",
     type: "website",
+    // Site 3.0 (lot F2) : l'image du site, une seule source (`lib/partage`) ; chaque page pose la sienne (`metadonneesPage`).
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
-        width: 1200,
-        height: 630,
+        url: IMAGE_PARTAGE.url,
+        width: IMAGE_PARTAGE.largeur,
+        height: IMAGE_PARTAGE.hauteur,
         alt: "CoverSwap — Covering adhésif premium",
       },
     ],
@@ -67,7 +69,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CoverSwap — Covering adhésif premium",
     description: "Rénovez votre intérieur en 1 journée. Simulation IA gratuite.",
-    images: [`${SITE_URL}/og-image.jpg`],
+    images: [IMAGE_PARTAGE.url],
   },
   alternates: {
     canonical: SITE_URL,

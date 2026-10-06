@@ -44,8 +44,8 @@ export const BANDES_ACCUEIL: readonly { ref: string; apres: IdSectionAccueil | "
 export const TITRE_ACCUEIL = `Votre cuisine, transformée en ${DUREE_POSE_TEXTE}.`;
 export const LIGNE_ACCUEIL = "Sans travaux, sans remplacer vos meubles. Réversible.";
 
-/** Métadonnées de l'accueil (description : 155 caractères au plus, testé). */
-export const TITRE_META_ACCUEIL = `CoverSwap — Votre cuisine transformée en ${DUREE_POSE_TEXTE}, sans travaux`;
+/** Métadonnées de l'accueil (titre : 60 caractères au plus ; description : 155 ; testé ; `docs/SEO.md`). */
+export const TITRE_META_ACCUEIL = `Rénover sa cuisine sans travaux, en ${DUREE_POSE_TEXTE} | CoverSwap`;
 export const DESCRIPTION_META_ACCUEIL = `Covering adhésif à Montpellier : votre cuisine rénovée en ${DUREE_POSE_TEXTE}, sans travaux. ${PRIX_PLAGE} fourni et posé. Simulation gratuite sur votre photo.`;
 
 /**
