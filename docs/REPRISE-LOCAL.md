@@ -1996,3 +1996,23 @@ aucun formulaire touché)
   des images cassées (relevé en local sur un build sans la variable). La production a la variable ; le repli prévu au
   plan B7 n'a pas été fait.
 
+## G3 — Lighthouse sur coverswap.fr après la fusion (06/10/2026)
+
+**Fait**
+- Mesure de la production (`main` aea81f4) avec la méthode de B0 : Lighthouse 12.6.1 en ligne de commande, mobile par
+  défaut, Chrome 153 sans interface, même poste, 3 passages par page, le meilleur gardé ; 11 adresses (les 8 de la CI,
+  `/matieres?ref=NF13`, `/inspirations`, `/contact`). Envois d'événements bloqués (`--blocked-url-patterns`) : coupés
+  sur les 33 passages ; aucune génération, aucun formulaire. Tableaux et comparaison dans `docs/SEO.md`, « Lot G3 ».
+- En bref : accessibilité, bonnes pratiques, SEO à 100 sur les 11 pages, aucune erreur de console ; performance 83 à 90,
+  LCP 2,9 à 3,9 s ; les 8 pages de la CI passent ses seuils (85, 4 s, 400 ms, 0,05), sans marge sur le simulateur et la
+  prestation cuisine (85).
+- B0 production → G3 production : réalisations +2 (LCP -0,4 s), simulateur =, accueil -1 ; recul de 5 à 9 points sur
+  `/matieres`, « Comment ça marche », `/pro`, la prestation cuisine et `/matieres?ref=NF13`, surtout par le TBT
+  (+100 à +190 ms). Production proche du build local de F7 (±4 points).
+
+**Problèmes**
+- `/matieres?ref=NF13` : CLS 0,015 sur 2 passages sur 3 (la grille des matières se décale), 0 en B0 et en local ;
+  sous le seuil, à regarder.
+- Performance sous 90 sur 8 pages sur 11, LCP au-dessus de 2,5 s sur les 11 : objectifs toujours non atteints
+  (F6, F7).
+

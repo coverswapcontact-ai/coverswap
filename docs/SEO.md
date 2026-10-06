@@ -495,4 +495,64 @@ pas ce calcul) :
 
 ### Lot G3 (coverswap.fr, après la fusion)
 
-À remplir, avec la même méthode.
+Production `main` aea81f4, mesurée le 06/10/2026 entre 10 h 38 et 10 h 51 avec la méthode de B0 : Lighthouse 12.6.1 en
+ligne de commande, réglage mobile par défaut (412 × 823, simulation « Lantern »), Chrome 153 sans interface, même poste,
+trois passages par page, le meilleur gardé (performance la plus haute, puis LCP le plus court). Les envois d'événements
+sont bloqués (`--blocked-url-patterns=*/api/site/evenements*`) : sur les 33 passages, l'envoi apparaît coupé (statut
+-1), aucune fausse visite au CRM ; aucune génération, aucun formulaire. Aucune erreur de console, aucun audit
+d'accessibilité, de bonnes pratiques ou de SEO en échec sur les 33 passages.
+
+| Page | Adresse | Performance | Accessibilité | Bonnes pratiques | SEO | LCP | CLS | TBT | Performance des 3 passages |
+|---|---|---|---|---|---|---|---|---|---|
+| accueil | `/` | 86 | 100 | 100 | 100 | 3,6 s | 0,000 | 219 ms | 86 / 84 / 82 |
+| simulateur | `/simulateur` | 85 | 100 | 100 | 100 | 3,9 s | 0,000 | 197 ms | 85 / 84 / 84 |
+| matieres | `/matieres` | 86 | 100 | 100 | 100 | 3,9 s | 0,000 | 129 ms | 86 / 86 / 83 |
+| realisations | `/realisations` | 90 | 100 | 100 | 100 | 3,4 s | 0,000 | 111 ms | 90 / 89 / 89 |
+| comment-ca-marche | `/comment-ca-marche` | 88 | 100 | 100 | 100 | 3,1 s | 0,000 | 272 ms | 88 / 87 / 86 |
+| pro | `/pro` | 87 | 100 | 100 | 100 | 3,3 s | 0,000 | 253 ms | 87 / 87 / 83 |
+| prestation-cuisine | `/prestations/cuisine` | 85 | 100 | 100 | 100 | 3,2 s | 0,000 | 339 ms | 85 / 85 / 85 |
+| matieres-nf13 | `/matieres?ref=NF13` | 83 | 100 | 100 | 100 | 3,9 s | 0,015 | 211 ms | 83 / 82 / 78 |
+| fiche-nf13 | `/matieres/couleur/NF13` | 90 | 100 | 100 | 100 | 3,0 s | 0,000 | 226 ms | 90 / 90 / 89 |
+| inspirations | `/inspirations` | 84 | 100 | 100 | 100 | 3,4 s | 0,000 | 263 ms | 84 / 79 / 77 |
+| contact | `/contact` | 90 | 100 | 100 | 100 | 2,9 s | 0,000 | 256 ms | 90 / 86 / 83 |
+
+**B0 production → G3 production**, performance · LCP · TBT (accessibilité, bonnes pratiques et SEO à 100 des deux
+côtés) — B0 : coverswap.fr le 05/10/2026, `main` a7dd5a6, le site d'avant le 3.0 ; G3 : coverswap.fr après la fusion.
+
+| Page | B0 production | G3 production | Écart |
+|---|---|---|---|
+| `/` | 87 · 3,7 s · 168 ms | 86 · 3,6 s · 219 ms | -1 · -0,1 s · +51 ms |
+| `/simulateur` | 85 · 3,9 s · 206 ms | 85 · 3,9 s · 197 ms | +0 · +0,0 s · -9 ms |
+| `/matieres` | 93 · 3,1 s · 81 ms | 86 · 3,9 s · 129 ms | -7 · +0,8 s · +48 ms |
+| `/realisations` | 88 · 3,8 s · 123 ms | 90 · 3,4 s · 111 ms | +2 · -0,4 s · -12 ms |
+| `/comment-ca-marche` | 97 · 2,5 s · 94 ms | 88 · 3,1 s · 272 ms | -9 · +0,6 s · +178 ms |
+| `/pro` | 96 · 2,7 s · 64 ms | 87 · 3,3 s · 253 ms | -9 · +0,6 s · +189 ms |
+| `/prestations/cuisine` | 90 · 3,4 s · 157 ms | 85 · 3,2 s · 339 ms | -5 · -0,2 s · +182 ms |
+| `/matieres?ref=NF13` | 91 · 3,3 s · 105 ms | 83 · 3,9 s · 211 ms | -8 · +0,6 s · +106 ms |
+| `/matieres/couleur/NF13` | — | 90 · 3,0 s · 226 ms | — |
+| `/inspirations` | — | 84 · 3,4 s · 263 ms | — |
+| `/contact` | — | 90 · 2,9 s · 256 ms | — |
+
+### À retenir (lot G3)
+
+- **Accessibilité, bonnes pratiques et SEO à 100 sur les 11 pages en production**, comme en B0 et en F7. CLS 0 partout
+  sauf `/matieres?ref=NF13` : 0,015 sur deux passages sur trois (la grille des matières, `section > div > ul.mt-4`, se
+  décale pendant le chargement) ; sous le seuil de la CI (0,05) mais nouveau par rapport à B0 et à F6-F7 (0 en local).
+- **Les 8 pages de la CI passent ses seuils en production** au meilleur des trois passages (performance 85 à 90, LCP 3,0
+  à 3,9 s, TBT 111 à 339 ms) ; la marge est nulle sur le simulateur et la prestation cuisine (85), et un passage
+  médiocre de l'accueil, de `/matieres` ou de `/pro` (82-83) tomberait sous 85.
+- **Par rapport au site d'avant (B0 production)** : le LCP gagne sur les pages à photo d'ouverture (accueil -0,1 s,
+  réalisations -0,4 s, prestation cuisine -0,2 s, simulateur égal) et perd sur les pages légères d'avant (`/matieres`
+  +0,8 s, « Comment ça marche » et `/pro` +0,6 s, `/matieres?ref=NF13` +0,6 s). La performance recule de 5 à 9 points
+  sur cinq pages sur huit, surtout par le **TBT** (+100 à +190 ms sur « Comment ça marche », `/pro`, la prestation
+  cuisine, `/matieres?ref=NF13`) : sur « Comment ça marche », `/pro` et la prestation cuisine, une tâche longue de 260 à
+  300 ms vers 2,5 s (un même morceau commun du JavaScript, `3depa4ur8gt7u.js`) s'ajoute à celle du document (80 à
+  210 ms vers 1 s). Seules `/realisations` (+2) et le simulateur (=) tiennent ou gagnent.
+- **Par rapport au build local de F7** (même méthode, même poste) : performance à ±4 points, sans tendance
+  (réalisations 88 → 90, `/pro` 86 → 87, « Comment ça marche » 92 → 88, `/matieres` 88 → 86) ; LCP plus court sur
+  six pages (accueil 3,9 → 3,6 s, `/pro` 3,8 → 3,3 s, prestation cuisine 3,8 → 3,2 s, `/inspirations` 3,9 → 3,4 s,
+  réalisations 3,7 → 3,4 s, « Comment ça marche » 3,3 → 3,1 s), égal sur la fiche, plus long sur quatre (`/matieres` 3,4 → 3,9 s, `/matieres?ref=NF13` 3,4 → 3,9 s, contact
+  2,7 → 2,9 s, simulateur 3,8 → 3,9 s). La mise en ligne n'a rien cassé ; les objectifs de 90 et 2,5 s restent non
+  atteints, pour les raisons écrites en F6 et F7.
+- **Écart entre passages** : jusqu'à 7 points sur une même page (`/inspirations` 84 / 79 / 77, `contact` 90 / 86 / 83),
+  toujours par le TBT (`/inspirations` : 263 à 472 ms).
