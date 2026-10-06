@@ -2091,6 +2091,19 @@ aucun formulaire touché)
     build du `main` d'avant dans un worktree (-1). Accessibilité 97 sur l'accueil : artefact de `content-visibility`
     (SEO.md), laissé tel quel.
 
+**Vérifié en production (coverswap.fr, `main` 96717f2)**
+- Les cinq fichiers répondent 200, `Content-Type: video/mp4`, `Cache-Control: public, max-age=31536000, immutable`,
+  `Accept-Ranges: bytes` ; les quatre pages portent leur `VideoObject` (4, 1, 1, 1), aucun `<video>` dans le HTML.
+- Edge (Playwright, 412 × 823) : `/matieres` sans geste → affiche + « Lire », aucun fichier ; après un mouvement de
+  souris → la boucle part (requête à 2,0 s), joue muette, « Pause » ; moins de mouvement → rien ; page défilée en bas →
+  rien ; `/`, `/comment-ca-marche`, `/simulateur` → aucun `<video>`, aucun fichier ; « Voir en 30 s » → visionneuse,
+  film muet, bouton « Son », Échap ferme et retire le `<video>`.
+- Lighthouse production (3 passages) : `/matieres` 86 / 86 / 86, LCP 4,0 s, TBT 72-98 ms, accessibilité 100 (G3 : 86) ;
+  avant la règle du premier geste : 70 / 83 / 69. L'accueil : 83 / 86 / 78 (G3 : 86), accessibilité 97 (artefact,
+  `docs/SEO.md`).
+- CI GitHub : les runs de 8d9b889 et 96717f2 échouent à l'étape « Lighthouse — seuils », comme le run de 8016ca4 avant
+  la mission (journal réservé aux comptes connectés : à lire par Lucas dans l'artefact `lighthouse`).
+
 **Problèmes**
 - `label-content-name-mismatch` (Pastille497) : déjà en échec avant la mission, poids nul ; à décider par Lucas.
 - `npx lighthouse` lancé hors du dépôt prend la 12.8.2 (cache npx), pas la 12.6.1 du dépôt : même version des deux
