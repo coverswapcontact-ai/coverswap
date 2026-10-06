@@ -20,3 +20,9 @@ export const libelleFamille = (id: string) => FAMILLES.find((f) => f.id === id)?
 
 /** `id` est-il une famille du catalogue (une adresse `?famille=` inconnue ne filtre rien) ? */
 export const estFamille = (id: string | null | undefined): id is string => !!id && FAMILLES.some((f) => f.id === id);
+
+/**
+ * Site 3.0 (lot D3) : l'adresse de la page d'une famille (`/matieres/bois`). Les identifiants de famille sont les
+ * adresses, stables (`?famille=`, et les fiches de D4 sous `/matieres/<famille>/<REF>`).
+ */
+export const cheminFamille = (id: string) => `/matieres/${id}`;

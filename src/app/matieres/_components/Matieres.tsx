@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useFavoris } from "@/app/simulateur/_components/useFavoris";
 import { IconeCoeur, IconeLoupe } from "@/components/espace/Illustrations";
@@ -13,6 +14,7 @@ import { PleinEcran } from "@/components/simulation/PleinEcran";
 import { GRILLE_ECHANTILLONS, SqueletteTuiles } from "@/components/simulation/Squelette";
 import { texteCartel } from "@/lib/cartel";
 import { differer } from "@/lib/differer";
+import { cheminFamille } from "@/lib/familles-matieres";
 import { DELAI_RECHERCHE_MS, MATIERES_PAR_PAGE, chargerCatalogue, estAffine, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, type FiltreMatieres, type Matiere, type Tiroir } from "@/lib/matieres";
 import { urlEchantillon } from "@/lib/simulateur/generation-client";
 import { TEINTES, trierParTeinte, type Teinte } from "@/lib/teintes";
@@ -153,6 +155,7 @@ export function Matieres({ premieres, tiroirs, finitions, vueDans = {} }: { prem
     if (tuile.isConnected) tuile.focus({ preventScroll: true });
   }, [agrandie]);
 
+  const tiroirOuvert = tiroirs.find((t) => t.id === filtre && t.id !== "tout") ?? null;
   const choix: Tiroir[] = [...tiroirs, { id: "favoris", libelle: "Favoris", nombre: favoris.length, teintes: [] }];
 
   return (
@@ -247,6 +250,12 @@ export function Matieres({ premieres, tiroirs, finitions, vueDans = {} }: { prem
         <p className="mt-3 min-h-[24px] text-[14.5px] text-encre-2" aria-live="polite">
           {message}
         </p>
+        {/* Lot D3 : un tiroir ouvert mène à la page de sa famille (ce que c'est, où ça se pose, l'entretien, les limites). */}
+        {tiroirOuvert ? (
+          <Link href={cheminFamille(tiroirOuvert.id)} className="inline-flex min-h-[44px] items-center text-[14.5px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
+            Tout savoir sur les {tiroirOuvert.libelle.toLowerCase()}
+          </Link>
+        ) : null}
       </div>
 
       {/* ── Les échantillons, rangés par teinte ── */}

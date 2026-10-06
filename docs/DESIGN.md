@@ -2,7 +2,7 @@
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
 prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
-(`/realisations`), C6 (l'espace client), C7 (les guides du blog) et D2 (le présentoir de `/matieres`).
+(`/realisations`), C6 (l'espace client), C7 (les guides du blog), D2 (le présentoir de `/matieres`) et D3 (les pages de famille).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -584,6 +584,32 @@ d'échantillons, pas une grille de produits.
   les favoris.
 - Une **bande de matière** (chêne Original Oak AA14) ferme le présentoir, avant le pied de page : en tête, elle aurait
   repoussé la première rangée d'échantillons hors du premier écran du téléphone.
+
+## Les pages de famille — `/matieres/<famille>`
+
+Lot D3, `src/app/matieres/[famille]/page.tsx` (serveur, statique), textes dans `src/data/textes-familles.ts`, règles
+pures dans `src/lib/pages-familles.ts` (énoncé, phase D). Sept pages : `bois`, `couleur`, `textile`, `pierre`, `metal`,
+`beton`, `paillettes` (les identifiants du catalogue, stables). Captures de référence :
+`docs/captures/site-3-0/matieres-bois-390.jpg` et `matieres-bois-1440.jpg`.
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Ouverture | papier | fil d'Ariane, « Matières · N références », le nom du tiroir en `h1`, l'accroche, le principal (« Essayer un bois sur ma photo », `depuis=matiere-famille`) et « Les voir en vrai chez moi » (secondaire), puis la **bande de toutes ses teintes** |
+| 2. Le texte | papier | quatre `h2` : ce que c'est, où ça se pose, l'entretien, les limites ; 300 mots au moins, largeur de lecture |
+| — bande | sa première vedette | `BandeMatiere` |
+| 3. Où on les voit | papier-2 | trois `CarteAmbiance` (« Ambiance », cartels vers leur matière), une pièce chacune tant que possible ; **omise** sans ambiance (textiles, métaux, paillettes) ; deux pour les bétons |
+| 4. Nos vedettes | papier | `Echantillon` (vignette du CRM), huit au plus ; « Pour commencer » quand aucune vedette n'existe (quatre teintes prises dans le nuancier) |
+| 5. Les N références | papier-2 | toutes, dans l'ordre du nuancier : pastille de couleur, nom, référence ; repliées (`<details>`) au-delà de 41 (bois, couleurs) |
+| 6. Plus loin | papier | où on les pose (pages de prestation), les six autres familles en pastilles, « Tout le présentoir » |
+| 7. Dernier appel | encre | le même principal, « Les voir en vrai chez moi » en `sur-encre` |
+
+- **La bande des teintes** : un seul `linear-gradient` à arrêts francs (`degradeDeTeintes`), une bande égale par
+  teinte, dans l'ordre du présentoir ; aucune image (rien à charger, jamais le LCP), 64 px de haut, 96 px dès 768 px,
+  `role="img"` nommé « Les N teintes, rangées comme un nuancier, de … à … ».
+- **Aucune image prioritaire** : le titre est le LCP ; toutes les sections après le texte sont `differee`.
+- Les pastilles de famille (quatre teintes en disques CSS, comme les tiroirs) servent aussi à la section « Les
+  familles, une par une » de `/matieres`, entre le présentoir et la bande AA14 ; un tiroir ouvert y ajoute « Tout
+  savoir sur les bois ».
 
 ## Les guides du blog
 

@@ -1061,3 +1061,79 @@ titre ; page `async`), guides (le même principal deux fois, sous le titre et en
 `scripts/captures.mjs` (Edge) à 390 et 1 440 px sur l'accueil, `/realisations`, `/comment-ca-marche`, `/inspirations`,
 deux guides et `/prestations/salle-de-bain` : aucun débordement à 360 px, 0 requête coupée. Captures de référence
 `accueil-*` et `comment-ca-marche-*` de `docs/captures/site-3-0` refaites ; les autres dans `scratchpad/m21/rbc`.
+
+## D3 — `/matieres/<famille>` (06/10/2026)
+
+**Fait** (aucune image générée, aucun envoi ; `docs/DESIGN.md` « Les pages de famille », `docs/SUIVI.md`)
+- **Sept pages statiques** `src/app/matieres/[famille]/page.tsx` : `bois`, `couleur`, `textile`, `pierre`, `metal`,
+  `beton`, `paillettes` (les identifiants du catalogue, ceux de `?famille=` et des futures fiches
+  `/matieres/<famille>/<REF>` ; `SLUGS_FAMILLES`, écrits en dur dans le test). `dynamicParams = false` et `notFound()`
+  par sûreté : `/matieres/inconnue`, `/matieres/bois/x` → 404 (vérifié sur le build).
+- **Les textes** `src/data/textes-familles.ts`, écrits à la main, « on » / « nous », quatre parties (ce que c'est, où
+  ça se pose, l'entretien, les limites). Mots (accroche + texte / texte seul, rendu dans la page) : bois 419 / 398,
+  couleurs 408 / 388, textiles 346 / 330, pierres 375 / 353, métaux 347 / 331, bétons et stucs 365 / 351, paillettes
+  349 / 329. Rien sur les performances techniques (ni norme, ni épaisseur, ni durée, ni tenue chiffrée) : ce qu'on
+  fait (échantillons chez vous, cas par cas près des plaques), ce qu'on déconseille (métaux, textiles, paillettes ni
+  sur un plan de travail ni près de l'eau, comme `prestationsDeFamille`), ce que le film n'est pas. Entretien repris
+  de `/comment-ca-marche`. Aucun montant. Les détails de catalogue sont vérifiés dans `revetements.json` (six chênes
+  structurés et un rustique, deux unis laqués, trois rayés, la série de cuirs LP, les noms cités).
+- **La page** : fil d'Ariane visible + `BreadcrumbList` (Accueil › Matières › famille), titre ≤ 60 et description ≤ 155
+  (`metadonneesPage`, canonique `/matieres/<famille>`), principal « Essayer un bois sur ma photo »…, « Les voir en vrai
+  chez moi », la bande de toutes ses teintes (un dégradé CSS à arrêts francs, `degradeDeTeintes`), le texte, une bande
+  de matière (sa première vedette), trois ambiances (`ambiancesDeFamille` : la plus grande part de surfaces de la
+  famille d'abord, une pièce chacune tant que possible), ses vedettes (`vedettesDeFamille`), toutes ses références dans
+  l'ordre du nuancier, où on les pose, les six autres familles, le dernier appel en encre.
+- **`/matieres` mène aux sept** : section « Les familles, une par une » (pastilles des tiroirs, nombre) entre le
+  présentoir et la bande AA14 ; dans le présentoir, un tiroir ouvert affiche « Tout savoir sur les <famille> »
+  (`cheminFamille`, dans `lib/familles-matieres`, module léger lu par le client).
+
+**Décisions prises seul**
+1. **Action principale = le simulateur sans famille** (`/simulateur?depuis=matiere-famille`) : le simulateur ne lit
+   que `ref`, `projet`, `element`, `choix` ; présélectionner une référence au hasard de la famille aurait trompé.
+   Nouvelle valeur `depuis` seulement (SUIVI.md), aucun événement nouveau.
+2. **« Les voir en vrai chez moi » → `/contact?visite=1&famille=<id>`** : pertinent pour une famille (on vient avec
+   les échantillons). Aujourd'hui le formulaire ignore `visite` et `famille` (il ne lit que `ref`) : **pour D4**, faire
+   lire `visite=1` à `FormulaireContact.tsx` (message prérempli) et y gérer `famille` (« les échantillons de bois »).
+3. **Liens des références vers `/matieres?ref=<REF>`** par `lienMatiere`, puisque D4 n'est pas dans ce commit. **Pour
+   D4** : changer `lienMatiere` (la seule source, comme le prévoit le plan) suffit à faire passer toutes les listes,
+   vedettes et cartels de ces pages aux fiches ; adapter alors l'expression des liens de `familles.test.ts`
+   (`/^\/matieres\?ref=…$/` dans « les liens mènent tous à une page qui existe »).
+4. **Vedettes** : celles du site (accueil, prestations) puis les plus vues dans une ambiance, huit au plus ; textiles
+   et paillettes n'en ont aucune → quatre teintes prises dans le nuancier, sous le titre « Pour commencer » (pas
+   « Nos vedettes ») ; métaux (Q1) et bétons (NE24, NH12) sont complétés à quatre, et l'intro le dit.
+5. **Ambiances** : section omise pour textiles, métaux, paillettes (aucune ambiance) ; deux pour les bétons (les deux
+   seules) ; les textes de ces familles le disent (« Nous n'avons pas encore d'image d'ambiance avec … »).
+6. **Liste repliée au-delà de 41 références** (bois 267, couleurs 89 : `<details>`, toujours dans la page pour le
+   référencement) ; dépliée pour les cinq autres. Lignes de 44 px, deux colonnes dès 360 px.
+7. Le plan du site et `llms.txt` ne listent pas encore les familles : c'est D5 (`sitemap.test.ts` compare la liste
+   exacte).
+8. `insecables` (blog) reprise pour la typographie (espace insécable avant « : ; ? ! »).
+
+**Tests** : 451 → 471, tous réussis. Nouveau `src/app/matieres/familles.test.ts` (20) : les sept slugs écrits en dur,
+`generateStaticParams`, `dynamicParams = false` ; 404 et aucune métadonnée pour `inconnue`, `Bois`, `tout`, `favoris`,
+`bois-clair`, vide ; textes (quatre parties, 300 mots au moins, le compte juste, aucun montant ni promesse chiffrée,
+seuls nombres permis, « on ») ; titres ≤ 60 et distincts, descriptions ≤ 155 non coupées, canonique ; chaque page
+rendue (h1, texte entier et ≥ 300 mots rendus, fil visible et `BreadcrumbList` exact, bande des teintes, deux
+principaux identiques vers le simulateur avec `depuis`, visite, ambiances étiquetées ou section omise, vedettes,
+toutes les références dans l'ordre du nuancier, repli) ; tous les liens mènent à une page qui existe ; aucune image
+prioritaire ni donnée du CRM ; règles (nuancier, dégradé, choix des ambiances sur une liste connue, vedettes, compte des
+mots) ; le lien du tiroir ouvert. `matieres.test.ts` adapté en gardant son intention : les 32 pastilles se comptent
+dans la barre des tiroirs (la page en a 28 de plus, celles des familles, vérifiées avec leurs liens).
+`npx eslint .` et `npm run build` passent (7 pages `●` sous `/matieres/[famille]`).
+
+**Vérification visuelle** : build local comme la CI (CRM de production en lecture, `NEXT_PUBLIC_SANS_EVENEMENTS=1`),
+`next start -p 3100` arrêté ensuite. `scripts/captures.mjs` (Edge) à 390 et 1 440 px sur bois, textiles, bétons,
+paillettes et `/matieres` : aucun débordement à 360 px, 0 requête coupée. Captures de référence
+`docs/captures/site-3-0/matieres-bois-390.jpg`, `matieres-bois-1440.jpg`, `matieres-390.jpg`, `matieres-1440.jpg`
+(refaites : section des familles). Dans le navigateur : `/matieres?famille=metal` montre « Tout savoir sur les
+métaux » → `/matieres/metal`.
+
+**Problèmes**
+- `scripts/captures.mjs` rend en blanc les sections `differee` (`content-visibility: auto`) hors du dernier écran : il
+  remonte en haut avant la capture pleine page, et le navigateur ne peint plus ces sections. Les captures de référence
+  de ce lot sont faites avec un script temporaire qui force `content-visibility: visible` (non commité). À corriger
+  dans `captures.mjs` (une ligne `addStyleTag`) quand un lot y touche ; les captures `prestation-*` et
+  `comment-ca-marche-*` déjà commitées sont peut-être concernées.
+- En local sous Windows, `/matieres/Bois` répond 200 (le système de fichiers ne distingue pas la casse : le fichier
+  prérendu `bois.html` est trouvé, la page servie est celle du 404 sans le statut) ; `/matieres/BOIS` répond 404. Même
+  chose pour `/prestations/Cuisine`, avant ce lot. Sur Vercel (Linux), la casse compte : 404.

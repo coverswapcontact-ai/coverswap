@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { cheminFamille } from "@/lib/familles-matieres";
 import { vueDans } from "@/lib/indexation-matieres";
 import { choixFinitions, premieresDuPresentoir, tiroirs, type Matiere } from "@/lib/matieres";
 import { matiereCartel } from "@/lib/matieres-vedettes";
@@ -38,6 +40,10 @@ export const metadata: Metadata = {
 };
 
 /** « Vue dans » réduit à ce que la matière en grand affiche (l'ancre et le titre) : la page n'envoie rien de plus. */
+/** Les sept tiroirs, calculés une fois : le présentoir et les liens vers les pages de famille (lot D3). */
+const TIROIRS_DU_PRESENTOIR = tiroirs(CATALOGUE);
+const FAMILLES_EN_DETAIL = TIROIRS_DU_PRESENTOIR.filter((t) => t.id !== "tout");
+
 const VUES = Object.fromEntries(Object.entries(vueDans()).map(([ref, liste]) => [ref, liste.map(({ id, titre }) => ({ id, titre }))]));
 
 export default function PageMatieres() {
@@ -54,7 +60,27 @@ export default function PageMatieres() {
         </div>
       </section>
       <Section large className="pt-6 md:pt-6">
-        <Matieres premieres={premieresDuPresentoir(CATALOGUE)} tiroirs={tiroirs(CATALOGUE)} finitions={choixFinitions(CATALOGUE)} vueDans={VUES} />
+        <Matieres premieres={premieresDuPresentoir(CATALOGUE)} tiroirs={TIROIRS_DU_PRESENTOIR} finitions={choixFinitions(CATALOGUE)} vueDans={VUES} />
+      </Section>
+      {/* Lot D3 : les sept familles, une page chacune (ce que c'est, où ça se pose, l'entretien, les limites). */}
+      <Section id="familles" large ton="papier-2" titre="Les familles, une par une" intro="Ce que c'est, où ça se pose, l'entretien et les limites de chaque famille, avec toutes ses teintes.">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {FAMILLES_EN_DETAIL.map((t) => (
+            <li key={t.id}>
+              <Link href={cheminFamille(t.id)} className="flex min-h-[56px] items-center gap-3 rounded-[var(--rayon-sm)] border border-trait bg-blanc px-4 py-2 text-encre transition-colors duration-[var(--duree-courte)] hover:border-encre">
+                <span aria-hidden="true" className="flex shrink-0 -space-x-1.5">
+                  {t.teintes.map((hex, i) => (
+                    <span key={i} className="h-4 w-4 rounded-full ring-2 ring-blanc" style={{ backgroundColor: hex }} />
+                  ))}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[15px] font-medium">{t.libelle}</span>
+                  <span className="block text-[13px] text-encre-2">{t.nombre} références</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </Section>
       {BANDE ? <BandeMatiere matiere={BANDE} /> : null}
     </div>

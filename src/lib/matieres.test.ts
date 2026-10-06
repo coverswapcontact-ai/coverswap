@@ -236,7 +236,12 @@ describe("la page rendue", () => {
     for (const f of tiroirs(CATALOGUE)) assert.ok(html.includes(`<span>${f.libelle}</span><span class="text-[13px] ${f.id === "tout" ? "text-blanc/70" : "text-encre-2"}">${f.nombre}</span>`), f.libelle);
     assert.equal(choixFamilles(CATALOGUE).length, tiroirs(CATALOGUE).length, "« Tout » et les sept familles");
     assert.ok(html.includes(">Favoris</span>"));
-    assert.equal(compter(html, "h-4 w-4 rounded-full ring-2"), 32, "quatre pastilles par tiroir, « Tout » compris");
+    const barre = html.slice(html.indexOf('aria-label="Familles de matières"'), html.indexOf('<select id="filtre-teinte"'));
+    assert.equal(compter(barre, "h-4 w-4 rounded-full ring-2"), 32, "quatre pastilles par tiroir, « Tout » compris");
+    // Lot D3 : les sept familles mènent à leur page, chacune avec les quatre teintes de son tiroir.
+    const familles = html.slice(html.indexOf('<section id="familles"'), html.indexOf("</section>", html.indexOf('<section id="familles"')));
+    assert.equal(compter(familles, "h-4 w-4 rounded-full ring-2"), 28, "quatre pastilles par famille");
+    for (const f of tiroirs(CATALOGUE).filter((t) => t.id !== "tout")) assert.ok(familles.includes(`href="/matieres/${f.id}"`) && familles.includes(`${f.nombre} références`), f.id);
     assert.match(html, /<select id="filtre-teinte"/);
     assert.match(html, /<select id="filtre-finition"[^>]*>.*Structurée \(6\).*Rustique \(1\).*Pailletée \(16\)<\/option><\/select>/);
     assert.ok(!/<option value="Soft"/.test(html), "« Standard » ne filtrerait presque rien");
