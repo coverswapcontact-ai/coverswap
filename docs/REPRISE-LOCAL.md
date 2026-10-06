@@ -35,7 +35,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - D2, `/matieres` le présentoir : fait (7 tiroirs, filtres teinte / finition / ambiance, échantillons rangés par teinte ; `docs/DESIGN.md` « Le présentoir »).
 - D3, `/matieres/<famille>` : fait (sept pages, textes, bande des teintes, ambiances, vedettes, toutes les références).
 - D4, `/matieres/<famille>/<REF>` : fait (497 fiches, 52 indexées avec leur note, les autres en `noindex, follow` ; `docs/DESIGN.md` « La fiche d'une matière »).
-- D5 : à venir.
+- D5, plan du site et `llms.txt` : fait (les sept familles et les 52 fiches indexées au plan du site, les familles dans `llms.txt`).
 
 ## Phase E : le simulateur
 
@@ -1226,3 +1226,29 @@ vignette chargée (595 × 790) ; robots `noindex, follow` sur A1, `preconnect` e
 - Le catalogue range quelques décors à l'aspect bois hors des bois (Brown Wenge A1 est un « textile ») : la fiche suit
   le catalogue, et `teinteDe` le classe « Beige et taupe » ; rien changé.
 - Le LCP de la fiche dépend du CRM (autre domaine) : à mesurer en F6 (le plan prévoit `?l=640` côté CRM si > 2,5 s).
+
+## D5 — plan du site et `llms.txt` (06/10/2026)
+
+**Fait**
+- `src/app/sitemap.ts` : les sept familles (`/matieres/<famille>`, priorité 0,7) et les 52 fiches indexées
+  (`fichesIndexees()` → `lienMatiere`, priorité 0,5), et rien d'autre : les 445 fiches en `noindex, follow` n'y sont
+  pas. 36 → 95 adresses (vérifié dans le `sitemap.xml` construit).
+- `src/app/llms.txt/route.ts` : section « Familles de matières » (les sept, avec leur accroche de
+  `data/textes-familles`) ; la ligne « Matières » dit le rangement par teinte, l'adresse d'une fiche
+  (`/matieres/<famille>/<référence>`, exemple NF13) et « Essayer chez moi ».
+
+**Décisions prises seul**
+1. **Dates** : les familles et les fiches portent `DATE_CATALOGUE` (06/10/2026, le jour de ces pages), les autres pages
+   gardent `LAST_BUILD` (30/09). Le plan voulait « la date de fusion », inconnue avant G3 : **en G3, passer
+   `LAST_BUILD` et `DATE_CATALOGUE` au jour de la mise en ligne** (et adapter les deux dates de `sitemap.test.ts`).
+2. Priorités : familles 0,7 (comme `/inspirations`, `/contact`), fiches 0,5 (comme les guides), sous les pages du
+   tunnel.
+
+**Tests** : 486 → 487, tous réussis. `sitemap.test.ts` : la liste exacte des pages gagne les sept familles et les 52
+fiches, **écrites en dur** (jamais reconstruites par `fichesIndexees()`), 95 adresses ; nouveau test « lot D5 » :
+présentes `/matieres/couleur/NF13`, `/matieres/bois/D1`, NE31, Q1, NF27, J3 et les familles ; absentes deux fiches
+non indexées (A1, Q2), AF02 et `/matieres?ref=NF13` ; 52 fiches au motif d'une fiche ; dates et priorités ; le test
+des dates garde son intention hors des matières ; `llms.txt` : les sept familles, la section, l'exemple de fiche.
+`npx eslint .` et `npm run build` passent (546 pages, 34 s avec le cache).
+
+**Problèmes** : aucun.

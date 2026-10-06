@@ -3,6 +3,10 @@ import { articles } from '@/data/blog-articles';
 import { ZONES, getZoneSlug } from '@/data/zones';
 import { PRESTATIONS, lienPrestation } from '@/data/prestations';
 import { ENTREPRISE } from '@/lib/entreprise';
+import { cheminFamille } from '@/lib/familles-matieres';
+import { fichesIndexees } from '@/lib/indexation-matieres';
+import { lienMatiere } from '@/lib/matieres-vedettes';
+import { SLUGS_FAMILLES } from '@/lib/pages-familles';
 
 /**
  * Sitemap dynamique CoverSwap (mission 16, partie 5 : les six pages du tunnel, les pages par pièce, les zones, les
@@ -13,9 +17,16 @@ import { ENTREPRISE } from '@/lib/entreprise';
  *  - `lastModified` figé à une date fixe par URL (pas Date.now à chaque build)
  *    pour éviter que Google interprète tout le site comme "constamment modifié".
  *  - Priorités : 1.0 (accueil), 0.9 (simulateur, zones — SEO local), 0.8 (matières, réalisations, comment ça marche,
- *    pro, pages par pièce), 0.7 (contact, index des zones), 0.5 (guides), 0.3 (légal).
+ *    pro, pages par pièce), 0.7 (contact, index des zones, familles de matières), 0.5 (guides, fiches de matière),
+ *    0.3 (légal).
+ *
+ * Site 3.0 (lot D5) : les sept familles de matières (`/matieres/<famille>`) et les 52 fiches indexées
+ * (`fichesIndexees` : les matières vues dans une ambiance et les vedettes) ; les 445 autres fiches sont servies en
+ * `noindex, follow` et n'y figurent pas. Leur date est celle du catalogue du site 3.0 (`DATE_CATALOGUE`) ; à la
+ * fusion de la branche (lot G3), `LAST_BUILD` et `DATE_CATALOGUE` passent au jour de la mise en ligne.
  */
 const LAST_BUILD = new Date('2026-09-30T00:00:00Z');
+const DATE_CATALOGUE = new Date('2026-10-06T00:00:00Z');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = ENTREPRISE.site;
@@ -58,5 +69,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticPages, ...prestationPages, ...zonePages, ...blogPages];
+  /** Les familles de matières (produit : « film adhésif effet marbre », « adhésif cuisine imitation bois »). */
+  const famillePages: MetadataRoute.Sitemap = SLUGS_FAMILLES.map((famille) => ({
+    url: `${baseUrl}${cheminFamille(famille)}`,
+    lastModified: DATE_CATALOGUE,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  /** Les fiches indexées, et seulement elles. */
+  const fichePages: MetadataRoute.Sitemap = fichesIndexees().map((ref) => ({
+    url: `${baseUrl}${lienMatiere(ref)}`,
+    lastModified: DATE_CATALOGUE,
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...prestationPages, ...zonePages, ...blogPages, ...famillePages, ...fichePages];
 }

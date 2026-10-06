@@ -3,7 +3,10 @@ import { ENTREPRISE } from "@/lib/entreprise";
 import { PRESTATIONS, lienPrestation } from "@/data/prestations";
 import { articles } from "@/data/blog-articles";
 import { ZONES, getZoneSlug } from "@/data/zones";
+import { TIROIRS, cheminFamille } from "@/lib/familles-matieres";
 import { choixFamilles } from "@/lib/matieres";
+import { SLUGS_FAMILLES } from "@/lib/pages-familles";
+import { texteFamille } from "@/data/textes-familles";
 import { DELAI_RENDU, DELAI_REPONSE, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE } from "@/lib/offre";
 
 /**
@@ -11,7 +14,8 @@ import { DELAI_RENDU, DELAI_REPONSE, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATI
  * nous faisons, pour qui, à quel prix, où, avec les pages à lire. Rien ici qui
  * ne soit déjà sur le site ; tout vient de la source unique.
  * Mission 16 (partie 5) : réécrite sur les pages du tunnel (simulateur, matières, réalisations, comment ça marche,
- * pro), les pages par pièce, les guides et les zones ; plus aucune adresse redirigée.
+ * pro), les pages par pièce, les guides et les zones ; plus aucune adresse redirigée. Site 3.0 (lot D5) : les sept
+ * familles de matières, chacune avec son accroche, et l'adresse d'une fiche (`/matieres/<famille>/<RÉF>`).
  */
 export const dynamic = "force-static";
 
@@ -42,10 +46,14 @@ export function GET() {
     "## Le parcours",
     "",
     `- [Simuler sur votre photo](${s}/simulateur) : la pièce, une photo, une matière par zone, le rendu, l'estimation, puis le devis.`,
-    `- [Matières](${s}/matieres) : les ${NB_REFERENCES} références Cover Styl' par famille, en grand ; « Essayer sur ma photo » ouvre le simulateur avec la matière choisie (${s}/simulateur?ref=<référence>).`,
+    `- [Matières](${s}/matieres) : les ${NB_REFERENCES} références Cover Styl' rangées par teinte, en sept familles ; chaque référence a sa fiche (${s}/matieres/<famille>/<référence>, par exemple ${s}/matieres/couleur/NF13) ; « Essayer chez moi » ouvre le simulateur avec la matière choisie (${s}/simulateur?ref=<référence>).`,
     `- [Réalisations](${s}/realisations) : chantiers publiés avec l'accord des clients et leurs avis ; sinon des exemples simulés, étiquetés comme tels.`,
     `- [Comment ça marche](${s}/comment-ca-marche) : le procédé, le prix (${s}/comment-ca-marche#prix), les questions fréquentes (${s}/comment-ca-marche#faq), le devis en ligne (${s}/comment-ca-marche#devis).`,
     `- [Professionnels](${s}/pro) : hôtels, restaurants, commerces, bureaux ; devis sur photos et surface.`,
+    "",
+    "## Familles de matières",
+    "",
+    ...SLUGS_FAMILLES.map((f) => `- [${TIROIRS[f]}](${s}${cheminFamille(f)}) : ${texteFamille(f)?.accroche ?? ""}`),
     "",
     "## Pages par pièce",
     "",
