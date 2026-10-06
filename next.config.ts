@@ -35,20 +35,22 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
+    // Site 3.0 (lot F3) : toutes en 301 (`statusCode`, plus `permanent` qui répond 308) ; le changement d'hôte (www et
+    // coverswap.vercel.app → coverswap.fr) est dans vercel.json, avant le site. Docs : docs/SEO.md, « Un seul hôte ».
     // L'ancien simulateur vivait sur /simulation ; l'adresse est indexée et partagée.
     return [
-      { source: "/simulation", destination: "/simulateur", permanent: true },
+      { source: "/simulation", destination: "/simulateur", statusCode: 301 },
       // Ancien article daté ; son sujet vit dans un guide sans date.
-      { source: "/blog/tendances-deco-2025-covering", destination: "/blog/quelle-finition-choisir", permanent: true },
+      { source: "/blog/tendances-deco-2025-covering", destination: "/blog/quelle-finition-choisir", statusCode: 301 },
       // Mission 16 (partie 4) : le devis passe par la simulation (tunnel) ; la page pro devient /pro. Test : src/redirections.test.ts.
-      { source: "/devis", destination: "/simulateur", permanent: true },
-      { source: "/prestations/professionnel", destination: "/pro", permanent: true },
+      { source: "/devis", destination: "/simulateur", statusCode: 301 },
+      { source: "/prestations/professionnel", destination: "/pro", statusCode: 301 },
       // Mission 16 (partie 5) : le catalogue devient /matieres (`?famille=` et `?ref=` passent tels quels : Next garde la
       // requête), l'index des prestations mène aux réalisations (les pages par pièce gardent leur adresse), l'index du
       // blog mène à « Comment ça marche » (les guides gardent la leur). Sonde en ligne : scripts/verifier-redirections.mjs.
-      { source: "/revetements", destination: "/matieres", permanent: true },
-      { source: "/prestations", destination: "/realisations", permanent: true },
-      { source: "/blog", destination: "/comment-ca-marche", permanent: true },
+      { source: "/revetements", destination: "/matieres", statusCode: 301 },
+      { source: "/prestations", destination: "/realisations", statusCode: 301 },
+      { source: "/blog", destination: "/comment-ca-marche", statusCode: 301 },
     ];
   },
   async headers() {

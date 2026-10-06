@@ -187,3 +187,51 @@ describe("site 3.0 (lot F2) : titres ≤ 60, descriptions écrites pour tenir en
     assert.match(readFileSync(join(process.cwd(), "src", "app", "realisations", "page.tsx"), "utf8"), /titre: avis\.length > 0 \? TITRE_AVEC_AVIS : TITRE_SANS_AVIS/);
   });
 });
+
+describe("site 3.0 (lot F3) : un seul hôte, un canonical par page, aucun par défaut", () => {
+  test("le gabarit n'a plus de canonical par défaut ; son adresse est ENTREPRISE.site", () => {
+    // Lu comme texte : le gabarit importe globals.css (pas de rendu sous node). La 404 construite est vérifiée en F3
+    // sur le build (aucun <link rel="canonical">).
+    const gabarit = readFileSync(join(process.cwd(), "src", "app", "layout.tsx"), "utf8");
+    assert.doesNotMatch(gabarit, /alternates:|canonical|NEXT_PUBLIC_SITE_URL/, "la 404 et les pages privées ne pointent plus vers l'accueil");
+    assert.match(gabarit, /const SITE_URL = ENTREPRISE\.site;/);
+    assert.match(gabarit, /metadataBase: new URL\(SITE_URL\)/);
+  });
+
+  test("aucune autre adresse du site que ENTREPRISE.site (ni www, ni vercel.app, ni variable d'environnement)", () => {
+    const SRC = join(process.cwd(), "src");
+    const fichiers: string[] = [];
+    const parcourir = (dossier: string) => {
+      for (const n of readdirSync(dossier)) {
+        const chemin = join(dossier, n);
+        if (statSync(chemin).isDirectory()) parcourir(chemin);
+        else if (/\.tsx?$/.test(n) && !n.endsWith(".test.ts")) fichiers.push(chemin);
+      }
+    };
+    parcourir(SRC);
+    for (const f of fichiers) {
+      const texte = readFileSync(f, "utf8");
+      assert.doesNotMatch(texte, /NEXT_PUBLIC_SITE_URL|www\.coverswap\.fr|coverswap\.vercel\.app/, relative(SRC, f));
+    }
+  });
+
+  test("le plan du site cite chaque page fixe indexable, et aucune page privée", async () => {
+    const { default: sitemap } = await import("@/app/sitemap");
+    const urls = new Set(sitemap().map((e) => e.url));
+    const APP = join(process.cwd(), "src", "app");
+    const fixes: string[] = [];
+    const parcourir = (dossier: string) => {
+      for (const n of readdirSync(dossier)) {
+        const chemin = join(dossier, n);
+        if (statSync(chemin).isDirectory()) parcourir(chemin);
+        else if (n === "page.tsx") fixes.push(relative(APP, dossier).split(sep).join("/"));
+      }
+    };
+    parcourir(APP);
+    const publiques = fixes.filter((d) => !d.includes("[") && !/^(e|desinscription)(\/|$)/.test(d));
+    assert.ok(publiques.length >= 12, String(publiques.length));
+    for (const d of publiques) assert.ok(urls.has(urlAbsolue(`/${d}`)), `/${d} au plan du site`);
+    for (const u of urls) assert.doesNotMatch(u, /\/(e|desinscription|api)(\/|$)/, u);
+    for (const u of urls) assert.ok(u === "https://coverswap.fr" || u.startsWith("https://coverswap.fr/"), u);
+  });
+});

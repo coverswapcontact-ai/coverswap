@@ -11,6 +11,7 @@ import HorsSimulateur from "@/components/HorsSimulateur";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
+import { ENTREPRISE } from "@/lib/entreprise";
 import { IMAGE_PARTAGE } from "@/lib/partage";
 /**
  * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900, droit et italique) et Libre Franklin pour le texte,
@@ -31,7 +32,13 @@ const franklin = Libre_Franklin({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://coverswap.fr";
+/**
+ * Site 3.0 (lot F3) : une seule adresse du site, `ENTREPRISE.site` (https://coverswap.fr, l'hôte gardé : le www et
+ * l'adresse vercel.app de production y redirigent en 301, vercel.json). Aucune adresse canonique par défaut ici :
+ * chaque page pose la sienne (`metadonneesPage`) ; la 404 et les pages privées n'en ont pas (avant, elles héritaient
+ * de celle de l'accueil).
+ */
+const SITE_URL = ENTREPRISE.site;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -70,9 +77,6 @@ export const metadata: Metadata = {
     title: "CoverSwap — Covering adhésif premium",
     description: "Rénovez votre intérieur en 1 journée. Simulation IA gratuite.",
     images: [IMAGE_PARTAGE.url],
-  },
-  alternates: {
-    canonical: SITE_URL,
   },
   icons: {
     icon: "/logo.png",

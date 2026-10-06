@@ -146,6 +146,10 @@ Mots comptés dans le `<main>` rendu (build du 06/10, scripts et styles retirés
   tout ouvert sauf `/api/`, `/e/`, `/desinscription`, et l'adresse du plan.
 - Sonde en ligne après la fusion : `node scripts/verifier-redirections.mjs` (anciennes adresses en 301, et les deux
   hôtes vers `coverswap.fr`).
+- **Vérifié sur le build local (06/10)** : les 7 anciennes adresses en 301 (sonde `SITE=http://localhost:3100`, 8/8),
+  la requête gardée ; les 540 pages construites ont leur canonical absolu exact ; la 404 n'en a plus ; 95 adresses au
+  plan du site. Les règles d'hôte de `vercel.json` ne jouent que chez Vercel : **à sonder en ligne après la fusion
+  (G3)** — d'ici là la production répond encore 200 sur les trois hôtes et 308 sur les anciennes adresses.
 
 ### Les guides du lot C7 (posés en avance, repris dans la carte ci-dessus)
 

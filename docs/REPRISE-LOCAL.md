@@ -47,7 +47,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 - F1, `docs/SEO.md` : fait (carte des intentions, une ligne par page indexée ; image de partage et hôte unique décrits).
 - F2, métadonnées : fait (titles ≤ 60 et descriptions ≤ 155 partout, image de partage par page, `lib/partage.ts`, `npm run og`).
-- F3 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
+- F3, un seul hôte : fait (`vercel.json` : www et coverswap.vercel.app → coverswap.fr en 301 ; redirections en 301 ; plus de canonical par défaut).
+- F4 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
 
 ## Phase G : livraison
 
@@ -1541,3 +1542,40 @@ gardée. `npx eslint .` et `npm run build` passent ; inventaire du build : 0 pag
 existe.
 
 **Problèmes** : aucun.
+
+## F3 — un seul hôte (06/10/2026)
+
+**Fait**
+- Production vérifiée par `curl -I` : `coverswap.fr`, `www.coverswap.fr` et `coverswap.vercel.app` répondaient tous
+  200, `/devis` 308 ; `ENTREPRISE.site` et tous les canonicals disent `https://coverswap.fr` → **hôte gardé :
+  coverswap.fr, sans www**.
+- `vercel.json` : deux règles `redirects`, hôtes **exacts** `www.coverswap.fr` et `coverswap.vercel.app` (aucun
+  joker : les prévisualisations restent servies), `source` `/((?!api/).*)` → `https://coverswap.fr/$1`,
+  `statusCode: 301` (la requête suit) ; la tâche planifiée reste.
+- `next.config.ts` : les 7 redirections en `statusCode: 301` (308 avant) ; vérifié sur `next start` : 301 et bon
+  `location` partout, `?famille=bois` gardé.
+- `layout.tsx` : canonical par défaut retiré (la 404 et les pages privées pointaient vers l'accueil ; la 404 construite
+  n'en a plus), `SITE_URL = ENTREPRISE.site` (plus de `NEXT_PUBLIC_SITE_URL`). Inventaire du build : canonical exact
+  sur les 540 pages, titles ≤ 60 et descriptions ≤ 155 toujours ; plan du site 95 adresses, `robots.txt` inchangé.
+- `scripts/verifier-redirections.mjs` : n'accepte plus que 301 ; sur la production, sonde aussi les deux hôtes
+  (`SONDES_HOTES`, location absolue vers coverswap.fr). `docs/SUIVI.md` et `docs/SEO.md` à jour.
+
+**Décisions prises seul**
+1. **Routes `/api/` exclues des règles d'hôte** (le plan disait `/(.*)`) : une 301 transforme un `POST` en `GET`
+   (formulaires, relais ntfy du CRM, s'il passait par un de ces hôtes) et une tâche planifiée Vercel ne suit pas les
+   redirections ; ces routes ne sont pas indexées (`robots.txt`), donc rien n'est perdu pour le référencement.
+2. Le test interdit désormais toute adresse `www.coverswap.fr` / `coverswap.vercel.app` / `NEXT_PUBLIC_SITE_URL` dans
+   `src` (hors tests).
+3. `.env.example` cite encore `NEXT_PUBLIC_SITE_URL` (variable désormais inutilisée) : non modifié (consigne : aucun
+   fichier `.env*` ouvert) ; à retirer par Lucas, ainsi que la variable dans Vercel si elle y est posée.
+
+**Tests** : 531 → 537, tous réussis. `redirections.test.ts` : 301 écrit et ni `permanent` ni `has` dans next.config ;
+nouveau bloc `vercel.json` (2) : deux règles, 301, hôtes exacts sans joker, destination `ENTREPRISE.site/$1`, motif
+qui garde les pages et exclut `/api/` (contact, relais, tâche), tâche planifiée gardée ; la sonde connaît les deux
+hôtes ; un 308 est désormais KO ; sonde de production (hôtes sondés, un hôte qui sert la page est KO).
+`metadonnees.test.ts` (3) : gabarit sans canonical ni variable, aucune autre adresse du site dans `src`, plan du site
+qui cite chaque page fixe et aucune page privée. `npx eslint .` et `npm run build` passent ; serveur local arrêté.
+
+**Problèmes / à vérifier en G3** : les règles d'hôte ne se testent que chez Vercel — après la fusion, `node
+scripts/verifier-redirections.mjs` doit donner 11/11 (7 anciennes adresses, la requête, 3 sondes d'hôte). Le CORS du
+CRM accepte toujours `www` : sans effet, le navigateur n'y restera plus.
