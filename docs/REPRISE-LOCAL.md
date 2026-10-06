@@ -45,7 +45,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 ## Phase F : SEO et performance
 
-À venir (F1 à F6). Mesures « avant » : `docs/SEO.md`.
+- F1, `docs/SEO.md` : fait (carte des intentions, une ligne par page indexée ; image de partage et hôte unique décrits).
+- F2 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
 
 ## Phase G : livraison
 
@@ -1467,3 +1468,28 @@ l'analyse que la mémoire injectée (photo sans analyse) redemandait au CRM. Cap
 
 **Problèmes** : aucun. À vérifier par Lucas : la note « Souhaite recevoir les échantillons » arrive dans le message
 du lead (champ `message` du CRM, déjà transmis par la route).
+
+## F1 — `docs/SEO.md` (06/10/2026)
+
+**Fait** (documentation seule, aucun code)
+- `docs/SEO.md`, « Carte des intentions » : les quatre familles d'intentions (locale, produit, informationnelle,
+  commerciale) et qui porte quoi ; une ligne par page indexée (intention, requête cible, H1, title et description que
+  F2 pose avec leurs longueurs, pages qui y mènent, pages où elle mène — relevés sur le build) ; les 12 guides dans un
+  second tableau ; les pages qui manquent de texte pour F6 ; les règles de l'image de partage (F2) et de l'hôte unique
+  (F3).
+- Relevé fait sur un build local (inventaire du `<main>` de chaque page construite : title, description, canonical,
+  H1, mots, liens internes) : tous les canonicals sont justes sur les pages indexées, le plan du site cite exactement
+  les 95 pages indexées, **la 404 et les pages privées héritent du canonical de l'accueil** (corrigé en F3).
+
+**Décisions prises seul**
+1. **Montpellier, un propriétaire par requête** : « covering cuisine Montpellier » → `/prestations/cuisine` ;
+   « covering adhésif Montpellier » → `/zones/covering-montpellier` ; l'accueil porte « rénover sa cuisine sans
+   travaux », sans ville dans le title.
+2. **« avis » → `/realisations` seulement quand le CRM publie des avis** : sans avis, le title dit « Réalisations de
+   covering à Montpellier ».
+3. H1 inchangés (posés aux lots B à D) ; seuls les titles et quelques descriptions changent en F2.
+4. Mots comptés dans le `<main>` rendu : **`/contact` (205) et `/matieres` (287) sont sous 300**, notés pour F6.
+
+**Tests** : 517, inchangés (documentation seule).
+
+**Problèmes** : aucun.
