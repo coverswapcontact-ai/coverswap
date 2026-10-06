@@ -12,7 +12,7 @@ import { ProAccueil } from "@/components/accueil/ProAccueil";
 import { QuestionsAccueil } from "@/components/accueil/QuestionsAccueil";
 import { RealisationsAccueil, realisationsAccueil } from "@/components/accueil/RealisationsAccueil";
 import { ANCRES_ACCUEIL, BANDES_ACCUEIL, CIBLES_BOUTON_COLLE, DESCRIPTION_META_ACCUEIL, TITRE_META_ACCUEIL, lienSimulerAccueil, sectionsAccueil, type IdSectionAccueil } from "@/components/accueil/sections";
-import { DonneesStructurees, ServiceSchema } from "@/components/JsonLd";
+import { DonneesStructurees, ServiceSchema, refImage } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { BoutonColle } from "@/components/simulation/BoutonColle";
 import { Lien } from "@/components/simulation/Lien";
@@ -65,6 +65,8 @@ export default async function PageAccueil() {
     questions: <QuestionsAccueil />,
   };
 
+  const imageOuverture = imageObjetOuverture(ouverture);
+
   return (
     <>
       <ServiceSchema
@@ -72,8 +74,9 @@ export default async function PageAccueil() {
         description={DESCRIPTION_META_ACCUEIL}
         url={ENTREPRISE.site}
         urlOffre={`${ENTREPRISE.site}/simulateur`}
+        image={refImage(imageOuverture)}
       />
-      <DonneesStructurees data={imageObjetOuverture(ouverture)} />
+      <DonneesStructurees data={imageOuverture} />
       {sectionsAccueil().map((s) => (
         <Fragment key={s.id}>
           {sections[s.id]}

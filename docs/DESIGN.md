@@ -374,6 +374,14 @@ légales) et le secondaire en `sur-encre-2` (6,69:1), au papier et soulignés au
 (2,92:1) ni l'encre en texte ; filets au papier à 20 %. Le focus passe au papier (`.ton-encre :focus-visible`).
 Chaque lien fait au moins 44 × 44 px (`min-h-[44px] min-w-[44px]` : « Pro » et « CGV » étaient plus étroits).
 
+### Le fil d'Ariane — `Breadcrumb.tsx` (serveur, lot F4)
+
+Au-dessus du `h1` de toute page intérieure (14 px, gris chaud, la page courante en encre, `/` en séparateur muet,
+chaque lien de 44 px de haut) ; il pose aussi le `BreadcrumbList` de la page à partir des mêmes éléments. Exceptions :
+l'accueil n'en a pas ; le simulateur l'a **sous l'outil** (au-dessus de « Comment ça marche »), le premier écran
+reste à l'outil. Le dernier élément d'un guide est son titre court (`titreSeo`) ; sur téléphone le fil passe alors
+sur deux lignes, le bouton principal reste au premier écran.
+
 ### Le bouton collé — `simulation/BoutonColle.tsx`
 
 Option **`masquerSurSaisie`**, prise par **l'accueil seul** : le bouton s'efface tant qu'un champ de saisie a le

@@ -3,7 +3,8 @@ import { PAIRES_SERIE_2 } from "@/data/ambiances";
 import { ambianceDeLImage } from "@/lib/ambiances";
 import { sourcesPhoto, type ManifesteImages, type SourcesImage, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
-import { urlAbsolue, type ImagePartage } from "@/lib/metadonnees";
+import { imageObjet } from "@/lib/donnees-images";
+import type { ImagePartage } from "@/lib/metadonnees";
 import { imagePartage } from "@/lib/partage";
 import { sourcesPhotoCrm, type Publication } from "@/lib/publications";
 
@@ -94,8 +95,9 @@ export function choisirOuverture(realisations: readonly Publication[], manifeste
       ratio: RATIO_REALISATION,
       etiquette: reelle.ville ? `Réalisation, ${reelle.ville}` : "Réalisation",
       legende: reelle.ville ? `${reelle.titre}, ${reelle.ville}.` : `${reelle.titre}.`,
-      alt: `Après — ${reelle.titre}`,
-      altAvant: `Avant — ${reelle.titre}`,
+      // Site 3.0 (lot F4) : le texte dit la pièce (le titre du chantier) et les matières posées quand le CRM les publie.
+      alt: `Après la pose — ${reelle.titre}${reelle.matieres?.length ? `, ${reelle.matieres.map((m) => `${m.nom} ${m.ref}`).join(", ")}` : ""}`,
+      altAvant: `Avant la pose — ${reelle.titre}`,
       preparees: { avant: sourcesPhotoCrm(reelle.photoAvant), apres: sourcesPhotoCrm(reelle.photoApres) },
       idPublication: reelle.id,
     };
@@ -131,12 +133,14 @@ export function partageOuverture(choix: ChoixOuverture | null, chemin = "/"): Im
 
 /**
  * L'`ImageObject` (schema.org) de l'image de l'ouverture : son adresse, sa légende (celle affichée) et ce qu'elle est
- * (« Réalisation » ou « Ambiance · avant / après », comme l'étiquette posée dessus). `null` sans image.
+ * (« Réalisation » ou « Ambiance · avant / après », comme l'étiquette posée dessus). `null` sans image. Site 3.0 (lot
+ * F4) : `imageObjet`, la règle de tous les avant / après — l'image la plus grande préparée, `@id`, et le `creditText`
+ * d'une image d'ambiance (une réalisation n'en porte pas). Accueil, pages de prestation, `/pro`.
  */
 export function imageObjetOuverture(choix: ChoixOuverture | null): Record<string, unknown> | null {
   if (!choix) return null;
-  const adresse = choix.apres.startsWith("http") ? choix.apres : urlAbsolue(choix.apres);
-  return { "@context": "https://schema.org", "@type": "ImageObject", contentUrl: adresse, caption: choix.legende, description: `${choix.etiquette}. ${choix.alt}` };
+  const ambiance = choix.type === "ambiance";
+  return imageObjet({ src: choix.apres, sources: ambiance ? choix.preparees.apres : null, legende: choix.legende, description: `${choix.etiquette}. ${choix.alt}`, ambiance });
 }
 
 /**

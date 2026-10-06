@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
-import { BreadcrumbSchema } from "@/components/JsonLd";
-import { ENTREPRISE } from "@/lib/entreprise";
+import Breadcrumb from "@/components/Breadcrumb";
 import { metadonneesPage } from "@/lib/metadonnees";
 
 export const metadata: Metadata = {
@@ -28,8 +27,8 @@ function Section({ titre, children }: { titre: string; children: React.ReactNode
 export default function MentionsLegales() {
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Mentions légales", url: `${ENTREPRISE.site}/mentions-legales` }]} />
       <div className="mx-auto max-w-3xl">
+        <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Mentions légales", href: "/mentions-legales" }]} />
         <h1 className="titre-1 mb-2 text-encre">Mentions légales</h1>
         <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>
 

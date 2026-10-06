@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { insecables } from "@/app/blog/[slug]/illustration";
 import { CarteAmbiance, resoudreCas } from "@/components/ambiances/CarteAmbiance";
 import Breadcrumb from "@/components/Breadcrumb";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Echantillon } from "@/components/revue/Echantillon";
 import { Etiquette } from "@/components/simulation/Etiquette";
@@ -12,7 +11,6 @@ import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
 import { texteFamille } from "@/data/textes-familles";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { cheminFamille } from "@/lib/familles-matieres";
 import { prestationsDeFamille } from "@/lib/indexation-matieres";
 import { lienSimuler } from "@/lib/liens-simulateur";
@@ -72,7 +70,6 @@ export default async function PageFamille({ params }: Props) {
   if (!texte || !estSlugFamille(famille)) notFound();
 
   const nom = nomDeFamille(famille);
-  const url = `${ENTREPRISE.site}${cheminFamille(famille)}`;
   const nuancier = nuancierDeFamille(famille, CATALOGUE);
   const nombre = nuancier.length;
   const cas = ambiancesDeFamille(famille).flatMap((a) => {
@@ -99,18 +96,10 @@ export default async function PageFamille({ params }: Props) {
 
   return (
     <div>
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Matières", url: `${ENTREPRISE.site}/matieres` },
-          { name: nom, url },
-        ]}
-      />
-
       {/* ── 1. Ouverture : le titre, l'action, la bande de toutes ses teintes ── */}
       <section aria-labelledby="titre-famille" className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: "/matieres" }, { label: nom }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: "/matieres" }, { label: nom, href: cheminFamille(famille) }]} />
           <p className="surtitre">
             Matières · {nombre} références
           </p>

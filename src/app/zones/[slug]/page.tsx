@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
-import { FAQSchema, BreadcrumbSchema, ServiceSchema } from "@/components/JsonLd";
+import { FAQSchema, ServiceSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ENTREPRISE } from "@/lib/entreprise";
@@ -82,18 +82,11 @@ export default async function ZonePage({
         zone={{ "@type": "City", name: zone.ville }}
       />
       <FAQSchema faqs={zone.faqLocale.map((f) => ({ q: f.q, a: texteOffre(f.a) }))} />
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Zones d'intervention", url: `${ENTREPRISE.site}/zones` },
-          { name: `Covering ${zone.ville}`, url },
-        ]}
-      />
 
       {/* ══════════════════ OUVERTURE ══════════════════ */}
       <section className="bg-fond-2 px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention", href: "/zones" }, { label: `Covering ${zone.ville}` }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention", href: "/zones" }, { label: `Covering ${zone.ville}`, href: `/zones/${getZoneSlug(zone)}` }]} />
           <p className="surtitre">Zone d&apos;intervention · {zone.codePostal.split(" / ")[0]}</p>
           <h1 className="titre-1 mt-2 max-w-4xl text-encre">Covering adhésif à {zone.ville} — Cuisine, salle de bain, meubles : rénovés en {DUREE_POSE}</h1>
           <p className="texte mt-4 mb-8 max-w-3xl text-encre-2">

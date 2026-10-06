@@ -223,7 +223,8 @@ describe("1. Ouverture", () => {
     assert.ok(!/loading="lazy"/.test(html));
     // L'image de partage et l'ImageObject suivent l'image retenue.
     assert.deepEqual(partageOuverture(choix), { url: "https://crm.example.test/api/site/photos/b/apres?l=1600", largeur: 1600, hauteur: 1067, alt: "Cuisine en chêne, Lattes." });
-    assert.deepEqual(imageObjetOuverture(choix), { "@context": "https://schema.org", "@type": "ImageObject", contentUrl: complete.photoApres, caption: "Cuisine en chêne, Lattes.", description: `Réalisation, Lattes. ${choix.alt}` });
+    // Site 3.0 (lot F4) : `@id` (le Service y renvoie) ; une vraie photo de chantier ne porte pas le creditText d'ambiance.
+    assert.deepEqual(imageObjetOuverture(choix), { "@context": "https://schema.org", "@type": "ImageObject", "@id": `${complete.photoApres}#image`, contentUrl: complete.photoApres, caption: "Cuisine en chêne, Lattes.", description: `Réalisation, Lattes. ${choix.alt}` });
   });
 
   test("une image d'ambiance n'est jamais partagée sans son étiquette ; son ImageObject dit « Ambiance · avant / après »", () => {
@@ -239,10 +240,14 @@ describe("1. Ouverture", () => {
     const objet = imageObjetOuverture(choix);
     assert.equal(objet?.["@type"], "ImageObject");
     assert.equal(objet?.caption, LEGENDE_OUVERTURE);
-    assert.match(String(objet?.contentUrl), /^https:\/\/coverswap\.fr\/images\/prep\/cuisine-bordeaux-brillante-apres-couleur-960\.jpg\?v=/);
+    // Site 3.0 (lot F4) : l'image la plus grande préparée, et le creditText honnête d'une image d'ambiance.
+    assert.match(String(objet?.contentUrl), /^https:\/\/coverswap\.fr\/images\/prep\/cuisine-bordeaux-brillante-apres-couleur-1536\.jpg\?v=/);
+    assert.equal(objet?.creditText, "Image d'ambiance générée aux teintes du catalogue");
     assert.ok(String(objet?.description).startsWith("Ambiance · avant / après. "));
     assert.equal(imageObjetOuverture(null), null);
-    assert.match(lire("src/app/page.tsx"), /<DonneesStructurees data=\{imageObjetOuverture\(ouverture\)\} \/>/);
+    assert.match(lire("src/app/page.tsx"), /const imageOuverture = imageObjetOuverture\(ouverture\);/);
+    assert.match(lire("src/app/page.tsx"), /<DonneesStructurees data=\{imageOuverture\} \/>/);
+    assert.match(lire("src/app/page.tsx"), /image=\{refImage\(imageOuverture\)\}/, "le Service de l'accueil renvoie à l'image de l'ouverture");
   });
 
   test("sourcesPhotoCrm : les largeurs demandées au CRM (?l=), la photo entière en repli", () => {

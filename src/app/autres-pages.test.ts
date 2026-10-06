@@ -225,9 +225,17 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
       assert.ok(dernier.includes(">Être rappelé</button>") && boutons(dernier, "sur-encre").some(([href]) => href === "/contact"));
       assert.ok(html.includes(p.prix.fourchette));
       assert.ok(!html.includes('href="/prestations"'), "le fil d'Ariane passe par /realisations");
+      // Site 3.0 (lot F4) : toujours les quatre types de la prestation, une fois chacun, plus un ImageObject par avant / après rendu.
       const types = balisage(html).map((b) => b["@type"]);
-      assert.deepEqual([...types].sort(), ["BreadcrumbList", "FAQPage", "HowTo", "Service"]);
-      const service = balisage(html).find((b) => b["@type"] === "Service") as { offers: { url: string }; provider: { "@id": string } };
+      assert.deepEqual([...new Set(types)].sort(), ["BreadcrumbList", "FAQPage", "HowTo", "ImageObject", "Service"]);
+      for (const t of ["BreadcrumbList", "FAQPage", "HowTo", "Service"]) assert.equal(types.filter((x) => x === t).length, 1, `${slug} : un seul ${t}`);
+      assert.equal(types.filter((x) => x === "ImageObject").length, compter(html, 'role="slider"'), `${slug} : un ImageObject par curseur`);
+      const service = balisage(html).find((b) => b["@type"] === "Service") as { "@id": string; image: { "@id": string }; offers: { url: string }; provider: { "@id": string } };
+      assert.deepEqual(Object.keys(service).slice(0, 4), ["@context", "@type", "@id", "image"], "@id et image juste après @type");
+      assert.equal(service["@id"], `https://coverswap.fr/prestations/${slug}#service`);
+      const ouvertureObjet = balisage(html).find((b) => b["@type"] === "ImageObject" && b["@id"] === service.image["@id"]);
+      assert.ok(ouvertureObjet && String(ouvertureObjet.contentUrl).includes(`/images/prep/${CAS_PRESTATIONS[slug].ouverture.apres}-`), `${slug} : le Service renvoie à l'avant / après de l'ouverture`);
+      assert.equal(ouvertureObjet.creditText, "Image d'ambiance générée aux teintes du catalogue");
       assert.equal(service.offers.url, `https://coverswap.fr/simulateur?projet=${p.simulateur}`, "l'offre : l'adresse du simulateur de la pièce, sans le `depuis` du bouton");
       assert.equal(service.provider["@id"], "https://coverswap.fr/#entreprise");
       const fil = balisage(html).find((b) => b["@type"] === "BreadcrumbList") as { itemListElement: { name: string; item: string }[] };
@@ -316,11 +324,11 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
         { id: "MEUBLES", sousParties: [{ id: "meuble-tv", libelle: "Meuble TV", metrage: false, prixUnitaire: 65, unite: "ml" }], formats: [] },
       ],
     };
-    const avec = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("cuisine")!, url: "https://coverswap.fr/prestations/cuisine", fil: [], filSchema: [], tarifs })));
+    const avec = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("cuisine")!, url: "https://coverswap.fr/prestations/cuisine", fil: [], tarifs })));
     const prix = avec.slice(avec.indexOf('id="prix"'), avec.indexOf('id="villes"'));
     assert.ok(prix.includes("Façades hautes") && prix.includes(`${euros(110)}/ml`), "le prix du CRM, tel quel");
     assert.ok(!prix.includes("Crédence") && !prix.includes("Meuble TV"), "un prix nul est masqué ; les autres familles n'y sont pas");
-    const sans = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: null })));
+    const sans = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], tarifs: null })));
     const repli = sans.slice(sans.indexOf('id="prix"'), sans.indexOf('id="villes"'));
     assert.ok(repli.includes(PRIX_PLAGE) && !repli.includes(fourchette("sdb")) && !repli.includes(fourchette("cuisine")), "le repli : la plage au mètre linéaire, aucune fourchette par pièce (relecture des lots B et C)");
     // Ni le texte de la page, ni sa FAQ, ni sa description ne chiffrent la pièce : le bloc du CRM est le seul prix.
@@ -329,7 +337,7 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
       const texte = JSON.stringify([p.descriptionSeo, p.prix, p.faq]);
       for (const n of [FOURCHETTES.cuisine.min, FOURCHETTES.cuisine.max, FOURCHETTES.sdb.max, FOURCHETTES.meuble.min]) assert.ok(!texte.includes(euros(n)), `${slug} : ${euros(n)}`);
     }
-    const sdbCrm = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: { version: 1, familles: [{ id: "SDB", sousParties: [{ id: "meuble-vasque", libelle: "Meuble vasque", metrage: true, prixUnitaire: null, unite: "ml" }], formats: [] }] } })));
+    const sdbCrm = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], tarifs: { version: 1, familles: [{ id: "SDB", sousParties: [{ id: "meuble-vasque", libelle: "Meuble vasque", metrage: true, prixUnitaire: null, unite: "ml" }], formats: [] }] } })));
     assert.ok(sdbCrm.includes("Sur devis, après une visite ou sur vos photos."), "une famille sans aucun prix : « Sur devis »");
   });
 
@@ -602,7 +610,9 @@ describe("pages locales et guides", () => {
   test("un guide : fil d'Ariane et retours vers « Comment ça marche » (l'index /blog est redirigé)", () => {
     const guide = lire("app/blog/[slug]/page.tsx");
     assert.match(guide, /const GUIDES = "\/comment-ca-marche#guides";/);
-    assert.match(guide, /name: "Comment ça marche", url: `\$\{ENTREPRISE\.site\}\/comment-ca-marche`/);
+    // Site 3.0 (lot F4) : le fil visible pose lui-même son BreadcrumbList (l'ancre #guides reste au lien, pas au balisage) ; le dernier élément est le titre du guide, le même des deux côtés.
+    assert.match(guide, /<Breadcrumb items=\{\[\{ label: "Accueil", href: "\/" \}, \{ label: "Comment ça marche", href: GUIDES \}, \{ label: article\.titreSeo \?\? article\.title, href: `\/blog\/\$\{article\.slug\}` \}\]\} \/>/);
+    assert.doesNotMatch(guide, /BreadcrumbSchema/);
     assert.match(guide, /<Lien href=\{GUIDES\} variante="secondaire">/);
     assert.match(guide, /<ArticleSchema/);
   });

@@ -5,8 +5,8 @@ import { ContenuPrix } from "@/components/BlocPrix";
 import { CarteRealisation } from "@/components/CarteRealisation";
 import { CarteAmbiance, regrouperMatieres, resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
-import { choisirOuverture, type ChoixOuverture } from "@/components/accueil/etudes";
-import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
+import { choisirOuverture, imageObjetOuverture, type ChoixOuverture } from "@/components/accueil/etudes";
+import { DonneesStructurees, FAQSchema, HowToSchema, ServiceSchema, refImage } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Cartel } from "@/components/revue/Cartel";
 import { Echantillon } from "@/components/revue/Echantillon";
@@ -54,8 +54,8 @@ import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
 export type ProprietesContenuPrestation = {
   p: Prestation;
   url: string;
+  /** Le fil d'Ariane, visible et balisé (`Breadcrumb` pose aussi le `BreadcrumbList`). */
   fil: BreadcrumbItem[];
-  filSchema: { name: string; url: string }[];
   lienDevis?: string;
   devisPrincipal?: boolean;
   /** Les réalisations publiées par le CRM (toutes pièces : la page garde les siennes). */
@@ -114,7 +114,7 @@ export function vueDeLaPrestation(p: Prestation, realisations: readonly Publicat
 /** Les villes de la zone, de la plus proche à la plus lointaine. */
 const VILLES = [...ZONES].sort((a, b) => a.distanceKm - b.distanceKm);
 
-export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = "/contact", devisPrincipal = false, realisations = [], tarifs = null }: ProprietesContenuPrestation) {
+export default function ContenuPrestation({ p, url, fil, lienDevis = "/contact", devisPrincipal = false, realisations = [], tarifs = null }: ProprietesContenuPrestation) {
   const autres = PRESTATIONS.filter((a) => a.slug !== p.slug);
   const depuis = depuisPrestation(p.slug);
   const lienSimulation = p.simulateur ? lienSimuler({ projet: p.simulateur, depuis }) : null;
@@ -126,6 +126,8 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
   const famille = FAMILLE_TARIFS[p.crmTypeProjet];
   const { ouverture, reelles, cas, vedettes } = vueDeLaPrestation(p, realisations);
   const donnees = p.simulateur ? casDeLaPrestation(p.slug) : null;
+  // Site 3.0 (lot F4) : l'ImageObject de l'avant / après de l'ouverture, auquel le Service renvoie.
+  const imageOuverture = imageObjetOuverture(ouverture);
 
   const boutons = (surEncre: boolean) => (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -152,10 +154,10 @@ export default function ContenuPrestation({ p, url, fil, filSchema, lienDevis = 
 
   return (
     <div style={styleTeinte(teinte)}>
-      <ServiceSchema name={p.nom} description={p.descriptionSeo} url={url} typeProjet={p.court} urlOffre={`${ENTREPRISE.site}${devisEnPremier || !p.simulateur ? lienDevis : `/simulateur?projet=${p.simulateur}`}`} />
+      <ServiceSchema name={p.nom} description={p.descriptionSeo} url={url} typeProjet={p.court} urlOffre={`${ENTREPRISE.site}${devisEnPremier || !p.simulateur ? lienDevis : `/simulateur?projet=${p.simulateur}`}`} image={refImage(imageOuverture)} />
       <FAQSchema faqs={p.faq} />
       <HowToSchema name={`${p.nom} : comment ça se passe`} description={p.accroche} etapes={p.deroulement} />
-      <BreadcrumbSchema items={filSchema} />
+      <DonneesStructurees data={imageOuverture} />
 
       {/* ── 1. Ouverture : l'avant / après de la pièce (téléphone : l'image d'abord), le titre, l'action ── */}
       <section aria-labelledby="titre-prestation" className="px-4 pt-4 pb-[var(--espace-5)] md:px-6 md:pt-8">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BreadcrumbSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_REPONSE } from "@/lib/offre";
@@ -25,8 +25,8 @@ export default async function ContactPage() {
   const lienTexte = "text-encre underline underline-offset-4";
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Contact", url: `${ENTREPRISE.site}/contact` }]} />
       <div className="mx-auto max-w-3xl">
+        <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Contact", href: "/contact" }]} />
         <p className="surtitre">Contact</p>
         <h1 className="titre-1 mt-2 text-encre">Écrivez-nous</h1>
         <p className="texte mt-4 text-encre-2">

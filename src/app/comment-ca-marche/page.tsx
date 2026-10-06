@@ -5,14 +5,13 @@ import { CartesAtouts, EtapesPrestation, QuestionsPrestation } from "@/component
 import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
 import { ContenuPrix } from "@/components/BlocPrix";
-import { BreadcrumbSchema, FAQSchema } from "@/components/JsonLd";
+import { FAQSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
 import { Section } from "@/components/simulation/Section";
 import { articles } from "@/data/blog-articles";
 import { PHOTOS_UTILES } from "@/data/ambiances";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { lienSimuler } from "@/lib/liens-simulateur";
 import { matiereCartel } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
@@ -92,13 +91,12 @@ export default async function PageCommentCaMarche() {
   const tarifs = await chargerTarifs();
   return (
     <div>
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Comment ça marche", url: `${ENTREPRISE.site}${CHEMIN}` }]} />
       <FAQSchema faqs={QUESTIONS_BALISEES} />
 
       {/* ── 1. Ouverture ── */}
       <section className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche", href: CHEMIN }]} />
           <h1 className="titre-1 max-w-3xl text-encre">Comment ça marche</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">{INTRO_PAGE}</p>
           <div className="mt-6">

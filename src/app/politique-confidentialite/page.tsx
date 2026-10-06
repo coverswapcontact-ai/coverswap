@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE } from "@/lib/constants";
-import { BreadcrumbSchema } from "@/components/JsonLd";
-import { ENTREPRISE } from "@/lib/entreprise";
+import Breadcrumb from "@/components/Breadcrumb";
 import { metadonneesPage } from "@/lib/metadonnees";
 import OppositionMesure from "@/components/OppositionMesure";
 
@@ -40,8 +39,8 @@ const SOUS_TRAITANTS: { nom: string; role: string; lieu: string }[] = [
 export default function PolitiqueConfidentialite() {
   return (
     <div className="bg-fond px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Politique de confidentialité", url: `${ENTREPRISE.site}/politique-confidentialite` }]} />
       <div className="mx-auto max-w-3xl">
+        <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Politique de confidentialité", href: "/politique-confidentialite" }]} />
         <h1 className="titre-1 mb-2 text-encre">Politique de confidentialité</h1>
         <p className="mb-10 text-[14px] text-encre-2">Dernière mise à jour : {MISE_A_JOUR}</p>
 

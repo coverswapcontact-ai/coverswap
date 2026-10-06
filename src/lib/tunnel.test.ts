@@ -364,7 +364,7 @@ describe("/pro et /contact", () => {
   test("balisage Service : l'offre suit le bouton de la page (simulateur de la pièce, sinon /contact pour les vitrages)", () => {
     const offre = (slug: string) => {
       const p = getPrestation(slug)!;
-      const html = renderToStaticMarkup(createElement(ContenuPrestation, { p, url: `https://coverswap.fr/prestations/${slug}`, fil: [], filSchema: [] }));
+      const html = renderToStaticMarkup(createElement(ContenuPrestation, { p, url: `https://coverswap.fr/prestations/${slug}`, fil: [] }));
       const service = JSON.parse(html.match(/<script[^>]*>(\{"@context":"https:\/\/schema\.org","@type":"Service"[\s\S]*?)<\/script>/)![1]) as { offers?: { url?: string } };
       return service.offers?.url;
     };

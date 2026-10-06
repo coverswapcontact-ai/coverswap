@@ -49,8 +49,7 @@ export default async function PagePrestation({ params }: Props) {
       url={url}
       realisations={realisations}
       tarifs={tarifs}
-      fil={[{ label: "Accueil", href: "/" }, { label: "Réalisations", href: "/realisations" }, { label: p.court }]}
-      filSchema={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Réalisations", url: `${ENTREPRISE.site}/realisations` }, { name: p.nom, url }]}
+      fil={[{ label: "Accueil", href: "/" }, { label: "Réalisations", href: "/realisations" }, { label: p.nom, href: `/prestations/${p.slug}` }]}
     />
   );
 }

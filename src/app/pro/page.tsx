@@ -8,8 +8,8 @@ import { CarteRealisation } from "@/components/CarteRealisation";
 import { TAILLES_OUVERTURE_PRESTATION } from "@/components/ContenuPrestation";
 import { CarteAmbiance, regrouperMatieres } from "@/components/ambiances/CarteAmbiance";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
-import { partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
-import { BreadcrumbSchema, FAQSchema, HowToSchema, ServiceSchema } from "@/components/JsonLd";
+import { imageObjetOuverture, partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
+import { DonneesStructurees, FAQSchema, HowToSchema, ServiceSchema, refImage } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
@@ -67,18 +67,20 @@ export default async function PagePro() {
   const paires = lieux.filter((l) => l.cas.preparees.avant);
   const photos = lieux.filter((l) => !l.cas.preparees.avant);
   const lienDevis = `#${ANCRE_DEVIS_PRO}`;
+  // Site 3.0 (lot F4) : l'ImageObject de l'avant / après de l'ouverture, auquel le Service renvoie.
+  const imageOuverture = imageObjetOuverture(ouverture);
 
   return (
     <div style={styleTeinte(teinte)}>
-      <ServiceSchema name={PRO.nom} description={PRO.descriptionSeo} url={URL_PRO} typeProjet={PRO.court} urlOffre={`${URL_PRO}${lienDevis}`} />
+      <ServiceSchema name={PRO.nom} description={PRO.descriptionSeo} url={URL_PRO} typeProjet={PRO.court} urlOffre={`${URL_PRO}${lienDevis}`} image={refImage(imageOuverture)} />
+      <DonneesStructurees data={imageOuverture} />
       <FAQSchema faqs={PRO.faq} />
       <HowToSchema name={`${PRO.nom} : comment ça se passe`} description={PRO.accroche} etapes={PRO.deroulement} />
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Pro", url: URL_PRO }]} />
 
       {/* ── 1. Ouverture : l'avant / après (téléphone : l'image d'abord), le titre, une ligne, un bouton ── */}
       <section aria-labelledby="titre-pro" className="px-4 pt-4 pb-[var(--espace-5)] md:px-6 md:pt-8">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Pro" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Pro", href: "/pro" }]} />
           <div className="flex flex-col gap-5 md:gap-6 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-x-12 lg:gap-y-6">
             <div className="flex flex-col lg:col-start-1 lg:row-span-2 lg:row-start-1">
               <p className="surtitre flex items-center gap-3">

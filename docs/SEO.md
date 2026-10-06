@@ -1,7 +1,7 @@
 # SEO et performance du site — site 3.0
 
 Squelette posé au lot B0 (mission 21) ; carte des intentions, image de partage et hôte unique écrits au lot F1 et
-appliqués aux lots F2 et F3 ; les mesures « après » aux lots F6 et G3.
+appliqués aux lots F2 et F3 ; données structurées au lot F4 ; les mesures « après » aux lots F6 et G3.
 
 ## Objectifs
 
@@ -150,6 +150,53 @@ Mots comptés dans le `<main>` rendu (build du 06/10, scripts et styles retirés
   la requête gardée ; les 540 pages construites ont leur canonical absolu exact ; la 404 n'en a plus ; 95 adresses au
   plan du site. Les règles d'hôte de `vercel.json` ne jouent que chez Vercel : **à sonder en ligne après la fusion
   (G3)** — d'ici là la production répond encore 200 sur les trois hôtes et 308 sur les anciennes adresses.
+
+### Données structurées (lot F4)
+
+Tout le balisage part de `src/components/JsonLd.tsx` (et de `lib/donnees-images.ts` pour les images), en JSON-LD :
+
+- **Une seule entreprise locale** : `HomeAndConstructionBusiness` (`@id` `https://coverswap.fr/#entreprise`) et
+  `Organization`, posés par le gabarit, sur toutes les pages ; aucune page n'en écrit une autre. Chaque `Service` y
+  renvoie (`provider`).
+- **Un `Service` par prestation** (cuisine, salle de bain, meubles, vitrages, `/pro`), plus celui de l'accueil et un
+  par ville (`areaServed` : la ville) : `@id` (`<adresse de la page>#service`) et `image` (une référence `{ "@id" }`
+  à l'`ImageObject` de l'ouverture) juste après `@type` ; vitrages n'a pas d'image.
+- **`FAQPage`** : accueil, comment-ça-marche, simulateur, prestations, `/pro`, villes ; une seule par page.
+- **`BreadcrumbList`** : posé par le fil d'Ariane visible lui-même (`Breadcrumb.tsx`, une seule liste pour les deux :
+  mêmes noms, même ordre, la dernière adresse est la page ; une ancre reste au lien visible). Fil visible sur toutes
+  les pages intérieures, désormais aussi `/contact`, les trois pages légales et `/simulateur` (sous l'outil, pour
+  laisser le premier écran au simulateur) ; celui d'un guide finit par le titre du guide (`titreSeo`), plus « Guide ».
+- **`ImageObject` par avant / après rendu** (accueil, prestations, `/pro`, `/inspirations`, `/realisations`, familles,
+  guides à paire) : `@id` (l'image suivie de `#image`), `contentUrl` (le plus grand JPEG préparé, 1 536 px, 1 024 en
+  portrait), `caption` (la légende affichée, ou le titre de la carte et ses matières), `description` (l'étiquette, puis
+  le texte alternatif), et sur les images générées `creditText` « Image d'ambiance générée aux teintes du catalogue ».
+  Une réalisation publiée (vraie photo de chantier) n'a pas de `creditText` : on ne sait pas qui l'a prise.
+- **Textes alternatifs** : une ambiance dit sa scène (la pièce), chaque surface avec sa matière (nom et référence) et
+  « Image d'ambiance aux teintes du catalogue » ; un « avant » dit la pièce d'origine ; une réalisation, « Après la
+  pose — <titre>, <matières publiées> ». Seules restent muettes (`alt=""`) les images posées dans un lien qui a déjà
+  son texte (rangée « Ambiances » de l'accueil, cartes des pièces) et les pictos.
+
+Types par page (rendu du 06/10/2026, gabarit en plus : `HomeAndConstructionBusiness`, `Organization`) :
+
+| Page | Types |
+|---|---|
+| `/` | `Service`, `FAQPage`, `ImageObject` × 8 |
+| `/simulateur` | `HowTo`, `FAQPage`, `BreadcrumbList` |
+| `/matieres`, familles sans avant / après, fiches | `BreadcrumbList` |
+| familles avec avant / après (bois, couleur…) | `BreadcrumbList`, `ImageObject` × curseurs |
+| `/prestations/cuisine`, `salle-de-bain`, `meubles` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 11 / 3 / 5 |
+| `/prestations/vitrages` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList` |
+| `/pro` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 2 |
+| `/comment-ca-marche` | `FAQPage`, `BreadcrumbList` |
+| `/inspirations` | `BreadcrumbList`, `ImageObject` × 41 |
+| `/realisations` | `BreadcrumbList`, `ImageObject` × 4 (+ un par chantier publié avec avant) |
+| `/zones` | `BreadcrumbList` ; une ville : `Service`, `FAQPage`, `BreadcrumbList` |
+| `/contact`, pages légales | `BreadcrumbList` |
+| guide | `Article`, `BreadcrumbList` (+ `ImageObject` × 2 pour un guide à paire) |
+
+Vérifié sur le build (542 fichiers HTML) : JSON valide partout, une entreprise locale par page (sauf `_global-error`,
+hors gabarit), un `BreadcrumbList` exactement là où un fil est visible, un `ImageObject` par curseur.
+`src/app/donnees-structurees.test.ts` le tient sur les pages rendues.
 
 ### Les guides du lot C7 (posés en avance, repris dans la carte ci-dessus)
 

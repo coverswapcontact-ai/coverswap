@@ -1,3 +1,4 @@
+import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
@@ -6,6 +7,7 @@ import { PAIRES_SERIE_2 } from "@/data/ambiances";
 import { ambianceDeLImage } from "@/lib/ambiances";
 import { sourcesPhoto, type ManifesteImages } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
+import { imageObjet, legendeAmbiance } from "@/lib/donnees-images";
 import { matiereCartel } from "@/lib/matieres-vedettes";
 import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
 
@@ -34,6 +36,7 @@ export function ProAccueil() {
   return (
     <Section id="pro" large differee ton="encre" surtitre="Professionnels" titre="Un comptoir, un bar, une boutique, rénovés sans fermer" intro="Comptoirs, mobilier, portes et murs, recouverts de nuit ou hors service. Sur devis, après une visite ou sur vos photos.">
       <div className="grid gap-8 md:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] md:items-end md:gap-12" style={styleTeinte(teinte)}>
+        {pro ? <DonneesStructurees data={imageObjet({ src: pro.preparees.apres.src, sources: pro.preparees.apres, legende: legendeAmbiance(pro.ambiance.titre, pro.ambiance.surfaces), description: `Ambiance · avant / après. ${pro.ambiance.alt}`, ambiance: true })} /> : null}
         {pro ? (
           <AvantApres
             avant={pro.preparees.avant.src}

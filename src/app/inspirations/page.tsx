@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { PIECES_INSPIRATION, TEINTES, type AmbianceResolue } from "@/lib/ambiances";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { lienSimuler } from "@/lib/liens-simulateur";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { FiltresInspirations, VoirLaSuite, reglesFiltres, reglesSuite, suitesDesAmbiances, teinteJeton } from "./_components/FiltresInspirations";
@@ -66,15 +64,9 @@ export default function PageInspirations() {
   return (
     <div className="filtrable">
       <style>{`${reglesFiltres(".filtrable", filtrables, idsPieces, idsTeintes)}\n${reglesSuite(".filtrable", filtrables, idsPieces, idsTeintes)}`}</style>
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Inspirations", url: `${ENTREPRISE.site}${CHEMIN}` },
-        ]}
-      />
       <section className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Inspirations" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Inspirations", href: CHEMIN }]} />
           <p className="surtitre">Ambiances</p>
           <h1 className="titre-1 mt-2 text-encre">Inspirations</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">

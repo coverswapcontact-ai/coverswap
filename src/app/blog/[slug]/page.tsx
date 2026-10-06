@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
 import { ContenuPrix } from "@/components/BlocPrix";
-import { ArticleSchema, BreadcrumbSchema } from "@/components/JsonLd";
-import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
+import { ArticleSchema } from "@/components/JsonLd";
+import { CarteAmbiance, imageObjetCas } from "@/components/ambiances/CarteAmbiance";
+import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
@@ -56,6 +57,7 @@ function Ouverture({ illustration }: { illustration: IllustrationGuide }) {
   const { cas } = illustration;
   return (
     <figure className="m-0">
+      <DonneesStructurees data={imageObjetCas(cas)} />
       <AvantApres
         avant={cas.preparees.avant?.src ?? null}
         apres={cas.preparees.apres.src}
@@ -125,21 +127,11 @@ export default async function BlogPostPage({ params }: Props) {
         image={imageDuBalisage(article)}
         url={`${ENTREPRISE.site}/blog/${article.slug}`}
       />
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Comment ça marche", url: `${ENTREPRISE.site}/comment-ca-marche` },
-          {
-            name: article.title,
-            url: `${ENTREPRISE.site}/blog/${article.slug}`,
-          },
-        ]}
-      />
 
       {/* Titre */}
       <section className="px-4 pt-6 pb-8 md:px-6 md:pt-10 md:pb-10">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche", href: GUIDES }, { label: "Guide" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche", href: GUIDES }, { label: article.titreSeo ?? article.title, href: `/blog/${article.slug}` }]} />
           <p className="surtitre">{article.category}</p>
           <h1 className="titre-1 mt-2 max-w-3xl text-balance text-encre">{insecables(article.title)}</h1>
           <p className="mt-4 text-[14px] text-encre-2">

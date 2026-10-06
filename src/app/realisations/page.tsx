@@ -3,7 +3,6 @@ import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
 import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { CartesPieces } from "@/components/simulation/CartesPieces";
 import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
@@ -88,10 +87,9 @@ export default async function PageRealisations() {
 
   return (
     <div className="bg-fond">
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Réalisations", url: `${ENTREPRISE.site}${CHEMIN}` }]} />
       <section className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Réalisations" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Réalisations", href: CHEMIN }]} />
           <h1 className="titre-1 max-w-3xl text-encre">Ce que ça donne</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">
             {realisations.length > 0 ? "Photos prises à la fin des chantiers, publiées avec l'accord des personnes. Pas d'image de catalogue présentée comme une pose." : "Des avant / après en ambiance, étiquetés comme tels, avec nos tarifs, en attendant les photos de nos chantiers."}

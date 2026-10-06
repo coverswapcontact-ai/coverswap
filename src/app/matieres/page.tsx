@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { cheminFamille } from "@/lib/familles-matieres";
 import { vueDans } from "@/lib/indexation-matieres";
 import { choixFinitions, premieresDuPresentoir, tiroirs, type Matiere } from "@/lib/matieres";
@@ -49,10 +47,9 @@ const VUES = Object.fromEntries(Object.entries(vueDans()).map(([ref, liste]) => 
 export default function PageMatieres() {
   return (
     <div>
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Matières", url: `${ENTREPRISE.site}${CHEMIN}` }]} />
       <section className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: CHEMIN }]} />
           <p className="surtitre">Catalogue Cover Styl&apos;</p>
           <h1 className="titre-1 mt-2 text-encre">Choisissez votre matière</h1>
           {/* Deux lignes au plus à 390 px (la première rangée d'échantillons reste dans le premier écran) ; les familles sont dans les tiroirs. */}

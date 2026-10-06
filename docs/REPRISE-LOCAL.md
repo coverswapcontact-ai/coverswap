@@ -48,7 +48,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - F1, `docs/SEO.md` : fait (carte des intentions, une ligne par page indexée ; image de partage et hôte unique décrits).
 - F2, métadonnées : fait (titles ≤ 60 et descriptions ≤ 155 partout, image de partage par page, `lib/partage.ts`, `npm run og`).
 - F3, un seul hôte : fait (`vercel.json` : www et coverswap.vercel.app → coverswap.fr en 301 ; redirections en 301 ; plus de canonical par défaut).
-- F4 à F6 : à venir. Mesures « avant » : `docs/SEO.md`.
+- F4, données structurées : fait (une entreprise locale, `Service` avec `@id` et image, `ImageObject` par avant / après, fil d'Ariane visible et balisé partout ; `docs/SEO.md` « Données structurées »).
+- F5 et F6 : à venir. Mesures « avant » : `docs/SEO.md`.
 
 ## Phase G : livraison
 
@@ -1579,3 +1580,58 @@ qui cite chaque page fixe et aucune page privée. `npx eslint .` et `npm run bui
 **Problèmes / à vérifier en G3** : les règles d'hôte ne se testent que chez Vercel — après la fusion, `node
 scripts/verifier-redirections.mjs` doit donner 11/11 (7 anciennes adresses, la requête, 3 sondes d'hôte). Le CORS du
 CRM accepte toujours `www` : sans effet, le navigateur n'y restera plus.
+
+## F4 — données structurées (06/10/2026)
+
+**Fait** (aucun appel d'API, aucun envoi)
+- **Une entreprise locale** : `HomeAndConstructionBusiness` du gabarit, seule ; vérifié sur les pages rendues et les
+  542 fichiers du build ; tous les `Service` y renvoient par `@id`.
+- **`Service` par prestation** : `@id` (`<page>#service`, `idService`) et `image` (référence à l'`ImageObject` de
+  l'ouverture) juste après `@type` ; accueil, 4 prestations, `/pro` ; vitrages sans image.
+- **`ImageObject` sur chaque avant / après rendu** (`lib/donnees-images.ts` : `imageObjet`, `legendeAmbiance`,
+  `adresseImage` ; `CREDIT_AMBIANCE`) : posé par `CarteAmbiance` (cas des prestations, accueil, `/inspirations`,
+  `/realisations`, familles, `/pro`, guides), par l'ouverture (`imageObjetOuverture` : accueil, prestations, `/pro`),
+  par `ProAccueil`, par l'ouverture d'un guide et par `CarteRealisation` (chantier publié avec avant, sans
+  `creditText`). Plus grand JPEG préparé, légende, description (étiquette + texte alternatif), `@id`.
+- **Fil d'Ariane visible ET balisé** : `Breadcrumb.tsx` pose lui-même le `BreadcrumbList` (`elementsBalisage`) ;
+  `href` obligatoire, le dernier compris ; plus aucun `BreadcrumbSchema` dans une page ; `ContenuPrestation` ne
+  prend plus que `fil`. Ajouté et visible : `/contact`, `/cgv`, `/mentions-legales`, `/politique-confidentialite`,
+  `/simulateur` (sous l'outil). Alignés : guide (titre du guide au lieu de « Guide », plus le `title` long),
+  prestation (« Covering cuisine » des deux côtés, l'ancien fil visible disait « Cuisine »).
+- **Textes alternatifs** : ambiances déjà conformes (scène, surfaces et matières, « Image d'ambiance… », vérifié sur
+  les 55 ambiances) ; réalisations : « Après la pose — <titre>, <matières publiées> » / « Avant la pose — <titre> »
+  (ouverture et cartes).
+- Petit module `components/ScriptJsonLd.tsx` (le `<script>` JSON-LD et `DonneesStructurees`) : `CarteAmbiance` ne tire
+  pas `JsonLd.tsx` (qui importe `lib/partage` → `inspirations/ordre` → `CarteAmbiance` : cycle évité).
+- `docs/SEO.md` « Données structurées (lot F4) » (types par page), `docs/DESIGN.md` « Le fil d'Ariane ».
+
+**Décisions prises seul**
+1. **`ImageObject` à part, pas imbriqué** : un bloc par avant / après (le plan disait « toujours 4 types par page de
+   prestation ») ; la page de prestation garde un seul `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, plus ses
+   `ImageObject`, et le `Service` renvoie à celui de l'ouverture par `@id` (aucune image décrite deux fois).
+2. **Pas de `creditText` sur une vraie photo de chantier** : on ne sait pas qui l'a prise ; la description dit
+   « Réalisation ».
+3. **Fil du simulateur sous l'outil**, pas au-dessus : le premier écran reste à l'outil (l'en-tête du simulateur a
+   déjà « ‹ Accueil »).
+4. Les images d'ambiance posées dans un lien qui a son propre texte (rangée « Ambiances » de l'accueil, cartes des
+   pièces) restent `alt=""` : le lien nomme déjà la pièce et les matières (le test le vérifie).
+5. Légendes sans « : » (« Titre. Surfaces et matières. ») : les blocs JSON-LD sont dans le texte que lisent les tests
+   de typographie (espace insécable devant « : »).
+
+**Tests** : 537 → 551, tous réussis. Nouveau `src/app/donnees-structurees.test.ts` (14) : 22 pages rendues comme par
+Next (composants asynchrones, routeur factice, CRM simulé) — types attendus comptés par page, un `ImageObject` par
+curseur et leurs nombres (8, 11, 3, 5, 2, 41, 4), JSON valide sans « < », `@context`/`@type` en tête, une seule
+entreprise locale (gabarit seul, aucun autre fichier), `Service` (`@id`, `image` après `@type`, l'image est sur la
+page), `ImageObject` (adresse, légende, description, `@id` unique, crédit d'ambiance), réalisation publiée sans
+crédit, règles pures, `FAQPage` ; fil visible = `BreadcrumbList` (noms, ordre, adresses, dernière = la page) sur 21
+pages, guide, simulateur sous l'outil ; textes alternatifs des ambiances et des images rendues. Adaptés (intention
+gardée) : `autres-pages.test.ts` (prestation : quatre types une fois chacun + un `ImageObject` par curseur, `@id` et
+image du `Service` ; guide : le fil visible pose le balisage), `accueil.test.ts` (`ImageObject` de l'ouverture :
+`@id`, 1 536 px, `creditText`), `metadonnees.test.ts` (`<Breadcrumb ` exigé, `<BreadcrumbSchema` interdit dans une
+page), `tunnel.test.ts` (`filSchema` retiré). `npx eslint .` et `npm run build` passent ; inventaire du build : 0 écart.
+Captures 390 / 1 440 (contact, cgv, simulateur, guide bordeaux, prestation cuisine) regardées ; aucun débordement à
+360 px ; serveur local arrêté.
+
+**Problèmes** : aucun. `/inspirations` porte 41 `ImageObject` (≈ 20 Ko de HTML en plus) : page hors des mesures
+Lighthouse, à surveiller en F6.
+

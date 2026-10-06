@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Photo } from "@/components/simulation/Photo";
@@ -8,6 +9,7 @@ import { ambianceDeLImage, type AmbianceResolue } from "@/lib/ambiances";
 import type { MatiereCartel } from "@/lib/cartel";
 import { sourcesPhoto, type ManifesteImages, type SourcesPhoto } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
+import { imageObjet, legendeAmbiance } from "@/lib/donnees-images";
 import { avecDepuis } from "@/lib/liens-simulateur";
 import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 
@@ -66,6 +68,15 @@ export function resoudreCas(image: string, { nom, depuis }: { nom?: string; depu
 }
 
 /**
+ * L'`ImageObject` d'un cas qui est un avant / après (site 3.0, lot F4) : l'« après », légendé par le titre de la carte et
+ * ses matières, décrit par son texte alternatif, `creditText` d'ambiance ; `null` pour une photo seule.
+ */
+export function imageObjetCas(cas: CasAmbiance): Record<string, unknown> | null {
+  if (!cas.preparees.avant) return null;
+  return imageObjet({ src: cas.preparees.apres.src, sources: cas.preparees.apres, legende: legendeAmbiance(cas.nom, cas.ambiance.surfaces), description: `Ambiance · avant / après. ${cas.ambiance.alt}`, ambiance: true });
+}
+
+/**
  * La carte (titre, image, cartels, lien), à poser dans un `<li>`. `teinte` : la teinte de la prestation, sur le filet
  * des cartels (sinon la couleur de chaque matière). `cartelsColonnes` : la grille des cartels. `children` : une ligne
  * de plus sous les cartels (le prix habituel sur `/realisations`). `sansLien` : pas de lien vers le simulateur (`/pro`,
@@ -73,6 +84,7 @@ export function resoudreCas(image: string, { nom, depuis }: { nom?: string; depu
  * sous le `h1`), `priorite` (la première image de la page, en `fetchPriority="high"` — une photo seule seulement :
  * une paire n'est jamais prioritaire, ses deux images passeraient devant tout), `liensMatieres` (chaque cartel mène à
  * sa matière).
+ * Site 3.0 (lot F4) : un avant / après pose son `ImageObject` (`imageObjetCas`).
  */
 export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, balise = "h3", priorite = false, liensMatieres = false, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; balise?: "h2" | "h3"; priorite?: boolean; liensMatieres?: boolean; children?: ReactNode }) {
   const { preparees } = cas;
@@ -80,6 +92,7 @@ export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid
   return (
     <>
       <Titre className="font-display text-[24px] leading-tight font-semibold text-encre">{cas.nom}</Titre>
+      <DonneesStructurees data={imageObjetCas(cas)} />
       {preparees.avant ? (
         <AvantApres
           className="mt-3"

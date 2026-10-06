@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
+import { FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { exemplesSimulateur } from "@/lib/exemples-simulateur";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
@@ -45,12 +45,13 @@ export default async function PageSimulateur() {
     <div data-theme="simulation" data-page="simulateur" className="min-h-[100dvh] bg-fond text-encre">
       <HowToSchema name="Simuler un covering sur sa propre photo" description="Quatre étapes, sans inscription." etapes={ETAPES} dureeTotale="PT3M" />
       <FAQSchema faqs={FAQ_SIMULATEUR} />
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Simulateur", url: `${ENTREPRISE.site}/simulateur` }]} />
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
         <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} />
-        <section className="mt-16 max-w-2xl border-t border-trait pt-10">
+        {/* Site 3.0 (lot F4) : le fil d'Ariane, visible et balisé, sous l'outil — le premier écran reste au simulateur. */}
+        <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Simulateur", href: "/simulateur" }]} className="mt-16 mb-0" />
+        <section className="mt-4 max-w-2xl border-t border-trait pt-10">
           <h2 className="font-display text-[22px] font-semibold">Comment ça marche</h2>
           <ol className="mt-5 space-y-4">
             {ETAPES.map((e, i) => (

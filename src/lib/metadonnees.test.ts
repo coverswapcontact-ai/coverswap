@@ -152,7 +152,9 @@ describe("toutes les pages publiques passent par metadonneesPage", () => {
       assert.match(source, /metadonneesPage\(/, `${nomDe(f)} : metadonneesPage`);
       assert.doesNotMatch(source, /openGraph:|alternates:/, `${nomDe(f)} : métadonnées écrites à la main`);
       // Un fil d'Ariane balisé sur chaque page (sauf l'accueil) ; les pages par pièce le posent par `ContenuPrestation`.
-      if (nomDe(f) !== "page.tsx") assert.match(source, /<BreadcrumbSchema|<ContenuPrestation/, `${nomDe(f)} : fil d'Ariane`);
+      // Site 3.0 (lot F4) : le fil VISIBLE (`<Breadcrumb`) pose aussi le BreadcrumbList ; aucune page ne balise un fil à part.
+      if (nomDe(f) !== "page.tsx") assert.match(source, /<Breadcrumb |<ContenuPrestation/, `${nomDe(f)} : fil d'Ariane`);
+      assert.doesNotMatch(source, /<BreadcrumbSchema/, `${nomDe(f)} : un balisage de fil séparé du fil visible`);
     }
     for (const f of pages.filter((x) => privees.has(nomDe(x)))) assert.match(readFileSync(f, "utf8"), /robots: \{ index: false/, nomDe(f));
   });

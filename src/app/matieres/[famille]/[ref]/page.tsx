@@ -5,7 +5,6 @@ import { preconnect } from "react-dom";
 import { insecables } from "@/app/blog/[slug]/illustration";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { Echantillon, OMBRE_ECHANTILLON } from "@/components/revue/Echantillon";
 import { Lien } from "@/components/simulation/Lien";
@@ -14,7 +13,6 @@ import { Section } from "@/components/simulation/Section";
 import { GLOSES_FINITIONS, NOTES_MATIERES, REPERES_FAMILLES } from "@/data/notes-matieres";
 import { lienInspiration } from "@/lib/ambiances";
 import { familleDuCartel, libelleFinition } from "@/lib/cartel";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { TIROIRS, cheminFamille } from "@/lib/familles-matieres";
 import { ambiancesDeLaFiche, descriptionFiche, ecartLisible, estFicheIndexee, ficheDe, parametresDesFiches, prochesDeLaFiche, realisationsDeLaMatiere, titreFiche } from "@/lib/fiches-matieres";
@@ -87,7 +85,6 @@ export default async function PageFiche({ params }: Props) {
 
   const cartel = matiereCartel(m.id)!;
   const nomFamille = TIROIRS[m.famille];
-  const url = `${ENTREPRISE.site}${lienMatiere(m.id)}`;
   const note = estFicheIndexee(m.id) ? NOTES_MATIERES[m.id] : undefined;
   const reperes = REPERES_FAMILLES[m.famille];
   const vues = ambiancesDeLaFiche(m.id);
@@ -113,20 +110,11 @@ export default async function PageFiche({ params }: Props) {
 
   return (
     <div>
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Matières", url: `${ENTREPRISE.site}/matieres` },
-          { name: nomFamille, url: `${ENTREPRISE.site}${cheminFamille(m.famille)}` },
-          { name: nomComplet, url },
-        ]}
-      />
-
       {/* ── 1. Ouverture : le nom, la grande vignette, les deux actions, le cartel ── */}
       <section aria-labelledby="titre-fiche" className="px-4 pt-6 pb-6 md:px-6 md:pt-10 md:pb-10">
         <div className="mx-auto grid max-w-6xl gap-x-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[auto_1fr]">
           <div className="lg:col-start-2">
-            <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: "/matieres" }, { label: nomFamille, href: cheminFamille(m.famille) }, { label: nomComplet }]} />
+            <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: "/matieres" }, { label: nomFamille, href: cheminFamille(m.famille) }, { label: nomComplet, href: lienMatiere(m.id) }]} />
             <p className="surtitre">
               {familleDuCartel(m.famille)} · {m.id}
             </p>
