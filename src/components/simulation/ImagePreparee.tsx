@@ -10,6 +10,11 @@ import { MEDIA_TELEPHONE, plafonnerSrcset, type SourcesImage } from "@/lib/image
  * n'est pas écrite ; `width` / `height` seulement s'ils sont connus (sinon le
  * cadre réserve la place par `aspect-ratio`). Sans état : composant serveur ou
  * client.
+ *
+ * Site 3.0, lot F6 (poids des pages) : une image du dépôt a toujours son AVIF ; on n'écrit plus alors ni son WebP ni
+ * sa série JPEG plafonnée du téléphone. Tout navigateur actuel lit l'AVIF ; celui qui ne le lit pas (Safari d'avant
+ * iOS 16) prend le JPEG de l'`<img>`. Trois séries au lieu de six par image : /inspirations perd le tiers de son HTML.
+ * Une photo du CRM (WebP seulement) garde ses deux sources WebP.
  */
 export type ProprietesImagePreparee = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet" | "sizes" | "width" | "height" | "alt"> & {
   sources: SourcesImage;
@@ -22,14 +27,16 @@ export function ImagePreparee({ sources, tailles, alt, ...props }: ProprietesIma
   // Téléphone : la même série plafonnée à 960 px (voir `plafonnerSrcset`), écrite seulement si elle diffère. Toutes
   // les sources du téléphone viennent AVANT les autres (la première qui convient l'emporte).
   const plafond = (s?: string) => (s ? plafonnerSrcset(s) : undefined);
-  const telephone = [sources.avif, sources.webp, sources.jpg].some((s) => !!s && plafond(s) !== s);
+  const webp = sources.avif ? undefined : sources.webp;
+  const jpgTelephone = sources.avif ? undefined : sources.jpg;
+  const telephone = [sources.avif, webp, jpgTelephone].some((s) => !!s && plafond(s) !== s);
   return (
     <picture>
       {telephone && sources.avif ? <source media={MEDIA_TELEPHONE} type="image/avif" srcSet={plafond(sources.avif)} sizes={tailles} /> : null}
-      {telephone && sources.webp ? <source media={MEDIA_TELEPHONE} type="image/webp" srcSet={plafond(sources.webp)} sizes={tailles} /> : null}
-      {telephone && sources.jpg ? <source media={MEDIA_TELEPHONE} srcSet={plafond(sources.jpg)} sizes={tailles} /> : null}
+      {telephone && webp ? <source media={MEDIA_TELEPHONE} type="image/webp" srcSet={plafond(webp)} sizes={tailles} /> : null}
+      {telephone && jpgTelephone ? <source media={MEDIA_TELEPHONE} srcSet={plafond(jpgTelephone)} sizes={tailles} /> : null}
       {sources.avif ? <source type="image/avif" srcSet={sources.avif} sizes={tailles} /> : null}
-      {sources.webp ? <source type="image/webp" srcSet={sources.webp} sizes={tailles} /> : null}
+      {webp ? <source type="image/webp" srcSet={webp} sizes={tailles} /> : null}
       <img src={sources.src} srcSet={sources.jpg} sizes={sources.jpg ? tailles : undefined} width={sources.largeur} height={sources.hauteur} alt={alt} {...props} />
     </picture>
   );

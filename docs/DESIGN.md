@@ -123,8 +123,13 @@ ses cartes** (pictos de l'accueil, cartes des zones, « autres prestations »). 
 - **Libre Franklin** pour le texte (`--font-sans`, la police du corps de page).
 - Chargées par `next/font/google` dans `src/app/layout.tsx` : téléchargées au build et servies par le site (aucun
   appel à Google Fonts depuis le navigateur), `display: swap`, préchargées, avec une police de repli ajustée
-  (`adjustFontFallback`, par défaut) contre le décalage au chargement. Sous-ensemble latin préchargé : 3 fichiers
-  (Playfair droit 38 Ko, Playfair italique 39 Ko, Libre Franklin 29 Ko).
+  (`adjustFontFallback`, par défaut) contre le décalage au chargement. Sous-ensemble latin préchargé : 2 fichiers
+  (Playfair droit 38 Ko, Libre Franklin 29 Ko).
+- **L'italique** (lot F6) : une famille à part, `--font-display-italique` (classe `font-display-italique`, toujours
+  avec `italic`), chargée **à la demande** (`preload: false`) : elle ne sert qu'au nom des matières des cartels, le
+  plus souvent sous le premier écran, et ses 38 Ko préchargés prenaient la bande passante du LCP sur chaque page. Sa
+  police de repli est ajustée comme les autres. Jamais `italic` sur `font-display` : l'italique serait imitée
+  (testé).
 
 ### Les tailles
 
@@ -316,6 +321,12 @@ pour « Avant ») :
 
 Les pictos (dessins) n'en portent pas. Une étiquette décorative sur une image `alt=""` est muette (`muette`).
 
+Lot F6 : la carte d'un chantier publié (`CarteRealisation`, accueil et `/realisations`) porte « Réalisation » sur sa
+photo, comme l'ouverture. `src/app/honnetete.test.ts` le vérifie sur les pages rendues : chaque image du dépôt
+(manifeste) porte son étiquette (« Ambiance » ou « Ambiance · avant / après », « Simulation » pour la seule capture
+du simulateur `etape-simulation`), jamais « Réalisation » ; un rendu fait sur une pièce d'exemple jamais
+« Simulation ».
+
 ### Le curseur avant / après — `simulation/AvantApres.tsx`
 
 Les deux images superposées, l'« avant » découpé par le curseur ; poignée de 48 px qu'on glisse au doigt (la page
@@ -377,7 +388,7 @@ Chaque lien fait au moins 44 × 44 px (`min-h-[44px] min-w-[44px]` : « Pro » e
 ### Le fil d'Ariane — `Breadcrumb.tsx` (serveur, lot F4)
 
 Au-dessus du `h1` de toute page intérieure (14 px, gris chaud, la page courante en encre, `/` en séparateur muet,
-chaque lien de 44 px de haut) ; il pose aussi le `BreadcrumbList` de la page à partir des mêmes éléments. Exceptions :
+chaque lien de 44 px de haut et de large au moins — lot F6 : « Bois » mesurait 29 px) ; il pose aussi le `BreadcrumbList` de la page à partir des mêmes éléments. Exceptions :
 l'accueil n'en a pas ; le simulateur l'a **sous l'outil** (au-dessus de « Comment ça marche »), le premier écran
 reste à l'outil. Le dernier élément d'un guide est son titre court (`titreSeo`) ; sur téléphone le fil passe alors
 sur deux lignes, le bouton principal reste au premier écran.
@@ -803,6 +814,23 @@ Lot E4 (énoncé, phase E point 3), sous l'image du résultat, dans cet ordre :
   (Façades), AG13 (Plan de travail) ». Le lien disparaît une fois la demande envoyée.
 - Puis, sans changement : la note sur le rendu, « Essayer d'autres matières », « Télécharger », « Partager »,
   l'estimation, la demande et son **seul** bouton principal, « Recevoir mon devis ».
+
+## Performance et accessibilité (lot F6)
+
+- **Images du dépôt** (`ImagePreparee`) : AVIF (série plafonnée à 960 px pour le téléphone, série entière ailleurs) et
+  JPEG de repli dans l'`<img>` ; plus de WebP ni de série JPEG du téléphone à côté d'un AVIF (trois séries au lieu de
+  six). Les photos du CRM, en WebP seulement, gardent leurs deux sources WebP.
+- **Préchargement de l'image du premier écran** : par `components/Prechargements.tsx`, un composant **client** (accueil,
+  prestations, `/pro`, fiche d'une matière). Jamais `preload()`, `<link rel="preload">` ni `<img>` non différé hors
+  `<picture>` dans un composant serveur : React en fait un indice de la charge RSC, et le routeur de Next le suit dès
+  qu'il précharge la page depuis un lien visible (le logo mène à « / » partout : toutes les pages téléchargeaient
+  l'image de l'accueil). La grande vignette de la fiche est posée dans un `<picture>` pour cette raison.
+- **Cibles** : 44 × 44 px au moins pour tout lien ou bouton hors d'une phrase (questions repliables, fil d'Ariane, lien
+  de famille de la fiche corrigés au lot F6 ; relevé à 390 px sur le build, sur 21 pages). Les liens dans une phrase
+  (« Avec : Black Mat K1, … ») relèvent de l'exception « en ligne » du WCAG.
+- **Noms** : un lien ou un bouton fait d'un cartel est nommé par son texte, sans `aria-label` qui le double (échantillons
+  liés, tuiles du présentoir avec « voir en grand » pour les lecteurs d'écran) ; le champ piège des formulaires est
+  hors de l'ordre du clavier (`tabIndex={-1}`).
 
 ## Ce qu'on a jeté de la maquette
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { preload } from "react-dom";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CartesAtouts, CartesSurfaces, EtapesPrestation, PhraseTarif, QuestionsPrestation } from "@/components/BlocsPrestation";
 import { CarteRealisation } from "@/components/CarteRealisation";
@@ -9,6 +8,7 @@ import { TAILLES_OUVERTURE_PRESTATION } from "@/components/ContenuPrestation";
 import { CarteAmbiance, regrouperMatieres } from "@/components/ambiances/CarteAmbiance";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
 import { imageObjetOuverture, partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
+import { Prechargements } from "@/components/Prechargements";
 import { DonneesStructurees, FAQSchema, HowToSchema, ServiceSchema, refImage } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Cartel } from "@/components/revue/Cartel";
@@ -62,7 +62,6 @@ export default async function PagePro() {
   if (!PRO) notFound();
   const { realisations } = await chargerPublications();
   const { ouverture, reelles, lieux, vedettes } = vueDuPro(realisations);
-  for (const prechargement of prechargementsOuverture(ouverture, TAILLES_OUVERTURE_PRESTATION)) preload(prechargement.href, prechargement.options);
   const teinte = teintePrestation("professionnel");
   const hexCartel = teinte?.seconde?.hex ?? teinte?.teinte.hex;
   const matiereBande = teinte?.seconde ? matiereCartel(teinte.seconde.ref) : null;
@@ -74,6 +73,8 @@ export default async function PagePro() {
 
   return (
     <div style={styleTeinte(teinte)}>
+      {/* L'« avant » de l'ouverture préchargé (lot C2), par un composant client depuis le lot F6 (`Prechargements`). */}
+      <Prechargements liste={prechargementsOuverture(ouverture, TAILLES_OUVERTURE_PRESTATION)} />
       <ServiceSchema name={PRO.nom} description={PRO.descriptionSeo} url={URL_PRO} typeProjet={PRO.court} urlOffre={`${URL_PRO}${lienDevis}`} image={refImage(imageOuverture)} />
       <DonneesStructurees data={imageOuverture} />
       <FAQSchema faqs={PRO.faq} />

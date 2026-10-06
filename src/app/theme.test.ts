@@ -355,3 +355,19 @@ describe("site 3.0, lot C6 : l'espace client aux jetons", () => {
     }
   });
 });
+
+describe("site 3.0, lot F6 : cibles de 44 px", () => {
+  // Relevé à 390 px sur le build (lot F6, docs/REPRISE-LOCAL.md) : ces trois-là mesuraient 24 px, 18 px et 29 px.
+  test("les questions du simulateur, le lien de famille de la fiche et chaque étape du fil d'Ariane font 44 px au moins ; le titre de l'écran Pièce réserve sa place", () => {
+    assert.match(lire(join(SRC, "app", "simulateur", "page.tsx")), /<summary className="flex min-h-\[44px\] cursor-pointer/);
+    assert.match(lire(join(SRC, "app", "matieres", "[famille]", "[ref]", "page.tsx")), /<Link href=\{cheminFamille\(m\.famille\)\} className="inline-flex min-h-\[44px\] items-center/);
+    assert.match(lire(join(SRC, "components", "Breadcrumb.tsx")), /<Link href=\{item\.href\} className="inline-flex min-h-\[44px\] min-w-\[44px\] items-center/);
+    // Aucun décalage au chargement des polices : le titre de l'écran Pièce réserve ses deux lignes au téléphone (CLS 0,027 mesuré à 412 px).
+    assert.match(lire(join(SRC, "app", "simulateur", "_components", "EcranPiece.tsx")), /<h2 id="etape-piece" className="[^"]*max-sm:min-h-\[2\.5em\]"/);
+    // … et chaque carte de pièce, les deux lignes de sa description (la grille gardait 18 px de plus en police de repli).
+    assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /line-clamp-2 block min-h-\[2\.75em\] text-\[13px\] leading-snug/);
+    // Aucune question repliable sans sa hauteur de cible, où qu'elle soit.
+    const pages = (dossier: string): string[] => readdirSync(dossier).flatMap((n) => (statSync(join(dossier, n)).isDirectory() ? pages(join(dossier, n)) : n.endsWith(".tsx") ? [join(dossier, n)] : []));
+    for (const f of pages(SRC)) for (const l of lire(f).split("\n").filter((l) => /<summary className=/.test(l))) assert.match(l, /min-h-\[(4[4-9]|[5-9]\d)px\]/, `${relative(SRC, f)} : ${l.trim().slice(0, 90)}`);
+  });
+});

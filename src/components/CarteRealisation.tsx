@@ -13,6 +13,8 @@ import { sourcesPhotoCrm } from "@/lib/publications";
  * WebP réduit par le CRM (`sourcesPhotoCrm`) ; titre, légende (type · ville),
  * texte (`avecTexte`), matières posées vers la page Matières, prix et durée
  * (`lignePrixDuree` : publiés ; sans prix publié, aucun, la durée habituelle libellée comme telle).
+ * Lot F6 (honnêteté) : la photo porte l'étiquette « Réalisation », comme toute image du site porte la sienne
+ * (`honnetete.test.ts`) — un vrai chantier se reconnaît sur l'image, pas seulement au titre de la section.
  * Composant serveur.
  */
 export const CLASSE_CARTE_REALISATION = "overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white";
@@ -39,6 +41,7 @@ export function CarteRealisation({ etude, avecTexte = false, tailles = TAILLES_P
           ratio={RATIO_CARTE_REALISATION}
           preparees={{ apres: sourcesPhotoCrm(etude.apres), avant: etude.avant ? sourcesPhotoCrm(etude.avant) : null, tailles }}
           sansOutils
+          etiquette="Réalisation"
         />
       ) : null}
       <div className="p-5">

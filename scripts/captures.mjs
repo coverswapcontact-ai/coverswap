@@ -5,7 +5,7 @@
  * (`.github/workflows/site.yml`) sur le site construit et démarré (`next start -p 3100`), puis comparé à la dernière
  * exécution réussie sur `main` (`scripts/comparer-captures.mjs`).
  *
- *   npm run captures                                   # les six pages de Lighthouse, 3 largeurs, dans captures/
+ *   npm run captures                                   # les huit pages de Lighthouse, 3 largeurs, dans captures/
  *   node scripts/captures.mjs sortie --pages=accueil,/prestations/cuisine --largeurs=390,1440
  *   SITE=https://coverswap.fr npm run captures
  *
@@ -24,7 +24,10 @@ import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-/** Les six pages mesurées par la CI (les mêmes que `lighthouserc.json`) : la sélection par défaut. */
+/**
+ * Les huit pages mesurées par la CI (les mêmes que `lighthouserc.json`) : la sélection par défaut. Site 3.0, lot F6 :
+ * les six d'avant, plus une prestation (cuisine) et une fiche de matière indexée (NF13), où le LCP vient du CRM.
+ */
 export const PAGES_CAPTURES = [
   { nom: "accueil", chemin: "/" },
   { nom: "simulateur", chemin: "/simulateur" },
@@ -32,13 +35,13 @@ export const PAGES_CAPTURES = [
   { nom: "realisations", chemin: "/realisations" },
   { nom: "comment-ca-marche", chemin: "/comment-ca-marche" },
   { nom: "pro", chemin: "/pro" },
+  { nom: "prestation-cuisine", chemin: "/prestations/cuisine" },
+  { nom: "matiere-fiche-nf13", chemin: "/matieres/couleur/NF13" },
 ];
 
 /** Pages connues hors sélection par défaut, appelables par leur nom avec `--pages`. */
 export const PAGES_SUPPLEMENTAIRES = [
-  { nom: "prestation-cuisine", chemin: "/prestations/cuisine" },
   { nom: "matieres-nf13", chemin: "/matieres?ref=NF13" },
-  { nom: "matiere-fiche-nf13", chemin: "/matieres/couleur/NF13" },
 ];
 
 /** Téléphone, tablette, ordinateur ; la hauteur de fenêtre n'est que celle du premier écran (la capture prend toute la page). */
@@ -82,7 +85,7 @@ function resoudreLargeur(valeur) {
 
 /**
  * Lit la ligne de commande : `[dossier] [--pages=a,b] [--largeurs=390,1440]` (aussi `--pages a,b`). Sans option : les
- * six pages, les trois largeurs, `captures/`.
+ * huit pages, les trois largeurs, `captures/`.
  */
 export function lireOptions(argv) {
   const options = { dossier: "captures", pages: PAGES_CAPTURES, largeurs: LARGEURS_CAPTURES };

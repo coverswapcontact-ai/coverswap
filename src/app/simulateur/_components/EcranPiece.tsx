@@ -27,7 +27,9 @@ export function EcranPiece({ zones, projet, onChoisir }: { zones: ZonesSimulateu
   return (
     <section aria-labelledby="etape-piece" className="space-y-5">
       <div>
-        <h2 id="etape-piece" className="font-display text-[26px] leading-tight font-semibold tracking-tight text-balance">
+        {/* Lot F6 : deux lignes réservées sous 640 px (2 × 1,25 em) : en Playfair le titre passe sur deux lignes à 412 px, en
+            police de repli sur une ; la grille des pièces sautait de 32 px à l'arrivée de la police (CLS 0,027 mesuré). */}
+        <h2 id="etape-piece" className="font-display text-[26px] leading-tight font-semibold tracking-tight text-balance max-sm:min-h-[2.5em]">
           Quelle pièce transformons-nous ?
         </h2>
         <p className="mt-1.5 text-[15px] leading-relaxed text-encre-2">Choisissez, puis prenez une photo : le rendu se fait sur votre propre photo, sans inscription.</p>

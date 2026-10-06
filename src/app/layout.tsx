@@ -14,16 +14,28 @@ import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { IMAGE_PARTAGE } from "@/lib/partage";
 /**
- * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900, droit et italique) et Libre Franklin pour le texte,
- * en polices variables téléchargées au build et servies par le site (next/font) : aucun appel à Google Fonts depuis
- * le navigateur. `display: swap`, préchargées, et une police de repli ajustée (adjustFontFallback, par défaut) contre
- * le décalage au chargement. Les jetons --font-display et --font-sans de globals.css pointent sur ces variables.
+ * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900) et Libre Franklin pour le texte, en polices
+ * variables téléchargées au build et servies par le site (next/font) : aucun appel à Google Fonts depuis le
+ * navigateur. `display: swap`, préchargées, et une police de repli ajustée (adjustFontFallback, par défaut) contre le
+ * décalage au chargement. Les jetons --font-display et --font-sans de globals.css pointent sur ces variables.
+ *
+ * Lot F6 : l'italique de Playfair (38 Ko) n'est plus préchargée avec le droit. Elle ne sert qu'au nom des matières
+ * des cartels (`font-display-italique`), le plus souvent sous le premier écran : préchargée, elle prenait la bande
+ * passante du LCP sur chaque page. Une famille à part, demandée par le navigateur quand un cartel s'affiche, avec
+ * sa propre police de repli ajustée.
  */
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  style: ["normal", "italic"],
   variable: "--font-playfair",
   display: "swap",
+});
+
+const playfairItalique = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+  variable: "--font-playfair-italique",
+  display: "swap",
+  preload: false,
 });
 
 const franklin = Libre_Franklin({
@@ -101,7 +113,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${playfair.variable} ${franklin.variable}`}>
+    <html lang="fr" className={`${playfair.variable} ${playfairItalique.variable} ${franklin.variable}`}>
       <body className="bg-fond font-sans text-encre antialiased">
         {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans suivi de parcours ni habillage commercial. */}
         {/* Mission 16 (partie 6) : aucun script tiers ni cookie de mesure (GTM, GA4, pixel Meta, Clarity et Vercel Analytics retirés,

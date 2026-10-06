@@ -70,7 +70,7 @@ export default async function PageSimulateur() {
           <div className="mt-5 space-y-2.5">
             {FAQ_SIMULATEUR.map((f) => (
               <details key={f.q} className="group rounded-[var(--rayon-md)] border border-trait bg-white p-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
+                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
                   {f.q}
                   <span aria-hidden className="text-2xl leading-none text-encre-2 transition-transform duration-[var(--duree-courte)] group-open:rotate-45">
                     +

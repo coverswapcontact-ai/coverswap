@@ -12,7 +12,6 @@ import { cx, useLiensDeFeuille } from "@/components/simulation/Feuille";
 import { Lien } from "@/components/simulation/Lien";
 import { PleinEcran } from "@/components/simulation/PleinEcran";
 import { GRILLE_ECHANTILLONS, SqueletteTuiles } from "@/components/simulation/Squelette";
-import { texteCartel } from "@/lib/cartel";
 import { differer } from "@/lib/differer";
 import { cheminFamille, cheminMatiere } from "@/lib/familles-matieres";
 import { DELAI_RECHERCHE_MS, MATIERES_PAR_PAGE, chargerCatalogue, estAffine, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, type FiltreMatieres, type Matiere, type Tiroir } from "@/lib/matieres";
@@ -272,11 +271,12 @@ export function Matieres({ premieres, tiroirs, finitions, vueDans = {} }: { prem
                     declencheur.current = e.currentTarget;
                     setAgrandie(m);
                   }}
-                  aria-label={`${texteCartel(m)} : voir en grand`}
                   className={cx("group block w-full rounded-[var(--rayon-sm)] text-left", SOUS_LES_BARRES)}
                 >
+                  {/* Lot F6 : le nom du bouton est son texte (le cartel, puis « voir en grand » pour les lecteurs d'écran), plus un aria-label qui le doublait (WCAG 2.5.3). */}
                   <VignetteEchantillon matiere={m} priorite={rang < PREMIERE_RANGEE} className="transition-transform duration-[var(--duree-courte)] motion-safe:group-hover:-translate-y-0.5" />
                   <Cartel matiere={m} balise="span" className="mt-3" />
+                  <span className="sr-only"> : voir en grand</span>
                 </button>
                 <BoutonFavori nom={m.nom} favori={favori} onBasculer={() => basculerFavori(m.id)} className={SOUS_LES_BARRES} />
               </li>

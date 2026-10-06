@@ -76,7 +76,8 @@ export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce",
               </span>
             )}
             <span className="mt-2 block text-[15.5px] leading-snug font-semibold text-encre">{p.libelle}</span>
-            <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-encre-2">{p.description}</span>
+            {/* Lot F6 : deux lignes réservées (2 × 1,375 em) : la carte garde sa hauteur quand Libre Franklin remplace la police de repli. */}
+            <span className="mt-0.5 line-clamp-2 block min-h-[2.75em] text-[13px] leading-snug text-encre-2">{p.description}</span>
           </>
         );
         return lien ? (

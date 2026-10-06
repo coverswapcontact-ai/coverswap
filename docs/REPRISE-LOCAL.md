@@ -50,7 +50,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - F3, un seul hôte : fait (`vercel.json` : www et coverswap.vercel.app → coverswap.fr en 301 ; redirections en 301 ; plus de canonical par défaut).
 - F4, données structurées : fait (une entreprise locale, `Service` avec `@id` et image, `ImageObject` par avant / après, fil d'Ariane visible et balisé partout ; `docs/SEO.md` « Données structurées »).
 - F5, maillage : fait (ambiance → fiches et prestation, fiche → ambiances et prestations, prestation → 3 avant / après, vedettes, villes, ville → prestations et réalisations ; `docs/SEO.md` « Maillage »).
-- F6 : à venir. Mesures « avant » : `docs/SEO.md`.
+- F6, performance, accessibilité, honnêteté : fait (Lighthouse après dans `docs/SEO.md` : accessibilité, SEO et bonnes pratiques à 100 sur 11 pages, CLS 0 ; performance 77 à 91 et LCP simulé 3,2 à 5,2 s, objectifs 90 et 2,5 s non atteints, expliqué ; `honnetete.test.ts`, `mots.test.ts`, 8 pages en CI).
 
 ## Phase G : livraison
 
@@ -1681,3 +1681,80 @@ build inchangé (JSON valide, fil = `BreadcrumbList`, `ImageObject` = curseurs).
 **Problèmes** : aucun. Le maillage ajoute des liens (cartels, prestation) sur `/inspirations` et l'accueil : à
 regarder au Lighthouse de F6 (taille du DOM).
 
+## F6 — performance, accessibilité, honnêteté (06/10/2026)
+
+**Fait** (aucun appel d'API, aucun envoi : captures et sondes avec les `POST` et le CRM coupés)
+- **L'image de l'accueil n'est plus téléchargée sur les autres pages** (signalé en C1 / C2). Cause trouvée : le
+  serveur RSC de React transforme en indice de préchargement (`HL` dans la charge RSC) tout `preload()`, tout
+  `<link rel="preload">` et tout `<img>` non différé hors `<picture>` d'un composant **serveur** ; le routeur de Next
+  suit ces indices quand il précharge une page depuis un lien visible (le logo → « / » sur toutes les pages, le menu →
+  `/pro` à l'ordinateur, les cartels → les fiches, dont l'échantillon du CRM jusqu'à 105 Ko en priorité haute).
+  Correction : `components/Prechargements.tsx`, composant **client** qui appelle `preload` (le `<link>` reste dans le
+  `<head>` du HTML de la page, rien dans la charge RSC) — accueil, prestations, `/pro`, fiche ; la grande vignette de la
+  fiche passe dans un `<picture>`. Vérifié sur le build : 0 indice d'image dans les `.rsc` (accueil, `/pro`, cuisine,
+  NF13), les préchargements toujours dans le `<head>`.
+- **Polices** : l'italique de Playfair (38 Ko, seul usage : le nom des matières des cartels) n'est plus préchargée —
+  famille à part `--font-display-italique` / `font-display-italique`, `preload: false` ; 2 polices préchargées au lieu
+  de 3. Toujours auto-hébergées (next/font), `swap`, repli ajusté.
+- **Poids** : `ImagePreparee` n'écrit plus de WebP ni de série JPEG du téléphone à côté d'un AVIF (3 séries au lieu de
+  6), `sourcesPhoto` n'annonce plus le WebP (les fichiers restent sur le disque) ; photos du CRM inchangées (WebP).
+  HTML : accueil 320 → 288 Ko, `/inspirations` 854 → 739 Ko (56 Ko compressés).
+- **Aucun décalage** : sous ralentissement réel, le titre de l'écran Pièce du simulateur passait d'une à deux lignes à
+  l'arrivée de Playfair (412 px) : hauteur réservée au téléphone, et deux lignes pour la description des cartes de
+  pièce (CLS réel 0,027 → 0,006 ; 0 en simulation partout).
+- **Accessibilité** : `/contact` 96 → 100 (champ piège de `DevisForm` hors du clavier) ; relevé des cibles à 390 px sur
+  21 pages et états (script de scratchpad) : questions repliables du simulateur 24 px → 44, lien de famille de la fiche
+  18 px → 44, fil d'Ariane ≥ 44 px de large (« Bois » faisait 29) ; les liens dans une phrase restent en ligne
+  (exception WCAG). Boutons à icône : aucun sans nom. Noms : l'échantillon lié et la tuile du présentoir sont nommés
+  par leur texte (le cartel ; « voir en grand » en texte pour lecteurs d'écran), plus d'`aria-label` qui doublait le
+  texte visible sans le reprendre (WCAG 2.5.3). Contrastes : déjà mesurés au lot B1 (gris chaud 4,90:1 sur le grain le
+  plus sombre) ; Lighthouse `color-contrast` passe partout. Curseur au clavier : en place depuis B3 (vérifié).
+- **Honnêteté** : la carte d'un chantier publié (`CarteRealisation`) porte « Réalisation » sur sa photo (elle n'avait
+  aucune étiquette). Nouveau `src/app/honnetete.test.ts`.
+- **Textes** : `/contact` 205 → 465 mots (« Après votre message », « Ce qui nous aide à vous répondre juste », « Où
+  nous intervenons »), `/matieres` 287 → 533 (« Choisir sans se tromper »). Nouveau `src/app/mots.test.ts`.
+- **CI** : `lighthouserc.json` et `PAGES_CAPTURES` passent à 8 pages (+ `/prestations/cuisine`, + la fiche
+  `/matieres/couleur/NF13`), seuils inchangés ; `site.yml`, `docs/SUIVI.md` et `captures.mjs` le disent.
+- **Lighthouse après** (même méthode que B0, 11 pages) : tableaux dans `docs/SEO.md`, avec une mesure complémentaire
+  sous ralentissement réel. `docs/DESIGN.md` : polices, étiquette, fil d'Ariane, « Performance et accessibilité ».
+
+**Décisions prises seul**
+1. **Pas de `?l=640` au CRM** : l'échantillon entier fait 595 px de large (une version à 640 px n'existe pas), et le
+   LCP de la fiche (3,2 s simulé, 2,9 s réel, NF13 = 4 Ko) tient à la page, pas à l'image. Le CRM n'est pas touché.
+2. **AVIF + JPEG seulement** pour les images du dépôt : tout navigateur actuel lit l'AVIF ; un Safari d'avant iOS 16
+   reçoit le JPEG (plus lourd), au lieu du WebP.
+3. **L'italique à la demande** (le plan B1 interdisait `preload: false` « à revoir en F6 si le LCP le demande ») :
+   une seule police non préchargée, testée comme telle.
+4. **Feuille de style dans la page (`experimental.inlineCss`) essayée et écartée** : HTML de l'accueil 288 → 516 Ko
+   (la feuille est recopiée dans la charge RSC), performance simulée 82 → 77.
+5. **Objectifs performance 90 et LCP 2,5 s non atteints, pas forcés** : la simulation compte tout le JavaScript chargé
+   avant l'affichage (cadre Next/React ~116 Ko compressés) ; sans JavaScript le LCP simulé de l'accueil serait 2,6 s.
+   Le navigateur affiche l'image avant ce JavaScript (sonde Edge, processeur ÷4 : 0,77 s). Retirer l'hydratation est
+   hors du site 3.0. Les seuils bloquants de la CI (85, LCP 4 s) restent ceux de B0 : **la prestation cuisine (78,
+   5,2 s), l'accueil (82, 4,8 s), `/pro` (83, 4,5 s) et `/matieres` (84) sont sous le plancher de la CI en mesure
+   locale** — la CI de GitHub (Linux, autre machine) mesurera au prochain passage sur `main` (G3).
+6. `/inspirations` laissé à 739 Ko : alléger les 40 cartes de la suite (l'après seul jusqu'au clic, par exemple) est
+   un choix d'interface, pour Lucas.
+7. L'étiquette « Réalisation » posée sur `CarteRealisation` par la prop `etiquette` d'`AvantApres` (en bas à gauche, comme
+   l'ouverture) ; « Réalisation » sans la ville (la légende de la carte la donne déjà).
+
+**Tests** : 557 → 567, tous réussis. Nouveaux : `src/app/honnetete.test.ts` (4 : lecture des cadres ; chaque image
+du manifeste rendue sur les 95 pages indexées porte « Ambiance » / « Ambiance · avant / après », « Simulation » pour la
+seule capture `etape-simulation`, la série 2 jamais « Réalisation » ni dans l'étiquette ni dans le texte alternatif,
+233 cadres vus ; un chantier publié porte « Réalisation » et passe premier sur `/` et `/realisations` ; les 18
+exemples du simulateur et leur résultat jamais « Simulation » — contrôle : sans l'étiquette de `CarteAmbiance`, le
+test échoue), `src/app/mots.test.ts` (3 : le compte ; les 95 adresses du plan du site ≥ 300 mots ; les textes ajoutés
+sont là, sans phrase répétée). `perf.test.ts` : + « aucun préchargement d'image dans la charge RSC », + « AVIF et
+JPEG seulement ». `theme.test.ts` : + « cibles de 44 px » (et hauteurs réservées). Adaptés (intention gardée) :
+`perf.test.ts` (préchargement par `<Prechargements …/>` sur les 4 pages, `preload(` nulle part ailleurs ; polices :
+l'italique seule non préchargée ; 8 pages Lighthouse et captures ; client admis `Prechargements`),
+`autres-pages.test.ts` et `tunnel.test.ts` (le couple prioritaire compté sur les `<img>`, les liens de préchargement
+précédant la page dans le rendu isolé), `matieres.test.ts` et `revue.test.ts` (nommé par le texte du cartel, plus
+d'`aria-label`), `images-manifeste.test.ts` (AVIF et JPEG, plus de WebP annoncé). `npx eslint .` et `npm run build`
+passent. Captures 390 / 1 440 (accueil, simulateur, `/matieres`, fiche NF13, `/contact`, `/realisations`, prestation
+cuisine) regardées ; aucun débordement à 360 px ; serveur local arrêté.
+
+**Problèmes** : objectifs Lighthouse de performance et de LCP non atteints (ci-dessus, point 5) ; écart de mesure
+jusqu'à 12 points entre passages ; sous la CI, quatre pages pourraient échouer le plancher de 85 si la machine de
+GitHub mesure comme ce poste — à surveiller au premier passage sur `main` (G3), et à trancher (plancher ou
+hydratation) avec Lucas.

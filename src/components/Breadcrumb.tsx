@@ -41,7 +41,7 @@ export default function Breadcrumb({ items, className = "mb-2" }: { items: Bread
           return (
             <span key={`${item.label}-${idx}`} className="flex min-h-[44px] items-center gap-2">
               {!isLast ? (
-                <Link href={item.href} className="inline-flex min-h-[44px] items-center transition-colors duration-[var(--duree-courte)] hover:text-encre">
+                <Link href={item.href} className="inline-flex min-h-[44px] min-w-[44px] items-center transition-colors duration-[var(--duree-courte)] hover:text-encre">
                   {item.label}
                 </Link>
               ) : (

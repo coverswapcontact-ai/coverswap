@@ -6,6 +6,7 @@ import { insecables } from "@/app/blog/[slug]/illustration";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
 import { LiensAmbiance } from "@/components/ambiances/LiensAmbiance";
+import { Prechargements } from "@/components/Prechargements";
 import { Cartel } from "@/components/revue/Cartel";
 import { Echantillon, OMBRE_ECHANTILLON } from "@/components/revue/Echantillon";
 import { Lien } from "@/components/simulation/Lien";
@@ -125,8 +126,13 @@ export default async function PageFiche({ params }: Props) {
           </div>
           <figure className="m-0 mt-6 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:mt-0">
             <div className={`relative aspect-[4/3] overflow-hidden rounded-[var(--rayon-sm)] md:aspect-[595/790] ${OMBRE_ECHANTILLON}`} style={{ backgroundColor: m.hex }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- échantillon servi et mis en cache par le CRM */}
-              <img src={urlEchantillon(m.id)} alt={`Échantillon ${m.nom}, référence ${m.id}`} width={LARGEUR_ECHANTILLON} height={HAUTEUR_ECHANTILLON} loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
+              {/* Lot F6 : l'échantillon (le LCP) est préchargé par `Prechargements` et posé dans un `<picture>` : un `<img>`
+                  non différé d'un composant serveur devient un indice de préchargement de la charge RSC, et chaque page
+                  qui montre un lien vers la fiche téléchargeait l'échantillon en priorité haute en la préchargeant. */}
+              <Prechargements liste={[{ href: urlEchantillon(m.id), options: { as: "image", fetchPriority: "high", referrerPolicy: "no-referrer" } }]} />
+              <picture>
+                <img src={urlEchantillon(m.id)} alt={`Échantillon ${m.nom}, référence ${m.id}`} width={LARGEUR_ECHANTILLON} height={HAUTEUR_ECHANTILLON} loading="eager" fetchPriority="high" decoding="async" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
+              </picture>
             </div>
             <figcaption className="mt-2 text-[14px] text-encre-2">L&apos;échantillon du fabricant, en grand. Un écran ne rend pas fidèlement une matière : on l&apos;apporte chez vous.</figcaption>
           </figure>
@@ -147,7 +153,7 @@ export default async function PageFiche({ params }: Props) {
               </dd>
               <dt className="surtitre">Famille</dt>
               <dd className="m-0">
-                <Link href={cheminFamille(m.famille)} className="text-encre underline underline-offset-4 hover:text-encre-2">
+                <Link href={cheminFamille(m.famille)} className="inline-flex min-h-[44px] items-center text-encre underline underline-offset-4 hover:text-encre-2">
                   {nomFamille}, {familleDuTiroir.nombre} références
                 </Link>
               </dd>

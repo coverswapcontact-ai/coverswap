@@ -6,6 +6,8 @@
      (scripts/jetons.mjs › lireJetons). Jamais une valeur hexadécimale dans un composant. ── */
   --font-sans: var(--font-franklin), system-ui, sans-serif;
   --font-display: var(--font-playfair), Georgia, serif;
+  /* L'italique de Playfair (le nom des matières dans les cartels, seul usage) : une famille à part, chargée à la demande. */
+  --font-display-italique: var(--font-playfair-italique), Georgia, serif;
   /* La mention « Google Maps » des avis (mission 16, partie 3) : Roboto, sinon la sans-serif du système (règle de Google). */
   --font-google: Roboto, sans-serif;
 

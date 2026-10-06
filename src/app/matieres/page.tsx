@@ -4,6 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
+import { ENTREPRISE } from "@/lib/entreprise";
 import { cheminFamille } from "@/lib/familles-matieres";
 import { vueDans } from "@/lib/indexation-matieres";
 import { choixFinitions, premieresDuPresentoir, tiroirs, type Matiere } from "@/lib/matieres";
@@ -78,6 +79,25 @@ export default function PageMatieres() {
             </li>
           ))}
         </ul>
+      </Section>
+      {/* Lot F6 : comment choisir, en quelques lignes (le texte utile de la page, 300 mots rendus au moins : mots.test.ts). */}
+      <Section id="choisir" titre="Choisir sans se tromper">
+        <div className="texte space-y-4 text-encre">
+          <p>
+            Un film Cover Styl&apos;, c&apos;est un décor (bois, pierre, couleur unie, métal, textile) imprimé sur un film adhésif, distribué en France par{" "}
+            {ENTREPRISE.fournisseur.distributeur}. On le pose à chaud sur ce que vous avez déjà, nettoyé et dégraissé : façades, plan de travail, portes, murs.
+            Rien n&apos;est démonté.
+          </p>
+          <p>
+            Commencez par la teinte : les échantillons sont rangés du clair au foncé, et le filtre des teintes resserre le choix. Regardez ensuite la famille et la
+            finition, qui changent la façon dont la lumière accroche la surface : un mat s&apos;efface, un brillant reflète la fenêtre, un veinage se lit de près.
+          </p>
+          <p>
+            Un écran ne rend jamais une teinte exactement : la luminosité, son réglage et la lumière de la pièce la déplacent. C&apos;est pour ça qu&apos;on vient avec
+            les vrais échantillons, posés contre vos meubles, avant de commander quoi que ce soit. En attendant, chaque référence s&apos;essaie sur une photo de
+            votre pièce, depuis sa fiche.
+          </p>
+        </div>
       </Section>
       {BANDE ? <BandeMatiere matiere={BANDE} /> : null}
     </div>

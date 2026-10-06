@@ -250,7 +250,8 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
       const html = await page(slug);
       // L'image de la page est celle de l'ouverture : ses deux images, et elles seules, en priorité haute.
       const prioritaires = [...html.matchAll(/<img [^>]*src="([^"]*)"[^>]*fetchPriority="high"/g)].map((m) => m[1]);
-      assert.equal(compter(html, 'fetchPriority="high"'), 2, slug);
+      // Lot F6 : les liens de préchargement (`Prechargements`, hissés dans le <head> sur le site) portent aussi fetchPriority ; on compte les images.
+      assert.equal((html.match(/<img [^>]*fetchPriority="high"/g) ?? []).length, 2, slug);
       assert.deepEqual(prioritaires.map((src) => src.replace(/-\d+\.jpg\?v=.*$/, "").replace("/images/prep/", "")).sort(), [ouverture.apres, ouverture.avant].sort(), slug);
       assert.ok(html.indexOf(`/images/prep/${ouverture.avant}-`) < html.indexOf('id="cas"'), `${slug} : l'ouverture avant les cas`);
       assert.ok(html.includes(`>${ouverture.legende}</figcaption>`), slug);
@@ -346,7 +347,8 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
     for (const slug of PIECES) {
       const html = await page(slug);
       const t = teintePrestation(slug)!;
-      assert.ok(html.startsWith(`<div style="--teinte:${t.teinte.hex}">`), slug);
+      // Lot F6 : les liens de préchargement (hissés dans le <head> sur le site) précèdent la page dans ce rendu isolé.
+      assert.ok(html.replace(/^(?:<link [^>]*\/>)+/, "").startsWith(`<div style="--teinte:${t.teinte.hex}">`), slug);
       assert.ok(compter(html, 'class="filet') >= 8 + 1, `${slug} : filets des villes et des cas`);
       // Les autres prestations portent leur propre teinte (vitrages : aucune).
       const pro = html.match(/<a [^>]*href="\/pro"[^>]*>/)?.[0] ?? "";
@@ -365,7 +367,7 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
     const cuisine = await page("cuisine");
     assert.ok(cuisine.includes(">Réalisation, Lattes</span>") && cuisine.includes(">Cuisine en chêne, Lattes.</figcaption>"));
     assert.match(cuisine, /<img src="[^"]*\/api\/site\/photos\/c1\/avant"[^>]*fetchPriority="high"/);
-    assert.equal(compter(cuisine, 'fetchPriority="high"'), 2);
+    assert.equal((cuisine.match(/<img [^>]*fetchPriority="high"/g) ?? []).length, 2);
     assert.ok(cuisine.indexOf(">Nos chantiers</h3>") < cuisine.indexOf(">Ambiance</span>"), "les chantiers avant les ambiances");
     assert.ok(cuisine.includes(">Cuisine noire</h3>") && !cuisine.includes(">Cuisine en chêne</h3>"), "l'ouverture n'est pas répétée en carte");
     assert.ok(!cuisine.includes("Salle de bain verte"), "une réalisation d'une autre pièce n'est pas montrée");

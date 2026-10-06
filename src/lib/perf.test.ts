@@ -20,6 +20,7 @@ import { Presentoir } from "@/components/accueil/Presentoir";
 import { ProAccueil } from "@/components/accueil/ProAccueil";
 import { QuestionsAccueil } from "@/components/accueil/QuestionsAccueil";
 import { RealisationsAccueil } from "@/components/accueil/RealisationsAccueil";
+import { ImagePreparee } from "@/components/simulation/ImagePreparee";
 import { Section } from "@/components/simulation/Section";
 import { differer } from "./differer";
 import { urlEvenements } from "./evenements-site";
@@ -86,6 +87,7 @@ const CLIENTS_ADMIS: Record<string, string> = {
   "src/components/HorsEspaceClient.tsx": "lit l'adresse (usePathname) ; ses enfants restent serveur",
   "src/components/HorsSimulateur.tsx": "lit l'adresse (usePathname) ; ses enfants restent serveur",
   "src/components/ScrollToTop.tsx": "remet la page en haut à chaque navigation",
+  "src/components/Prechargements.tsx": "le préchargement de l'image du premier écran, hors de la charge RSC (site 3.0, lot F6)",
 };
 /** La directive seule sur sa ligne (une mention dans un commentaire ne compte pas). */
 const estClient = (source: string) => /^["']use client["'];?\s*$/m.test(source);
@@ -244,30 +246,52 @@ describe("l'ouverture : l'« avant » préchargé sur / et les prestations seule
   });
 
   test("appelé par la page d'accueil, les pages de prestation (lot C1) et /pro (lot C2), qui ouvrent sur un curseur, par elles seules ; l'ancien préchargement du poster n'existe plus", () => {
+    // Lot F6 : par le composant client `Prechargements` (jamais `preload` dans un composant serveur : voir le test suivant).
     const accueil = lire("src/app/page.tsx");
-    assert.match(accueil, /import \{ preload \} from "react-dom";/);
-    assert.match(accueil, /for \(const prechargement of prechargementsOuverture\(ouverture\)\) preload\(prechargement\.href, prechargement\.options\);/);
+    assert.match(accueil, /<Prechargements liste=\{prechargementsOuverture\(ouverture\)\} \/>/);
     // La page de prestation précharge l'« avant » de SON ouverture, avec les `sizes` de son `<picture>`.
     const prestation = lire("src/app/prestations/[slug]/page.tsx");
-    assert.match(prestation, /import \{ preload \} from "react-dom";/);
-    assert.match(prestation, /for \(const prechargement of prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\) preload\(prechargement\.href, prechargement\.options\);/);
+    assert.match(prestation, /<Prechargements liste=\{prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\} \/>/);
     assert.match(lire("src/components/ContenuPrestation.tsx"), /preparees=\{\{ \.\.\.ouverture\.preparees, tailles: TAILLES_OUVERTURE_PRESTATION \}\}/);
     // Lot C2 : /pro ouvre aussi sur un curseur (le comptoir, ou une réalisation PRO) : même préchargement, mêmes `sizes`.
     const pro = lire("src/app/pro/page.tsx");
-    assert.match(pro, /import \{ preload \} from "react-dom";/);
-    assert.match(pro, /for \(const prechargement of prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\) preload\(prechargement\.href, prechargement\.options\);/);
+    assert.match(pro, /<Prechargements liste=\{prechargementsOuverture\(ouverture, TAILLES_OUVERTURE_PRESTATION\)\} \/>/);
     assert.match(pro, /preparees=\{\{ \.\.\.ouverture\.preparees, tailles: TAILLES_OUVERTURE_PRESTATION \}\}/);
-    const pagesAOuverture = ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx", "src/app/pro/page.tsx"];
-    const autres = SOURCES.filter((f) => !pagesAOuverture.includes(f) && /\bpreload\(|rel="preload"|hero-poster/.test(lire(f)));
+    // Lot F6 : la fiche d'une matière précharge son échantillon du CRM (le LCP), de la même façon.
+    assert.match(lire("src/app/matieres/[famille]/[ref]/page.tsx"), /<Prechargements liste=\{\[\{ href: urlEchantillon\(m\.id\), options: \{ as: "image", fetchPriority: "high", referrerPolicy: "no-referrer" \} \}\]\} \/>/);
+    const avecPrechargement = ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx", "src/app/pro/page.tsx", "src/app/matieres/[famille]/[ref]/page.tsx"];
+    assert.deepEqual(SOURCES.filter((f) => /<Prechargements /.test(lire(f))).sort(), [...avecPrechargement].sort());
+    const autres = SOURCES.filter((f) => f !== "src/components/Prechargements.tsx" && /\bpreload\(|rel="preload"|hero-poster/.test(lire(f)));
     assert.deepEqual(autres, []);
   });
 
-  test("les polices du site 3.0 : Playfair Display et Libre Franklin par next/font, préchargées, en swap ; aucun appel à Google Fonts", () => {
+  test("lot F6 : aucun préchargement d'image dans la charge RSC — le préchargement de « / » (logo) ne télécharge plus l'image de l'accueil sur les autres pages", () => {
+    // Le serveur RSC de React transforme en indice de préchargement (`HL`) tout `preload()`, tout `<link rel="preload">` et
+    // tout `<img>` non différé (hors `<picture>`, hors `fetchPriority="low"`) d'un composant SERVEUR ; le routeur de Next
+    // exécute ces indices dès qu'il précharge une page depuis un lien visible. Le composant client les garde hors de la charge.
+    const composant = lire("src/components/Prechargements.tsx");
+    assert.match(composant, /^"use client";/);
+    assert.match(composant, /for \(const p of liste\) preload\(p\.href, p\.options\);/);
+    assert.match(composant, /return null;/);
+    for (const f of SOURCES.filter((s) => !estClient(lire(s)))) assert.doesNotMatch(lire(f), /import \{[^}]*\bpreload\b[^}]*\} from "react-dom"/, `${f} : preload dans un composant serveur`);
+    // La grande vignette de la fiche, seul <img> prioritaire d'un composant serveur, est posée dans un <picture>.
+    const fiche = lire("src/app/matieres/[famille]/[ref]/page.tsx");
+    assert.match(fiche, /<picture>\s*<img src=\{urlEchantillon\(m\.id\)\}[^>]*loading="eager" fetchPriority="high"[^>]*\/>\s*<\/picture>/);
+  });
+
+  test("les polices du site 3.0 : Playfair Display et Libre Franklin par next/font, préchargées, en swap ; l'italique des cartels à la demande ; aucun appel à Google Fonts", () => {
     const gabarit = lire("src/app/layout.tsx");
     assert.match(gabarit, /import \{ Libre_Franklin, Playfair_Display \} from "next\/font\/google";/);
-    assert.match(gabarit, /Playfair_Display\(\{[^}]*style: \["normal", "italic"\][^}]*variable: "--font-playfair",\s*display: "swap"/);
+    assert.match(gabarit, /const playfair = Playfair_Display\(\{\s*subsets: \["latin"\],\s*variable: "--font-playfair",\s*display: "swap",\s*\}\);/);
     assert.match(gabarit, /Libre_Franklin\(\{[^}]*variable: "--font-franklin",\s*display: "swap"/);
-    assert.doesNotMatch(gabarit, /preload:\s*false|adjustFontFallback:\s*false/);
+    // Lot F6 : l'italique (38 Ko, le nom des matières des cartels seulement) n'est plus préchargée ; elle seule.
+    assert.match(gabarit, /const playfairItalique = Playfair_Display\(\{\s*subsets: \["latin"\],\s*style: \["italic"\],\s*variable: "--font-playfair-italique",\s*display: "swap",\s*preload: false,\s*\}\);/);
+    assert.equal((gabarit.match(/preload:\s*false/g) ?? []).length, 1);
+    assert.doesNotMatch(gabarit, /adjustFontFallback:\s*false/);
+    assert.match(gabarit, /className=\{`\$\{playfair\.variable\} \$\{playfairItalique\.variable\} \$\{franklin\.variable\}`\}/);
+    assert.match(lire("src/app/globals.css"), /--font-display-italique: var\(--font-playfair-italique\), Georgia, serif;/);
+    // L'italique n'est demandée qu'avec sa famille : aucun `italic` sur la famille droite (l'italique serait imitée).
+    for (const f of SOURCES) for (const l of lire(f).split("\n").filter((l) => /className=.*\bitalic\b/.test(l))) assert.match(l, /font-display-italique/, `${f} : ${l.trim().slice(0, 100)}`);
     assert.doesNotMatch(gabarit, /Space_Grotesk|\bInter\(/, "les anciennes polices sont parties");
     const css = lire("src/app/globals.css");
     assert.match(css, /--font-display: var\(--font-playfair\)/);
@@ -316,6 +340,18 @@ describe("cache et images", () => {
     }
     assert.equal(nextConfig.images?.unoptimized, true);
     assert.match(lire("next.config.ts"), /unoptimized: true,/);
+  });
+
+  test("lot F6 : une image du dépôt s'écrit en AVIF et JPEG seulement (trois séries, plus six) ; une photo du CRM garde ses WebP", () => {
+    const avant = sourcesPhoto(IMAGE_OUVERTURE.avant)!;
+    const html = renderToStaticMarkup(createElement(ImagePreparee, { sources: avant, tailles: TAILLES_OUVERTURE, alt: "x" }));
+    assert.deepEqual([...html.matchAll(/<source ([^>]*)\/>/g)].map((m) => m[1].match(/type="([^"]+)"/)?.[1] ?? "jpg"), ["image/avif", "image/avif"]);
+    assert.ok(html.includes(`<source media="${MEDIA_TELEPHONE}" type="image/avif" srcSet="${plafonnerSrcset(avant.avif)}"`), "le téléphone garde sa série plafonnée");
+    assert.ok(html.includes(`<img src="${avant.src}" srcSet="${avant.jpg}"`), "le JPEG en repli, dans l'<img>");
+    assert.doesNotMatch(html, /\.webp/);
+    const crm = sourcesPhotoCrm("https://crm.example.test/api/site/photos/b/apres");
+    const photo = renderToStaticMarkup(createElement(ImagePreparee, { sources: crm, tailles: TAILLES_OUVERTURE, alt: "x" }));
+    assert.deepEqual([...photo.matchAll(/<source ([^>]*)\/>/g)].map((m) => m[1].match(/type="([^"]+)"/)?.[1]), ["image/webp", "image/webp"]);
   });
 
   test("une image préparée porte l'empreinte de son original (`?v=`) : une image refaite change d'adresse", () => {
@@ -374,9 +410,9 @@ describe("INP : la recherche des matières est différée, les vignettes en lazy
 describe("intégration continue", () => {
   const rc = JSON.parse(lire("lighthouserc.json"));
 
-  test("lighthouserc.json : les six pages, mobile, deux passages, les seuils, rapports sur disque", () => {
+  test("lighthouserc.json : les huit pages (lot F6 : + une prestation et une fiche de matière), mobile, deux passages, les seuils, rapports sur disque", () => {
     assert.deepEqual(rc.ci.collect.url, PAGES_CAPTURES.map((p: { chemin: string }) => `http://localhost:3100${p.chemin}`));
-    assert.equal(rc.ci.collect.url.length, 6);
+    assert.equal(rc.ci.collect.url.length, 8);
     assert.equal(rc.ci.collect.numberOfRuns, 2);
     assert.equal(rc.ci.collect.settings?.preset, undefined, "mobile par défaut, jamais le préréglage desktop");
     assert.deepEqual(rc.ci.assert.assertions, {
@@ -427,8 +463,8 @@ describe("intégration continue", () => {
     assert.match(flux, /branch: main/);
   });
 
-  test("captures : six pages × 390 / 768 / 1440, les mêmes que Lighthouse ; JPEG qualité 80, échelle 2 sous 768 px", () => {
-    assert.deepEqual(PAGES_CAPTURES.map((p: { nom: string }) => p.nom), ["accueil", "simulateur", "matieres", "realisations", "comment-ca-marche", "pro"]);
+  test("captures : huit pages × 390 / 768 / 1440, les mêmes que Lighthouse ; JPEG qualité 80, échelle 2 sous 768 px", () => {
+    assert.deepEqual(PAGES_CAPTURES.map((p: { nom: string }) => p.nom), ["accueil", "simulateur", "matieres", "realisations", "comment-ca-marche", "pro", "prestation-cuisine", "matiere-fiche-nf13"]);
     assert.deepEqual(LARGEURS_CAPTURES.map((l: { largeur: number }) => l.largeur), [390, 768, 1440]);
     assert.deepEqual(LARGEURS_CAPTURES.map((l: { mobile: boolean }) => l.mobile), [true, false, false]);
     assert.deepEqual([360, 390, 767, 768, 1440].map(echelle), [2, 2, 2, 1, 1]);

@@ -292,7 +292,8 @@ describe("/pro et /contact", () => {
     assert.ok(ouverture.includes("/images/prep/pro-comptoir-accueil-avant-") && ouverture.includes("/images/prep/pro-comptoir-accueil-apres-bois-"));
     assert.ok(ouverture.includes(">Ambiance · avant / après</span>"));
     assert.ok(ouverture.includes(PAIRE_COMPTOIR_PRO.legende.replace(/'/g, "&#x27;")));
-    assert.equal((html.match(/fetchPriority="high"/g) ?? []).length, 2, "le couple de l'ouverture, rien d'autre");
+    // Lot F6 : les liens de préchargement (`Prechargements`, dans le <head> sur le site) portent aussi fetchPriority ; on compte les images.
+    assert.equal((html.match(/<img [^>]*fetchPriority="high"/g) ?? []).length, 2, "le couple de l'ouverture, rien d'autre");
     assert.ok(ouverture.includes("Classic Walnut") && ouverture.includes("D1 · ") && ouverture.includes("K1 · "), "les cartels du comptoir");
     // Les lieux, dans l'ordre : le bar (paire), puis l'hôtel, la boutique, les bureaux ; aucun lien vers le simulateur.
     const lieux = html.slice(html.indexOf('id="lieux"'), html.indexOf('id="devis-pro"'));
@@ -303,7 +304,8 @@ describe("/pro et /contact", () => {
     assert.ok(lieux.indexOf("pro-comptoir-accueil-apres-couleur-") > lieux.indexOf("pro-restaurant-avant-") && lieux.indexOf("pro-comptoir-accueil-apres-couleur-") < lieux.indexOf("/images/prep/pro-hotel-"), "l'autre direction du comptoir suit le bar");
     assert.ok(!lieux.includes("Essayer cette composition"));
     // La teinte du professionnel : Black Mat K1 (filets), Classic Walnut D1 (cartels, bande de matière).
-    assert.match(html, /^<div style="--teinte:#232220;--teinte-2:#654835">/);
+    // Lot F6 : les liens de préchargement (hissés dans le <head> sur le site) précèdent la page dans ce rendu isolé.
+    assert.match(html.replace(/^(?:<link [^>]*\/>)+/, ""), /^<div style="--teinte:#232220;--teinte-2:#654835">/);
     assert.ok(lieux.includes('aria-label="Matière Classic Walnut · D1'), "la bande Classic Walnut ferme les lieux");
     // Le formulaire, inchangé : le même composant, posé tel quel dans sa section.
     assert.match(lire("app/pro/page.tsx"), /<FormulairePro \/>/);

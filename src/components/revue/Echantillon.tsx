@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { texteCartel, type MatiereCartel } from "@/lib/cartel";
+import type { MatiereCartel } from "@/lib/cartel";
 import { urlVignette } from "@/lib/simulateur/generation-client";
 import { Cartel } from "./Cartel";
 
@@ -9,7 +9,9 @@ import { Cartel } from "./Cartel";
  * la matière tant qu'elle charge ; dessous, son cartel. Place réservée (carré), chargement différé sauf `priorite`.
  *
  * `href` : tout l'échantillon devient un lien (la fiche, `/matieres/<famille>/<REF>`…), nommé par son cartel. La vignette est
- * décorative (`alt=""`) : le cartel dit tout. Composant serveur.
+ * décorative (`alt=""`) : le cartel dit tout. Lot F6 : le nom du lien vient du texte du cartel lui-même (« Sage Green ·
+ * RM20 · Couleur · Standard », le « · » caché aux yeux compris), plus d'`aria-label` qui le doublait sans reprendre
+ * le texte visible mot pour mot (WCAG 2.5.3, « le nom contient l'étiquette visible »). Composant serveur.
  *
  * Lot D2 : la vignette seule (`VignetteEchantillon`) sert aussi au présentoir de /matieres, où l'échantillon est un
  * bouton (la matière en grand) ; une vignette qui ne répond pas laisse voir la couleur de la matière.
@@ -36,7 +38,7 @@ export function Echantillon({ matiere, href, teinte, priorite = false, className
   );
   if (!href) return figure;
   return (
-    <Link href={href} aria-label={texteCartel(matiere)} className={["group block rounded-[var(--rayon-sm)]", className].filter(Boolean).join(" ")}>
+    <Link href={href} className={["group block rounded-[var(--rayon-sm)]", className].filter(Boolean).join(" ")}>
       {figure}
     </Link>
   );

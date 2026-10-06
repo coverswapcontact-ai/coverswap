@@ -243,10 +243,11 @@ export default function DevisForm({
 
         <CaseConsentement id="consentement-devis" checked={consentement} onChange={setConsentement} />
 
-        {/* Honeypot - hidden from humans */}
+        {/* Honeypot - hidden from humans. Lot F6 : le champ sort aussi de l'ordre du clavier (`tabIndex={-1}`, comme ceux de
+            /pro et de l'accueil) — un champ atteignable sous aria-hidden coûtait 4 points d'accessibilité à /contact. */}
         <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
           <label htmlFor="website">Website</label>
-          <input type="text" id="website" name="website" autoComplete="off" />
+          <input type="text" id="website" name="website" autoComplete="off" tabIndex={-1} />
         </div>
 
         <Turnstile action="devis" theme="light" onToken={setJetonCaptcha} actif={touche} />

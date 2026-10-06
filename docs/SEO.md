@@ -89,9 +89,17 @@ voisins ; « mène à » : accueil, `/comment-ca-marche`, simulateur, `/matieres
 Hors carte, indexées sans requête visée : `/cgv`, `/mentions-legales`, `/politique-confidentialite` (titles de 28 à
 41 caractères, descriptions ≤ 155, inchangés). Jamais indexées : `/e/<jeton>`, `/desinscription` (`noindex`), la 404.
 
-### 300 mots utiles par page indexée : ce qui manque (pour F6)
+### 300 mots utiles par page indexée
 
-Mots comptés dans le `<main>` rendu (build du 06/10, scripts et styles retirés) :
+**Lot F6 : fait.** `src/app/mots.test.ts` rend chaque adresse du plan du site (les 95 pages indexées) comme Next et
+échoue sous 300 mots (contenu de la page sans en-tête ni pied, scripts et styles retirés). Textes écrits pour les deux
+pages qui manquaient : `/contact` **205 → 465 mots** (« Après votre message » : qui répond et quand, le devis, la
+visite, rien n'engage avant la signature ; ce qu'il est utile de joindre ; où l'on pose, avec les liens des zones et de
+« comment ça marche ») et `/matieres` **287 → 533 mots** (« Choisir sans se tromper » : ce qu'est un film Cover Styl',
+choisir par la teinte puis la finition, pourquoi l'échantillon chez soi). Les plus courtes restent au-dessus du seuil :
+guide « marbre, bois, béton » 341, `/simulateur` 352, guide « entretenir » 361, `/zones` 385.
+
+Relevé du lot F1, gardé pour mémoire — mots comptés dans le `<main>` rendu (build du 06/10, scripts et styles retirés) :
 
 - **`/contact` : 205 mots** — le formulaire seul ; il manque une introduction (qui répond, sous quel délai, ce qu'il
   faut joindre, la zone d'intervention, ce qui se passe après l'envoi).
@@ -289,4 +297,91 @@ publiques du CRM : tarifs, vignettes des matières) et `NEXT_PUBLIC_SANS_EVENEME
 
 ## Lighthouse après
 
-À remplir aux lots F6 (build local) et G3 (coverswap.fr, après la fusion), avec la même méthode.
+### Lot F6 (06/10/2026) — build local de `site-3-0`, même méthode que B0
+
+Lighthouse 12.6.1, réglage mobile par défaut (simulation « Lantern »), Chrome 153 sans interface, build construit comme
+la CI (`NEXT_PUBLIC_SIMULATE_URL` = CRM de production, `NEXT_PUBLIC_SANS_EVENEMENTS=1`), `next start -p 3100`, trois
+passages par page, le meilleur gardé. Les 8 pages de la CI (lot F6 : `lighthouserc.json` et les captures passent de
+6 à 8 avec `/prestations/cuisine` et la fiche `/matieres/couleur/NF13`), plus `/matieres?ref=NF13` (comparaison avec
+B0), `/inspirations` et `/contact`. `/simulateur` mesuré sur le dernier build du lot (titre de l'écran Pièce), les
+autres sur l'avant-dernier (seule différence : deux hauteurs réservées sur cet écran).
+
+| Page | Adresse | Performance | Accessibilité | Bonnes pratiques | SEO | LCP | CLS | TBT | Performance des 3 passages |
+|---|---|---|---|---|---|---|---|---|---|
+| accueil | `/` | 82 | 100 | 100 | 100 | 4,8 s | 0,000 | 108 ms | 82 / 82 / 81 |
+| simulateur | `/simulateur` | 88 | 100 | 100 | 100 | 3,8 s | 0,000 | 109 ms | 88 / 87 / 85 |
+| matieres | `/matieres` | 84 | 100 | 100 | 100 | 3,8 s | 0,000 | 199 ms | 84 / 84 / 83 |
+| realisations | `/realisations` | 89 | 100 | 100 | 100 | 3,7 s | 0,000 | 99 ms | 89 / 85 / 84 |
+| comment-ca-marche | `/comment-ca-marche` | 91 | 100 | 100 | 100 | 3,5 s | 0,000 | 91 ms | 91 / 90 / 87 |
+| pro | `/pro` | 83 | 100 | 100 | 100 | 4,5 s | 0,000 | 91 ms | 83 / 80 / 79 |
+| prestation-cuisine | `/prestations/cuisine` | 78 | 100 | 100 | 100 | 5,2 s | 0,000 | 161 ms | 78 / 78 / 78 |
+| matieres-nf13 | `/matieres?ref=NF13` | 80 | 100 | 100 | 100 | 4,0 s | 0,000 | 231 ms | 80 / 79 / 79 |
+| fiche-nf13 | `/matieres/couleur/NF13` | 91 | 100 | 100 | 100 | 3,2 s | 0,000 | 170 ms | 91 / 88 / 84 |
+| inspirations | `/inspirations` | 77 | 100 | 100 | 100 | 4,6 s | 0,000 | 172 ms | 77 / 76 / 76 |
+| contact | `/contact` | 89 | 100 | 100 | 100 | 3,3 s | 0,000 | 187 ms | 89 / 89 / 88 |
+
+**Avant / après**, performance · accessibilité · SEO · LCP (bonnes pratiques à 100 partout) — B0 : le site d'avant le
+3.0, sur le même poste ; F5 : la branche au début du lot (même mesure, mêmes pages) ; F6 : après le lot.
+
+| Page | B0 (avant le site 3.0) | F5 (début du lot F6) | F6 (après) |
+|---|---|---|---|
+| `/` | 89 · 100 · 100 · 3,6 s | 81 · 100 · 100 · 4,8 s | 82 · 100 · 100 · 4,8 s |
+| `/simulateur` | 89 · 100 · 100 · 3,4 s | 85 · 100 · 100 · 4,1 s | 88 · 100 · 100 · 3,8 s |
+| `/matieres` | 94 · 100 · 100 · 2,9 s | 82 · 100 · 100 · 4,1 s | 84 · 100 · 100 · 3,8 s |
+| `/realisations` | 87 · 100 · 100 · 4,0 s | 88 · 100 · 100 · 3,8 s | 89 · 100 · 100 · 3,7 s |
+| `/comment-ca-marche` | 95 · 100 · 100 · 2,8 s | 90 · 100 · 100 · 3,5 s | 91 · 100 · 100 · 3,5 s |
+| `/pro` | 91 · 100 · 100 · 3,5 s | 87 · 100 · 100 · 4,0 s | 83 · 100 · 100 · 4,5 s |
+| `/prestations/cuisine` | 90 · 100 · 100 · 3,3 s | 85 · 100 · 100 · 4,0 s | 78 · 100 · 100 · 5,2 s |
+| `/matieres?ref=NF13` | 85 · 100 · 100 · 3,7 s | 79 · 100 · 100 · 4,2 s | 80 · 100 · 100 · 4,0 s |
+| `/matieres/couleur/NF13` | — | 92 · 100 · 100 · 3,2 s | 91 · 100 · 100 · 3,2 s |
+| `/inspirations` | — | 78 · 100 · 100 · 4,7 s | 77 · 100 · 100 · 4,6 s |
+| `/contact` | — | 88 · 96 · 100 · 3,1 s | 89 · 100 · 100 · 3,3 s |
+
+**Sous ralentissement réel** (complément, pas la méthode de B0 : `--throttling-method=devtools`, le réseau et le
+processeur sont vraiment ralentis pendant le chargement, le LCP est celui qui s'affiche ; 2 passages, le meilleur) :
+
+| Page | Adresse | Performance | LCP | FCP | CLS | TBT |
+|---|---|---|---|---|---|---|
+| accueil | `/` | 77 | 3,3 s | 3,2 s | 0,000 | 396 ms |
+| simulateur | `/simulateur` | 79 | 3,1 s | 3,1 s | 0,006 | 389 ms |
+| matieres | `/matieres` | 81 | 3,3 s | 3,3 s | 0,000 | 261 ms |
+| realisations | `/realisations` | 81 | 3,0 s | 3,1 s | 0,000 | 332 ms |
+| comment-ca-marche | `/comment-ca-marche` | 84 | 2,9 s | 2,8 s | 0,000 | 294 ms |
+| pro | `/pro` | 79 | 3,3 s | 3,2 s | 0,000 | 310 ms |
+| prestation-cuisine | `/prestations/cuisine` | 74 | 3,5 s | 3,3 s | 0,000 | 421 ms |
+| fiche-nf13 | `/matieres/couleur/NF13` | 86 | 2,9 s | 2,9 s | 0,000 | 233 ms |
+
+### À retenir (lot F6)
+
+- **Accessibilité 100, SEO 100, bonnes pratiques 100 sur les 11 pages** ; `/contact` remonte de 96 à 100 (un champ
+  piège atteignable au clavier sous `aria-hidden`). **CLS 0** partout en simulation ; sous ralentissement réel,
+  0,027 sur le simulateur (le titre de l'écran Pièce passait d'une à deux lignes à l'arrivée de Playfair à 412 px) →
+  0,006 après réservation de la hauteur.
+- **Performance ≥ 90 et LCP ≤ 2,5 s : non atteints.** Performance 77 à 91 (F5 : 78 à 92), LCP simulé 3,2 à 5,2 s.
+  Sous ralentissement réel, le LCP est de 2,9 à 3,5 s et il est égal au premier affichage (FCP) : l'image d'ouverture
+  arrive à temps, c'est l'aller-retour du document, de la feuille de style et des polices qui coûte.
+- **Ce qui pèse sur le LCP simulé, mesuré** (accueil) : sans aucun JavaScript, le LCP simulé tombe de 4,8 à 2,6 s ;
+  sans les polices, à 4,6 s ; sans les six curseurs de « Cuisines comme la vôtre », à 4,6 s ; sans les pictos, rien.
+  La simulation compte tout le JavaScript chargé avant l'affichage observé (le cadre de Next et React, ~116 Ko
+  compressés, plus ~45 Ko de composants) ; le navigateur, lui, affiche l'image avant d'exécuter ce JavaScript
+  (sonde Edge, processeur ralenti 4 fois : premier affichage et LCP à 0,77 s, avec ou sans JavaScript). Descendre sous
+  2,5 s en simulation demanderait de retirer l'hydratation des pages — hors du périmètre du site 3.0.
+- **Écart de mesure** : jusqu'à 12 points entre deux passages d'une même page (prestation cuisine : 85 / 74 / 73 au
+  début du lot, 78 / 78 / 78 à la fin). `/pro` et la prestation cuisine paraissent reculer ; leurs passages médians
+  n'ont pas bougé (74 → 78, 76 → 80).
+- **Ce qui a été fait** : l'image de l'accueil n'est plus téléchargée sur les autres pages (préchargement hors charge
+  RSC, `Prechargements`) — ni l'« avant » des prestations et de `/pro`, ni l'échantillon d'une fiche dès qu'un lien y
+  mène ; l'italique de Playfair (38 Ko) n'est plus préchargée ; une seule série AVIF et le JPEG de repli par image
+  (plus de WebP) ; HTML : accueil 320 → 288 Ko, `/inspirations` 854 → 739 Ko (56 Ko compressés).
+- **Essayé et écarté** : la feuille de style écrite dans la page (`experimental.inlineCss`) — le HTML de l'accueil
+  passe de 288 à 516 Ko (la feuille est aussi recopiée dans la charge RSC), performance simulée 82 → 77 ; et
+  `?l=640` au CRM pour la fiche : l'échantillon entier fait 595 px de large, une version à 640 px n'existe pas, et le
+  LCP de la fiche (3,2 s simulé, 2,9 s réel) est celui de la page, pas de l'image (4 Ko pour NF13). Le CRM n'est pas
+  touché.
+- **`/inspirations`** : 739 Ko de HTML (52 cartes, chacune avec son curseur, ses cartels et son `ImageObject` ; la
+  moitié est la charge RSC qui double le HTML). Pour aller plus loin, il faudrait alléger les 40 cartes de « Voir toutes
+  les ambiances » (par exemple l'après seul jusqu'au clic) : un choix d'interface, laissé à Lucas.
+
+### Lot G3 (coverswap.fr, après la fusion)
+
+À remplir, avec la même méthode.

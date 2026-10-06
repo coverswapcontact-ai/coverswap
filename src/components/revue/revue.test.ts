@@ -95,9 +95,12 @@ describe("l'échantillon : la vraie vignette du catalogue, place réservée, cha
     assert.match(rendre(createElement(Echantillon, { matiere: RM20, priorite: true })), /loading="eager"/);
   });
 
-  test("avec un lien : tout l'échantillon est le lien, nommé par son cartel", () => {
+  test("avec un lien : tout l'échantillon est le lien, nommé par son cartel (son propre texte, lot F6 : plus d'aria-label qui le double)", () => {
     const html = rendre(createElement(Echantillon, { matiere: RM20, href: "/matieres?ref=RM20" }));
-    assert.match(html, /^<a [^>]*aria-label="Sage Green · RM20 · Couleur · Standard"[^>]*><figure/);
+    assert.match(html, /^<a [^>]*><figure/);
+    assert.doesNotMatch(html, /aria-label/);
+    // Le nom calculé du lien : son texte, l'image étant décorative — le cartel entier, séparateur caché compris.
+    assert.equal(html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim(), "Sage Green · RM20 · Couleur · Standard");
     assert.match(html, /href="\/matieres\?ref=RM20"/);
   });
 });

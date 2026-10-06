@@ -227,7 +227,11 @@ describe("la page rendue", () => {
     assert.equal(compter(grille, "rounded-[var(--rayon-sm)] bg-fond-2 shadow-[0_10px_22px_rgba(40,25,15,0.18)]"), MATIERES_PAR_PAGE);
     const premiere = nuancier[0];
     assert.ok(grille.includes(`background-color:${premiere.hex}`), "la couleur de la matière tant que la vignette charge");
-    assert.ok(grille.includes(`aria-label="${premiere.nom} · ${premiere.id} · `), "l'échantillon est nommé par son cartel");
+    // Lot F6 : le bouton est nommé par son propre texte (le cartel, puis « voir en grand » pour les lecteurs d'écran), plus par un aria-label qui le doublait.
+    const premierBouton = grille.slice(grille.indexOf("<button"), grille.indexOf("</button>"));
+    assert.ok(!premierBouton.includes("aria-label"), "pas d'aria-label qui double le texte");
+    assert.ok(premierBouton.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().startsWith(`${premiere.nom} · ${premiere.id} · `), "l'échantillon est nommé par son cartel");
+    assert.ok(premierBouton.includes('<span class="sr-only"> : voir en grand</span>'));
     assert.equal(compter(grille, '<span class="relative block pl-[15px] mt-3"'), MATIERES_PAR_PAGE, "un cartel par échantillon, dans le bouton");
     assert.ok(!grille.includes("<p "), "pas de paragraphe dans un bouton");
     assert.equal(compter(html, `class="${classesBouton("principal")}`), 0, "le bouton principal est dans la matière en grand");

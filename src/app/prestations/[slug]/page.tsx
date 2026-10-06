@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { preload } from "react-dom";
 import { partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
+import { Prechargements } from "@/components/Prechargements";
 import ContenuPrestation, { TAILLES_OUVERTURE_PRESTATION, vueDeLaPrestation } from "@/components/ContenuPrestation";
 import { PRESTATIONS, getPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
@@ -42,14 +42,17 @@ export default async function PagePrestation({ params }: Props) {
   const url = `${ENTREPRISE.site}/prestations/${p.slug}`;
   const [{ realisations }, tarifs] = await Promise.all([chargerPublications(), chargerTarifs()]);
   const ouverture = vueDeLaPrestation(p, realisations).ouverture;
-  for (const prechargement of prechargementsOuverture(ouverture, TAILLES_OUVERTURE_PRESTATION)) preload(prechargement.href, prechargement.options);
   return (
-    <ContenuPrestation
-      p={p}
-      url={url}
-      realisations={realisations}
-      tarifs={tarifs}
-      fil={[{ label: "Accueil", href: "/" }, { label: "Réalisations", href: "/realisations" }, { label: p.nom, href: `/prestations/${p.slug}` }]}
-    />
+    <>
+      {/* L'« avant » de l'ouverture préchargé (lot C1), par un composant client depuis le lot F6 (`Prechargements`). */}
+      <Prechargements liste={prechargementsOuverture(ouverture, TAILLES_OUVERTURE_PRESTATION)} />
+      <ContenuPrestation
+        p={p}
+        url={url}
+        realisations={realisations}
+        tarifs={tarifs}
+        fil={[{ label: "Accueil", href: "/" }, { label: "Réalisations", href: "/realisations" }, { label: p.nom, href: `/prestations/${p.slug}` }]}
+      />
+    </>
   );
 }

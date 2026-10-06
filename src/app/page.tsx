@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Fragment, type ReactNode } from "react";
-import { preload } from "react-dom";
 import { AvisPrix } from "@/components/accueil/AvisPrix";
 import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
 import { CuisinesCommeLaVotre } from "@/components/accueil/CuisinesCommeLaVotre";
@@ -13,6 +12,7 @@ import { QuestionsAccueil } from "@/components/accueil/QuestionsAccueil";
 import { RealisationsAccueil, realisationsAccueil } from "@/components/accueil/RealisationsAccueil";
 import { ANCRES_ACCUEIL, BANDES_ACCUEIL, CIBLES_BOUTON_COLLE, DESCRIPTION_META_ACCUEIL, TITRE_META_ACCUEIL, lienSimulerAccueil, sectionsAccueil, type IdSectionAccueil } from "@/components/accueil/sections";
 import { DonneesStructurees, ServiceSchema, refImage } from "@/components/JsonLd";
+import { Prechargements } from "@/components/Prechargements";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { BoutonColle } from "@/components/simulation/BoutonColle";
 import { Lien } from "@/components/simulation/Lien";
@@ -49,9 +49,6 @@ function bandeApres(id: IdSectionAccueil): ReactNode {
 export default async function PageAccueil() {
   const { realisations } = await chargerPublications();
   const ouverture = choisirOuverture(realisations);
-  // Mission 16 (partie 6) : l'image « avant » de l'ouverture est le LCP — préchargée ici, sur l'accueil seulement
-  // (`<link rel="preload" as="image" imagesrcset imagesizes type fetchpriority="high">` dans le <head>).
-  for (const prechargement of prechargementsOuverture(ouverture)) preload(prechargement.href, prechargement.options);
 
   const sections: Record<IdSectionAccueil, ReactNode> = {
     ouverture: <Ouverture choix={ouverture} />,
@@ -69,6 +66,10 @@ export default async function PageAccueil() {
 
   return (
     <>
+      {/* Mission 16 (partie 6) : l'« avant » de l'ouverture, préchargé sur l'accueil seulement (un lien de préchargement
+          `as="image"` avec imagesrcset, imagesizes, type et fetchpriority="high" dans le <head>) ; lot F6 : par un composant
+          client, pour que le préchargement de « / » depuis le logo des autres pages ne le télécharge plus (`Prechargements`). */}
+      <Prechargements liste={prechargementsOuverture(ouverture)} />
       <ServiceSchema
         name="Covering adhésif : rénovation de cuisine sans travaux"
         description={DESCRIPTION_META_ACCUEIL}
