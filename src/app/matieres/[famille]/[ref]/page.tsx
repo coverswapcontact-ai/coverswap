@@ -5,6 +5,7 @@ import { preconnect } from "react-dom";
 import { insecables } from "@/app/blog/[slug]/illustration";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
+import { LiensAmbiance } from "@/components/ambiances/LiensAmbiance";
 import { Cartel } from "@/components/revue/Cartel";
 import { Echantillon, OMBRE_ECHANTILLON } from "@/components/revue/Echantillon";
 import { Lien } from "@/components/simulation/Lien";
@@ -217,7 +218,9 @@ export default async function PageFiche({ params }: Props) {
             <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {vues.map(({ ambiance, ici, avec }) => (
                 <li key={ambiance.id} className="filet flex flex-col pt-4">
-                  <h3 className="font-display text-[22px] leading-tight font-semibold text-encre">{ambiance.titre}</h3>
+                  <h3 data-ambiance={ambiance.id} className="font-display text-[22px] leading-tight font-semibold text-encre">
+                    {ambiance.titre}
+                  </h3>
                   <Photo nom={ambiance.image} alt={ambiance.alt} ratio="4 / 3" tailles={TAILLES_AMBIANCE} etiquette="Ambiance" className="mt-3 rounded-[var(--rayon-md)]" />
                   <p className="mt-3 text-[15px] text-encre">
                     <span className="text-encre-2">Ici : </span>
@@ -236,6 +239,7 @@ export default async function PageFiche({ params }: Props) {
                       ))}
                     </p>
                   ) : null}
+                  <LiensAmbiance piece={ambiance.piece} className="mt-1" />
                   <div className="mt-auto flex flex-wrap gap-x-5 pt-2">
                     {/* Un lien de page, pas le routeur : l'ancre montre l'ambiance même dans la suite masquée de /inspirations. */}
                     <a href={lienInspiration(ambiance.id)} className="inline-flex min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">

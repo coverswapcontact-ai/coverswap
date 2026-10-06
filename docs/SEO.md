@@ -1,7 +1,7 @@
 # SEO et performance du site — site 3.0
 
 Squelette posé au lot B0 (mission 21) ; carte des intentions, image de partage et hôte unique écrits au lot F1 et
-appliqués aux lots F2 et F3 ; données structurées au lot F4 ; les mesures « après » aux lots F6 et G3.
+appliqués aux lots F2 et F3 ; données structurées au lot F4, maillage au lot F5 ; les mesures « après » aux lots F6 et G3.
 
 ## Objectifs
 
@@ -186,7 +186,7 @@ Types par page (rendu du 06/10/2026, gabarit en plus : `HomeAndConstructionBusin
 | familles avec avant / après (bois, couleur…) | `BreadcrumbList`, `ImageObject` × curseurs |
 | `/prestations/cuisine`, `salle-de-bain`, `meubles` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 11 / 3 / 5 |
 | `/prestations/vitrages` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList` |
-| `/pro` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 2 |
+| `/pro` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 3 (2 au lot F4, 3 depuis F5) |
 | `/comment-ca-marche` | `FAQPage`, `BreadcrumbList` |
 | `/inspirations` | `BreadcrumbList`, `ImageObject` × 41 |
 | `/realisations` | `BreadcrumbList`, `ImageObject` × 4 (+ un par chantier publié avec avant) |
@@ -197,6 +197,26 @@ Types par page (rendu du 06/10/2026, gabarit en plus : `HomeAndConstructionBusin
 Vérifié sur le build (542 fichiers HTML) : JSON valide partout, une entreprise locale par page (sauf `_global-error`,
 hors gabarit), un `BreadcrumbList` exactement là où un fil est visible, un `ImageObject` par curseur.
 `src/app/donnees-structurees.test.ts` le tient sur les pages rendues.
+
+### Maillage (lot F5)
+
+Vérifié sur les pages rendues par `src/app/maillage.test.ts` :
+
+- **Toute ambiance → ses matières et sa prestation** : chaque carte d'ambiance (accueil, prestations, `/pro`,
+  `/inspirations`, `/realisations`, familles, guides) a un lien vers la fiche de chacune de ses matières et vers sa
+  prestation (`prestationDeLaPiece` : cuisine, salle de bain, meubles — les murs y vont —, `/pro`), sauf sur la page
+  de cette prestation. Les 52 ambiances d'inspiration y passent toutes.
+- **Toute matière → ses ambiances et sa prestation** : les 497 fiches mènent à leur famille et aux prestations de
+  `prestationsDeFamille` (celles sans ambiance comprises, 448) ; les 49 vues dans une ambiance mènent à chacune
+  (`/inspirations#<id>`) et, sous chaque ambiance, à la prestation de celle-ci.
+- **Toute prestation → trois avant / après, ses vedettes, ses villes** : cuisine 11, salle de bain 3, meubles 5,
+  `/pro` 3 (le comptoir dans ses deux directions et le bar) ; leurs vedettes en échantillons vers leur fiche (`/pro` :
+  « Les matières de ces lieux », huit) ; les 8 villes (`VillesIntervention`, aussi sur `/pro`). Vitrages : pas
+  d'avant / après, mais ses villes.
+- **Toute ville → ses prestations et ses réalisations** : les cinq prestations et le catalogue (déjà là), puis « Nos
+  réalisations » : les chantiers publiés par le CRM dans la ville (trois au plus ; la page est relue toutes les cinq
+  minutes), sinon une phrase qui renvoie aux photos de chantier et aux ambiances étiquetées ; toujours
+  `/realisations`.
 
 ### Les guides du lot C7 (posés en avance, repris dans la carte ci-dessus)
 

@@ -262,8 +262,9 @@ describe("/pro et /contact", () => {
     assert.ok(ouverture.includes(LIGNE_PRO.replace(/'/g, "&#x27;")));
     assert.ok(!ouverture.includes("sous-traitance"), "l'accroche longue n'est pas dans l'ouverture");
     // Site 3.0 (lot C2) : l'hôtel, la boutique, les bureaux en photo seule (« Ambiance ») ; le comptoir et le bar en paire (« Ambiance · avant / après ») ; jamais « Simulation » ni « Réalisation ».
+    // Lot F5 (trois avant / après par prestation) : le même comptoir dans son autre direction, en paire lui aussi.
     assert.equal((html.match(/>Ambiance</g) ?? []).length, 3);
-    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 2);
+    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 3);
     assert.ok(!html.includes(">Simulation<") && !/>Réalisation/.test(html));
     for (const r of REFERENCES_PRO) assert.ok(html.includes(`/images/prep/${r.nom}-`), r.nom);
     const echappe = (t: string) => t.replace(/&/g, "&amp;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;");
@@ -297,7 +298,9 @@ describe("/pro et /contact", () => {
     const lieux = html.slice(html.indexOf('id="lieux"'), html.indexOf('id="devis-pro"'));
     const positions = ["pro-restaurant-avant-", ...REFERENCES_PRO.map((r) => `/images/prep/${r.nom}-`)].map((m) => lieux.indexOf(m));
     assert.ok(positions.every((p, i) => p > 0 && (i === 0 || p > positions[i - 1])), JSON.stringify(positions));
-    assert.ok(!lieux.includes("pro-comptoir-accueil"), "le comptoir n'est pas répété");
+    // L'image de l'ouverture n'est pas répétée ; le lot F5 ajoute l'AUTRE après du comptoir, juste après le bar.
+    assert.ok(!lieux.includes("pro-comptoir-accueil-apres-bois"), "le comptoir de l'ouverture n'est pas répété");
+    assert.ok(lieux.indexOf("pro-comptoir-accueil-apres-couleur-") > lieux.indexOf("pro-restaurant-avant-") && lieux.indexOf("pro-comptoir-accueil-apres-couleur-") < lieux.indexOf("/images/prep/pro-hotel-"), "l'autre direction du comptoir suit le bar");
     assert.ok(!lieux.includes("Essayer cette composition"));
     // La teinte du professionnel : Black Mat K1 (filets), Classic Walnut D1 (cartels, bande de matière).
     assert.match(html, /^<div style="--teinte:#232220;--teinte-2:#654835">/);
@@ -317,9 +320,9 @@ describe("/pro et /contact", () => {
     assert.ok(chantier > 0 && chantier < lieux.indexOf("pro-comptoir-accueil-avant-"), "les vraies d'abord, puis le comptoir en ambiance");
     assert.ok(lieux.indexOf("Nos chantiers") < chantier);
     assert.ok(lieux.indexOf("pro-comptoir-accueil-avant-") < lieux.indexOf("pro-restaurant-avant-"));
-    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 2, "le comptoir et le bar, toujours étiquetés");
+    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 3, "le comptoir (ses deux directions) et le bar, toujours étiquetés");
     const { vueDuPro } = await import("@/app/pro/vue");
-    assert.deepEqual(vueDuPro([]).lieux.map((l) => l.cas.ambiance.image), ["pro-restaurant", "pro-hotel", "pro-commerce", "pro-bureaux"]);
+    assert.deepEqual(vueDuPro([]).lieux.map((l) => l.cas.ambiance.image), ["pro-restaurant", "pro-comptoir-accueil-apres-couleur", "pro-hotel", "pro-commerce", "pro-bureaux"]);
   });
 
   test("/contact : une colonne, « Écrivez-nous », téléphone et e-mail, ancre #espace avec la phrase de l'espace client", () => {

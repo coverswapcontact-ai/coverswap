@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
@@ -8,7 +9,7 @@ import { ambianceDeLImage } from "@/lib/ambiances";
 import { sourcesPhoto, type ManifesteImages } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { imageObjet, legendeAmbiance } from "@/lib/donnees-images";
-import { matiereCartel } from "@/lib/matieres-vedettes";
+import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
 
 /**
@@ -54,7 +55,9 @@ export function ProAccueil() {
             <ul className="space-y-4" aria-label="Matières posées sur le comptoir">
               {pro.matieres.map((m) => (
                 <li key={m.id}>
-                  <Cartel matiere={m} variante="encre" />
+                  <Link href={lienMatiere(m.id)} className="block underline-offset-4 hover:underline">
+                    <Cartel matiere={m} variante="encre" />
+                  </Link>
                 </li>
               ))}
             </ul>

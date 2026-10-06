@@ -421,6 +421,14 @@ référence : `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
 - Une seule action principale par écran ; le bouton collé « Simuler ma pièce » du téléphone s'efface sur les autres
   appels, pendant une saisie et tant qu'une feuille est ouverte.
 
+## Le maillage des cartes d'ambiance (lot F5)
+
+Toute carte d'ambiance (`CarteAmbiance` : accueil, prestations, `/pro`, `/inspirations`, `/realisations`, familles,
+guides) mène à la fiche de chacune de ses matières — les cartels sont des liens (soulignés au survol) — et, sous les
+cartels, à sa prestation : « La prestation : Covering cuisine » (`LiensAmbiance`, lien de 44 px ; les murs vont aux
+meubles, le professionnel à `/pro`), omis sur la page de cette prestation. Même ligne sous les ambiances « Vue dans »
+d'une fiche. Les cartels des ouvertures (prestations, `/pro`, comptoir de l'accueil, guide) sont aussi des liens.
+
 ## Les pages de prestation
 
 Lot C1, `src/components/ContenuPrestation.tsx`, données `src/data/cas-prestations.ts` (énoncé, § C.2). Captures de
@@ -480,6 +488,11 @@ filet des cartels et la bande de matière ; le trait du surtitre est double (K1 
   La section le dit dans son intro, sans pastille de tête (trois « Ambiance » exactement, testé).
 - Une seule action : le devis pro. Sur téléphone, la ligne passe sous le bouton pour qu'il tienne au premier écran
   (390 × 660 : 591-639 px).
+- Lot F5 (maillage) : le même comptoir dans son autre direction (vert sauge RM20, dessus marbre NE31) suit le bar,
+  en paire (trois avant / après sur la page, jamais l'image de l'ouverture répétée) ; les cartels de l'ouverture et
+  des lieux mènent aux fiches ; après « En détail », « Les matières de ces lieux » (huit échantillons, papier foncé,
+  vers leur fiche) puis « Où nous intervenons » (les villes, `VillesIntervention`, le bloc des prestations), avant le
+  dernier appel.
 
 ## La page Réalisations
 

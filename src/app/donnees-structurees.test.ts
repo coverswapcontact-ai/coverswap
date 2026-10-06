@@ -97,7 +97,7 @@ describe("données structurées des pages rendues (site 3.0, lot F4)", () => {
     }
     // Les comptes du rendu du 06/10/2026 (bibliothèque série 2) : ils changent avec les pages, pas en silence.
     const nombre = async (chemin: string) => types(await page(chemin)).filter((t) => t === "ImageObject").length;
-    assert.deepEqual(await Promise.all(["/", "/prestations/cuisine", "/prestations/salle-de-bain", "/prestations/meubles", "/pro", "/inspirations", "/realisations"].map(nombre)), [8, 11, 3, 5, 2, 41, 4]);
+    assert.deepEqual(await Promise.all(["/", "/prestations/cuisine", "/prestations/salle-de-bain", "/prestations/meubles", "/pro", "/inspirations", "/realisations"].map(nombre)), [8, 11, 3, 5, 3, 41, 4]);
   });
 
   test("du JSON valide partout, sans « < » (rien ne peut fermer le script) ; chaque bloc porte @context et @type", async () => {

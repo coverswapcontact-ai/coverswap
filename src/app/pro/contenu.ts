@@ -30,6 +30,16 @@ export const PAIRE_COMPTOIR_PRO = {
   legende: "Comptoir d'accueil effet hêtre au dessus gris → façade Classic Walnut D1, dessus Black Mat K1.",
 } as const;
 
+/**
+ * Site 3.0 (lot F5, maillage : trois avant / après par prestation) : l'autre « après » du même comptoir (série 2), vert
+ * sauge et marbre — une autre direction pour le même accueil, jamais l'image de l'ouverture répétée.
+ */
+export const PAIRE_COMPTOIR_PRO_COULEUR = {
+  apres: "pro-comptoir-accueil-apres-couleur",
+  titre: "Le même comptoir, en clair",
+  ligne: "Le même accueil, autre direction : vert sauge et marbre blanc. On compare les deux sur échantillons, sur place.",
+} as const;
+
 /** Mission 19 : la paire avant / après du restaurant (l'« après » ; son « avant » est dans `data/ambiances`). */
 export const PAIRE_PRO = { nom: "pro-restaurant", titre: "Un bar, avant et après", ligne: "Le même bar en pin verni des années 2000, puis habillé de noir mat, de pierre et de noyer." } as const;
 

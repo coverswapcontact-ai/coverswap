@@ -3,10 +3,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { FAQSchema, ServiceSchema } from "@/components/JsonLd";
+import { CarteRealisation } from "@/components/CarteRealisation";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { chargerPublications, type Publication } from "@/lib/publications";
 import { descriptionVille, titreVille } from "../textes-seo";
 import { ZONES, getZoneSlug, getZoneBySlug } from "@/data/zones";
 import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE, GARANTIE, NB_REFERENCES, texteOffre } from "@/lib/offre";
@@ -16,7 +19,20 @@ import { DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE, GARANTIE, 
  * « Simuler ma cuisine ». Balisage : un `Service` par ville (`areaServed` : la ville ; `provider` : l'entreprise par son
  * `@id`, déclarée une fois dans le gabarit) — plus de seconde fiche `LocalBusiness` par ville (nom et coordonnées de
  * centre-ville concurrents de la vraie fiche). Délais, garantie, durée : `offre.ts`.
+ * Site 3.0 (lot F5, maillage) : la ville mène à ses prestations et à ses réalisations — les chantiers publiés par le
+ * CRM dans cette ville (trois au plus, relus toutes les cinq minutes), sinon une phrase honnête, et toujours
+ * `/realisations`.
  */
+export const revalidate = 300;
+
+/** Les réalisations montrées sur une page de ville, au plus. */
+export const REALISATIONS_VILLE_MAX = 3;
+const sansAccents = (t: string) => t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+
+/** Les réalisations publiées (avec une photo après) faites dans cette ville, dans l'ordre du CRM. */
+export function realisationsDeLaVille(ville: string, realisations: readonly Publication[]): Publication[] {
+  return realisations.filter((p) => p.type === "REALISATION" && !!p.photoApres && !!p.ville && sansAccents(p.ville) === sansAccents(ville)).slice(0, REALISATIONS_VILLE_MAX);
+}
 
 /* ──────────────────────────────────────────────────────────────────
    STATIC GENERATION — pré-build des 8 pages au build time
@@ -61,6 +77,8 @@ export default async function ZonePage({
   if (!zone) notFound();
 
   const otherZones = ZONES.filter((z) => z.slug !== zone.slug);
+  const { realisations } = await chargerPublications();
+  const chantiers = realisationsDeLaVille(zone.ville, realisations);
   const url = `${ENTREPRISE.site}/zones/${getZoneSlug(zone)}`;
 
   const CARTE = "rounded-[var(--rayon-md)] border border-trait bg-white";
@@ -145,6 +163,25 @@ export default async function ZonePage({
               <span className="mt-4 inline-flex text-[15px] font-medium text-encre underline underline-offset-4">Découvrir</span>
             </Link>
           ))}
+        </div>
+        {/* Site 3.0 (lot F5) : les réalisations de la ville, sinon une phrase honnête ; toujours /realisations. */}
+        <div id="realisations" className="filet mt-12 pt-6">
+          <h3 className="text-[17px] font-semibold text-encre">{chantiers.length > 0 ? `Nos réalisations à ${zone.ville}` : "Nos réalisations"}</h3>
+          <p className="texte-2 mt-2 max-w-2xl">
+            {chantiers.length > 0 ? `Photos prises à la fin de nos chantiers à ${zone.ville}, publiées avec l'accord des clients.` : "Les photos de nos chantiers paraissent sur la page Réalisations, avec l'accord des clients. Vous y trouverez aussi des avant / après en ambiance, étiquetés comme tels, et nos tarifs."}
+          </p>
+          {chantiers.length > 0 ? (
+            <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {chantiers.map((p) => (
+                <CarteRealisation key={p.id} etude={versEtudeReelle(p)} />
+              ))}
+            </div>
+          ) : null}
+          <div className="mt-6">
+            <Lien href="/realisations" variante="secondaire">
+              Voir nos réalisations
+            </Lien>
+          </div>
         </div>
       </Section>
 

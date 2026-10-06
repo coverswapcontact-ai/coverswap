@@ -49,7 +49,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - F2, métadonnées : fait (titles ≤ 60 et descriptions ≤ 155 partout, image de partage par page, `lib/partage.ts`, `npm run og`).
 - F3, un seul hôte : fait (`vercel.json` : www et coverswap.vercel.app → coverswap.fr en 301 ; redirections en 301 ; plus de canonical par défaut).
 - F4, données structurées : fait (une entreprise locale, `Service` avec `@id` et image, `ImageObject` par avant / après, fil d'Ariane visible et balisé partout ; `docs/SEO.md` « Données structurées »).
-- F5 et F6 : à venir. Mesures « avant » : `docs/SEO.md`.
+- F5, maillage : fait (ambiance → fiches et prestation, fiche → ambiances et prestations, prestation → 3 avant / après, vedettes, villes, ville → prestations et réalisations ; `docs/SEO.md` « Maillage »).
+- F6 : à venir. Mesures « avant » : `docs/SEO.md`.
 
 ## Phase G : livraison
 
@@ -1634,4 +1635,49 @@ Captures 390 / 1 440 (contact, cgv, simulateur, guide bordeaux, prestation cuisi
 
 **Problèmes** : aucun. `/inspirations` porte 41 `ImageObject` (≈ 20 Ko de HTML en plus) : page hors des mesures
 Lighthouse, à surveiller en F6.
+
+## F5 — maillage (06/10/2026)
+
+**Fait** (aucun appel d'API, aucun envoi)
+- **Ambiance → ses matières et sa prestation** : `CarteAmbiance` rend ses cartels en liens vers les fiches par défaut
+  (`liensMatieres` vrai) et `LiensAmbiance` (« La prestation : Covering cuisine ») sous les cartels, sauf sur la page de
+  la prestation (`ici`) ; `prestationDeLaPiece` (`data/prestations.ts`) : murs → meubles (la page cite têtes de lit et
+  meubles TV), professionnel → `/pro`. Cartels liés aussi aux ouvertures des prestations, de `/pro`, du comptoir de
+  l'accueil (`ProAccueil`) et des guides ; `LiensAmbiance` sous l'ouverture d'un guide et sous chaque « Vue dans »
+  d'une fiche. Titres des cartes marqués `data-ambiance` (lus par le test).
+- **Matière → ses ambiances et sa prestation** : déjà en place depuis D4 (famille, « Où la poser », « Voir
+  l'ambiance ») ; s'ajoute la prestation de chaque ambiance « Vue dans ». Vérifié sur les 497 fiches rendues.
+- **Prestation → 3 avant / après, vedettes, villes** : cuisine 11, salle de bain 3, meubles 5 (déjà) ; `/pro` passe de
+  2 à 3 (`PAIRE_COMPTOIR_PRO_COULEUR` : le même comptoir en vert sauge RM20 et marbre NE31, après le bar), gagne « Les
+  matières de ces lieux » (`vueDuPro().vedettes` : matières de l'ouverture et des lieux, une fois, huit au plus) et
+  « Où nous intervenons » (`components/VillesIntervention.tsx`, sorti de `ContenuPrestation`).
+- **Ville → ses prestations et ses réalisations** : sous « Nos prestations covering à <ville> », un bloc « Nos
+  réalisations » : les chantiers publiés dans la ville (`realisationsDeLaVille`, accents et casse indifférents, trois
+  au plus, avec photo après ; `revalidate = 300`), sinon une phrase honnête ; toujours « Voir nos réalisations ».
+- `docs/SEO.md` « Maillage (lot F5) », `docs/DESIGN.md` « Le maillage des cartes d'ambiance » et la page Pro.
+
+**Décisions prises seul**
+1. **`/pro` compte comme une prestation** (seule vitrages est exclue par le plan) : la bibliothèque n'a que deux
+   paires pro ; la troisième est l'autre « après » du comptoir — une autre composition, l'image de l'ouverture n'est
+   jamais répétée (le test C2 est adapté : l'après « bois » absent des lieux, le « couleur » après le bar).
+2. **Murs → meubles** pour la prestation d'une ambiance (tête de lit, mur TV) : aucune page « murs » ; `lienPiece`
+   (cartes des pièces de `/realisations`) garde le simulateur pour les murs, inchangé.
+3. Pas de composant de liens séparé pour les matières : les cartels deviennent les liens (rien de répété à l'écran) ;
+   `LiensAmbiance` ne porte que la prestation.
+4. Ville sans chantier publié : pas d'avant / après d'ambiance sur la page (ce ne sont pas des réalisations de la
+   ville), une phrase et le lien.
+
+**Tests** : 551 → 557, tous réussis. Nouveau `src/app/maillage.test.ts` (6), sur les pages rendues : règle des
+pièces ; toute carte d'ambiance de 13 pages → fiches de ses matières et sa prestation (jamais la page même), les 52
+ambiances d'inspiration couvertes ; les 497 fiches → famille, prestations, ambiances et leur prestation (49 avec
+ambiance) ; cuisine, salle de bain, meubles, `/pro` → ≥ 3 curseurs, vedettes, 8 villes (vitrages : 0 curseur,
+villes) ; vedettes de `/pro` ; les 8 villes → 5 prestations et `/realisations`, un chantier publié à « LATTES » sur
+Lattes seulement, sans photo écarté, trois au plus. Contrôle : sans `LiensAmbiance`, le test échoue. Adaptés
+(intention gardée) : `tunnel.test.ts` (/pro : 3 paires, l'image de l'ouverture jamais répétée, ordre des lieux),
+`donnees-structurees.test.ts` (/pro : 3 `ImageObject`). `npx eslint .` et `npm run build` passent ; inventaire du
+build inchangé (JSON valide, fil = `BreadcrumbList`, `ImageObject` = curseurs). Captures 390 / 1 440 (`/pro`, Lattes,
+`/inspirations`, prestation cuisine, fiche NF13, accueil) regardées ; aucun débordement à 360 px ; serveur arrêté.
+
+**Problèmes** : aucun. Le maillage ajoute des liens (cartels, prestation) sur `/inspirations` et l'accueil : à
+regarder au Lighthouse de F6 (taille du DOM).
 

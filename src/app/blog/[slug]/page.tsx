@@ -6,12 +6,14 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { ContenuPrix } from "@/components/BlocPrix";
 import { ArticleSchema } from "@/components/JsonLd";
 import { CarteAmbiance, imageObjetCas } from "@/components/ambiances/CarteAmbiance";
+import { LiensAmbiance } from "@/components/ambiances/LiensAmbiance";
 import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { Cartel } from "@/components/revue/Cartel";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { lienMatiere } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_RENDU, NB_REFERENCES } from "@/lib/offre";
 import { chargerTarifs } from "@/lib/tarifs-site";
@@ -75,10 +77,13 @@ function Ouverture({ illustration }: { illustration: IllustrationGuide }) {
           {cas.matieres.map((m) => (
             <li key={m.matiere.id}>
               <span className="block text-[13px] text-encre-2">{m.surfaces}</span>
-              <Cartel matiere={m.matiere} className="mt-1" />
+              <Link href={lienMatiere(m.matiere.id)} className="mt-1 block underline-offset-4 hover:underline">
+                <Cartel matiere={m.matiere} />
+              </Link>
             </li>
           ))}
         </ul>
+        <LiensAmbiance piece={cas.ambiance.piece} />
         <Link href={cas.lien} className="mt-1 inline-flex min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
           Essayer cette composition chez moi
         </Link>

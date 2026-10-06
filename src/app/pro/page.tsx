@@ -12,14 +12,16 @@ import { imageObjetOuverture, partageOuverture, prechargementsOuverture } from "
 import { DonneesStructurees, FAQSchema, HowToSchema, ServiceSchema, refImage } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Cartel } from "@/components/revue/Cartel";
+import { Echantillon } from "@/components/revue/Echantillon";
+import { VillesIntervention } from "@/components/VillesIntervention";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { getPrestation } from "@/data/prestations";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { matiereCartel } from "@/lib/matieres-vedettes";
+import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
-import { DELAI_REPONSE } from "@/lib/offre";
+import { DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerPublications } from "@/lib/publications";
 import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
 import { FormulairePro } from "./_components/FormulairePro";
@@ -59,7 +61,7 @@ const TAILLES_LIEU = "(min-width: 1024px) 360px, (min-width: 768px) 33vw, calc(1
 export default async function PagePro() {
   if (!PRO) notFound();
   const { realisations } = await chargerPublications();
-  const { ouverture, reelles, lieux } = vueDuPro(realisations);
+  const { ouverture, reelles, lieux, vedettes } = vueDuPro(realisations);
   for (const prechargement of prechargementsOuverture(ouverture, TAILLES_OUVERTURE_PRESTATION)) preload(prechargement.href, prechargement.options);
   const teinte = teintePrestation("professionnel");
   const hexCartel = teinte?.seconde?.hex ?? teinte?.teinte.hex;
@@ -125,7 +127,9 @@ export default async function PagePro() {
                 {regrouperMatieres(ouverture.matieres).map((m) => (
                   <li key={m.matiere.id}>
                     <p className="text-[13px] text-encre-2">{m.surfaces}</p>
-                    <Cartel matiere={m.matiere} teinte={hexCartel} className="mt-1" />
+                    <Link href={lienMatiere(m.matiere.id)} className="mt-1 block underline-offset-4 hover:underline">
+                      <Cartel matiere={m.matiere} teinte={hexCartel} />
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -151,7 +155,7 @@ export default async function PagePro() {
             <ul className={`flex flex-col gap-12${reelles.length > 0 ? " mt-14" : ""}`}>
               {paires.map(({ cas, ligne }) => (
                 <li key={cas.ambiance.id} className="filet flex max-w-4xl flex-col pt-4">
-                  <CarteAmbiance cas={cas} tailles={TAILLES_PAIRE} teinte={hexCartel} cartelsColonnes="grid-cols-2 sm:grid-cols-3" sansLien>
+                  <CarteAmbiance cas={cas} tailles={TAILLES_PAIRE} teinte={hexCartel} cartelsColonnes="grid-cols-2 sm:grid-cols-3" sansLien ici="/pro">
                     {ligne ? <p className="texte-2 mt-3">{ligne}</p> : null}
                   </CarteAmbiance>
                 </li>
@@ -162,7 +166,7 @@ export default async function PagePro() {
             <ul className={`grid gap-12 md:grid-cols-3 md:gap-6${paires.length > 0 || reelles.length > 0 ? " mt-12" : ""}`}>
               {photos.map(({ cas, ligne }) => (
                 <li key={cas.ambiance.id} className="filet flex flex-col pt-4">
-                  <CarteAmbiance cas={cas} tailles={TAILLES_LIEU} teinte={hexCartel} cartelsColonnes="grid-cols-2 md:grid-cols-1" sansLien>
+                  <CarteAmbiance cas={cas} tailles={TAILLES_LIEU} teinte={hexCartel} cartelsColonnes="grid-cols-2 md:grid-cols-1" sansLien ici="/pro">
                     {ligne ? <p className="texte-2 mt-3">{ligne}</p> : null}
                   </CarteAmbiance>
                 </li>
@@ -222,6 +226,20 @@ export default async function PagePro() {
           .
         </p>
       </Section>
+
+      {/* ── Site 3.0 (lot F5, maillage) : les matières de ces lieux, vers leur fiche ; puis les villes ── */}
+      {vedettes.length > 0 ? (
+        <Section id="matieres" large differee ton="papier-2" titre="Les matières de ces lieux" intro={`Les références posées sur ces comptoirs, ce bar, cet hôtel, cette boutique et ces bureaux, parmi les ${NB_REFERENCES} du catalogue. On apporte les échantillons sur place.`}>
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-4 md:gap-x-8">
+            {vedettes.map((m) => (
+              <li key={m.id}>
+                <Echantillon matiere={m} href={lienMatiere(m.id)} teinte={hexCartel} />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+      <VillesIntervention />
 
       {/* ── 6. Dernier appel, en encre : le formulaire en principal, « Être rappelé » en secondaire ── */}
       <Section id="dernier-appel" large differee ton="encre" titre="Un devis pour votre lieu" intro={`Quelques photos et une surface approximative, ou un appel : réponse ${DELAI_REPONSE}.`}>

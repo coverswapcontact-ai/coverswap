@@ -14,9 +14,9 @@ import { AvantApres } from "@/components/simulation/AvantApres";
 import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
+import { VillesIntervention } from "@/components/VillesIntervention";
 import { casDeLaPrestation } from "@/data/cas-prestations";
 import { PRESTATIONS, lienPrestation, type Prestation } from "@/data/prestations";
-import { ZONES, getZoneSlug } from "@/data/zones";
 import type { MatiereCartel } from "@/lib/cartel";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
@@ -111,9 +111,6 @@ export function vueDeLaPrestation(p: Prestation, realisations: readonly Publicat
   return { ouverture, reelles, cas, vedettes };
 }
 
-/** Les villes de la zone, de la plus proche à la plus lointaine. */
-const VILLES = [...ZONES].sort((a, b) => a.distanceKm - b.distanceKm);
-
 export default function ContenuPrestation({ p, url, fil, lienDevis = "/contact", devisPrincipal = false, realisations = [], tarifs = null }: ProprietesContenuPrestation) {
   const autres = PRESTATIONS.filter((a) => a.slug !== p.slug);
   const depuis = depuisPrestation(p.slug);
@@ -200,7 +197,9 @@ export default function ContenuPrestation({ p, url, fil, lienDevis = "/contact",
                 {regrouperMatieres(ouverture.matieres).map((m) => (
                   <li key={m.matiere.id}>
                     <p className="text-[13px] text-encre-2">{m.surfaces}</p>
-                    <Cartel matiere={m.matiere} teinte={hexTeinte} className="mt-1" />
+                    <Link href={lienMatiere(m.matiere.id)} className="mt-1 block underline-offset-4 hover:underline">
+                      <Cartel matiere={m.matiere} teinte={hexTeinte} />
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -231,7 +230,7 @@ export default function ContenuPrestation({ p, url, fil, lienDevis = "/contact",
               <ul className="mt-8 flex flex-col gap-12 md:block md:columns-2 md:gap-x-6 lg:columns-3">
                 {cas.map((c) => (
                   <li key={c.ambiance.id} className="filet flex flex-col pt-4 md:mb-12 md:break-inside-avoid">
-                    <CarteAmbiance cas={c} tailles={TAILLES_CAS} teinte={hexTeinte} cartelsColonnes="grid-cols-2 md:grid-cols-1" />
+                    <CarteAmbiance cas={c} tailles={TAILLES_CAS} teinte={hexTeinte} cartelsColonnes="grid-cols-2 md:grid-cols-1" ici={lienPrestation(p.slug)} />
                   </li>
                 ))}
               </ul>
@@ -302,17 +301,7 @@ export default function ContenuPrestation({ p, url, fil, lienDevis = "/contact",
       </Section>
 
       {/* ── 7. Les villes ── */}
-      <Section id="villes" large differee titre="Où nous intervenons" intro={`On pose à ${ENTREPRISE.zone.principale}, et partout en France métropolitaine sur devis. Une page par ville :`}>
-        <ul className="grid grid-cols-2 gap-x-6 sm:grid-cols-4">
-          {VILLES.map((z) => (
-            <li key={z.slug} className="filet">
-              <Link href={`/zones/${getZoneSlug(z)}`} className="flex min-h-[48px] items-center text-[16px] text-encre underline-offset-4 hover:underline">
-                {z.ville}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <VillesIntervention />
 
       {/* ── 8. FAQ ── */}
       <Section differee ton="papier-2" titre="Questions fréquentes">

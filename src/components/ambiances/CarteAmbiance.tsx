@@ -12,6 +12,7 @@ import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { imageObjet, legendeAmbiance } from "@/lib/donnees-images";
 import { avecDepuis } from "@/lib/liens-simulateur";
 import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
+import { LiensAmbiance } from "./LiensAmbiance";
 
 /**
  * Le cas d'une ambiance (site 3.0, lots B6 et C1) : un titre, l'image — le curseur avant / après d'une paire calée
@@ -84,14 +85,18 @@ export function imageObjetCas(cas: CasAmbiance): Record<string, unknown> | null 
  * sous le `h1`), `priorite` (la première image de la page, en `fetchPriority="high"` — une photo seule seulement :
  * une paire n'est jamais prioritaire, ses deux images passeraient devant tout), `liensMatieres` (chaque cartel mène à
  * sa matière).
- * Site 3.0 (lot F4) : un avant / après pose son `ImageObject` (`imageObjetCas`).
+ * Site 3.0 (lots F4 et F5) : un avant / après pose son `ImageObject` (`imageObjetCas`) ; chaque cartel mène à la fiche
+ * de sa matière (`liensMatieres`, vrai par défaut) et la carte à sa prestation (`LiensAmbiance`), sauf sur la page de
+ * cette prestation (`ici` : l'adresse de la page).
  */
-export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, balise = "h3", priorite = false, liensMatieres = false, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; balise?: "h2" | "h3"; priorite?: boolean; liensMatieres?: boolean; children?: ReactNode }) {
+export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid-cols-2", sansLien = false, balise = "h3", priorite = false, liensMatieres = true, ici, children }: { cas: CasAmbiance; tailles: string; teinte?: string; cartelsColonnes?: string; sansLien?: boolean; balise?: "h2" | "h3"; priorite?: boolean; liensMatieres?: boolean; ici?: string; children?: ReactNode }) {
   const { preparees } = cas;
   const Titre = balise;
   return (
     <>
-      <Titre className="font-display text-[24px] leading-tight font-semibold text-encre">{cas.nom}</Titre>
+      <Titre data-ambiance={cas.ambiance.id} className="font-display text-[24px] leading-tight font-semibold text-encre">
+        {cas.nom}
+      </Titre>
       <DonneesStructurees data={imageObjetCas(cas)} />
       {preparees.avant ? (
         <AvantApres
@@ -122,6 +127,7 @@ export function CarteAmbiance({ cas, tailles, teinte, cartelsColonnes = "sm:grid
           </li>
         ))}
       </ul>
+      <LiensAmbiance piece={cas.ambiance.piece} ici={ici} />
       {children}
       {sansLien ? null : (
         <Link href={cas.lien} className="mt-auto inline-flex self-start pt-3 min-h-[44px] items-center text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
