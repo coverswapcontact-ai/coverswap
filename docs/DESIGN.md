@@ -2,7 +2,7 @@
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
 prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
-(`/realisations`) et C6 (l'espace client).
+(`/realisations`), C6 (l'espace client) et C7 (les guides du blog).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -524,7 +524,7 @@ questions) détonnaient avec les filets : chaque bloc se pose désormais **sous 
 page, l'encre sans teinte), sans fond ni cadre ; les étapes portent leur **grand numéro** (comme « Comment on
 travaille ») ; les questions se replient entre des filets, comme celles de l'accueil. Restent en carte blanche, pour
 l'instant : les formulaires (`DevisForm`, `FormulairePro`), les avis, les cartes de réalisation et les pages hors
-tunnel (zones, CGV, blog).
+tunnel (zones, CGV). Les guides du blog les ont quittées au lot C7.
 
 ## La page Inspirations
 
@@ -546,6 +546,27 @@ Lot C4, `src/app/inspirations/page.tsx`, ordre dans `_components/ordre.ts`, filt
   sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres`, qui
   navigue par le routeur, est à passer en lien de page avec la phase D). La page passe de 18 800 à 3 700 px de haut à
   1 440 px de large, et mesure 8 800 px à 390 px.
+
+## Les guides du blog
+
+Lot C7, `src/app/blog/[slug]/page.tsx`, images dans `illustration.ts`, textes dans `src/data/blog-articles.ts` (énoncé,
+§ C.2). Une page qu'on lit : le titre sur le papier, puis une colonne de lecture (768 px au plus) et, dès 1 024 px, une
+colonne de 300 px à droite ; au téléphone, la colonne passe sous l'article.
+
+- **Sans carte blanche** : le papier du gabarit (son grain), des filets d'encre en tête des blocs de la colonne
+  (« Envie de tester ? », le catalogue, les articles similaires) et de « Pour aller plus loin » ; l'astuce reste un
+  encart `fond-2` à filet gauche d'encre.
+- **L'ouverture** : la photo de fond des premiers guides (une vraie photo, décorative, sans étiquette), ou, pour les
+  guides écrits avec la bibliothèque, le curseur « Ambiance · avant / après » de leur paire (prioritaire, « Comparer »
+  seul au téléphone) avec sa phrase, les cartels de sa composition et « Essayer cette composition chez moi », ou une
+  photo utile « Ambiance » décrite par le texte de la bibliothèque.
+- **Dans le texte** : une section peut porter une image de plus (le second « après » de la paire en `CarteAmbiance`,
+  une photo utile) et les prix publiés de la cuisine (`ContenuPrix`, sans intro : la section dit déjà comment on
+  facture). Aucun montant écrit dans le texte (testé).
+- **Une seule action principale** : « Simuler ma cuisine » (guide de cuisine) ou « Simuler ma pièce », dans la
+  colonne, `depuis=blog` ; le reste en liens de texte entre filets (prestation, simulateur, guides voisins).
+- **Typographie** : l'espace devant « : ; ? ! » est insécable dans tout ce que la page affiche (`insecables`) : jamais
+  un deux-points en début de ligne d'un titre.
 
 ## L'espace client
 

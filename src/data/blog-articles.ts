@@ -1,11 +1,49 @@
-import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+import { lienSimuler } from "@/lib/liens-simulateur";
+import type { IdFamilleTarifs } from "@/lib/tarifs-site";
 
 /**
  * Guides : les vraies questions que les gens posent avant un covering, avec
  * des réponses vérifiables. Les chiffres viennent de lib/offre (grille réelle
  * au mètre linéaire) ; ce qui n'est pas sûr n'est pas écrit.
+ *
+ * Site 3.0, lot C7 : trois guides écrits avec la bibliothèque d'images (`paire` : l'« après » d'une paire de la
+ * série 2, en curseur « Ambiance · avant / après » ; `imagePreparee` : une photo utile, « Ambiance » ; noms du
+ * manifeste) et les prix du site (`prix` d'une section : les tarifs du CRM de ces familles, `ContenuPrix`). Leur texte
+ * ne porte AUCUN montant (testé) : un prix n'est jamais écrit à la main, seulement lu au CRM (ou son repli
+ * documenté). 800 mots au plus chacun (testé).
  */
-export interface BlogArticle {
+export type SectionArticle = {
+  title: string;
+  text: string;
+  /** Lot C7 : une image de la bibliothèque sous le texte — l'« après » d'une paire (curseur, cartels, « Essayer ») ou une photo utile (« Ambiance »). */
+  image?: string;
+  /** Lot C7 : les prix publiés de ces familles sous le texte (« Sur devis » quand le CRM n'en publie pas). */
+  prix?: readonly IdFamilleTarifs[];
+};
+
+/** L'image d'ouverture : la photo de fond des premiers guides, ou (lot C7) une image de la bibliothèque. */
+type IllustrationArticle =
+  | {
+      /** Photo de fond locale : `/images/fonds/<id>` (paire 800/1600). */
+      image: string;
+      paire?: never;
+      imagePreparee?: never;
+    }
+  | {
+      image?: never;
+      /** L'« après » d'une paire de la série 2 (nom du manifeste) : le curseur « Ambiance · avant / après » d'ouverture, l'image du balisage. */
+      paire: string;
+      imagePreparee?: never;
+    }
+  | {
+      image?: never;
+      paire?: never;
+      /** Une photo utile de la bibliothèque (nom du manifeste) : la photo « Ambiance » d'ouverture, l'image du balisage. */
+      imagePreparee: string;
+    };
+
+export type BlogArticle = IllustrationArticle & {
   slug: string;
   title: string;
   excerpt: string;
@@ -16,16 +54,18 @@ export interface BlogArticle {
   dateIso: string;
   dateModifiedIso: string;
   readTime: string;
-  /** Photo de fond locale : `/images/fonds/<id>` (paire 800/1600). */
-  image: string;
+  /** Lot C7 : la pièce du guide ; le bouton de la colonne devient « Simuler ma cuisine » (`?projet=`). */
+  projet?: "cuisine";
   content: {
     intro: string;
-    sections: { title: string; text: string }[];
+    sections: SectionArticle[];
     tip?: string;
     conclusion: string;
   };
+  /** Lot C7 : « Pour aller plus loin », sous la conclusion : la prestation, le simulateur, les guides voisins. */
+  liens?: readonly { href: string; libelle: string }[];
   relatedSlugs: string[];
-}
+};
 
 const MAJ = "2026-09-17";
 const MAJ_TEXTE = "17 septembre 2026";
@@ -34,7 +74,167 @@ const cuisineMax = euros(FOURCHETTES.cuisine.max);
 const sdbMin = euros(FOURCHETTES.sdb.min);
 const sdbMax = euros(FOURCHETTES.sdb.max);
 
+const C7 = "2026-10-06";
+const C7_TEXTE = "6 octobre 2026";
+const DEPUIS_GUIDE = "blog";
+const SIMULER_CUISINE = lienSimuler({ projet: "cuisine", depuis: DEPUIS_GUIDE });
+
 export const articles: BlogArticle[] = [
+  {
+    slug: "cuisine-bordeaux-brillante-renover-sans-changer",
+    title: "Cuisine bordeaux brillante : la rénover sans la changer",
+    excerpt: "Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux directions possibles et comment se fait le prix.",
+    category: "Cuisine",
+    date: C7_TEXTE,
+    dateIso: C7,
+    dateModifiedIso: C7,
+    readTime: "3 min",
+    paire: "cuisine-bordeaux-brillante-apres-couleur",
+    projet: "cuisine",
+    content: {
+      intro: `Le bordeaux brillant a équipé beaucoup de cuisines d'appartement dans les années 2000. Le plus souvent, les meubles vont bien : les caissons sont solides, les portes ferment, les tiroirs coulissent. Ce qui date, c'est la couleur et le reflet. Et c'est exactement ce que le covering change : on garde la cuisine, on change sa surface, en ${DUREE_POSE_TEXTE}.`,
+      sections: [
+        {
+          title: "Ce qu'on regarde avant de parler couleur",
+          text: "Une façade brillante est en général laquée ou en panneau polymère : lisse, peu poreuse, le film y adhère bien après un nettoyage et un dégraissage soignés. Ce qui nous arrête, c'est le support : un panneau qui a gonflé près de l'évier ou du lave-vaisselle, une laque qui s'écaille, un chant qui ne tient plus. Montrez-les sur vos photos : on vous dit au devis ce qu'on peut reprendre, et ce qu'il vaut mieux changer.",
+        },
+        {
+          title: "Ce qui reste en place",
+          text: "Les caissons, les portes, les tiroirs, les poignées et les charnières, l'évier, la plaque, la hotte, le carrelage. Rien n'est démonté ni emporté. On pose le film façade par façade, chants compris, puis on habille le plan de travail sans le déposer. Il n'y a ni poussière ni séchage : la cuisine sert le soir même.",
+        },
+        {
+          title: "Deux directions pour la même cuisine",
+          text: "Sur cette cuisine en L, on a essayé deux partis. En haut de page, un vert profond mat sur les façades et un chêne pâle sur le plan : la cuisine garde du caractère, sans le reflet. Ci-dessous, un gris clair mat et un chêne plus soutenu : la pièce paraît plus grande et plus calme. Dans les deux cas, le carrelage blanc et les poignées inox ne bougent pas. Les matières posées sont écrites sous chaque image ; vous pouvez les essayer sur la photo de votre cuisine.",
+          image: "cuisine-bordeaux-brillante-apres-neutre",
+        },
+        {
+          title: "Le mat change plus que la couleur",
+          text: "Le brillant renvoie la lumière de la fenêtre et montre chaque trace de doigt. Une finition mate, ou un bois au léger relief, calme la pièce et marque beaucoup moins. Si vous aimez le rouge, rien n'interdit de le garder : un bordeaux mat ou une terracotta ne font pas le même effet qu'une laque. Dans tous les cas, on valide la teinte sur de vrais échantillons, chez vous, à la lumière de votre cuisine : un vert profond n'a pas le même rendu sous une fenêtre plein sud ou dans une pièce sombre.",
+        },
+        {
+          title: "Le plan de travail et la crédence",
+          text: "Le plan gris moucheté vieillit lui aussi la cuisine. Il s'habille sans dépose, en bois, en pierre ou en béton, chants finis. Près des plaques de cuisson, on vérifie sur place ce qui est possible et on pose les références prévues pour la chaleur. La crédence carrelée peut rester telle quelle, comme ici, ou se recouvrir sans casser un carreau.",
+        },
+        {
+          title: "Comment se fait le prix",
+          text: `On facture au mètre linéaire de film posé, fourni et posé. Le prix dépend surtout de la pose (le nombre de découpes, l'accès, l'état du support, le métrage), bien plus que de la teinte choisie. Une cuisine en L comme celle-ci, façades et plan de travail, se chiffre sur vos photos : le devis est gratuit, il arrive ${DELAI_REPONSE} et détaille chaque surface. Voici les prix que nous publions.`,
+          prix: ["CUISINE"],
+        },
+      ],
+      tip: `Prenez votre cuisine de face, à hauteur d'yeux, lumière allumée. Le simulateur pose la matière choisie sur votre propre photo en ${DELAI_RENDU}, et on chiffre ensuite sur la même photo.`,
+      conclusion: `Une cuisine bordeaux brillante en bon état n'a pas besoin d'être remplacée. On garde ce qui fonctionne, on change la surface en ${DUREE_POSE_TEXTE}, et le film se retire à chaud le jour où vous voulez changer encore. Le plus simple pour commencer : essayer une teinte sur votre photo.`,
+    },
+    liens: [
+      { href: "/prestations/cuisine", libelle: "Le covering de cuisine : ce qu'on recouvre, nos prix, nos cas" },
+      { href: SIMULER_CUISINE, libelle: "Essayer une teinte sur la photo de ma cuisine" },
+      { href: "/matieres", libelle: "Voir toutes les matières" },
+    ],
+    relatedSlugs: ["cuisine-blanche-jaunie-que-faire", "covering-peinture-remplacement-comparatif", "quelle-finition-choisir"],
+  },
+  {
+    slug: "cuisine-blanche-jaunie-que-faire",
+    title: "Cuisine blanche qui a jauni : que faire ?",
+    excerpt: "Pourquoi le blanc jaunit, ce que le nettoyage peut faire, les signes qui comptent sur le meuble, et trois façons d'en sortir sans casser.",
+    category: "Cuisine",
+    date: C7_TEXTE,
+    dateIso: C7,
+    dateModifiedIso: C7,
+    readTime: "3 min",
+    paire: "cuisine-blanche-jaunie-apres-bois",
+    projet: "cuisine",
+    content: {
+      intro: "Une cuisine blanche des années 1980 ou 1990 finit presque toujours par virer au crème, puis au jaune. Ce n'est pas forcément de la saleté : c'est souvent la surface elle-même qui a vieilli. Avant de penser à tout changer, il faut savoir ce qui a jauni, et si le meuble, dessous, est encore sain.",
+      sections: [
+        {
+          title: "Pourquoi le blanc jaunit",
+          text: "Les façades blanches de cette époque sont le plus souvent en mélaminé, en stratifié ou laquées. Au fil des années, la lumière du jour, la chaleur de la cuisson et les graisses en suspension changent la teinte de la surface. Le jaune est souvent plus marqué près de la fenêtre, de la hotte et du four. Ce qui a vieilli, c'est la couche du dessus : le panneau, lui, est en général intact.",
+        },
+        {
+          title: "Ce que le nettoyage peut faire, et ce qu'il ne peut pas",
+          text: "Commencez par un dégraissant doux et une éponge souple : le film gras jaunit aussi, et il part. Si la façade redevient blanche, c'était de la graisse. Si elle reste crème, la teinte est dans la surface, et aucun produit ne la rendra blanche. Les produits agressifs (javel pure, solvants, éponges qui grattent) abîment la surface sans la blanchir.",
+        },
+        {
+          title: "Les signes à regarder de près",
+          text: "Sur cette porte, trois choses : le chant qui se décolle, de petits éclats, une poignée en plastique qui a jauni elle aussi. Un chant décollé ou un éclat se reprennent souvent avant la pose ; on vous le dit au devis, sur vos photos. Un panneau qui a gonflé à l'eau, sous l'évier par exemple, ou qui s'effrite, ne se répare pas avec un film : il faut changer la pièce. Les poignées restent en place pendant la pose ; si les vôtres ont jauni, c'est le bon moment pour les changer.",
+          image: "usure-detail",
+        },
+        {
+          title: "Trois façons d'en sortir",
+          text: "Repeindre : c'est possible, mais sur un mélaminé il faut poncer, poser une sous-couche d'accroche, deux couches, et attendre le séchage entre chacune ; plusieurs jours, et la peinture s'use vite aux poignées et aux arêtes. Remplacer : justifié si les caissons sont abîmés, mais c'est le chantier le plus lourd. Recouvrir : un film posé à chaud sur les façades saines, sans démontage, la cuisine utilisable le soir même. Le comparatif complet des trois est dans un guide à part.",
+        },
+        {
+          title: "Deux directions pour la même cuisine",
+          text: "En haut de page, des façades en chêne pâle et un plan effet marbre noir : la cuisine des années 1980 prend la chaleur du bois. Ci-dessous, un bleu nuit mat et un plan en chêne. Dans les deux cas, on a gardé le carrelage à frise : il peut se recouvrir aussi, mais rien n'y oblige. Et si vous tenez au blanc, un blanc neuf, mat ou satiné, se pose de la même façon.",
+          image: "cuisine-blanche-jaunie-apres-couleur",
+        },
+        {
+          title: "Comment se fait le prix",
+          text: `On facture au mètre linéaire de film posé, fourni et posé : les façades seules, ou les façades et le plan de travail. Le prix dépend de la pose (découpes, accès, état du support, métrage) plus que de la teinte. Le devis est gratuit et arrive ${DELAI_REPONSE} après vos photos. Voici les prix que nous publions.`,
+          prix: ["CUISINE"],
+        },
+      ],
+      tip: "Photographiez une façade près de la fenêtre, une autre loin d'elle, et l'intérieur du meuble sous l'évier : on voit tout de suite si c'est la surface ou le panneau qui a vieilli.",
+      conclusion: `Un blanc jauni n'est pas une raison de changer une cuisine dont les caissons tiennent. Nettoyez d'abord ; si la teinte reste, regardez les chants et le dessous de l'évier ; si le meuble est sain, un covering lui rend une surface neuve en ${DUREE_POSE_TEXTE}, garantie ${GARANTIE_ANS} ans.`,
+    },
+    liens: [
+      { href: "/comment-ca-marche#quand-renover", libelle: "Quand rénover, et quand le film ne suffit pas" },
+      { href: "/prestations/cuisine", libelle: "Le covering de cuisine : ce qu'on recouvre, nos prix, nos cas" },
+      { href: SIMULER_CUISINE, libelle: "Essayer une teinte sur la photo de ma cuisine" },
+    ],
+    relatedSlugs: ["covering-peinture-remplacement-comparatif", "cuisine-bordeaux-brillante-renover-sans-changer", "entretenir-revetement-adhesif"],
+  },
+  {
+    slug: "covering-peinture-remplacement-comparatif",
+    title: "Covering, peinture ou remplacement : le vrai comparatif",
+    excerpt: "Trois façons de changer une cuisine, comparées sur le délai, la poussière, la réversibilité et la durée. Et quand nous déconseillons le covering.",
+    category: "Comparatif",
+    date: C7_TEXTE,
+    dateIso: C7,
+    dateModifiedIso: C7,
+    readTime: "3 min",
+    imagePreparee: "pose-mains",
+    projet: "cuisine",
+    content: {
+      intro: "Quand une cuisine ne plaît plus, il y a trois chemins : la recouvrir, la repeindre ou la remplacer. Nous posons du covering, nous ne sommes donc pas neutres. Voici quand même la comparaison telle que nous la faisons avec les gens qui nous appellent, critère par critère, y compris quand le covering n'est pas la bonne réponse.",
+      sections: [
+        {
+          title: "Le délai",
+          text: `Covering : ${DUREE_POSE_TEXTE} de pose pour une cuisine courante, après un devis qui arrive ${DELAI_REPONSE} et la commande du film. Peinture : plusieurs jours, entre le ponçage, la sous-couche, deux couches et les temps de séchage, avec les façades démontées ou la cuisine immobilisée. Remplacement : la fabrication et la livraison des meubles passent avant la pose, qui demande elle-même plusieurs jours, plomberie et électricité comprises.`,
+        },
+        {
+          title: "La poussière et le bruit",
+          text: "Covering : ni ponçage ni dépose. On nettoie, on dégraisse, puis on pose à chaud avec une raclette, un cutter et un décapeur thermique. Rien ne sèche, rien ne sent. Peinture : poncer un mélaminé fait une poussière fine qui se dépose partout, et la peinture sent pendant le séchage. Remplacement : dépose de l'ancienne cuisine, gravats, perçages ; la pièce devient un chantier.",
+          image: "outils-pose",
+        },
+        {
+          title: "La réversibilité",
+          text: "Covering : le film se retire à chaud et le support retrouve son état d'origine ; on peut aussi le recouvrir à nouveau le jour où l'on veut changer. C'est ce qui le rend possible en location. Peinture : une façade peinte reste peinte, et revenir en arrière demande de décaper. Remplacement : par définition, rien ne revient.",
+        },
+        {
+          title: "La durée",
+          text: `Covering : films et pose garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration, en usage normal ; il craint la lame d'un couteau et les éponges abrasives, comme un stratifié. Peinture : sa tenue dépend de la préparation et de l'usage ; sur des façades de cuisine, elle s'use d'abord aux poignées et aux arêtes. Remplacement : des meubles neufs, la durée la plus longue, au prix du neuf.`,
+        },
+        {
+          title: "Le prix",
+          text: "Nous ne donnons ici que nos prix, ceux du covering, au mètre linéaire de film posé, fourni et posé. Pour la peinture et le remplacement, les écarts entre un travail fait soi-même, un peintre et un cuisiniste sont trop grands pour qu'un chiffre soit honnête : demandez des devis, et comparez-les surface par surface avec le nôtre.",
+          prix: ["CUISINE"],
+        },
+        {
+          title: "Quand ne pas choisir le covering",
+          text: "Si les caissons sont abîmés, si un panneau a gonflé à l'eau, si vous voulez changer l'implantation ou ajouter des meubles : remplacez. Si vous voulez garder un bois massif visible, ou s'il s'agit d'un mur : la peinture est plus adaptée. Le covering est fait pour une cuisine saine dont seule la surface a vieilli : mélaminé, stratifié, laqué, bois verni.",
+        },
+      ],
+      tip: "Pour comparer deux devis, regardez trois lignes : ce qui est démonté, combien de jours la cuisine reste inutilisable, et ce que couvre la garantie.",
+      conclusion: `Sur une cuisine saine, le covering l'emporte : ${DUREE_POSE_TEXTE}, sans poussière, réversible, garanti ${GARANTIE_ANS} ans. La peinture garde l'avantage du petit budget quand on la fait soi-même ; le remplacement, celui de tout changer, y compris ce qui est cassé. Pour le face-à-face détaillé avec la peinture, et pour lire un devis de covering ligne par ligne, deux guides vont plus loin.`,
+    },
+    liens: [
+      { href: "/blog/covering-adhesif-vs-peinture-cuisine", libelle: "Covering adhésif ou peinture : le face-à-face détaillé" },
+      { href: "/blog/prix-renovation-cuisine-covering", libelle: "Combien coûte un covering de cuisine, et ce que contient le devis" },
+      { href: "/prestations/cuisine", libelle: "Le covering de cuisine : ce qu'on recouvre, nos prix, nos cas" },
+      { href: SIMULER_CUISINE, libelle: "Essayer une matière sur la photo de ma cuisine" },
+    ],
+    relatedSlugs: ["covering-adhesif-vs-peinture-cuisine", "prix-renovation-cuisine-covering", "cuisine-blanche-jaunie-que-faire"],
+  },
   {
     slug: "prix-renovation-cuisine-covering",
     title: "Combien coûte une rénovation de cuisine par covering ?",
@@ -72,7 +272,7 @@ export const articles: BlogArticle[] = [
       tip: "Envoyez des photos de face avec un objet de taille connue (une feuille A4 posée sur le plan de travail) : le métrage se lit mieux et le devis est plus juste dès le premier envoi.",
       conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € le mètre linéaire posé selon la complexité de la pose, ${cuisineMin} à ${cuisineMax} pour une cuisine complète. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
     },
-    relatedSlugs: ["covering-adhesif-vs-peinture-cuisine", "comment-se-passe-une-pose-de-covering", "covering-adhesif-durabilite"],
+    relatedSlugs: ["covering-peinture-remplacement-comparatif", "covering-adhesif-vs-peinture-cuisine", "comment-se-passe-une-pose-de-covering", "covering-adhesif-durabilite"],
   },
   {
     slug: "comment-se-passe-une-pose-de-covering",
@@ -156,7 +356,7 @@ export const articles: BlogArticle[] = [
       ],
       conclusion: "Peinture : bon marché en matériel, long, résultat uni, définitif. Covering : une journée, textures réalistes, garanti, réversible. Pour des façades de cuisine en mélaminé, le covering est presque toujours le choix le plus durable.",
     },
-    relatedSlugs: ["prix-renovation-cuisine-covering", "covering-adhesif-durabilite", "quelle-finition-choisir"],
+    relatedSlugs: ["covering-peinture-remplacement-comparatif", "prix-renovation-cuisine-covering", "covering-adhesif-durabilite", "quelle-finition-choisir"],
   },
   {
     slug: "covering-adhesif-durabilite",

@@ -830,3 +830,67 @@ dépôt dans `scratchpad/m21/c6/captures`, script `c6/espace-essai.mjs`.
 
 **Problèmes** : aucun bloquant. L'espace garde son dessin propre (cartes blanches arrondies, 17 px) : seules les
 couleurs ont changé, comme demandé ; son fond est le papier uni (`bg-fond` posé sur le grain du `body`), comme avant.
+
+## C7 — Le blog (06/10/2026)
+
+**Fait** (aucune image régénérée, aucun envoi ; `docs/DESIGN.md` « Les guides du blog », `docs/SEO.md`, `docs/SUIVI.md`)
+- **Trois guides** en tête de `src/data/blog-articles.ts`, à la première personne du pluriel, sans aucun montant écrit :
+  « Cuisine bordeaux brillante : la rénover sans la changer » (621 mots), « Cuisine blanche qui a jauni : que faire ? »
+  (603 mots), « Covering, peinture ou remplacement : le vrai comparatif » (528 mots) — titre, intro, sections, astuce
+  et conclusion comptés. Prix : la section « Comment se fait le prix » / « Le prix » montre les tarifs publiés de la
+  cuisine (`ContenuPrix`, « Sur devis » quand le CRM n'en publie pas, son repli documenté s'il ne répond pas) ; la
+  peinture et le remplacement : « demandez des devis », aucun chiffre.
+- **La bibliothèque** : `paire` (l'« après » d'une paire, curseur « Ambiance · avant / après » d'ouverture,
+  prioritaire, avec sa phrase, ses cartels et « Essayer cette composition chez moi »), `imagePreparee` (photo utile
+  « Ambiance » d'ouverture), `image` d'une section (le second « après » en `CarteAmbiance`, ou une photo utile) ;
+  `image` (photo de fond) devient optionnelle par un type union (une seule ouverture par guide). Bordeaux : les deux
+  après de la paire ; jaunie : les deux après et `usure-detail` ; comparatif : `pose-mains`, `outils-pose`.
+- **`src/app/blog/[slug]/illustration.ts`** (pur, testé) : `illustrationDe` (une paire seulement pour un « après »
+  nommé, jamais un avant seul), `imageDuBalisage` (`Article.image` = `/images/prep/<nom>-1536.jpg`, la plus grande
+  largeur préparée ; photo de fond 1600 px pour les neuf premiers guides), `actionDuGuide`, `insecables`.
+- **La page** passe au papier du gabarit, sans carte blanche (filets d'encre ; colonne de lecture de 768 px, colonne
+  de 300 px dès 1 024 px), pour les douze guides. Un seul principal : « Simuler ma cuisine » (`?projet=cuisine&depuis=blog`)
+  pour les trois guides de cuisine, « Simuler ma pièce » (`?depuis=blog`) pour les autres (avant : « Simuler mon
+  projet », `/simulateur` sans `depuis`). « Pour aller plus loin » : prestation cuisine, simulateur, guides voisins.
+  Les tarifs ne sont lus au CRM que pour un guide qui les montre (les neuf autres : aucun appel).
+- **Maillage** : comparatif ↔ `covering-adhesif-vs-peinture-cuisine` et ↔ `prix-renovation-cuisine-covering`
+  (`relatedSlugs` des deux côtés, plus deux liens du comparatif) ; bordeaux ↔ jaunie ↔ comparatif. Les trois sont listés
+  à `/comment-ca-marche#guides` (en tête), au plan du site et dans `llms.txt` (automatique).
+
+**Décisions prises seul**
+1. Deux curseurs dans les articles de cuisine (les deux « après » de la paire) : « deux directions pour la même
+   cuisine » est le cœur utile de l'article ; l'ouverture prend l'après « couleur » (bordeaux → vert profond, comme
+   l'accueil) ou « bois » (jaunie → chêne pâle).
+2. Le comparatif ne cannibalise pas ses voisins : trois options, quatre critères (délai, poussière, réversibilité,
+   durée) et « quand ne pas choisir le covering » ; le face-à-face film/peinture (rendu, tenue) et la lecture du devis
+   restent dans les deux guides existants, vers lesquels il renvoie (intentions dans `docs/SEO.md`).
+3. Le texte ne nomme pas les références (elles sont dans les cartels sous l'image) : il ne peut pas diverger des
+   données de la bibliothèque.
+4. Le restyle de la page vaut pour les douze guides (le lot précédent laissait le blog en cartes blanches) ; les photos
+   de fond des neuf premiers restent sans étiquette (de vraies photos, décoratives, comme avant).
+5. Espace insécable devant « : ; ? ! » dans tout ce que la page affiche (`String.fromCharCode(160)`, aucun caractère
+   invisible tapé) : le titre ne casse plus avant son deux-points.
+6. Dates des trois guides : 6 octobre 2026 ; temps de lecture « 3 min ». Pas d'image de partage propre (lot F2 : les
+   images de partage composées et étiquetées).
+
+**Tests** : 415 → 427, tous réussis. Nouveau `src/app/blog/guides.test.ts` (12) : titres de l'énoncé et images prévues
+(les deux après de chaque paire), une seule ouverture par guide et chaque image résolue (un avant seul jamais), 400 à
+800 mots et description ≤ 155, aucun « € » dans leur texte ni `\d+ €` dans les sources du blog, liens réciproques et
+les quatre critères ; page rendue : 2 curseurs « Ambiance · avant / après » (bordeaux, jaunie), « Ambiance » sur les
+photos utiles, jamais « Réalisation » / « Simulation », images prioritaires = l'ouverture seule ; « Essayer » parsé par
+`lireDepuis` / `lireComposition`, un seul principal, prestation et voisins ; prix du CRM tels quels / « Sur devis » /
+repli, aucun appel pour un guide sans prix ; `ArticleSchema` sur l'image `-1536.jpg` du manifeste (fichier présent) ou la
+photo de fond ; page sans carte blanche ; typographie. `autres-pages.test.ts` : la boucle de l'illustration ne vise plus
+que les 9 guides à photo de fond, `sizes` de la nouvelle colonne (768 px, `calc(100vw - 32px)`). `npx eslint .` et
+`npm run build` passent (les trois guides en statique, revalidés à l'heure pour les prix).
+
+**Vérification visuelle** : build local, `next start -p 3100` (arrêté ensuite), Playwright + Edge à 360 × 660,
+390 × 660 / 844, 1 024 et 1 440 px sur les trois guides et un ancien (`entretenir-revetement-adhesif`) : aucun
+débordement, 0 image cassée, 0 requête coupée (rien envoyé), un principal par page, LCP = l'ouverture (188 à 260 ms ;
+696 ms à 360 px pour bordeaux). Corrigé après la première capture : le « : » du titre seul en début de ligne à 1 440 px.
+Captures hors dépôt dans `scratchpad/m21/c7/cap`.
+
+**Problèmes** : au téléphone, le principal de la colonne arrive après l'article (≈ 5 100 px) ; les liens « Essayer »
+et « Pour aller plus loin » le relaient plus haut. Le guide `prix-renovation-cuisine-covering` (d'avant le site 3.0)
+écrit encore des fourchettes par `euros(900)` … `euros(1200)` dans son texte, hors des tarifs du CRM : à revoir avec
+F1 / les tarifs.

@@ -570,13 +570,17 @@ describe("pages locales et guides", () => {
 
   test("l'illustration d'un guide : 800 ou 1600 px au choix du navigateur (srcset), plus le seul 1600 px de next/image", async () => {
     assert.doesNotMatch(lire("app/blog/[slug]/page.tsx"), /from "next\/image"/);
-    for (const article of articles) {
+    // Les guides à photo de fond (lot C7 : ceux de la bibliothèque ont leur ouverture préparée, `blog/guides.test.ts`).
+    const aFond = articles.filter((a) => a.image);
+    assert.equal(aFond.length, 9);
+    for (const article of aFond) {
       const html = await rendrePage("@/app/blog/[slug]/page", { params: Promise.resolve({ slug: article.slug }) });
       const img = html.match(/<img[^>]*srcset="([^"]*)"[^>]*>/i);
       assert.ok(img, article.slug);
       assert.equal(img[1], `${article.image}-800.jpg 800w, ${article.image}-1600.jpg 1600w`);
       assert.match(img[0], /src="[^"]*-800\.jpg"/);
-      assert.match(img[0], /sizes="\(min-width: 1200px\) 702px, [^"]*calc\(100vw - 82px\)"/);
+      // Lot C7 : la colonne de l'article sans carte (768 px au plus, la colonne de 300 px et son écart dès 1 024 px).
+      assert.match(img[0], /sizes="\(min-width: 1152px\) 768px, [^"]*calc\(100vw - 32px\)"/);
       assert.match(img[0], /alt=""/);
     }
   });

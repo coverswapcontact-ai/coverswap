@@ -15,6 +15,20 @@ mesures « après » aux lots F6 et G3.
 À remplir au lot F1 : une ligne par page (intention, requête, H1, title, description, pages qui y mènent, pages où
 elle mène).
 
+### Les guides du lot C7 (posés en avance, à reprendre dans la carte complète)
+
+| Guide | Intention | Requête visée | Ce qui le distingue de ses voisins |
+|---|---|---|---|
+| `/blog/cuisine-bordeaux-brillante-renover-sans-changer` | informationnelle, cas précis | « rénover cuisine bordeaux brillante », « cuisine rouge laquée relooker » | une cuisine datée mais saine : ce qu'on garde, deux directions en curseur, le mat contre le brillant |
+| `/blog/cuisine-blanche-jaunie-que-faire` | informationnelle, problème | « cuisine blanche jaunie que faire », « meuble cuisine blanc jauni » | le diagnostic (graisse ou surface, chant, panneau gonflé) avant la solution ; renvoie à « Quand rénover ? » |
+| `/blog/covering-peinture-remplacement-comparatif` | commerciale, choix entre trois options | « covering ou peinture ou changer cuisine », « rénover ou remplacer cuisine » | trois options sur quatre critères (délai, poussière, réversibilité, durée) et quand ne pas choisir le covering ; pas de chiffre pour la peinture ni le remplacement |
+| `/blog/covering-adhesif-vs-peinture-cuisine` (voisin) | commerciale, deux options | « covering ou peinture cuisine » | le face-à-face détaillé film contre peinture (rendu, tenue) ; lié au comparatif dans les deux sens |
+| `/blog/prix-renovation-cuisine-covering` (voisin) | commerciale, prix | « prix covering cuisine » | la lecture d'un devis de covering ; lié au comparatif dans les deux sens |
+
+Les trois guides mènent à `/prestations/cuisine`, au simulateur (`depuis=blog`) et entre eux ; ils sont listés à
+`/comment-ca-marche#guides`, au plan du site et dans `llms.txt`. Balisage `Article` sur leur image de la bibliothèque
+(`/images/prep/<nom>-1536.jpg`).
+
 ## Lighthouse avant (lot B0, 05/10/2026)
 
 Mesure : Lighthouse 12.6.1 en ligne de commande, réglage mobile par défaut (le même que la CI : écran de 412 × 823,
