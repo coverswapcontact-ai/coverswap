@@ -14,7 +14,7 @@ import { PleinEcran } from "@/components/simulation/PleinEcran";
 import { GRILLE_ECHANTILLONS, SqueletteTuiles } from "@/components/simulation/Squelette";
 import { texteCartel } from "@/lib/cartel";
 import { differer } from "@/lib/differer";
-import { cheminFamille } from "@/lib/familles-matieres";
+import { cheminFamille, cheminMatiere } from "@/lib/familles-matieres";
 import { DELAI_RECHERCHE_MS, MATIERES_PAR_PAGE, chargerCatalogue, estAffine, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, type FiltreMatieres, type Matiere, type Tiroir } from "@/lib/matieres";
 import { urlEchantillon } from "@/lib/simulateur/generation-client";
 import { TEINTES, trierParTeinte, type Teinte } from "@/lib/teintes";
@@ -30,7 +30,8 @@ import { TEINTES, trierParTeinte, type Teinte } from "@/lib/teintes";
  *    finition », RANGÉE PAR TEINTE (`trierParTeinte`, hors du filtre), 30 par 30 (« Voir plus ») ;
  *  - un échantillon ouvre la matière EN GRAND (`PleinEcran` + `ZoomImage`, l'échantillon entier) : son cartel, « Vue
  *    dans » (liens de PAGE vers `/inspirations#<id>`, pour qu'une ambiance de la suite masquée s'ouvre : `:target`),
- *    « Essayer sur ma photo » (`depuis=matieres`) et les favoris.
+ *    « Essayer sur ma photo » (`depuis=matieres`), les favoris et, depuis le lot D4, « Voir la fiche de … »
+ *    (`/matieres/<famille>/<REF>`).
  * Le serveur rend les 30 premières du nuancier (« Tout ») ; le catalogue entier arrive ensuite (`chargerCatalogue`)
  * et prend le relais dans le même ordre (rien ne saute). L'adresse (`?famille=`, `?ref=`) est lue sans
  * `useSearchParams` (qui ferait rendre toute la page côté client) : `?ref=` ouvre la matière en grand UNE fois.
@@ -324,7 +325,13 @@ export function Matieres({ premieres, tiroirs, finitions, vueDans = {} }: { prem
                   ))}
                 </p>
               ) : null}
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {/* Lot D4 : la fiche de la matière (ses ambiances, ses voisines, « La voir en vrai chez moi »). */}
+              <p className="mt-2">
+                <Link href={cheminMatiere(agrandie.id, agrandie.famille)} onClick={aller(cheminMatiere(agrandie.id, agrandie.famille))} className="inline-flex min-h-[44px] items-center text-[14.5px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
+                  Voir la fiche de {agrandie.nom}
+                </Link>
+              </p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <Lien href={lienEssayer(agrandie.id, "matieres")} onClick={aller(lienEssayer(agrandie.id, "matieres"))} plein>
                   Essayer sur ma photo
                 </Lien>

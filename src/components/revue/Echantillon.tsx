@@ -8,7 +8,7 @@ import { Cartel } from "./Cartel";
  * le CRM, `/api/site/echantillons/<REF>?l=320`), carrée, coin arrondi, ombre portée légère, posée sur la couleur de
  * la matière tant qu'elle charge ; dessous, son cartel. Place réservée (carré), chargement différé sauf `priorite`.
  *
- * `href` : tout l'échantillon devient un lien (la fiche, `/matieres?ref=`…), nommé par son cartel. La vignette est
+ * `href` : tout l'échantillon devient un lien (la fiche, `/matieres/<famille>/<REF>`…), nommé par son cartel. La vignette est
  * décorative (`alt=""`) : le cartel dit tout. Composant serveur.
  *
  * Lot D2 : la vignette seule (`VignetteEchantillon`) sert aussi au présentoir de /matieres, où l'échantillon est un

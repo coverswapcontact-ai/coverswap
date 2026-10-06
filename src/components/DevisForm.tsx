@@ -29,12 +29,15 @@ export default function DevisForm({
   reference,
   submitLabel = "Envoyer ma demande",
   familles = FAMILLES_REPLI,
+  messageInitial,
 }: {
   source: string;
   reference?: string;
   submitLabel?: string;
   /** Les prestations de CoverSwap (fichier unique du CRM) ; un repli sinon. */
   familles?: Pick<FamillePrestation, "id" | "libelle" | "aide">[];
+  /** Site 3.0 (lot D4) : le message prérempli (une demande de visite avec échantillons, `lib/visite`). */
+  messageInitial?: string;
 }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -228,6 +231,7 @@ export default function DevisForm({
           <textarea
             id="devis-message"
             name="message"
+            defaultValue={messageInitial}
             required
             rows={4}
             placeholder="Décrivez votre projet, vos contraintes, vos envies..."

@@ -33,7 +33,9 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 - D1, teinte, ΔE, indexation : fait (`lib/teintes.ts`, `lib/indexation-matieres.ts` : 52 fiches indexées).
 - D2, `/matieres` le présentoir : fait (7 tiroirs, filtres teinte / finition / ambiance, échantillons rangés par teinte ; `docs/DESIGN.md` « Le présentoir »).
-- D3 à D5 : à venir.
+- D3, `/matieres/<famille>` : fait (sept pages, textes, bande des teintes, ambiances, vedettes, toutes les références).
+- D4, `/matieres/<famille>/<REF>` : fait (497 fiches, 52 indexées avec leur note, les autres en `noindex, follow` ; `docs/DESIGN.md` « La fiche d'une matière »).
+- D5 : à venir.
 
 ## Phase E : le simulateur
 
@@ -1137,3 +1139,90 @@ métaux » → `/matieres/metal`.
 - En local sous Windows, `/matieres/Bois` répond 200 (le système de fichiers ne distingue pas la casse : le fichier
   prérendu `bois.html` est trouvé, la page servie est celle du 404 sans le statut) ; `/matieres/BOIS` répond 404. Même
   chose pour `/prestations/Cuisine`, avant ce lot. Sur Vercel (Linux), la casse compte : 404.
+
+## D4 — `/matieres/<famille>/<REF>` (06/10/2026)
+
+**Fait** (aucune image générée, aucun envoi ; `docs/DESIGN.md` « La fiche d'une matière », `docs/SUIVI.md`)
+- **497 fiches statiques** `src/app/matieres/[famille]/[ref]/page.tsx` (`generateStaticParams` = une par référence,
+  sous SA famille ; `dynamicParams = false`, `notFound()` par sûreté) : `/matieres/bois/K1` (autre famille),
+  `/matieres/bois/ZZZ` → 404 ; référence en majuscules, sans redirection de casse. Revalidées à 300 s comme
+  `/realisations` (elles lisent `chargerPublications`).
+- **La page** : fil d'Ariane visible + `BreadcrumbList` (Accueil › Matières › famille › « Nom RÉF ») ; le nom du
+  fabricant en `h1` ; la **grande vignette** = l'échantillon entier du CRM (`urlEchantillon`, 595 × 790,
+  `fetchPriority="high"`, `preconnect` vers le CRM ; 4/3 au téléphone, entière dès 768 px) ; « Essayer chez moi »
+  (principal, `lienEssayer(ref, "matiere-fiche")` : le simulateur pose la matière, `matiere-demandee`) et « La voir en
+  vrai chez moi » (`/contact?ref=<REF>&visite=1`) ; cartel, teinte (`teinteDe` + couleur moyenne), finition glosée,
+  famille, référence ; la note (fiches indexées) ; « Nom chez vous » (où la poser + ses prestations, l'entretien, à
+  savoir, la voir en vrai) ; « Vue dans » (les réalisations publiées qui la portent d'abord — `realisationsDeLaMatiere`,
+  vide tant que le CRM ne publie pas les matières d'un chantier —, puis TOUTES ses ambiances des séries 1 et 2 :
+  photo « Ambiance », « Ici : », « Avec : » vers leurs fiches, « Voir l'ambiance », « Essayer cette composition chez
+  moi » `depuis=matiere-fiche` ; section omise sans rien) ; six voisines de teinte (ΔE, « Écart 1,1 ») ; sa famille et
+  les autres ; dernier appel en encre.
+- **Indexation** : les 52 de `fichesIndexees` indexées ; les 445 autres `noindex, follow` (nouvelle option
+  `indexer: false` de `metadonneesPage`). Titre ≤ 60 (`titreFiche` : « Deep Green NF13 : film adhésif uni |
+  CoverSwap », plus court pour les noms longs), description ≤ 155 (`descriptionFiche`), canonique = la fiche.
+- **Les notes** `src/data/notes-matieres.ts` : 52 notes écrites à la main, 62 à 88 mots, toutes distinctes (aucune
+  phrase de six mots ou plus reprise), d'après le nom du fabricant, la couleur moyenne, les ambiances où on l'a posée
+  et ses voisines ΔE ; aucune promesse technique, aucun montant ; chaque référence citée existe sous son vrai nom
+  (testé). Avec les repères de famille et le reste de la page : 300 mots rendus au moins sur les 52 (testé).
+- **Une seule règle des liens** : `cheminMatiere(ref, famille)` (`lib/familles-matieres`, module léger) ;
+  `lienMatiere(ref)` la suit en lisant la famille au catalogue (côté serveur). Le double de `CalqueMatieres.tsx` est
+  supprimé : le calque (client) appelle `cheminMatiere` avec la famille de l'ambiance résolue. Toutes les listes,
+  vedettes, cartels (accueil, prestations, familles, inspirations, réalisations) mènent donc aux fiches ; le présentoir
+  ajoute « Voir la fiche de … » dans la matière en grand. `/matieres?ref=` et `?famille=` restent servies (le
+  présentoir les lit toujours ; une référence hors catalogue garde cette adresse).
+- **La visite** : `lib/visite.ts` (`lienVisiteMatiere`, `lienVisiteFamille` déplacé de la page de famille,
+  `messageVisite`) ; `FormulaireContact` préremplit le message quand l'adresse porte `visite=1` (« Bonjour, j'aimerais
+  voir la matière NF13 en vrai, chez moi… » ou « vos bétons et stucs ») ; `DevisForm` gagne `messageInitial`
+  (`defaultValue`). Rien n'est envoyé seul ; aucun événement nouveau.
+- `TIROIRS` passe dans `lib/familles-matieres` (réexporté par `lib/matieres`) ; `scripts/captures.mjs` force
+  `content-visibility: visible` avant la capture pleine page (le défaut signalé en D3) et connaît
+  `matiere-fiche-nf13`.
+
+**Décisions prises seul**
+1. **« Vue dans » en cartes légères** (photo « après » seule, 4/3, étiquette « Ambiance ») plutôt que `CarteAmbiance`
+   et son curseur : Original Oak AA14 est dans 12 ambiances, douze curseurs client sur une fiche étaient trop lourds.
+   « Voir l'ambiance » mène au curseur de /inspirations.
+2. **Réalisations lues au CRM** (`chargerPublications`, en cache 300 s) : la fiche passe d'entièrement statique à
+   revalidée toutes les 5 minutes (ISR), comme /realisations. Au build, la requête au CRM est partagée par les pages.
+3. Voisines **toutes familles confondues** (une couleur proche d'un bois se montre : c'est l'intérêt) ; l'écart est
+   écrit (« Écart 0,0 » existe : deux références de même couleur moyenne).
+4. Vignette **recadrée en 4/3 au téléphone** (entière, elle repoussait les deux actions hors du premier écran) ; les
+   actions finissent à 674 px à 390 × 844.
+5. « La voir en vrai chez moi » d'une fiche : `/contact?ref=<REF>&visite=1` (le plan) ; le message ne cite que la
+   référence (le formulaire, côté client, n'a pas le catalogue) ; la référence s'affiche et part comme avant.
+6. Titre court pour les noms longs (« Pietra di Cardoso Grigio NH39 | CoverSwap ») plutôt que tronqué.
+
+**Volume du CRM** (contrôlé avant de pousser, comme le demandait le plan : chaque échantillon entier demandé est mis
+en cache sur le volume, ≈ 120 Ko × 497 au pire, 60 Mo) : `etat_crm` SANTE (lecture) → disque 15 % utilisé,
+3 789 Mo libres sur 4 469 (le volume a été agrandi). Rien n'attend.
+
+**Tests** : 471 → 486, tous réussis. Nouveau `src/app/matieres/fiches.test.ts` (15) : 497 adresses sous leur famille,
+`dynamicParams`, `revalidate` ; 404 et aucune métadonnée (autre famille, casse, inconnue) ; 52 indexées / 445 en
+`noindex, follow` (en dur), titres ≤ 60 et tous distincts, descriptions ≤ 155 non coupées, canonique ; `indexer`
+de `metadonneesPage` ; notes (52, 60 à 90 mots, aucune phrase reprise, honnêtes, références citées réelles, « on ») ;
+repères et gloses complets ; NF13 rendue (fil et `BreadcrumbList`, vignette 595 × 790 seule prioritaire, deux
+principaux identiques, visite ×2, cartel, teinte, finition, note, quatre ambiances étiquetées, six voisines avec
+écart) ; les 52 indexées ≥ 300 mots rendus et toutes leurs ambiances ; une fiche non indexée ; réalisation avant les
+ambiances (`fetch` remplacé : aucune requête) ; tous les liens mènent à une page qui existe ; source (`preconnect`,
+pas de `preload`) ; liens des autres pages et visite préremplie. Adaptés en gardant leur intention : `accueil.test.ts`
+(la vedette mène à sa fiche, `?ref=` toujours relu), `ambiances.test.ts` (l'étiquette du calque → la fiche),
+`inspirations.test.ts` (cartels → fiches), `familles.test.ts` (liens des références → fiches de leur famille).
+`npx eslint .` et `npm run build` passent : **546 pages** générées (49 + 497), build depuis zéro en 44 s (33 s avec
+le cache), dont 12 s de génération ; `.next` 203 Mo, dont 117 Mo pour `server/app/matieres` (fiche HTML ≈ 90 Ko,
+14 à 18 Ko compressée).
+
+**Vérification visuelle** : build local comme la CI (CRM de production en lecture, `NEXT_PUBLIC_SANS_EVENEMENTS=1`),
+`next start -p 3100` arrêté ensuite. `scripts/captures.mjs` (Edge) à 390 et 1 440 px sur NF13 (indexée), Brown Wenge
+A1 (textile, non indexée), Original Oak AA14 (12 ambiances) et `/matieres/couleur` : aucun débordement à 360 px,
+0 requête coupée ; captures de référence `docs/captures/site-3-0/matiere-fiche-390.jpg` et `-1440.jpg`. Essai scripté
+(Playwright + Edge, POST coupés : rien n'est parti) : « Voir la fiche de Deep Green » du présentoir mène à la fiche ;
+vignette chargée (595 × 790) ; robots `noindex, follow` sur A1, `preconnect` et préchargement de la vignette sur NF13 ;
+`/contact?ref=NF13&visite=1` prérempli, référence NF13 ; `?visite=1&famille=beton` prérempli ; aucune erreur de page.
+
+**Problèmes**
+- En local sous Windows, `/matieres/bois/d1` répond 200 (même cause qu'en D3 : le système de fichiers ignore la casse,
+  la page servie est le 404 sans le statut) ; sur Vercel (Linux) : 404.
+- Le catalogue range quelques décors à l'aspect bois hors des bois (Brown Wenge A1 est un « textile ») : la fiche suit
+  le catalogue, et `teinteDe` le classe « Beige et taupe » ; rien changé.
+- Le LCP de la fiche dépend du CRM (autre domaine) : à mesurer en F6 (le plan prévoit `?l=640` côté CRM si > 2,5 s).

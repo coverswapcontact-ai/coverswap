@@ -19,6 +19,7 @@ import { lienSimuler } from "@/lib/liens-simulateur";
 import { tiroirs, type Matiere } from "@/lib/matieres";
 import { lienMatiere, matiereCartel } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { lienVisiteFamille } from "@/lib/visite";
 import { NB_REFERENCES } from "@/lib/offre";
 import { SLUGS_FAMILLES, ambiancesDeFamille, degradeDeTeintes, estSlugFamille, nomDeFamille, nuancierDeFamille, vedettesDeFamille } from "@/lib/pages-familles";
 
@@ -36,8 +37,8 @@ type Props = { params: Promise<{ famille: string }> };
  *  3. une bande de matière (sa première vedette) ;
  *  4. trois ambiances où on la voit (« Ambiance », `CarteAmbiance`) — section omise si elle n'est dans aucune ;
  *  5. ses vedettes en échantillons ;
- *  6. la liste de toutes ses références, chacune vers sa matière (`lienMatiere` : `/matieres?ref=` jusqu'aux fiches
- *     de D4, qui changeront cette seule fonction) ; repliée au-delà de 41 (bois, couleurs) ;
+ *  6. la liste de toutes ses références, chacune vers sa fiche (`lienMatiere`, `/matieres/<famille>/<REF>` depuis
+ *     le lot D4) ; repliée au-delà de 41 (bois, couleurs) ;
  *  7. où elle se pose (les pages de prestation) et les autres familles ;
  *  8. le dernier appel, en encre.
  * Aucune donnée du CRM : la page est entièrement statique.
@@ -51,8 +52,8 @@ export const DEPUIS_FAMILLE = "matiere-famille";
 export const LISTE_DEPLIEE_JUSQUA = 41;
 const TAILLES_CAS = "(min-width: 1024px) 360px, (min-width: 768px) calc(50vw - 36px), calc(100vw - 32px)";
 
-/** « La voir en vrai chez moi » d'une famille : la demande de visite avec échantillons (préremplie par D4). */
-export const lienVisiteFamille = (famille: string) => `/contact?visite=1&famille=${encodeURIComponent(famille)}`;
+/** « Les voir en vrai chez moi » d'une famille : la demande de visite avec échantillons (`lib/visite`, message prérempli depuis D4). */
+export { lienVisiteFamille };
 
 export function generateStaticParams() {
   return SLUGS_FAMILLES.map((famille) => ({ famille }));
@@ -188,7 +189,7 @@ export default async function PageFamille({ params }: Props) {
       </Section>
 
       {/* ── 5. Toutes ses références ── */}
-      <Section id="references" large differee ton="papier-2" titre={`Les ${nombre} références`} intro="Rangées par teinte. Chacune s'ouvre en grand, avec « Essayer sur ma photo ».">
+      <Section id="references" large differee ton="papier-2" titre={`Les ${nombre} références`} intro="Rangées par teinte. Chacune a sa fiche : la matière en grand, où on la voit, ses voisines, « Essayer chez moi ».">
         <ListeReferences matieres={nuancier} repliee={nombre > LISTE_DEPLIEE_JUSQUA} />
       </Section>
 

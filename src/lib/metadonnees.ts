@@ -47,9 +47,14 @@ export type ProprietesMetadonnees = {
   /** Le chemin de la page (« /matieres ») ou son adresse absolue. */
   chemin: string;
   image?: ImagePartage;
+  /**
+   * Site 3.0 (lot D4) : `false` pour une page servie mais tenue hors de l'index (`noindex, follow` : les moteurs
+   * suivent ses liens, sans la montrer) — les fiches de matière hors des 52 indexées. Par défaut, rien n'est dit.
+   */
+  indexer?: boolean;
 };
 
-export function metadonneesPage({ titre, description, chemin, image = IMAGE_PARTAGE }: ProprietesMetadonnees): Metadata {
+export function metadonneesPage({ titre, description, chemin, image = IMAGE_PARTAGE, indexer = true }: ProprietesMetadonnees): Metadata {
   const url = urlAbsolue(chemin);
   const courte = couperDescription(description);
   const partage = { url: image.url, width: image.largeur, height: image.hauteur, alt: image.alt ?? titre };
@@ -59,5 +64,6 @@ export function metadonneesPage({ titre, description, chemin, image = IMAGE_PART
     alternates: { canonical: url },
     openGraph: { title: titre, description: courte, url, type: "website", siteName: ENTREPRISE.nom, locale: "fr_FR", images: [partage] },
     twitter: { card: "summary_large_image", title: titre, description: courte, images: [image.url] },
+    ...(indexer ? {} : { robots: { index: false, follow: true } }),
   };
 }

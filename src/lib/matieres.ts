@@ -1,5 +1,5 @@
 import { FINITIONS } from "./cartel";
-import { FAMILLES, estFamille, libelleFamille } from "./familles-matieres";
+import { FAMILLES, TIROIRS, estFamille, libelleFamille } from "./familles-matieres";
 import { referenceDeLAdresse } from "./matieres-vedettes";
 import { correspondRecherche } from "./recherche-finitions";
 import { teinteDe, trierParTeinte, type Teinte } from "./teintes";
@@ -45,11 +45,8 @@ export function choixFamilles(catalogue: readonly Pick<Matiere, "famille">[]): C
   return [{ id: "tout", libelle: "Tout", nombre: catalogue.length }, ...FAMILLES.map((f) => ({ id: f.id, libelle: f.libelle, nombre: catalogue.filter((m) => m.famille === f.id).length }))];
 }
 
-/**
- * Le nom d'un tiroir du présentoir (site 3.0, lot D2 ; énoncé, phase D) : la famille au pluriel, comme sur un meuble
- * d'échantillons. Les filtres du simulateur gardent leurs libellés (`FAMILLES`).
- */
-export const TIROIRS: Readonly<Record<string, string>> = { bois: "Bois", couleur: "Couleurs", textile: "Textiles", pierre: "Pierres", metal: "Métaux", beton: "Bétons et stucs", paillettes: "Paillettes" };
+/** Le nom d'un tiroir du présentoir (lot D2) : `lib/familles-matieres` depuis le lot D4, réexporté ici. */
+export { TIROIRS } from "./familles-matieres";
 
 /** Un tiroir : sa famille, son nom, son nombre de références et quatre teintes de son nuancier (pastilles CSS). */
 export type Tiroir = ChoixFamille & { teintes: string[] };

@@ -9,7 +9,7 @@ import { BANDES_ACCUEIL } from "./sections";
 /**
  * 5. Le présentoir (site 3.0, lot B6 ; énoncé, § C.1) : la pastille rouge « 497 matières » (le nombre du catalogue, `NB_REFERENCES`), huit matières vedettes en VRAIS
  * échantillons (les vignettes du catalogue, `Echantillon`, une par famille d'usage, `lib/matieres-vedettes`), chacun
- * vers sa fiche (`/matieres?ref=`), et l'entrée vers tout le catalogue (secondaire). Il remplace les tuiles de la
+ * vers sa fiche (`/matieres/<famille>/<REF>`, lot D4), et l'entrée vers tout le catalogue (secondaire). Il remplace les tuiles de la
  * mission 16. Il se ferme sur la bande de matière vert profond NF13 (en tête, elle aurait suivi la bande de marbre
  * sans rien entre les deux). Papier foncé, sans grain. Composant serveur.
  */

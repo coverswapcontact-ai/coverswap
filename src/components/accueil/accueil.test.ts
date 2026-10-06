@@ -12,6 +12,7 @@ import { lignePrixDuree, versEtudeReelle } from "@/lib/etude-de-cas";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import type { ManifesteImages } from "@/lib/images-preparees";
 import { avecDepuis, lienSimuler } from "@/lib/liens-simulateur";
+import { ficheDe } from "@/lib/fiches-matieres";
 import { MATIERES_VEDETTES, lienMatiere, matiereCartel, matieresVedettes, referenceDeLAdresse } from "@/lib/matieres-vedettes";
 import { DELAI_REPONSE, DUREE_POSE, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 import { LARGEURS_PHOTO_CRM, sourcesPhotoCrm, type Publication } from "@/lib/publications";
@@ -404,12 +405,17 @@ describe("5. Le présentoir", () => {
     assert.ok(html.includes('role="img" aria-label="Matière Deep Green · NF13'));
   });
 
-  test("la destination : la page Matières relit ?ref=, ouvre la fiche et filtre sa famille", () => {
+  test("la destination : la fiche de la matière (lot D4) ; la page Matières relit toujours ?ref=, ouvre la matière et filtre sa famille", () => {
     for (const v of MATIERES_VEDETTES) {
-      const ref = new URLSearchParams(lienMatiere(v.ref).split("?")[1]).get("ref");
+      // Site 3.0, lot D4 : l'échantillon mène à la fiche, sous la famille du catalogue, et la fiche existe.
+      assert.equal(lienMatiere(v.ref), `/matieres/${v.familleCatalogue}/${v.ref}`, v.ref);
+      assert.equal(ficheDe(v.familleCatalogue, v.ref)?.id, v.ref, v.ref);
+      // L'ancienne adresse reste servie : le présentoir l'ouvre toujours.
+      const ref = new URLSearchParams(`ref=${v.ref}`).get("ref");
       assert.equal(referenceDeLAdresse(ref, CATALOGUE)?.id, v.ref, v.ref);
       assert.equal(referenceDeLAdresse(ref, CATALOGUE)?.famille, v.familleCatalogue, v.ref);
     }
+    assert.equal(lienMatiere("ZZZ999"), "/matieres?ref=ZZZ999", "une référence hors catalogue garde l'ancienne adresse");
     for (const inconnue of [null, undefined, "", "  ", "ZZZ999"]) assert.equal(referenceDeLAdresse(inconnue, CATALOGUE), null, String(inconnue));
     const client = lire("src/app/matieres/_components/Matieres.tsx");
     assert.match(client, /const rechercheAdresse = useSyncExternalStore\(ecouterAdresse, rechercheDeLAdresse, rechercheServeur\);/);

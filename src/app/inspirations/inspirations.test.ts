@@ -114,7 +114,9 @@ describe("/inspirations : la page rendue", () => {
       assert.equal(lireDepuis(parametres.get("depuis")), "inspirations");
       const ref = parametres.get("ref");
       if (ref) assert.ok(lireRefDemandee(ref) === ref && lireComposition(ref), ref);
-      assert.ok(compter(c, 'href="/matieres?ref=') >= 1, "les cartels mènent à leur matière");
+      // Site 3.0, lot D4 : vers la fiche de leur matière (`/matieres/<famille>/<REF>`).
+      assert.ok(/href="\/matieres\/[a-z]+\/[A-Z0-9]+"/.test(c), "les cartels mènent à la fiche de leur matière");
+      assert.equal(compter(c, 'href="/matieres?ref='), 0);
     }
   });
 

@@ -1,11 +1,12 @@
 import revetements from "@/data/revetements.json";
 import type { MatiereCartel } from "./cartel";
+import { cheminMatiere } from "./familles-matieres";
 
 /**
  * Les huit matières montrées sur l'accueil (mission 16, partie 3) : huit
  * références RÉELLES du catalogue Cover Styl' (`src/data/revetements.json`),
  * une par famille d'usage — bois clair, bois foncé, noir mat, blanc mat,
- * marbre, béton, métal, couleur. Chaque tuile mène à `/matieres?ref=<ref>`.
+ * marbre, béton, métal, couleur. Chaque tuile mène à la fiche de sa matière (`lienMatiere`, site 3.0, lot D4).
  * `familleCatalogue` est la famille de la référence dans le catalogue (le test
  * vérifie qu'elle n'a pas changé) ; `libelle`, le mot montré sur la tuile.
  */
@@ -35,9 +36,15 @@ export function matieresVedettes(catalogue: readonly Reference[] = revetements a
   });
 }
 
-/** L'adresse de la page Matières ouverte sur une référence (le catalogue la relit : `referenceDeLAdresse`). */
-export function lienMatiere(ref: string): string {
-  return `/matieres?ref=${encodeURIComponent(ref)}`;
+/**
+ * L'adresse d'une matière, la seule source des liens vers une matière (site 3.0, lot D4) : sa fiche,
+ * `/matieres/<famille>/<REF>` (`cheminMatiere`, la famille lue dans le catalogue) ; une référence absente du catalogue
+ * garde l'ancienne adresse, le présentoir ouvert sur elle (`/matieres?ref=`, toujours servie : `referenceDeLAdresse`).
+ * Côté serveur : le catalogue entier ne part pas dans le navigateur (le calque des ambiances appelle `cheminMatiere`
+ * avec la famille qu'il connaît).
+ */
+export function lienMatiere(ref: string, catalogue: readonly Reference[] = revetements as Reference[]): string {
+  return cheminMatiere(ref, catalogue.find((r) => r.id === ref)?.famille);
 }
 
 /**

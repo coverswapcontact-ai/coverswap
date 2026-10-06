@@ -150,7 +150,9 @@ describe("les étiquettes rendues", () => {
   test("le calque : un point, un trait, une étiquette (« nom · réf ») vers la matière ; un numéro muet par surface pour le téléphone", () => {
     const html = renderToStaticMarkup(createElement(CalqueMatieres, { matieres: ouverture.surfaces }));
     assert.equal((html.match(/<line /g) ?? []).length, 3);
-    assert.ok(html.includes(">Sage Green · RM20<") && html.includes('href="/matieres?ref=RM20"'));
+    // Site 3.0, lot D4 : l'étiquette mène à la fiche de la matière (la famille vient de l'ambiance résolue).
+    assert.ok(html.includes(">Sage Green · RM20<") && html.includes('href="/matieres/couleur/RM20"'));
+    assert.ok(!html.includes("/matieres?ref="), "plus l'ancienne adresse quand la famille est connue");
     assert.match(html, /aria-label="meubles bas et tiroirs : Sage Green, référence RM20 — voir la matière"/);
     assert.equal((html.match(/md:hidden"[^>]*>[123]</g) ?? []).length, 3, "trois numéros pour le téléphone");
     assert.ok(!/loading="lazy"/.test(html), "rien de différé : le calque peut être au premier écran");

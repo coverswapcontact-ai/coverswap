@@ -192,20 +192,20 @@ describe("/matieres/<famille> : la page rendue", () => {
 
   test("les liens mènent tous à une page qui existe", async () => {
     const prestations = new Set(PRESTATIONS.map((p) => `/prestations/${p.slug}`));
-    const refs = new Set(CATALOGUE.map((m) => m.id));
     const ambiances = new Set(inspirations().map((a) => a.id));
     for (const s of SLUGS) {
       const html = await rendre(s);
       const liens = [...html.matchAll(/<a [^>]*href="([^"]*)"/g)].map((m) => m[1]);
       assert.ok(liens.length > COMPTES[s]);
       for (const l of liens) {
-        const ref = l.match(/^\/matieres\?ref=([A-Z0-9]+)$/)?.[1];
+        // Site 3.0, lot D4 : les références mènent à leur fiche, sous leur famille.
+        const [, familleRef, ref] = l.match(/^\/matieres\/([a-z]+)\/([A-Z0-9]+)$/) ?? [];
         const famille = l.match(/^\/matieres\/([a-z]+)$/)?.[1];
         const ancre = l.match(/^\/inspirations#(.+)$/)?.[1];
         const ok =
           ["/", "/matieres", "/pro"].includes(l) ||
           prestations.has(l) ||
-          (ref !== undefined && refs.has(ref)) ||
+          (ref !== undefined && CATALOGUE.some((m) => m.id === ref && m.famille === familleRef)) ||
           (famille !== undefined && SLUGS.includes(famille) && famille !== s) ||
           (ancre !== undefined && ambiances.has(ancre)) ||
           l === lienVisiteFamille(s) ||

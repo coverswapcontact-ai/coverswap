@@ -24,7 +24,7 @@ import { pairesRealisations } from "./paires";
 /**
  * « Réalisations » (mission 16, partie 5 ; site 3.0, lot C5) : se projeter, puis simuler. Les vraies d'abord :
  *  - Les réalisations publiées par le CRM (`chargerPublications`, accord écrit du client) : une carte par
- *    réalisation (`CarteRealisation` : avant / après, matières → /matieres?ref=, prix et durée publiés sinon
+ *    réalisation (`CarteRealisation` : avant / après, matières → leur fiche, prix et durée publiés sinon
  *    habituels libellés comme tels, ville), puis « Simuler ma pièce ». Sans réalisation : « Les premières réalisations
  *    arrivent », le lien Instagram et le même bouton.
  *  - Puis, SÉPARÉE et clairement étiquetée, la section « Avant / après en ambiance » : quatre paires de la série 2

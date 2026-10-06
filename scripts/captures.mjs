@@ -16,7 +16,7 @@
  *   génération), ainsi que les appels au CRM et à `/api/simulate*`, `/api/simulation/*`, `/api/site/evenements`. Seules
  *   les images du CRM (échantillons des matières) passent, en lecture.
  * - Avant chaque capture, la page défile jusqu'en bas puis remonte : les images en `loading="lazy"` et les sections en
- *   `content-visibility: auto` sont rendues. Mouvement réduit, animations coupées : deux passages donnent la même image.
+ *   `content-visibility: auto` sont rendues (et ces sections sont forcées visibles pour la capture pleine page). Mouvement réduit, animations coupées : deux passages donnent la même image.
  * - Navigateur : le Chromium de Playwright (`npx playwright install chromium`, installé par la CI, jamais au
  *   `npm install`) ; à défaut, Microsoft Edge installé sur le poste.
  */
@@ -38,6 +38,7 @@ export const PAGES_CAPTURES = [
 export const PAGES_SUPPLEMENTAIRES = [
   { nom: "prestation-cuisine", chemin: "/prestations/cuisine" },
   { nom: "matieres-nf13", chemin: "/matieres?ref=NF13" },
+  { nom: "matiere-fiche-nf13", chemin: "/matieres/couleur/NF13" },
 ];
 
 /** Téléphone, tablette, ordinateur ; la hauteur de fenêtre n'est que celle du premier écran (la capture prend toute la page). */
@@ -231,6 +232,9 @@ export async function capturer({ site = "http://localhost:3100", dossier = "capt
         const fichier = path.join(dossier, nomCapture(p.nom, format.largeur));
         await page.goto(new URL(p.chemin, site).toString(), { waitUntil: "networkidle", timeout: 60_000 });
         await faireDefiler(page);
+        // Site 3.0 (lot D4) : la page remonte avant la capture pleine page, et le navigateur ne peint plus les sections
+        // `content-visibility: auto` (`.sous-la-ligne`) hors du dernier écran : elles sortaient en blanc. On les force.
+        await page.addStyleTag({ content: "*{content-visibility:visible !important}" });
         await page.screenshot({ path: fichier, fullPage: true, animations: "disabled", ...FORMAT_CAPTURE });
         faites.push(fichier);
         journal(`capture ${fichier}`);

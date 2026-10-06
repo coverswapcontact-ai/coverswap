@@ -2,7 +2,7 @@
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
 prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
-(`/realisations`), C6 (l'espace client), C7 (les guides du blog), D2 (le présentoir de `/matieres`) et D3 (les pages de famille).
+(`/realisations`), C6 (l'espace client), C7 (les guides du blog), D2 (le présentoir de `/matieres`), D3 (les pages de famille) et D4 (les fiches de matière).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -610,6 +610,36 @@ pures dans `src/lib/pages-familles.ts` (énoncé, phase D). Sept pages : `bois`,
 - Les pastilles de famille (quatre teintes en disques CSS, comme les tiroirs) servent aussi à la section « Les
   familles, une par une » de `/matieres`, entre le présentoir et la bande AA14 ; un tiroir ouvert y ajoute « Tout
   savoir sur les bois ».
+
+## La fiche d'une matière — `/matieres/<famille>/<REF>`
+
+Lot D4, `src/app/matieres/[famille]/[ref]/page.tsx` (serveur, 497 pages statiques revalidées à 300 s pour les
+réalisations publiées), règles pures dans `src/lib/fiches-matieres.ts`, notes et repères dans
+`src/data/notes-matieres.ts` (énoncé, phase D). Une matière comme un échantillon qu'on vous tend : son nom, la matière
+en grand, et deux gestes, l'essayer sur sa photo ou la voir chez soi. Captures de référence :
+`docs/captures/site-3-0/matiere-fiche-390.jpg` et `matiere-fiche-1440.jpg` (Deep Green NF13).
+
+| Section | Ton | Ce qui la porte |
+|---|---|---|
+| 1. Ouverture | papier | fil d'Ariane (Accueil › Matières › famille › « Nom RÉF »), « Couleur · NF13 » en surtitre, le nom du fabricant en `h1` ; la **grande vignette** ; « Essayer chez moi » (principal) et « La voir en vrai chez moi » (secondaire) ; le cartel ; Teinte, Finition, Famille, Référence |
+| 2. Ce qu'on en dit | papier | la note (les 52 fiches indexées seulement), largeur de lecture |
+| 3. « Nom » chez vous | papier-2 | quatre blocs aux filets : où la poser (ses pages de prestation), l'entretien, à savoir, la voir en vrai |
+| 4. Vue dans | papier | les réalisations publiées qui la portent d'abord (`CarteRealisation`), puis **toutes** ses ambiances : la photo « Ambiance », le titre, « Ici : » (ses surfaces), « Avec : » (les autres matières, vers leur fiche), « Voir l'ambiance », « Essayer cette composition chez moi » ; **omise** sans ambiance ni réalisation |
+| 5. Les teintes voisines | papier-2 (papier sans « Vue dans ») | six `Echantillon`, « Écart 1,1 » sous chacun (ΔE CIEDE2000 sur la couleur moyenne) |
+| 6. Plus loin | papier | sa famille (pastilles, nombre), les six autres, « Tout le présentoir » |
+| 7. Dernier appel | encre | « Voir Nom sur votre photo », les deux mêmes actions (`sur-encre`) |
+
+- **La grande vignette** : l'échantillon entier du CRM (`/api/site/echantillons/<REF>`, 595 × 790), la seule image
+  prioritaire (`fetchPriority="high"`, `preconnect` vers le CRM) ; coin arrondi, ombre de l'échantillon, posée sur la
+  couleur de la matière tant qu'elle charge. Recadrée en 4/3 au téléphone (le premier écran garde le titre et les
+  actions), entière (595/790) dès 768 px. À 1 024 px et plus : deux colonnes, la vignette à gauche, le titre, les
+  actions et le cartel à droite.
+- **Le titre est le nom du fabricant** (« Deep Green ») : c'est lui qu'on lit sur l'échantillon. La famille et la
+  finition sont dites en français (`lib/cartel`).
+- **Teinte** : une pastille de sa couleur, la teinte du filtre (`teinteDe`) et la couleur moyenne en hexadécimal ;
+  **Finition** : le mot du cartel et ce qu'il veut dire (`GLOSES_FINITIONS`).
+- Une fiche non indexée a tout le reste, sans la note (`noindex, follow`) ; aucune n'est vide : repères de sa famille,
+  voisines, liens.
 
 ## Les guides du blog
 
