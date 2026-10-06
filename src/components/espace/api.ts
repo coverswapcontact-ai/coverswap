@@ -115,6 +115,8 @@ export type SimulationClient = {
   nouvelle: boolean;
   choisie: boolean;
   commentaire: string | null;
+  /** Relecture D, E, F : faite sur une pièce d'exemple du site (son nom) — « Ambiance · avant / après », jamais « Simulation ». Absent d'un CRM d'avant. */
+  exemple?: string | null;
 };
 
 export type LigneDevis = { type: "SECTION"; libelle: string } | { type: "PRESTATION"; designation: string; detail: string | null; quantite: number; unite: string; prixUnitaire: number; total: number };

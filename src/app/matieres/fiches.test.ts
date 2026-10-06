@@ -10,7 +10,7 @@ import { GLOSES_FINITIONS, NOTES_MATIERES, REPERES_FAMILLES } from "@/data/notes
 import { inspirations } from "@/lib/ambiances";
 import { FINITIONS } from "@/lib/cartel";
 import { cheminMatiere } from "@/lib/familles-matieres";
-import { ambiancesDeLaFiche, descriptionFiche, ecartLisible, ficheDe, parametresDesFiches, prochesDeLaFiche, realisationsDeLaMatiere, titreFiche } from "@/lib/fiches-matieres";
+import { ambiancesDeLaFiche, descriptionFiche, ecartLisible, ficheDe, parametresDesFiches, photosUtilesDeLaFiche, prochesDeLaFiche, realisationsDeLaMatiere, titreFiche } from "@/lib/fiches-matieres";
 import { fichesIndexees, vueDans } from "@/lib/indexation-matieres";
 import { lienEssayer, type Matiere } from "@/lib/matieres";
 import { lienMatiere } from "@/lib/matieres-vedettes";
@@ -256,7 +256,10 @@ describe("/matieres/<famille>/<REF> : la page rendue", () => {
       assert.ok(mots >= 300, `${ref} : ${mots} mots rendus`);
       assert.ok(html.includes(NOTES_MATIERES[ref]), `${ref} : la note`);
       assert.equal((html.match(/<img [^>]*fetchPriority="high"/g) ?? []).length, 1, ref);
-      assert.equal(compter(bloc(html, '<section id="vue-dans"'), "<li class=\"filet"), vueDans()[ref]?.length ?? 0, `${ref} : toutes ses ambiances`);
+      const vue = bloc(html, '<section id="vue-dans"');
+      assert.equal(compter(vue, "data-ambiance="), vueDans()[ref]?.length ?? 0, `${ref} : toutes ses ambiances`);
+      // Relecture D, E, F : puis ses photos de pose (RM20 : pose-sauge et detail-chant), une carte chacune.
+      assert.equal(compter(vue, "<li class=\"filet"), (vueDans()[ref]?.length ?? 0) + photosUtilesDeLaFiche(ref).length, `${ref} : ses ambiances et ses photos de pose`);
     }
   });
 

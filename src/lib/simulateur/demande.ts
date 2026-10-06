@@ -11,6 +11,8 @@ import type { CreneauRappel } from "@/lib/rappel";
  * sur une pièce d'exemple : cuisine-bordeaux-brillante ») ; la route le transmet au CRM tel quel (`message`).
  * Lot E4 : la case des échantillons de la demande après un rendu y ajoute « Souhaite recevoir les échantillons :
  * NF13 (Façades), AG13 (Plan de travail) ».
+ * Relecture des phases D, E, F : `exemple` part aussi en champ (le CRM marque la simulation, ne range pas l'avant
+ * comme photo du client) ; après un échec sur un exemple, l'avant d'exemple ne part JAMAIS comme photo du visiteur.
  */
 
 export type ExtraDemande = { estimation: Estimation | null; rappelCreneau: CreneauRappel | null };
@@ -58,7 +60,8 @@ export function corpsDemandeSimulation(e: EntreeDemande): Record<string, unknown
     references: e.references.map((r) => `${r.libelle} : ${r.ref} (${r.nom})`).join(" | "),
     // Après un rendu, le navigateur AFFICHERA le lien de l'espace : le CRM ne l'ouvre que sur cette demande. Après un
     // échec (la photo seule, simulation faite à la main), rien n'est affiché : pas de drapeau, pas d'espace ouvert d'ici.
-    ...(e.echec ? { photoAvant: e.echec.photo, simulationEchouee: e.echec.raison } : { afficherLienEspace: true }),
+    ...(e.echec ? { ...(e.exemple ? {} : { photoAvant: e.echec.photo }), simulationEchouee: e.echec.raison } : { afficherLienEspace: true }),
+    ...(e.exemple ? { exemple: e.exemple } : {}),
     turnstileToken: e.jetonCaptcha,
     ...e.acquisition,
     formulaire: `simulateur · ${e.page}`,

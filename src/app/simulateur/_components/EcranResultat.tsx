@@ -161,7 +161,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
           ) : null}
           <Etiquette className="pointer-events-none absolute bottom-3 left-3">{etiquette}</Etiquette>
           <span className="sr-only" role="status">
-            {phase === "chargement" ? "Chargement du rendu" : "Votre simulation apparaît"}
+            {phase === "chargement" ? "Chargement du rendu" : exemple ? "L'ambiance apparaît" : "Votre simulation apparaît"}
           </span>
         </div>
       )}

@@ -436,8 +436,8 @@ référence : `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
 
 Toute carte d'ambiance (`CarteAmbiance` : accueil, prestations, `/pro`, `/inspirations`, `/realisations`, familles,
 guides) mène à la fiche de chacune de ses matières — les cartels sont des liens (soulignés au survol) — et, sous les
-cartels, à sa prestation : « La prestation : Covering cuisine » (`LiensAmbiance`, lien de 44 px ; les murs vont aux
-meubles, le professionnel à `/pro`), omis sur la page de cette prestation. Même ligne sous les ambiances « Vue dans »
+cartels, à sa prestation : « La prestation : Covering cuisine » (`LiensAmbiance`, lien de 44 px ; le professionnel à
+`/pro` ; les murs n'ont pas de page de prestation : rien, relecture D, E, F), omis sur la page de cette prestation. Même ligne sous les ambiances « Vue dans »
 d'une fiche. Les cartels des ouvertures (prestations, `/pro`, comptoir de l'accueil, guide) sont aussi des liens.
 
 ## Les pages de prestation
@@ -654,9 +654,9 @@ en grand, et deux gestes, l'essayer sur sa photo ou la voir chez soi. Captures d
 | Section | Ton | Ce qui la porte |
 |---|---|---|
 | 1. Ouverture | papier | fil d'Ariane (Accueil › Matières › famille › « Nom RÉF »), « Couleur · NF13 » en surtitre, le nom du fabricant en `h1` ; la **grande vignette** ; « Essayer chez moi » (principal) et « La voir en vrai chez moi » (secondaire) ; le cartel ; Teinte, Finition, Famille, Référence |
-| 2. Ce qu'on en dit | papier | la note (les 52 fiches indexées seulement), largeur de lecture |
+| 2. Ce qu'on en dit | papier | la note (les 52 fiches indexées seulement), largeur de lecture ; dessous, en gris, la phrase propre à la fiche (`resumeFiche` : teinte, finition, ambiance, deux voisines) |
 | 3. « Nom » chez vous | papier-2 | quatre blocs aux filets : où la poser (ses pages de prestation), l'entretien, à savoir, la voir en vrai |
-| 4. Vue dans | papier | les réalisations publiées qui la portent d'abord (`CarteRealisation`), puis **toutes** ses ambiances : la photo « Ambiance », le titre, « Ici : » (ses surfaces), « Avec : » (les autres matières, vers leur fiche), « Voir l'ambiance », « Essayer cette composition chez moi » ; **omise** sans ambiance ni réalisation |
+| 4. Vue dans | papier | les réalisations publiées qui la portent d'abord (`CarteRealisation`), puis **toutes** ses ambiances : la photo « Ambiance », le titre, « Ici : » (ses surfaces), « Avec : » (les autres matières, vers leur fiche), « Voir l'ambiance », « Essayer cette composition chez moi » ; puis ses **photos de pose** (`photosUtilesDeLaFiche` : « Sur nos photos de pose », photo « Ambiance », « Ici : », « Voir comment on pose » → `/comment-ca-marche`) ; **omise** sans ambiance, photo de pose ni réalisation |
 | 5. Les teintes voisines | papier-2 (papier sans « Vue dans ») | six `Echantillon`, « Écart 1,1 » sous chacun (ΔE CIEDE2000 sur la couleur moyenne) |
 | 6. Plus loin | papier | sa famille (pastilles, nombre), les six autres, « Tout le présentoir » |
 | 7. Dernier appel | encre | « Voir Nom sur votre photo », les deux mêmes actions (`sur-encre`) |

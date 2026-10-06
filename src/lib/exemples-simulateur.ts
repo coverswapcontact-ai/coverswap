@@ -94,6 +94,14 @@ function exempleDe(paire: PaireAmbiance, manifeste: ManifesteImages): ExempleSim
   return { id: nom.replace(/-avant$/, ""), piece: paire.piece, aspect: reperes.aspect, forme: reperes.forme, ratio: paire.ratio, altAvant: `${paire.scene}. Image d'ambiance.`, avant, fichier, versions };
 }
 
+/**
+ * Relecture des phases D, E, F : le nom d'une pièce d'exemple connue (« cuisine-bordeaux-brillante »), sinon null — ce
+ * que `/api/simulation/prepare` et `/api/simulation/contact` acceptent avant de le dire au CRM (champ `exemple`).
+ */
+export function exempleConnu(valeur: unknown): string | null {
+  return typeof valeur === "string" && Object.prototype.hasOwnProperty.call(ASPECTS, `${valeur}-avant`) ? valeur : null;
+}
+
 /** Les 18 exemples, dans l'ordre de la bibliothèque ; `pieces` : seulement celles que le simulateur publie. */
 export function exemplesSimulateur({ pieces, manifeste = MANIFESTE_IMAGES }: { pieces?: readonly string[]; manifeste?: ManifesteImages } = {}): ExempleSimulateur[] {
   return PAIRES_SERIE_2.filter((p) => !pieces || pieces.includes(p.piece)).map((p) => exempleDe(p, manifeste));

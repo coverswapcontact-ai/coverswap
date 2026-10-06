@@ -17,7 +17,7 @@ import { lienInspiration } from "@/lib/ambiances";
 import { familleDuCartel, libelleFinition } from "@/lib/cartel";
 import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { TIROIRS, cheminFamille } from "@/lib/familles-matieres";
-import { ambiancesDeLaFiche, descriptionFiche, ecartLisible, estFicheIndexee, ficheDe, parametresDesFiches, prochesDeLaFiche, realisationsDeLaMatiere, titreFiche } from "@/lib/fiches-matieres";
+import { ambiancesDeLaFiche, descriptionFiche, ecartLisible, estFicheIndexee, ficheDe, parametresDesFiches, photosUtilesDeLaFiche, prochesDeLaFiche, realisationsDeLaMatiere, resumeFiche, titreFiche } from "@/lib/fiches-matieres";
 import { prestationsDeFamille } from "@/lib/indexation-matieres";
 import { avecDepuis } from "@/lib/liens-simulateur";
 import { lienEssayer, tiroirs, type Matiere } from "@/lib/matieres";
@@ -41,10 +41,12 @@ type Props = { params: Promise<{ famille: string; ref: string }> };
  *     entier du CRM, 595 × 790, la seule image prioritaire, `preconnect` vers le CRM), « Essayer chez moi » (le
  *     simulateur avec la matière posée, `?ref=<REF>&depuis=matiere-fiche`, mécanisme `matiere-demandee`) et « La voir
  *     en vrai chez moi » (`/contact?ref=<REF>&visite=1`, message prérempli), le cartel, la teinte, la finition ;
- *  2. la note (les 52 fiches indexées : `data/notes-matieres`, écrite à la main) ;
+ *  2. la note (les 52 fiches indexées : `data/notes-matieres`, écrite à la main), et sous elle `resumeFiche` (teinte,
+ *     finition, ambiance, voisines : ses données à elle) ;
  *  3. les repères : où la poser (ses prestations), l'entretien, à savoir, en voir en vrai ;
  *  4. « Vue dans » : une réalisation publiée qui la porte d'abord (si le CRM le dit), puis toutes les ambiances des
- *     séries 1 et 2 où elle est posée (« Ambiance ») — section omise s'il n'y en a aucune ;
+ *     séries 1 et 2 où elle est posée (« Ambiance »), puis les photos de pose où on la voit (`photosUtilesDeLaFiche`,
+ *     « Ambiance », vers /comment-ca-marche) — section omise s'il n'y en a aucune ;
  *  5. ses six voisines de teinte (ΔE), en échantillons ;
  *  6. sa famille, les autres familles, le présentoir ;
  *  7. le dernier appel, en encre.
@@ -90,6 +92,7 @@ export default async function PageFiche({ params }: Props) {
   const note = estFicheIndexee(m.id) ? NOTES_MATIERES[m.id] : undefined;
   const reperes = REPERES_FAMILLES[m.famille];
   const vues = ambiancesDeLaFiche(m.id);
+  const photosDePose = photosUtilesDeLaFiche(m.id);
   const { realisations } = await chargerPublications();
   const chantiers = realisationsDeLaMatiere(m.id, realisations);
   const proches = prochesDeLaFiche(m.id);
@@ -172,6 +175,10 @@ export default async function PageFiche({ params }: Props) {
           <p className="texte text-encre" data-note={m.id}>
             {insecables(note)}
           </p>
+          {/* Relecture D, E, F : ce qui est propre à la fiche, tiré de ses données (teinte, finition, ambiance, voisines). */}
+          <p className="texte-2 mt-4" data-resume={m.id}>
+            {insecables(resumeFiche(m, vues, proches))}
+          </p>
         </Section>
       ) : null}
 
@@ -209,8 +216,14 @@ export default async function PageFiche({ params }: Props) {
       </Section>
 
       {/* ── 4. Vue dans : les réalisations qui la portent, puis ses ambiances (aucune : section omise) ── */}
-      {chantiers.length + vues.length > 0 ? (
-        <Section id="vue-dans" large differee titre="Vue dans" intro={vues.length ? `${vues.length === 1 ? "L'ambiance" : `Les ${vues.length} ambiances`} où on l'a posée. Ce sont des images d'ambiance, pas des chantiers : les matières sont celles du catalogue.` : undefined}>
+      {chantiers.length + vues.length + photosDePose.length > 0 ? (
+        <Section
+          id="vue-dans"
+          large
+          differee
+          titre="Vue dans"
+          intro={vues.length ? `${vues.length === 1 ? "L'ambiance" : `Les ${vues.length} ambiances`} où on l'a posée. Ce sont des images d'ambiance, pas des chantiers : les matières sont celles du catalogue.` : photosDePose.length && !chantiers.length ? "Nos photos de pose où on la voit. Ce sont des images d'ambiance, pas des chantiers : la matière est celle du catalogue." : undefined}
+        >
           {chantiers.length ? (
             <ul className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-label="Nos réalisations avec cette matière">
               {chantiers.map((p) => (
@@ -259,11 +272,33 @@ export default async function PageFiche({ params }: Props) {
               ))}
             </ul>
           ) : null}
+          {photosDePose.length ? (
+            <div className={vues.length + chantiers.length > 0 ? "mt-12" : undefined}>
+              {vues.length + chantiers.length > 0 ? <h3 className="surtitre">Sur nos photos de pose</h3> : null}
+              <ul className="mt-4 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-label="Nos photos de pose avec cette matière">
+                {photosDePose.map(({ ambiance, ici }) => (
+                  <li key={ambiance.id} className="filet flex flex-col pt-4">
+                    <p data-photo-pose={ambiance.id} className="font-display text-[20px] leading-tight font-semibold text-encre">
+                      {ambiance.titre}
+                    </p>
+                    <Photo nom={ambiance.image} alt={ambiance.alt} ratio="4 / 3" tailles={TAILLES_AMBIANCE} etiquette="Ambiance" className="mt-3 rounded-[var(--rayon-md)]" />
+                    <p className="mt-3 text-[15px] text-encre">
+                      <span className="text-encre-2">Ici : </span>
+                      {ici}
+                    </p>
+                    <Link href="/comment-ca-marche" className="mt-auto inline-flex min-h-[44px] items-center pt-2 text-[15px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
+                      Voir comment on pose
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </Section>
       ) : null}
 
       {/* ── 5. Ses voisines de teinte ── */}
-      <Section id="proches" large differee ton={vues.length + chantiers.length > 0 ? "papier-2" : "papier"} titre="Les teintes voisines" intro="Les six références du catalogue dont la couleur est la plus proche, toutes familles confondues. Le nombre dit l'écart de teinte mesuré sur la couleur moyenne de chaque échantillon : plus il est petit, plus elles se ressemblent.">
+      <Section id="proches" large differee ton={vues.length + chantiers.length + photosDePose.length > 0 ? "papier-2" : "papier"} titre="Les teintes voisines" intro="Les six références du catalogue dont la couleur est la plus proche, toutes familles confondues. Le nombre dit l'écart de teinte mesuré sur la couleur moyenne de chaque échantillon : plus il est petit, plus elles se ressemblent.">
         <ul className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:gap-x-8 lg:grid-cols-6">
           {proches.map((p) => {
             const c = matiereCartel(p.id);

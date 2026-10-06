@@ -55,15 +55,19 @@ function cartes(html: string): { id: string; bloc: string }[] {
 }
 
 const PAR_ID = new Map(ambiances().map((a) => [a.id, a]));
-const prestationDe = (piece: string) => lienPrestation(prestationDeLaPiece(piece)!.slug);
+/** Relecture D, E, F : les murs n'ont pas de prestation (null) — plus « Covering meubles » sous un mur de chambre. */
+const prestationDe = (piece: string): string | null => {
+  const prestation = prestationDeLaPiece(piece);
+  return prestation ? lienPrestation(prestation.slug) : null;
+};
 
 describe("maillage (site 3.0, lot F5)", () => {
-  test("règle : chaque pièce d'ambiance a sa prestation (les murs vont aux meubles, le professionnel à /pro)", () => {
+  test("règle : chaque pièce d'ambiance a sa prestation (le professionnel à /pro), sauf les murs, qui n'en ont pas", () => {
     assert.deepEqual(
       ["cuisine", "salle-de-bain", "meubles", "mur-plafond", "professionnel"].map(prestationDe),
-      ["/prestations/cuisine", "/prestations/salle-de-bain", "/prestations/meubles", "/prestations/meubles", "/pro"],
+      ["/prestations/cuisine", "/prestations/salle-de-bain", "/prestations/meubles", null, "/pro"],
     );
-    for (const a of PAR_ID.values()) assert.ok(prestationDeLaPiece(a.piece), a.id);
+    for (const a of PAR_ID.values()) assert.equal(!!prestationDeLaPiece(a.piece), a.piece !== "mur-plafond", a.id);
     assert.equal(prestationDeLaPiece("inconnue"), undefined);
   });
 
@@ -88,7 +92,8 @@ describe("maillage (site 3.0, lot F5)", () => {
         const ici = liens(bloc);
         for (const s of a.surfaces) assert.ok(ici.has(lienMatiere(s.ref)), `${chemin} › ${id} : fiche de ${s.ref}`);
         const prestation = prestationDe(a.piece);
-        if (prestation === chemin) assert.ok(!ici.has(prestation), `${chemin} › ${id} : un lien vers la page même`);
+        if (prestation === null) assert.doesNotMatch(bloc, /La prestation/, `${chemin} › ${id} : un mur n'a pas de prestation`);
+        else if (prestation === chemin) assert.ok(!ici.has(prestation), `${chemin} › ${id} : un lien vers la page même`);
         else assert.ok(ici.has(prestation), `${chemin} › ${id} : sa prestation ${prestation}`);
         vues.add(id);
       }
@@ -113,7 +118,8 @@ describe("maillage (site 3.0, lot F5)", () => {
       for (const v of vue[ref] ?? []) {
         assert.ok(ici.has(lienInspiration(v.id)), `${ref} : son ambiance ${v.id}`);
         const carte = cartes(html).find((c) => c.id === v.id);
-        assert.ok(carte && liens(carte.bloc).has(prestationDe(v.piece)), `${ref} › ${v.id} : la prestation de l'ambiance`);
+        const prestation = prestationDe(v.piece);
+        assert.ok(carte && (prestation === null ? !/La prestation/.test(carte.bloc) : liens(carte.bloc).has(prestation)), `${ref} › ${v.id} : la prestation de l'ambiance (aucune pour un mur)`);
       }
       if (vue[ref]?.length) avecAmbiance++;
     }

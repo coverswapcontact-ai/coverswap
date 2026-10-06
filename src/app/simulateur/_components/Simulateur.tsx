@@ -11,7 +11,7 @@ import { adopterParcoursId, obtenirParcoursId } from "@/lib/parcours";
 import { phraseRappel, rappelDuCreneau } from "@/lib/rappel";
 import { corpsDemandeSimulation, type ExtraDemande } from "@/lib/simulateur/demande";
 import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/lib/simulateur/ecrans";
-import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
+import { changerDeSource, creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
 import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
 import { messageErreurPhoto, preparerPhoto, type ExempleCharge } from "@/lib/simulateur/photo";
 import { lireElementDemande, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
@@ -228,6 +228,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
       setBandeau(null);
       setConseilIgnore(false);
       effacerEchec();
+      changerDeSource(emetteur.current, { exemple: etat.exemple ?? null, projet: etat.projet }, { exemple: exemple?.id ?? null, projet: exemple?.piece ?? etat.projet });
       emetteur.current.marquer("PHOTO_CHARGEE", { projet: exemple?.piece ?? etat.projet, poids_ko: poidsKo, largeur, ...(exemple ? { exemple: exemple.id } : {}) });
       setEcran(reduireEcran(ecran, { type: "photo-chargee" }, etat).ecran);
     } catch (e) {
@@ -266,6 +267,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
         page: window.location.pathname,
         source: sourceCourte(origine) ?? null,
         campagne: origine.campagne,
+        exemple: etat.exemple,
       });
       if (lancement.ok) {
         mettreAJour({ travailEnCours: { travailId: lancement.travailId, lanceLe: Date.now(), attenteEstimeeS: lancement.attenteEstimeeS } });
@@ -469,6 +471,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
               setEcran(2);
             }}
             onJeton={setJetonCaptcha}
+            exemple={etat.exemple}
           />
         ) : null}
 

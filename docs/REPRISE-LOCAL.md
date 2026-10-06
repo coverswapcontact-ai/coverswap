@@ -1758,3 +1758,70 @@ cuisine) regardées ; aucun débordement à 360 px ; serveur local arrêté.
 jusqu'à 12 points entre passages ; sous la CI, quatre pages pourraient échouer le plancher de 85 si la machine de
 GitHub mesure comme ce poste — à surveiller au premier passage sur `main` (G3), et à trancher (plancher ou
 hydratation) avec Lucas.
+
+## Relecture adverse des phases D, E, F : corrections (06/10/2026)
+
+Constats de la relecture (`scratchpad/m21/relecture-def-constats.md`), chacun vérifié, puis corrigé avec un test qui le
+verrouille, ou écarté avec la raison. Aucun appel d'API, aucun formulaire envoyé (captures avec `POST` et CRM coupés).
+
+**CRM d'abord** : commit `2091c2c` sur `main` (poussé, déployé : `https://crm.coverswap.fr/api/health` rend
+`"commit":"2091c2c"`, `status: ok`). Détail dans `docs/REPRISE-LOCAL.md` du CRM. Le site reste sur `site-3-0` ; il
+marche avec l'ancien CRM comme avec le nouveau (le champ `exemple` est facultatif des deux côtés, ignoré d'un CRM
+d'avant).
+
+**Importants**
+1. **Corrigé — la pièce d'exemple dite de bout en bout.** Site : `exempleConnu` (`lib/exemples-simulateur.ts`, les 18
+   noms seulement) ; `lancerGeneration` envoie `exemple` à `prepare`, qui le relit et le rend, puis au CRM (hors
+   signature) ; la demande (`demande.ts`) l'envoie en champ ; `validation.ts` et la route `contact` le relisent, ne
+   gardent **jamais** la photo quand il y a un exemple, le passent au CRM et écrivent dans la note « Essai sur la pièce
+   d'exemple … : aucune photo du visiteur, la lui demander ». Après un échec sur un exemple, le secours
+   (`EcranGeneration`, prop `exemple`) dit « Recevoir une simulation faite à la main » (titre et bouton), sans « ma
+   photo », et la confirmation annonce qu'on lui demandera une photo de sa pièce. Espace : `SimulationClient.exemple`
+   (facultatif) ; `nommer` appelle ces simulations « Ambiance · avant / après » (comptées à part des essais),
+   `libelleSimulation` remplace les « Simulation » codés en dur d'`EspaceCompte` (5 endroits), étiquette
+   « Ambiance · avant / après » sur le curseur du compte et du devis en préparation (`EtapeDevis`). CRM : voir plus haut
+   (l'avant d'exemple n'entre jamais dans les photos du dossier ; titre de l'espace).
+2. **Déjà corrigé par F6 (vérifié)** : `/contact` 465 mots, `/matieres` 533 ; `mots.test.ts` vérifie les 95 adresses
+   du plan du site (≥ 300 mots), et passe.
+
+**Mineurs**
+1. **Corrigé** : `changerDeSource` (`lib/simulateur/entonnoir.ts`, `Emetteur.oublier`) — une photo d'une autre source
+   (sa photo ↔ un exemple, ou un autre exemple) réarme PHOTO_CHARGEE ; un exemple d'une autre pièce réémet
+   PIECE_CHOISIE (`{ projet, exemple }`) avant PHOTO_CHARGEE. La même source rechargée ne recompte rien.
+   `entonnoir.test.ts` gardé (message précisé : « une fois par parcours et par source »), + 2 tests.
+2. **Corrigé** : les murs n'ont plus de prestation (`prestationDeLaPiece("mur-plafond")` → rien) : plus de « La
+   prestation : Covering meubles » sous `chambre-pierre` ni `salon-marbre`. Choix : pas de lien plutôt qu'un lien vers
+   le simulateur (aucun nouveau `depuis`, aucun lien rouge de plus). `maillage.test.ts` adapté : un mur ne porte
+   aucune « La prestation » sur les 13 pages et les 497 fiches.
+3. **Corrigé** : `photosUtilesDeLaFiche` — sur la fiche, après les ambiances de « Vue dans », « Sur nos photos de
+   pose » (AF02 : `pose-mains` ; RM20 : `pose-sauge`, `detail-chant`), photo « Ambiance », « Ici : », « Voir comment
+   on pose » → `/comment-ca-marche`. `vueDans` (et donc l'indexation, 52 fiches) ne change pas. `fiches.test.ts`
+   adapté (les ambiances comptées par `data-ambiance`, les cartes = ambiances + photos de pose).
+4. **Écart accepté et écrit** (`docs/SEO.md`, « Barre finale ») : le 308 de Next sur `/pro/` reste ; le passer en 301
+   demandait `skipTrailingSlashRedirect` et une règle maison sur toutes les routes (risque de boucle, `/api/`,
+   fichiers) pour aucun gain (Google traite 308 comme 301). Verrouillé : ni `trailingSlash` ni
+   `skipTrailingSlashRedirect`, aucune adresse du plan ni lien interne rendu ne finit par « / ».
+5. **Corrigé** : description par défaut du gabarit 223 → 144 signes (test : ≤ 155, constantes substituées).
+6. **Corrigé** : sur un exemple, l'attente dit « L'ambiance se prépare » (`EcranAttente`, prop `titre`) et l'annonce
+   du résultat « L'ambiance apparaît ».
+7. **Corrigé** : les trois pictos (`EtapeProjet`, `EspaceClient`, `EspaceCompte`) : cadre de 72 × 80 avec la marge,
+   picto à 64 px (`h-16 w-16`).
+8. **Corrigé** : `resumeFiche` — sous la note des 52 fiches indexées, une phrase tirée de leurs données (teinte du
+   catalogue, finition, l'ambiance où on l'a posée, ses deux plus proches voisines) ; les 52 phrases sont toutes
+   différentes ; rien sur les fiches non indexées.
+9. **Rien à faire** (documenté par la relecture elle-même : vitrages sans avant / après, picto `plan-parallele` jamais
+   affiché).
+
+**Tests** : 567 → 588, tous réussis. Nouveaux : `src/app/simulateur/_components/exemple-honnete.test.ts` (11 : noms
+d'exemple ; `lancerGeneration` → prepare → CRM, avec et sans exemple ; `prepare` rendu ; la demande, sa validation et
+la route `contact` avec un `fetch` simulé — `exemple`, aucune photo, la note ; contrôle sur sa photo ; attente, secours
+et confirmation ; noms de l'espace et `EspaceCompte`), `src/app/relecture-def.test.ts` (8 : photos de pose, barre
+finale, description, pictos, phrase des fiches), `entonnoir.test.ts` (+2). Adaptés (intention gardée) :
+`maillage.test.ts`, `fiches.test.ts`, `entonnoir.test.ts` (message). `npx eslint .` et `npm run build` passent.
+Captures 390 / 1 440 sur le build local (`/matieres/bois/AF02`, `/matieres/couleur/RM20`, `/matieres/couleur/NF13`,
+`/inspirations`) regardées : photos de pose sous les ambiances, phrase de la fiche sous la note, aucun « La
+prestation » sous `chambre-pierre` ni `salon-marbre` ; aucun débordement à 360 px ; serveur arrêté. L'espace client
+et les écrans d'échec du simulateur ne se capturent pas sans CRM ni génération : vérifiés par les rendus des tests.
+
+**Problèmes** : aucun. La phrase de NF13 redit la voisine que sa note cite déjà (Jade Green NE83) ; sans gravité, à
+retoucher à la main si Lucas le souhaite.

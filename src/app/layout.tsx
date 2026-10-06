@@ -58,8 +58,8 @@ export const metadata: Metadata = {
     default: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
     template: "%s | CoverSwap",
   },
-  description:
-    `Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis gratuit ${DELAI_REPONSE}. Prix au mètre linéaire, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose.`,
+  // Relecture des phases D, E, F : 155 signes au plus, comme toutes les descriptions (elle n'était lue que sur la 404).
+  description: `Cuisine, salle de bain, meubles rénovés en 1 journée au covering adhésif premium. Simulation IA et devis gratuits ${DELAI_REPONSE}, ${PRIX_PLAGE} posé.`,
   keywords:
     "covering adhésif, rénovation cuisine, covering salle de bain, covering meubles, revêtement adhésif, simulation IA, rénovation rapide",
   applicationName: "CoverSwap",

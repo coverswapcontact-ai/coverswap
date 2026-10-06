@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AvantApres } from "@/components/simulation/AvantApres";
+import { LIBELLE_AMBIANCE, libelleSimulation } from "./simulations-outils";
 import { FeuilleCatalogue } from "@/components/simulation/FeuilleCatalogue";
 import { dateCourte, echantillon, ErreurEspace, euros, MESSAGE_APERCU, vignette, type Client, type Compte, type Etat, type IdFamille, type MessageClient, type ProjetCarte, type Reponse } from "./api";
 import { DessinFamille, IconeCoeur, IconeDevis, IconePlus, IconeTelephone } from "./Illustrations";
@@ -92,7 +93,10 @@ function CarteProjet({ projet, onOuvrir }: { projet: ProjetCarte; onOuvrir: () =
   return (
     <li>
       <button type="button" onClick={onOuvrir} className={cx("flex w-full items-center gap-3 rounded-[22px] border border-trait bg-blanc p-3.5 text-left shadow-[0_1px_2px_rgba(26,26,26,0.04)] active:bg-fond", FOCUS)}>
-        <DessinFamille famille={famille} className="h-16 w-20 shrink-0 rounded-xl bg-fond p-1" />
+        {/* Relecture D, E, F : la marge est sur le cadre, le picto garde ses 64 px utiles. */}
+        <span className="flex h-[72px] w-20 shrink-0 items-center justify-center rounded-xl bg-fond p-1">
+          <DessinFamille famille={famille} className="h-16 w-16" />
+        </span>
         <span className="min-w-0 flex-1">
           <span className="block line-clamp-2 text-[18px] leading-snug font-semibold text-encre">{projet.nom}</span>
           {/* Ses familles, quand son nom ne les dit pas déjà (« La salle de bain du haut » : oui ; « Cuisine et mobilier » : non). */}
@@ -466,7 +470,7 @@ export function ProjetConsultation({ etat, client }: { etat: Etat; client: Clien
           {validee.map((s) => (
             <button key={s.id} type="button" onClick={() => setOuverte(s.id)} className={cx("block w-full overflow-hidden rounded-2xl", FOCUS)}>
               {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
-              <img src={client.url(`/simulations/${s.id}`)} alt={s.titre ?? "Simulation validée"} className="aspect-[4/3] w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
+              <img src={client.url(`/simulations/${s.id}`)} alt={libelleSimulation(s, "Simulation validée")} className="aspect-[4/3] w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
             </button>
           ))}
         </Carte>
@@ -479,7 +483,7 @@ export function ProjetConsultation({ etat, client }: { etat: Etat; client: Clien
               <li key={s.id}>
                 <button type="button" onClick={() => setOuverte(s.id)} className={cx("block w-full overflow-hidden rounded-xl", FOCUS)}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM */}
-                  <img src={client.url(`/simulations/${s.id}`)} alt={s.titre ?? "Simulation"} className="aspect-square w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
+                  <img src={client.url(`/simulations/${s.id}`)} alt={libelleSimulation(s)} className="aspect-square w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
                 </button>
               </li>
             ))}
@@ -537,16 +541,16 @@ export function ProjetConsultation({ etat, client }: { etat: Etat; client: Clien
         </Carte>
       ) : null}
       {simulationOuverte ? (
-        <div className="fixed inset-0 z-50 flex flex-col bg-sombre" role="dialog" aria-modal="true" aria-label={simulationOuverte.titre ?? "Simulation"}>
+        <div className="fixed inset-0 z-50 flex flex-col bg-sombre" role="dialog" aria-modal="true" aria-label={libelleSimulation(simulationOuverte)}>
           <div className="flex items-center justify-between px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3">
-            <span className="truncate text-[16px] font-semibold text-blanc">{simulationOuverte.titre ?? "Simulation"}</span>
+            <span className="truncate text-[16px] font-semibold text-blanc">{libelleSimulation(simulationOuverte)}</span>
             <button type="button" onClick={() => setOuverte(null)} className={cx("min-h-[44px] rounded-full bg-blanc/15 px-4 text-[15px] font-semibold text-blanc", FOCUS)}>
               Fermer
             </button>
           </div>
           <div className="flex flex-1 items-center justify-center px-2">
             {simulationOuverte.avant ? (
-              <AvantApres avant={client.url(`/simulations/${simulationOuverte.id}/avant`)} apres={client.url(`/simulations/${simulationOuverte.id}`)} alt={simulationOuverte.titre ?? "Simulation"} className="w-full" />
+              <AvantApres avant={client.url(`/simulations/${simulationOuverte.id}/avant`)} apres={client.url(`/simulations/${simulationOuverte.id}`)} alt={libelleSimulation(simulationOuverte)} etiquette={simulationOuverte.exemple ? LIBELLE_AMBIANCE : undefined} className="w-full" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element -- image servie par le CRM
               <img src={client.url(`/simulations/${simulationOuverte.id}`)} alt="" className="max-h-full w-full object-contain" referrerPolicy="no-referrer" />

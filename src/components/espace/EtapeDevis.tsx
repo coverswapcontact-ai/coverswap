@@ -4,6 +4,7 @@ import { RappelCoordonnees } from "./Coordonnees";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "@/components/simulation/AvantApres";
+import { LIBELLE_AMBIANCE } from "./simulations-outils";
 import { Signature, type SignatureRef } from "./Signature";
 import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 import { devisDeLOnglet, enteteDesDevis, precisionAccord } from "@/lib/espace/devis";
@@ -323,7 +324,7 @@ export function DevisEnPreparation({ etat, client, onSimulations }: { etat: Etat
       <EnteteEtape titre="Votre devis" phrase="CoverSwap prépare votre devis sur la base de la simulation que vous avez validée. Il arrive ici même, très vite." />
       {simulation ? (
         <Carte className="space-y-3 p-3">
-          <AvantApres apres={client.url(`/simulations/${simulation.id}`)} avant={simulation.avant ? client.url(`/simulations/${simulation.id}/avant`) : null} alt="Votre simulation validée" sansOutils />
+          <AvantApres apres={client.url(`/simulations/${simulation.id}`)} avant={simulation.avant ? client.url(`/simulations/${simulation.id}/avant`) : null} alt={simulation.exemple ? `${LIBELLE_AMBIANCE} validée` : "Votre simulation validée"} etiquette={simulation.exemple ? LIBELLE_AMBIANCE : undefined} sansOutils />
           <ul className="space-y-1.5 px-1 pb-1">
             {simulation.zones.map((z) => (
               <li key={`${z.zone}-${z.ref}`} className="flex items-center gap-2.5 text-[15px]">

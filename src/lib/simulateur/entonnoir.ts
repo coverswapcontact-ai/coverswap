@@ -18,6 +18,8 @@ export type Emetteur = {
   emises: () => EtapeEntonnoir[];
   /** Nouveau parcours (« Nouvelle simulation ») : tout peut repartir. */
   reinitialiser: () => void;
+  /** Une étape peut repartir (relecture D, E, F : la photo change de source, l'exemple change la pièce). */
+  oublier: (etape: EtapeEntonnoir) => void;
 };
 
 export function creerEmetteur(envoyer: Envoi, dejaEmises: EtapeEntonnoir[] = []): Emetteur {
@@ -31,7 +33,27 @@ export function creerEmetteur(envoyer: Envoi, dejaEmises: EtapeEntonnoir[] = [])
     },
     emises: () => ORDRE_ENTONNOIR.filter((e) => faites.has(e)),
     reinitialiser: () => faites.clear(),
+    oublier: (etape) => {
+      faites.delete(etape);
+    },
   };
+}
+
+/** D'où vient la photo du parcours : `exemple` = le nom de la pièce d'exemple, null = la photo du visiteur. */
+export type SourcePhoto = { exemple: string | null; projet: string };
+
+/**
+ * Relecture des phases D, E, F : une photo d'une AUTRE source (photo du visiteur ↔ pièce d'exemple, ou un autre
+ * exemple) réarme PHOTO_CHARGEE — elle repart avec sa méta `exemple` ; un exemple d'une autre pièce change le projet
+ * sans passer par l'écran Pièce : PIECE_CHOISIE repart pour la nouvelle pièce (`exemple` dans sa méta). La même source
+ * rechargée ne recompte rien (une fois par parcours, comme avant). À appeler AVANT de marquer PHOTO_CHARGEE.
+ */
+export function changerDeSource(emetteur: Emetteur, avant: SourcePhoto, apres: SourcePhoto): void {
+  if (apres.projet !== avant.projet && apres.exemple) {
+    emetteur.oublier("PIECE_CHOISIE");
+    emetteur.marquer("PIECE_CHOISIE", { projet: apres.projet, exemple: apres.exemple });
+  }
+  if (apres.exemple !== avant.exemple) emetteur.oublier("PHOTO_CHARGEE");
 }
 
 /**

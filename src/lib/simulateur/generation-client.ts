@@ -51,6 +51,8 @@ export type EntreeLancement = {
   page: string;
   source: string | null;
   campagne: string | null;
+  /** Relecture D, E, F : la pièce d'exemple chargée à la place d'une photo (lot E3) ; le CRM ne la prend pas pour la photo du visiteur. */
+  exemple?: string | null;
 };
 
 async function lireJson(reponse: Response | null): Promise<Record<string, unknown>> {
@@ -69,7 +71,7 @@ export async function lancerGeneration(entree: EntreeLancement): Promise<Lanceme
   const prep = await fetch("/api/simulation/prepare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project_type: entree.projetId, parcoursId: entree.parcoursId, turnstileToken: entree.turnstileToken, selections: entree.selections }),
+    body: JSON.stringify({ project_type: entree.projetId, parcoursId: entree.parcoursId, turnstileToken: entree.turnstileToken, selections: entree.selections, ...(entree.exemple ? { exemple: entree.exemple } : {}) }),
   }).catch(() => null);
   const prepData = await lireJson(prep);
   if (!prep) return { ok: false, raison: "reseau", message: MESSAGE_INJOIGNABLE };
@@ -92,6 +94,8 @@ export async function lancerGeneration(entree: EntreeLancement): Promise<Lanceme
       page: entree.page,
       source: entree.source,
       campagne: entree.campagne,
+      // Relu par prepare (exemple connu du site) ; facultatif et hors signature : un CRM d'avant l'ignore.
+      ...(texte(prepData.exemple) ? { exemple: texte(prepData.exemple) } : {}),
       photo_base64: entree.photo,
     }),
   }).catch(() => null);

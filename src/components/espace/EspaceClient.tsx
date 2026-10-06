@@ -402,7 +402,10 @@ function ChoixFamille({ etat, client, prestations, onEtat, onSuite }: { etat: Et
         {prestations.familles.map((f) => (
           <li key={f.id}>
             <button type="button" onClick={() => void choisir(f.id)} disabled={occupe !== null} className={cx("flex w-full items-center gap-3 rounded-2xl border-2 border-trait bg-blanc p-3 text-left active:bg-fond disabled:opacity-60", FOCUS)}>
-              <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-fond p-1" />
+              {/* Relecture D, E, F : la marge est sur le cadre, le picto garde ses 64 px utiles. */}
+              <span className="flex h-[72px] w-20 shrink-0 items-center justify-center rounded-xl bg-fond p-1">
+                <DessinFamille famille={f.id} className="h-16 w-16" />
+              </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[18px] leading-snug font-semibold text-encre">{occupe === f.id ? "Un instant…" : f.libelle}</span>
                 <span className="mt-0.5 block text-[14.5px] leading-snug text-encre-2">{f.aide}</span>

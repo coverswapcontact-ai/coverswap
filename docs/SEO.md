@@ -158,6 +158,14 @@ Relevé du lot F1, gardé pour mémoire — mots comptés dans le `<main>` rendu
   la requête gardée ; les 540 pages construites ont leur canonical absolu exact ; la 404 n'en a plus ; 95 adresses au
   plan du site. Les règles d'hôte de `vercel.json` ne jouent que chez Vercel : **à sonder en ligne après la fusion
   (G3)** — d'ici là la production répond encore 200 sur les trois hôtes et 308 sur les anciennes adresses.
+- **Barre finale (relecture des phases D, E, F, écart accepté)** : `/pro/`, `/matieres/`… répondent **308** vers
+  l'adresse sans barre — c'est Next lui-même, avant toute règle. Le passer en 301 demanderait
+  `skipTrailingSlashRedirect` et une règle à nous qui retire la barre sur toutes les routes, sans toucher `/api/` ni
+  les fichiers : un risque de boucle ou de route cassée pour aucun gain, Google traitant 308 comme 301 (permanente,
+  signal transmis). `www` + barre finale fait deux sauts (301 de Vercel, puis 308), sans conséquence (Google en suit
+  jusqu'à dix). Ce qui compte est verrouillé par `src/app/relecture-def.test.ts` : ni `trailingSlash` ni
+  `skipTrailingSlashRedirect` dans `next.config.ts`, aucune adresse du plan du site et aucun lien interne des pages
+  rendues ne finit par « / » (hors l'accueil).
 
 ### Données structurées (lot F4)
 
@@ -212,8 +220,9 @@ Vérifié sur les pages rendues par `src/app/maillage.test.ts` :
 
 - **Toute ambiance → ses matières et sa prestation** : chaque carte d'ambiance (accueil, prestations, `/pro`,
   `/inspirations`, `/realisations`, familles, guides) a un lien vers la fiche de chacune de ses matières et vers sa
-  prestation (`prestationDeLaPiece` : cuisine, salle de bain, meubles — les murs y vont —, `/pro`), sauf sur la page
-  de cette prestation. Les 52 ambiances d'inspiration y passent toutes.
+  prestation (`prestationDeLaPiece` : cuisine, salle de bain, meubles, `/pro` ; les murs n'en ont pas depuis la
+  relecture des phases D, E, F — « Covering meubles » sous un mur de chambre était faux), sauf sur la page de cette
+  prestation. Les 52 ambiances d'inspiration y passent toutes.
 - **Toute matière → ses ambiances et sa prestation** : les 497 fiches mènent à leur famille et aux prestations de
   `prestationsDeFamille` (celles sans ambiance comprises, 448) ; les 49 vues dans une ambiance mènent à chacune
   (`/inspirations#<id>`) et, sous chaque ambiance, à la prestation de celle-ci.

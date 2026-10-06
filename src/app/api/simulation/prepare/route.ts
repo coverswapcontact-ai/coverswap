@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { exempleConnu } from "@/lib/exemples-simulateur";
 import { depasseLaLimite } from "@/lib/limite-abus";
 import { parcoursIdValide } from "@/lib/parcours";
 import { validerSelections } from "@/lib/simulateur/selections";
@@ -17,6 +18,10 @@ import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
  * Le navigateur transmet ensuite au CRM (/api/simulate, avec la photo) qui
  * vérifie la signature, relit zones et références, et crée le travail. Aucune
  * coordonnée ici : elles viennent après le résultat (/api/simulation/contact).
+ *
+ * Relecture des phases D, E, F : `exemple` (facultatif) — la pièce d'exemple du site chargée à la place d'une photo —
+ * est relu contre la liste des exemples et rendu tel quel ; le navigateur le transmet au CRM, hors signature (il ne
+ * fait que dire que l'avant n'est pas une photo du visiteur).
  *
  * Sans SIMULATE_TOKEN_SECRET → 503 : le simulateur le dit et propose de laisser
  * ses coordonnées.
@@ -63,5 +68,6 @@ export async function POST(req: NextRequest) {
   // Signature : parcours, pièce, sélections et expiration — le CRM la vérifie avant de créer le travail.
   const exp = Date.now() + VALIDITE_SIGNATURE_MS;
   const sig = signerSelections(secret, { parcoursId, projet, selections: lecture.selections, exp });
-  return NextResponse.json({ ok: true, projet, selections: lecture.selections, sig, exp, parcoursId });
+  const exemple = exempleConnu(body.exemple);
+  return NextResponse.json({ ok: true, projet, selections: lecture.selections, sig, exp, parcoursId, ...(exemple ? { exemple } : {}) });
 }

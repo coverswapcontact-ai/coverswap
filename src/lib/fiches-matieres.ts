@@ -6,7 +6,7 @@ import { estFamille } from "./familles-matieres";
 import { estFicheIndexee, vueDans } from "./indexation-matieres";
 import type { Matiere } from "./matieres";
 import type { Publication } from "./publications";
-import { matieresProches } from "./teintes";
+import { matieresProches, teinteDe } from "./teintes";
 
 /**
  * Les fiches de matière (`/matieres/<famille>/<REF>`, site 3.0, lot D4 ; énoncé, phase D) en règles pures, lues côté
@@ -82,6 +82,31 @@ export function ambiancesDeLaFiche(ref: string, liste = AMBIANCES): AmbianceDeLa
     const avec = [...new Map(ambiance.surfaces.filter((s) => s.ref !== ref).map((s) => [s.ref, { ref: s.ref, nom: s.nom, famille: s.famille }])).values()];
     return [{ ambiance, ici: majuscule(ici), avec }];
   });
+}
+
+/**
+ * Relecture des phases D, E, F : les photos utiles (la pose, le chant en gros plan — ambiances `inspiration: false`)
+ * où la matière apparaît. « Vue dans » les ignorait (AF02 sur `pose-mains`, RM20 sur `pose-sauge` et `detail-chant`) :
+ * elles sont listées sur la fiche, « Ambiance », avec un lien vers /comment-ca-marche. Hors de `vueDans`, qui décide
+ * de l'indexation : rien ne change au plan du site.
+ */
+export function photosUtilesDeLaFiche(ref: string, liste = AMBIANCES): Omit<AmbianceDeLaFiche, "avec">[] {
+  return ambiances(liste)
+    .filter((a) => !a.inspiration && a.surfaces.some((s) => s.ref === ref))
+    .map((ambiance) => ({ ambiance, ici: majuscule([...new Set(ambiance.surfaces.filter((s) => s.ref === ref).map((s) => s.surface))].join(" et ")) }));
+}
+
+/**
+ * Relecture des phases D, E, F : une ou trois phrases propres à la fiche, tirées de SES données — sa teinte dans les
+ * filtres du catalogue et sa finition, l'ambiance où on l'a posée, ses deux plus proches voisines de teinte — sous la
+ * note des fiches indexées (le reste de la page est commun à la famille). Rien d'autre que ce qu'on sait de la référence.
+ */
+export function resumeFiche(m: Pick<Matiere, "nom" | "famille" | "hex" | "finition">, vues: readonly Pick<AmbianceDeLaFiche, "ambiance" | "ici">[], proches: readonly Pick<Matiere, "id" | "nom">[]): string {
+  const phrases = [`${m.nom} se range dans les teintes « ${teinteDe(m.famille, m.hex).toLowerCase()} » du catalogue, en finition ${libelleFinition(m.finition).toLowerCase()}.`];
+  const [premiere] = vues;
+  if (premiere) phrases.push(vues.length === 1 ? `On l'a posée en ${premiere.ici.toLowerCase()} dans « ${premiere.ambiance.titre} ».` : `On l'a posée dans ${vues.length} ambiances, dont « ${premiere.ambiance.titre} » (${premiere.ici.toLowerCase()}).`);
+  if (proches.length >= 2) phrases.push(`Ses deux plus proches voisines de teinte : ${proches[0].nom} (${proches[0].id}) et ${proches[1].nom} (${proches[1].id}).`);
+  return phrases.join(" ");
 }
 
 /** Les réalisations publiées qui portent la référence (avec une photo « après ») : elles passent avant les ambiances. */

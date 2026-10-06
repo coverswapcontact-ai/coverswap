@@ -286,11 +286,12 @@ export function lienPiece(pieceId: string): string {
 
 /**
  * Site 3.0 (lot F5, maillage) : la prestation d'une pièce d'ambiance ou du simulateur — celle dont la page porte
- * cette pièce. Les murs (une tête de lit, un mur TV) vont aux meubles, dont la page les cite (« têtes de lit », « meubles
- * TV ») ; le professionnel va à `/pro` (`lienPrestation`). Une pièce inconnue : `undefined`.
+ * cette pièce ; le professionnel va à `/pro` (`lienPrestation`). Relecture des phases D, E, F : les murs et plafonds
+ * n'ont pas de page de prestation — « La prestation : Covering meubles » sous un mur de chambre était faux —, donc
+ * `undefined`, comme une pièce inconnue (aucun lien de prestation sous une ambiance de murs).
  */
 export function prestationDeLaPiece(pieceId: string): Prestation | undefined {
-  return PRESTATIONS.find((p) => p.simulateur === (pieceId === "mur-plafond" ? "meubles" : pieceId));
+  return PRESTATIONS.find((p) => p.simulateur === pieceId);
 }
 
 export function getPrestation(slug: string): Prestation | undefined {

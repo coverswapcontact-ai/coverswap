@@ -357,7 +357,10 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
                 {i === nbSiennes && nbSiennes > 0 ? <p className="mb-2 px-1 text-[15.5px] font-medium text-encre-2">Autre chose à rénover&nbsp;?</p> : null}
                 <div className={cx("overflow-hidden rounded-2xl border-2 bg-blanc", coche ? "border-encre" : "border-trait")}>
                 <button type="button" role="checkbox" aria-checked={coche} onClick={() => basculerFamille(f.id)} className={cx("flex w-full items-center gap-3 p-3 text-left active:bg-fond", FOCUS)}>
-                  <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-fond p-1" />
+                  {/* Relecture D, E, F : la marge est sur le cadre, le picto garde ses 64 px utiles. */}
+                  <span className="flex h-[72px] w-20 shrink-0 items-center justify-center rounded-xl bg-fond p-1">
+                    <DessinFamille famille={f.id} className="h-16 w-16" />
+                  </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-[18px] leading-snug font-semibold text-encre">{f.libelle}</span>
                     <span className="mt-0.5 block text-[14.5px] leading-snug text-encre-2">{f.aide}</span>
