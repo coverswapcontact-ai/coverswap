@@ -39,7 +39,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 ## Phase E : le simulateur
 
-À venir (E1 à E5).
+- E1, alléger `Simulateur.tsx` : fait (594 → 522 lignes ; `EcranGeneration.tsx`, `useFeuilleCatalogue.ts`).
+- E2 à E5 : à venir.
 
 ## Phase F : SEO et performance
 
@@ -1252,3 +1253,36 @@ des dates garde son intention hors des matières ; `llms.txt` : les sept famille
 `npx eslint .` et `npm run build` passent (546 pages, 34 s avec le cache).
 
 **Problèmes** : aucun.
+
+## E1 — alléger `Simulateur.tsx` (06/10/2026)
+
+**Fait** (aucun changement de comportement, aucune image générée, aucun envoi)
+- `Simulateur.tsx` : **594 → 522 lignes** (plafond de `tunnel.test.ts` : 600).
+- `src/app/simulateur/_components/EcranGeneration.tsx` : l'écran 3 pendant une génération et après son échec
+  (`EcranAttente`, la « simulation à la main » — formulaire de secours, Turnstile `simulateur-secours` —, « Revenir à
+  mes matières », « Nouvelle simulation » sans photo, la confirmation « Demande bien reçue »). Les films choisis et la
+  lecture de la photo (« Vu sur votre photo : … ») y sont calculés depuis la pièce, les sélections et l'analyse, dans
+  le même ordre qu'avant. `EcranSansPhoto` : « Commencez par une photo » (écran 3 sans photo sur l'appareil).
+- `src/app/simulateur/_components/useFeuilleCatalogue.ts` : le branchement de `FeuilleCatalogue` (zone ouverte, focus
+  rendu à « Modifier » sans défilement, favoris, choix d'une teinte avec les zones « aussi » et les incompatibles
+  vidées, retrait, autres zones proposées) ; le simulateur rend `<FeuilleCatalogue {...feuille} />`. Le refus 409
+  d'une zone choisie s'efface par le rappel `surChoix`.
+- Restent dans `Simulateur.tsx`, mot pour mot : les lignes lues par `tunnel.test.ts` (`?ref=`, ESTIMATION_VUE,
+  RAPPEL_DEMANDE, `lienEspace`, « Nouvelle simulation ») et `entonnoir.test.ts` (`depuisLien.current` trois fois,
+  PIECE_CHOISIE), `reprise.test.ts` (montage, `marquerPiece`, `useMatiereDemandee(…, zoneDemandee, setZoneOuverte)`)
+  et le message d'erreur en `alerte-*` de `theme.test.ts`.
+
+**Décisions prises seul**
+1. Le hook rend les **propriétés** de la feuille (`ProprietesFeuilleCatalogue | null`) plutôt que du JSX : il reste
+   un `.ts`, comme le voulait le plan.
+2. `films` et `lecturePhoto` passent dans `EcranGeneration` (seul écran qui s'en sert).
+
+**Tests** : 487 → 491, tous réussis. Nouveau `src/app/simulateur/_components/ecran-generation.test.ts` (4) :
+`Simulateur.tsx` sous 560 lignes, importe `EcranGeneration` et `useFeuilleCatalogue`, ne contient plus l'attente, le
+secours, `choisirTeinte` ni les favoris ; les règles de la feuille gardées (incompatibles vidées, focus, autres
+zones) ; rendu pendant la génération (films dans l'ordre des zones, lecture de la photo, pas de secours) ; après un
+échec (« Réessayer », « Revenir à mes matières », formulaire), demande envoyée (confirmation seule), sans photo
+(« Nouvelle simulation ») ; `EcranSansPhoto`. `npx eslint .` et `npm run build` passent (546 pages).
+
+**Problèmes** : aucun. Vérification visuelle des écrans 1 à 3 faite avec E2 (l'écran d'attente et le secours ne
+s'atteignent pas en local sans lancer de génération : couverts par les rendus des tests).
