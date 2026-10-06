@@ -31,7 +31,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 ## Phase D : le catalogue des matières
 
-À venir (D1 à D5).
+- D1, teinte, ΔE, indexation : fait (`lib/teintes.ts`, `lib/indexation-matieres.ts` : 52 fiches indexées).
+- D2 à D5 : à venir.
 
 ## Phase E : le simulateur
 
@@ -894,3 +895,40 @@ Captures hors dépôt dans `scratchpad/m21/c7/cap`.
 et « Pour aller plus loin » le relaient plus haut. Le guide `prix-renovation-cuisine-covering` (d'avant le site 3.0)
 écrit encore des fourchettes par `euros(900)` … `euros(1200)` dans son texte, hors des tarifs du CRM : à revoir avec
 F1 / les tarifs.
+
+## D1 — teinte, ΔE, indexation (06/10/2026)
+
+**Fait** (fonctions pures, aucun affichage changé)
+- `src/lib/teintes.ts` : `labDeHex` (sRGB → Lab D65, la conversion de `lib/ambiances` déplacée ici ; `lab` y reste
+  comme alias), `lchDeHex`, `deltaE` (CIEDE2000, kL = kC = kH = 1 : il n'existait encore nulle part dans le site, le
+  relevé des ambiances vivait au CRM) et `deltaEHex` ; `cleDeTeinte` / `trierParTeinte` (le nuancier) ;
+  `matieresProches(ref, catalogue, 6, { memeFamille })` (ΔE croissant puis référence, sans elle-même).
+- `src/lib/indexation-matieres.ts` : `vueDans()` (déplacée de `lib/ambiances`, qui la réexporte ; chaque entrée porte
+  maintenant `image` et `piece` en plus de `id` et `titre`, pour les fiches de D4), `referencesVedettes()` (les 8 de
+  l'accueil et les vedettes des pages de prestation), `fichesIndexees()` / `estFicheIndexee()`,
+  `prestationsDeFamille()` (bois, couleurs, pierres, bétons → cuisine, salle de bain, meubles ; métaux, textiles,
+  paillettes → meubles, `/pro`).
+- `Matiere` (`lib/matieres.ts`) gagne `hex` (déjà dans `revetements.json`).
+
+**Décisions prises seul**
+1. **52 fiches indexées au lieu des 40 de l'énoncé** (décision déjà prise au plan) : toutes les matières qui
+   apparaissent dans une ambiance d'inspiration des séries 1 et 2 (49 : 22 dans la série 1, 39 dans la série 2, des communes aux deux) et
+   les vedettes qui n'y sont pas (NF27, J3, Q1). Les vedettes des pages de prestation sont toutes déjà dans une
+   ambiance. AF02 n'est vue que dans `pose-mains` (photo utile, `inspiration: false`) : ni « Vue dans », ni indexée.
+   Les 445 autres fiches : `noindex, follow` (D4).
+2. **Nuancier** : les couleurs d'abord, par cases de teinte de 15° (rouge → orangé → jaune → vert → bleu → violet), du
+   plus clair au plus foncé dans chaque case ; puis les neutres à part (chroma < 8, 160 matières), du blanc au noir. Le
+   plan mettait les neutres « à part » sans dire où : au bout, pour que le premier écran du présentoir montre des
+   teintes (terracotta, rouges, bois roux) plutôt que trente blancs. Les cases (et non l'angle brut) font des dégradés
+   lisibles dans les 267 bois, presque tous entre 60° et 90°.
+3. Matières proches : sur tout le catalogue par défaut (une couleur proche d'un bois se montre), `memeFamille` pour
+   les fiches qui le voudront.
+
+**Tests** : 427 → 436, tous réussis. Nouveau `src/lib/teintes.test.ts` (9) : Lab du blanc et du noir, une seule
+conversion ; CIEDE2000 sur neuf paires de référence de Sharma, Wu et Dalal (2005) à 1e-4 ; zéro, symétrie ; un
+nuancier connu (rouge → violet, puis blanc, gris, noir ; trois bois d'une même case du clair au foncé) ; le catalogue
+rangé (permutation, liste reçue intacte, couleurs avant neutres, clé croissante) ; 6 proches sans la référence, aucun
+oubli, `memeFamille` ; 52 fiches (écrit en dur), AF02 absente, NF27 / J3 / Q1 présentes, les 49 vues ; « Vue dans »
+sur les deux séries, inspiration seulement, image et pièce exactes, ordre de `data/ambiances` ; prestations par
+famille. `ambiances.test.ts` inchangé et vert (réexport de `vueDans`).
+

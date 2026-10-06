@@ -13,7 +13,7 @@ import { correspondRecherche } from "./recherche-finitions";
  * feuille du simulateur et de l'espace (`FeuilleCatalogue`) lit la même copie.
  */
 
-export type Matiere = { id: string; nom: string; famille: string; categorie: string; finition: string; image: string; tags: string[] };
+export type Matiere = { id: string; nom: string; famille: string; categorie: string; finition: string; image: string; tags: string[]; /** La couleur moyenne de l'échantillon (« #RRGGBB ») : le nuancier (`lib/teintes`), la place réservée d'une vignette. */ hex: string };
 
 /** Les matières rendues par lot (« Voir plus ») ; le premier lot est rendu par le serveur. */
 export const MATIERES_PAR_PAGE = 30;
