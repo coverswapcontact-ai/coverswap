@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
-import { chargerCatalogue } from "@/components/simulation/FeuilleCatalogue";
+import { chargerCatalogue } from "@/lib/matieres";
 import { appliquerComposition, appliquerMatiereDemandee, lireComposition } from "@/lib/simulateur/matiere-demandee";
 import type { EtatSimulateur, Selection } from "@/lib/simulateur/reprise";
 import type { PieceSimulateur } from "@/lib/simulateur/zones";

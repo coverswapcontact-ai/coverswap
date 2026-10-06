@@ -81,7 +81,7 @@ describe("lot E2 : les pictos partout", () => {
     const simulateur = lire("app/simulateur/_components/Simulateur.tsx");
     assert.match(simulateur, /const choisirPiece = \(id: string, element: string \| null = null\) => \{/);
     assert.match(simulateur, /zoneDemandee\.current = zoneDeLElement\(element, id\);\s+marquerPiece\(id\);/);
-    assert.match(simulateur, /<EcranPiece zones=\{zones\} projet=\{charge && pieceChoisie \? etat\.projet : null\} onChoisir=\{choisirPiece\} \/>/);
+    assert.match(simulateur, /<EcranPiece zones=\{zones\} projet=\{charge && pieceChoisie \? etat\.projet : null\} onChoisir=\{choisirPiece\} photos=\{photosPieces\} \/>/);
   });
 
   test("écran 3 : chaque zone sans matière montre son picto de 64 px ; une matière choisie prend sa place", () => {

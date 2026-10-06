@@ -1,4 +1,4 @@
-import { resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
+import { resoudreCas, type CasAmbiance } from "@/components/ambiances/cas";
 import type { PieceAmbiance } from "@/data/ambiances";
 import { PIECES_INSPIRATION, inspirations, type AmbianceResolue } from "@/lib/ambiances";
 

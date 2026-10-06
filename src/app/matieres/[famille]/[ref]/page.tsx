@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { notFound } from "next/navigation";
 import { preconnect } from "react-dom";
 import { insecables } from "@/app/blog/[slug]/illustration";

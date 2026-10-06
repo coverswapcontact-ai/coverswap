@@ -1,6 +1,6 @@
 import type { SurfaceAmbiance } from "@/data/ambiances";
 import { cheminMatiere } from "@/lib/familles-matieres";
-import { urlVignette } from "@/lib/simulateur/generation-client";
+import { urlVignette } from "@/lib/simulateur/adresses-crm";
 
 /**
  * Les étiquettes matière posées sur une photo d'ambiance (mission 19), comme dans une boutique de déco : une couche

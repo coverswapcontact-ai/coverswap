@@ -1,165 +1,46 @@
 "use client";
 
-import { useId, useState } from "react";
-import { CHAMP } from "@/app/simulateur/_components/Formulaires";
-import CaseConsentement from "@/components/CaseConsentement";
-import { Bouton, classesBouton, type VarianteBouton } from "@/components/simulation/Bouton";
-import { Feuille } from "@/components/simulation/Feuille";
-import Turnstile, { reinitialiserTurnstile } from "@/components/Turnstile";
-import { consentementPourEnvoi } from "@/lib/consentement";
-import { envoyerEvenement } from "@/lib/evenements-site";
-import { obtenirParcoursId } from "@/lib/parcours";
-import { creneauxRappel, phraseRappel, rappelDuCreneau, type CreneauRappel, type OptionRappel } from "@/lib/rappel";
-import { acquisitionPourEnvoi } from "@/lib/utm";
+import { lazy, Suspense, useState } from "react";
+import { classesBouton, type VarianteBouton } from "@/components/simulation/Bouton";
+import { creneauxRappel, type OptionRappel } from "@/lib/rappel";
 
 /**
  * « Être rappelé » (site 3.0, lot B6) : le bouton SECONDAIRE de l'ouverture (et du dernier appel, en `sur-encre`), qui
- * ouvre une feuille : prénom, téléphone, un créneau (« Ce soir 18 h », « Demain 10 h »… en heure de Paris,
- * `lib/rappel`), le consentement aux e-mails (facultatif, jamais pré-coché), le captcha au premier geste, un pot de
- * miel. Envoi à `/api/contact` (`formulaire: "coverswap.fr/rappel"`, source `SITE_CONTACT`, `rappelCreneau` : le CRM
- * date le rappel). Événements : `CONTACT_ENVOYE` et `RAPPEL_DEMANDE` (`creneau`, `depuis`), `FORMULAIRE_ECHEC` en cas
- * d'échec. Feuille ouverte : le bouton collé de l'accueil s'efface (`data-feuille-ouverte`).
+ * ouvre une feuille (`FeuilleRappel` : prénom, téléphone, un créneau, le consentement, le captcha au premier geste).
+ *
+ * Lot F7 : ce composant n'est plus que le bouton. La feuille, son formulaire et le captcha (`Turnstile`) sont chargés au
+ * premier geste vers le bouton — survol, focus, toucher, au plus tard le clic — et non plus avec la page : sur
+ * l'accueil, une prestation, `/pro` et « Comment ça marche », leur JavaScript ne part plus au démarrage. Le rendu du
+ * bouton ne change pas ; la feuille s'ouvre au clic comme avant (sur un réseau lent, le temps de recevoir son code).
  */
 export const FORMULAIRE_RAPPEL = "coverswap.fr/rappel";
 
-const ETIQUETTE = "mb-1 block text-[14px] font-medium text-encre";
+const chargerFeuille = () => import("./FeuilleRappel");
+const FeuilleRappel = lazy(() => chargerFeuille().then((m) => ({ default: m.FeuilleRappel })));
 
 export function FormulaireRappel({ depuis, variante = "secondaire", className }: { depuis: string; variante?: Extract<VarianteBouton, "secondaire" | "sur-encre">; className?: string }) {
-  const id = useId();
   const [ouverte, setOuverte] = useState(false);
+  // Demandée une fois, la feuille reste montée (fermée) : ses réponses et sa confirmation restent.
+  const [demandee, setDemandee] = useState(false);
   const [options, setOptions] = useState<OptionRappel[]>([]);
-  const [creneau, setCreneau] = useState<CreneauRappel | null>(null);
-  const [consentement, setConsentement] = useState(false);
-  const [jeton, setJeton] = useState<string | null>(null);
-  const [touche, setTouche] = useState(false);
-  const [envoi, setEnvoi] = useState(false);
-  const [erreur, setErreur] = useState("");
-  const [confirmation, setConfirmation] = useState<string | null>(null);
-  const idFormulaire = `rappel-${id.replace(/[^a-zA-Z0-9-]/g, "")}`;
 
   const ouvrir = () => {
     // Les créneaux se calculent à l'ouverture (jamais au rendu serveur : « ce soir » dépend de l'heure).
-    const prochains = creneauxRappel(new Date());
-    setOptions(prochains);
-    setCreneau((c) => c ?? prochains[0]?.code ?? null);
+    setOptions(creneauxRappel(new Date()));
+    setDemandee(true);
     setOuverte(true);
   };
-  const toucher = () => setTouche(true);
-
-  async function envoyer(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!creneau) return;
-    setEnvoi(true);
-    setErreur("");
-    const formulaire = e.currentTarget;
-    const champ = (nom: string) => String(new FormData(formulaire).get(nom) ?? "").trim();
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: champ("prenom"),
-          phone: champ("telephone"),
-          website: champ("website"),
-          rappelCreneau: creneau,
-          source: FORMULAIRE_RAPPEL,
-          formulaire: FORMULAIRE_RAPPEL,
-          parcoursId: obtenirParcoursId(),
-          turnstileToken: jeton,
-          ...acquisitionPourEnvoi(),
-          ...consentementPourEnvoi(consentement, "rappel"),
-        }),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        setErreur(`${d?.error || "Une erreur est survenue."} Vos réponses sont conservées : vous pouvez réessayer.`);
-        envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "rappel", statut: res.status, raison: d?.reason });
-        return;
-      }
-      envoyerEvenement("CONTACT_ENVOYE", { formulaire: "rappel", depuis });
-      envoyerEvenement("RAPPEL_DEMANDE", { creneau, depuis });
-      const maintenant = new Date();
-      setConfirmation(phraseRappel(rappelDuCreneau(creneau, maintenant), maintenant));
-      formulaire.reset();
-      setConsentement(false);
-    } catch {
-      setErreur("Connexion interrompue. Vos réponses sont conservées : réessayez.");
-      envoyerEvenement("FORMULAIRE_ECHEC", { formulaire: "rappel", raison: "reseau" });
-    } finally {
-      setEnvoi(false);
-      reinitialiserTurnstile();
-      setJeton(null);
-    }
-  }
 
   return (
     <>
-      <button type="button" onClick={ouvrir} className={`${classesBouton(variante)}${className ? ` ${className}` : ""}`}>
+      <button type="button" onClick={ouvrir} onPointerEnter={chargerFeuille} onFocus={chargerFeuille} onTouchStart={chargerFeuille} className={`${classesBouton(variante)}${className ? ` ${className}` : ""}`}>
         Être rappelé
       </button>
-      <Feuille
-        ouverte={ouverte}
-        onFermer={() => setOuverte(false)}
-        titre="Être rappelé"
-        sousTitre={confirmation ? undefined : "Votre prénom, votre numéro, un moment : Lucas vous appelle. Gratuit, sans engagement."}
-        pied={
-          confirmation ? null : (
-            <Bouton type="submit" form={idFormulaire} plein occupe={envoi} libelleOccupe="Envoi en cours…" raisonDesactive={creneau ? null : "Choisissez un moment"}>
-              Être rappelé
-            </Bouton>
-          )
-        }
-      >
-        {confirmation ? (
-          <div role="status" className="space-y-2 pt-2">
-            <p className="text-[17px] font-semibold text-encre">C&apos;est noté.</p>
-            <p className="texte-2">{confirmation}</p>
-          </div>
-        ) : (
-          <form id={idFormulaire} onSubmit={envoyer} onFocusCapture={toucher} onPointerDownCapture={toucher} className="space-y-5 pt-2">
-            <div>
-              <label htmlFor={`${idFormulaire}-prenom`} className={ETIQUETTE}>
-                Prénom *
-              </label>
-              <input id={`${idFormulaire}-prenom`} name="prenom" required autoComplete="given-name" className={CHAMP} />
-            </div>
-            <div>
-              <label htmlFor={`${idFormulaire}-telephone`} className={ETIQUETTE}>
-                Téléphone *
-              </label>
-              <input id={`${idFormulaire}-telephone`} name="telephone" type="tel" inputMode="tel" required autoComplete="tel" className={CHAMP} />
-            </div>
-            <fieldset>
-              <legend className={ETIQUETTE}>Quand vous appeler ?</legend>
-              <div className="flex flex-wrap gap-2">
-                {options.map((o) => (
-                  <button
-                    key={o.code}
-                    type="button"
-                    aria-pressed={creneau === o.code}
-                    onClick={() => setCreneau(o.code)}
-                    className={`min-h-[44px] rounded-[var(--rayon-sm)] border px-4 text-[15px] font-medium transition-colors duration-[var(--duree-courte)] ${creneau === o.code ? "border-encre bg-encre text-blanc" : "border-trait bg-white text-encre hover:border-encre"}`}
-                  >
-                    {o.libelle}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-            <CaseConsentement id={`${idFormulaire}-consentement`} checked={consentement} onChange={setConsentement} />
-            {/* Pot de miel : invisible pour une personne. */}
-            <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
-              <label htmlFor={`${idFormulaire}-website`}>Website</label>
-              <input type="text" id={`${idFormulaire}-website`} name="website" autoComplete="off" tabIndex={-1} />
-            </div>
-            <Turnstile action="rappel" theme="light" onToken={setJeton} actif={touche} />
-            {erreur ? (
-              <p role="alert" className="rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[14.5px] text-alerte-texte">
-                {erreur}
-              </p>
-            ) : null}
-          </form>
-        )}
-      </Feuille>
+      {demandee ? (
+        <Suspense fallback={null}>
+          <FeuilleRappel depuis={depuis} ouverte={ouverte} onFermer={() => setOuverte(false)} options={options} />
+        </Suspense>
+      ) : null}
     </>
   );
 }

@@ -27,6 +27,7 @@ import { urlEvenements } from "./evenements-site";
 import { MANIFESTE_IMAGES } from "./images-manifeste";
 import { sourcesPhoto, type ManifesteImages } from "./images-preparees";
 import { DELAI_RECHERCHE_MS } from "./matieres";
+import { APRES_CHARGEMENT_MS, GESTES, adressePrechargeable, attendreLeMoment } from "./prechargement-liens";
 import { sourcesPhotoCrm, type Publication } from "./publications";
 
 /**
@@ -88,6 +89,8 @@ const CLIENTS_ADMIS: Record<string, string> = {
   "src/components/HorsSimulateur.tsx": "lit l'adresse (usePathname) ; ses enfants restent serveur",
   "src/components/ScrollToTop.tsx": "remet la page en haut à chaque navigation",
   "src/components/Prechargements.tsx": "le préchargement de l'image du premier écran, hors de la charge RSC (site 3.0, lot F6)",
+  "src/components/PrechargementDiffere.tsx": "le préchargement des liens, au geste puis après le chargement (site 3.0, lot F7)",
+  "src/components/accueil/FeuilleRappel.tsx": "la feuille « Être rappelé », chargée au premier geste vers son bouton (site 3.0, lot F7)",
 };
 /** La directive seule sur sa ligne (une mention dans un commentaire ne compte pas). */
 const estClient = (source: string) => /^["']use client["'];?\s*$/m.test(source);
@@ -285,7 +288,8 @@ describe("l'ouverture : l'« avant » préchargé sur / et les prestations seule
     assert.match(gabarit, /const playfair = Playfair_Display\(\{\s*subsets: \["latin"\],\s*variable: "--font-playfair",\s*display: "swap",\s*\}\);/);
     assert.match(gabarit, /Libre_Franklin\(\{[^}]*variable: "--font-franklin",\s*display: "swap"/);
     // Lot F6 : l'italique (38 Ko, le nom des matières des cartels seulement) n'est plus préchargée ; elle seule.
-    assert.match(gabarit, /const playfairItalique = Playfair_Display\(\{\s*subsets: \["latin"\],\s*style: \["italic"\],\s*variable: "--font-playfair-italique",\s*display: "swap",\s*preload: false,\s*\}\);/);
+    // Lot F7 : en graisse 400 seulement (un fichier fixe de 22 Ko), la seule que portent les cartels (`font-normal`).
+    assert.match(gabarit, /const playfairItalique = Playfair_Display\(\{\s*subsets: \["latin"\],\s*(?:\/\/[^\n]*\n\s*)*weight: "400",\s*style: \["italic"\],\s*variable: "--font-playfair-italique",\s*display: "swap",\s*preload: false,\s*\}\);/);
     assert.equal((gabarit.match(/preload:\s*false/g) ?? []).length, 1);
     assert.doesNotMatch(gabarit, /adjustFontFallback:\s*false/);
     assert.match(gabarit, /className=\{`\$\{playfair\.variable\} \$\{playfairItalique\.variable\} \$\{franklin\.variable\}`\}/);
@@ -587,5 +591,197 @@ describe("intégration continue", () => {
     const lignes = suivi.split("\n").filter((l) => /NEXT_PUBLIC_(GTM_ID|GA_ID|META_PIXEL_ID|CLARITY_ID)/.test(l));
     assert.equal(lignes.length, 1);
     assert.match(lignes[0], /Plus lues depuis la mission 16 \(partie 6\)\*\*, à retirer de Vercel/);
+  });
+});
+
+/**
+ * Site 3.0, lot F7 — le JavaScript chargé au démarrage. Un composant client n'entre dans le JavaScript d'une page que
+ * par les imports STATIQUES de ses modules serveur : ces tests suivent ces imports (un `import()` dynamique n'en est
+ * pas un, c'est le chargement à la demande) et verrouillent ce que le lot a retiré.
+ */
+const EXTENSIONS = ["", ".ts", ".tsx", "/index.ts", "/index.tsx"];
+function resoudreImport(depuis: string, specificateur: string): string | null {
+  let base: string;
+  if (specificateur.startsWith("@/")) base = `src/${specificateur.slice(2)}`;
+  else if (specificateur.startsWith(".")) base = path.posix.normalize(path.posix.join(path.posix.dirname(depuis), specificateur));
+  else return null;
+  for (const e of EXTENSIONS) {
+    const f = base + e;
+    if (/\.(ts|tsx)$/.test(f) && existsSync(path.join(RACINE, f)) && statSync(path.join(RACINE, f)).isFile()) return f;
+  }
+  return null;
+}
+/** Les modules atteints par imports statiques (hors `import type`, hors `import()`), le départ compris. */
+function grapheStatique(depart: string): Set<string> {
+  const vus = new Set<string>([depart]);
+  const file = [depart];
+  while (file.length > 0) {
+    const f = file.pop()!;
+    const source = lire(f).replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+    for (const m of source.matchAll(/(?:^|\n)\s*(import|export)\s+(?!type\b)([^"';]*?)\s*(?:from\s+)?["']([^"']+)["']/g)) {
+      const clause = m[2].trim();
+      if (/^\{\s*(?:type\s+\w+\s*,?\s*)+\}$/.test(clause)) continue;
+      const cible = resoudreImport(f, m[3]);
+      if (cible && !vus.has(cible)) {
+        vus.add(cible);
+        file.push(cible);
+      }
+    }
+  }
+  return vus;
+}
+const clientsDe = (depart: string) => [...grapheStatique(depart)].filter((f) => estClient(lire(f))).sort();
+
+describe("lot F7 : le JavaScript du démarrage", () => {
+  test("le suivi des imports voit ce qu'il doit voir (contrôle)", () => {
+    const g = grapheStatique("src/components/ambiances/CarteAmbiance.tsx");
+    assert.ok(g.has("src/components/simulation/AvantApres.tsx"), "la carte rend le curseur");
+    assert.ok(g.has("src/components/ambiances/cas.ts"));
+    assert.ok(!grapheStatique("src/components/accueil/FormulaireRappel.tsx").has("src/components/accueil/FeuilleRappel.tsx"), "un import() n'est pas suivi");
+    assert.ok(clientsDe("src/app/simulateur/page.tsx").includes("src/app/simulateur/_components/Simulateur.tsx"));
+  });
+
+  test("le gabarit et `metadonneesPage` n'emportent plus le curseur : seuls le menu, le suivi des pages et les liens partent sur toutes les pages", () => {
+    // Avant F7 : layout → lib/partage → inspirations/_components/ordre → CarteAmbiance → AvantApres (avec le plein écran,
+    // le calque des matières, le client de la génération et le manifeste des images) : 14 Ko compressés sur chaque page.
+    assert.deepEqual(clientsDe("src/app/layout.tsx"), [
+      "src/components/HorsEspaceClient.tsx",
+      "src/components/HorsSimulateur.tsx",
+      "src/components/MenuMobile.tsx",
+      "src/components/PrechargementDiffere.tsx",
+      "src/components/ScrollToTop.tsx",
+      "src/components/SuiviParcours.tsx",
+      "src/components/simulation/Feuille.tsx",
+    ]);
+    for (const f of ["src/lib/metadonnees.ts", "src/lib/partage.ts", "src/components/ambiances/cas.ts", "src/app/inspirations/_components/ordre.ts", "src/app/pro/vue.ts", "src/app/realisations/paires.ts", "src/app/blog/[slug]/illustration.ts"]) {
+      assert.deepEqual(clientsDe(f), [], `${f} n'importe aucun composant client`);
+      assert.ok(!grapheStatique(f).has("src/components/ambiances/CarteAmbiance.tsx"), `${f} : resoudreCas se lit dans ./cas`);
+    }
+    // Une page sans curseur n'a que les clients du gabarit (plus les siens).
+    for (const page of ["src/app/cgv/page.tsx", "src/app/contact/page.tsx", "src/app/mentions-legales/page.tsx"]) assert.ok(!clientsDe(page).includes("src/components/simulation/AvantApres.tsx"), page);
+  });
+
+  test("le curseur avant / après : ni le manifeste des images, ni le client de la génération, ni le plein écran au démarrage", () => {
+    const g = grapheStatique("src/components/simulation/AvantApres.tsx");
+    for (const absent of ["src/lib/images-manifeste.ts", "src/lib/images-preparees.ts", "src/lib/simulateur/generation-client.ts", "src/lib/simulateur/reprise.ts", "src/components/simulation/PleinEcran.tsx", "src/components/simulation/ZoomImage.tsx"]) assert.ok(!g.has(absent), absent);
+    const source = lire("src/components/simulation/AvantApres.tsx");
+    assert.match(source, /const chargerPleinEcran = \(\) => import\("\.\/PleinEcran"\);/);
+    assert.match(source, /const PleinEcran = lazy\(\(\) => chargerPleinEcran\(\)\.then\(\(m\) => \(\{ default: m\.PleinEcran \}\)\)\);/);
+    assert.match(source, /onClick=\{\(\) => setPleinEcran\(true\)\} onPointerEnter=\{chargerPleinEcran\} onFocus=\{chargerPleinEcran\}/);
+    assert.match(source, /\{pleinEcran \? \(\s*<Suspense fallback=\{null\}>\s*<PleinEcran ouvert onFermer=\{\(\) => setPleinEcran\(false\)\}/);
+    // Les adresses du CRM et les constantes du <picture> vivent dans des modules sans import.
+    for (const f of ["src/lib/sources-image.ts", "src/lib/simulateur/adresses-crm.ts"]) assert.doesNotMatch(lire(f), /^import /m, f);
+    assert.match(lire("src/lib/images-preparees.ts"), /export \{ LARGEUR_MAX_TELEPHONE, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset \} from "\.\/sources-image";/);
+    assert.match(lire("src/lib/simulateur/generation-client.ts"), /export \{ baseCrm, urlEchantillon, urlVignette \} from "\.\/adresses-crm";/);
+  });
+
+  test("« Être rappelé » : au démarrage, le bouton seul ; la feuille, le formulaire et le captcha au premier geste", () => {
+    const g = grapheStatique("src/components/accueil/FormulaireRappel.tsx");
+    for (const absent of ["src/components/accueil/FeuilleRappel.tsx", "src/components/Turnstile.tsx", "src/components/simulation/Feuille.tsx", "src/components/CaseConsentement.tsx", "src/app/simulateur/_components/Formulaires.tsx"]) assert.ok(!g.has(absent), absent);
+    const bouton = lire("src/components/accueil/FormulaireRappel.tsx");
+    assert.match(bouton, /const chargerFeuille = \(\) => import\("\.\/FeuilleRappel"\);/);
+    assert.match(bouton, /onClick=\{ouvrir\} onPointerEnter=\{chargerFeuille\} onFocus=\{chargerFeuille\} onTouchStart=\{chargerFeuille\}/);
+    assert.match(bouton, /\{demandee \? \(\s*<Suspense fallback=\{null\}>\s*<FeuilleRappel depuis=\{depuis\} ouverte=\{ouverte\}/);
+    // Les pages qui l'emploient ne chargent plus le captcha au démarrage.
+    for (const page of ["src/app/page.tsx", "src/app/prestations/[slug]/page.tsx", "src/app/comment-ca-marche/page.tsx"]) assert.ok(!clientsDe(page).includes("src/components/Turnstile.tsx"), page);
+  });
+
+  test("`next/link` n'est importé que par LienSite, sans préchargement automatique ; un seul composant précharge, au geste puis après le chargement", async () => {
+    assert.deepEqual(SOURCES.filter((f) => /from "next\/link"/.test(lire(f))), ["src/components/LienSite.tsx"]);
+    const lienSite = lire("src/components/LienSite.tsx");
+    assert.ok(!estClient(lienSite), "une fonction autour de next/link : aucun composant de plus à hydrater");
+    assert.match(lienSite, /<Link \{\.\.\.props\} prefetch=\{false\} \{\.\.\.\(prefetch === false \? \{ \[SANS_PRECHARGEMENT\]: "" \} : \{\}\)\} \/>/);
+    // Le rendu d'un lien ne change pas (l'attribut n'apparaît que sur un prefetch={false} écrit dans le code).
+    const LienSite = (await import("@/components/LienSite")).default;
+    const { AppRouterContext } = await import("next/dist/shared/lib/app-router-context.shared-runtime");
+    const rendre = (props: Record<string, unknown>) => renderToStaticMarkup(createElement(AppRouterContext.Provider, { value: { back() {}, forward() {}, refresh() {}, hmrRefresh() {}, push() {}, replace() {}, prefetch() {} } as never }, createElement(LienSite, props as never, "Simuler")));
+    assert.equal(rendre({ href: "/simulateur", className: "x" }), '<a class="x" href="/simulateur">Simuler</a>');
+    assert.equal(rendre({ href: "/matieres/couleur/NF13", prefetch: false }), '<a data-sans-prechargement="" href="/matieres/couleur/NF13">Simuler</a>');
+    // Le composant est posé une fois par le gabarit.
+    assert.match(lire("src/app/layout.tsx"), /<main id="main-content">\{children\}<\/main>\s*\{\/\*[^*]*\*\/\}\s*<PrechargementDiffere \/>/);
+    const composant = lire("src/components/PrechargementDiffere.tsx");
+    assert.match(composant, /useEffect\(\(\) => attendreLeMoment\(window, document, \(\) => setLibre\(true\)\), \[\]\);/);
+    assert.match(composant, /for \(const t of \["pointerover", "touchstart", "focusin"\]\) document\.addEventListener\(t, surIntention, \{ passive: true \}\);/);
+    assert.match(composant, /new IntersectionObserver\([\s\S]*\{ rootMargin: MARGE_VISIBLE \}/);
+    assert.match(composant, /router\.prefetch\(adresse\);/);
+  });
+
+  test("ce qui se précharge : les pages du site seulement, une fois chacune", () => {
+    const ici = { origin: "https://coverswap.fr", pathname: "/prestations/cuisine", search: "" };
+    assert.equal(adressePrechargeable({ href: "/simulateur?projet=cuisine&depuis=prestation-cuisine" }, ici), "/simulateur?projet=cuisine&depuis=prestation-cuisine");
+    assert.equal(adressePrechargeable({ href: "https://coverswap.fr/realisations#cuisine" }, ici), "/realisations");
+    assert.equal(adressePrechargeable({ href: "../matieres" }, ici), "/matieres");
+    for (const lien of [{ href: null }, { href: "#questions" }, { href: "/prestations/cuisine" }, { href: "https://wa.me/33600000000" }, { href: "tel:+33600000000" }, { href: "mailto:a@b.fr" }, { href: "/api/contact" }, { href: "/llms.txt" }, { href: "/images/og/a.jpg" }, { href: "/pro", cible: "_blank" }, { href: "/pro", telechargement: true }, { href: "/matieres/couleur/NF13", sansPrechargement: true }]) {
+      assert.equal(adressePrechargeable(lien, ici), null, JSON.stringify(lien));
+    }
+    assert.equal(adressePrechargeable({ href: "/pro", cible: "_self" }, ici), "/pro");
+  });
+
+  test("le moment : rien avant `load` + 3 s, sauf un geste ; une seule fois ; tout se défait", () => {
+    assert.equal(APRES_CHARGEMENT_MS, 3000);
+    assert.deepEqual([...GESTES], ["pointerdown", "keydown", "touchstart", "wheel", "scroll"]);
+    const fabriquer = () => {
+      const ecouteurs: Record<string, (() => void)[]> = {};
+      const minuteries: { f: () => void; ms: number; annulee: boolean }[] = [];
+      const fenetre = {
+        addEventListener: (t: string, f: () => void) => void (ecouteurs[t] ??= []).push(f),
+        removeEventListener: (t: string, f: () => void) => void (ecouteurs[t] = (ecouteurs[t] ?? []).filter((x) => x !== f)),
+        setTimeout: (f: () => void, ms: number) => minuteries.push({ f, ms, annulee: false }) - 1,
+        clearTimeout: (id: never) => void (minuteries[id as unknown as number] && (minuteries[id as unknown as number].annulee = true)),
+      };
+      return { ecouteurs, minuteries, fenetre };
+    };
+    // Par le temps : load, puis 3 s.
+    const a = fabriquer();
+    let pretA = 0;
+    attendreLeMoment(a.fenetre, { readyState: "loading" }, () => pretA++);
+    assert.deepEqual(Object.keys(a.ecouteurs).sort(), ["keydown", "load", "pointerdown", "scroll", "touchstart", "wheel"]);
+    assert.equal(a.minuteries.length, 0, "rien avant load");
+    for (const f of a.ecouteurs.load) f();
+    assert.deepEqual(a.minuteries.map((m) => m.ms), [3000]);
+    assert.equal(pretA, 0);
+    a.minuteries[0].f();
+    assert.equal(pretA, 1);
+    for (const g of GESTES) assert.equal(a.ecouteurs[g].length, 0, `${g} retiré`);
+    // Par un geste, avant la fin des 3 s : une seule fois, la minuterie annulée.
+    const b = fabriquer();
+    let pretB = 0;
+    attendreLeMoment(b.fenetre, { readyState: "complete" }, () => pretB++);
+    assert.deepEqual(b.minuteries.map((m) => m.ms), [3000], "page déjà chargée : 3 s tout de suite");
+    b.ecouteurs.scroll[0]();
+    assert.equal(pretB, 1);
+    assert.equal(b.minuteries[0].annulee, true);
+    b.minuteries[0].f();
+    assert.equal(pretB, 1, "une seule fois");
+    // Défait avant tout : plus rien ne part.
+    const c = fabriquer();
+    let pretC = 0;
+    const defaire = attendreLeMoment(c.fenetre, { readyState: "loading" }, () => pretC++);
+    defaire();
+    assert.equal((c.ecouteurs.load ?? []).length, 0);
+    for (const g of GESTES) assert.equal(c.ecouteurs[g].length, 0);
+    assert.equal(pretC, 0);
+  });
+
+  test("l'icône de l'onglet en 64 px (≈ 2 Ko au lieu de 12) ; le logo entier reste l'icône de l'écran d'accueil", async () => {
+    const gabarit = lire("src/app/layout.tsx");
+    assert.match(gabarit, /icons: \{\s*icon: \{ url: "\/icone-64\.png", type: "image\/png", sizes: "64x64" \},\s*apple: "\/logo\.png",\s*\}/);
+    const icone = path.join(RACINE, "public/icone-64.png");
+    const meta = await sharp(icone).metadata();
+    assert.deepEqual([meta.width, meta.height, meta.format], [64, 64, "png"]);
+    assert.ok(statSync(icone).size <= 4096, `${statSync(icone).size} octets`);
+    assert.match(lire("scripts/generate-assets.mjs"), /resize\(64, 64\)[^\n]*icone-64\.png/);
+  });
+
+  test("le simulateur au démarrage : l'écran Pièce sans le manifeste ni les ambiances ; attente, résultat et feuille chargés à part", () => {
+    const g = grapheStatique("src/app/simulateur/_components/Simulateur.tsx");
+    for (const absent of ["src/lib/images-manifeste.ts", "src/data/ambiances.ts", "src/data/ambiances-serie-2.ts", "src/app/simulateur/_components/EcranGeneration.tsx", "src/app/simulateur/_components/EcranResultat.tsx", "src/app/simulateur/_components/DemandeApresRendu.tsx", "src/components/simulation/FeuilleCatalogue.tsx", "src/components/simulation/Photo.tsx"]) assert.ok(!g.has(absent), absent);
+    for (const present of ["src/app/simulateur/_components/EcranPiece.tsx", "src/app/simulateur/_components/EcranPhoto.tsx", "src/app/simulateur/_components/EcranMatieres.tsx", "src/app/simulateur/_components/ecrans-differes.ts"]) assert.ok(g.has(present), present);
+    // L'espace client rend les mêmes cartes : sans le manifeste non plus.
+    assert.ok(!grapheStatique("src/components/espace/CreationEcrans.tsx").has("src/lib/images-manifeste.ts"));
+  });
+
+  test("l'italique en graisse 400 seulement : le nom du cartel est en font-normal", () => {
+    assert.match(lire("src/components/revue/Cartel.tsx"), /className=\{`block font-display-italique text-\[19px\] leading-tight font-normal italic \$\{v\.nom\}`\}/);
   });
 });

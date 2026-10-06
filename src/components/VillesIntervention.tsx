@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Section } from "@/components/simulation/Section";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import { ENTREPRISE } from "@/lib/entreprise";

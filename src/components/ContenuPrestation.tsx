@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import Breadcrumb, { type BreadcrumbItem } from "@/components/Breadcrumb";
 import { CartesAtouts, CartesSurfaces, EtapesPrestation, PhraseTarif, QuestionsPrestation } from "@/components/BlocsPrestation";
 import { ContenuPrix } from "@/components/BlocPrix";

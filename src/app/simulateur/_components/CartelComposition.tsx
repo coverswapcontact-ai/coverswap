@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { familleDuCartel, libelleFinition } from "@/lib/cartel";
 import { cheminMatiere } from "@/lib/familles-matieres";

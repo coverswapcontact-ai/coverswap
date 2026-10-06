@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
 import { FAQSchema, ServiceSchema } from "@/components/JsonLd";
 import { CarteRealisation } from "@/components/CarteRealisation";

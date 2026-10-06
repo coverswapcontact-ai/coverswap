@@ -54,6 +54,11 @@ console.log('SVG écrits.');
 try {
   await sharp(Buffer.from(logoSvg)).resize(512, 512).png({ compressionLevel: 9 }).toFile(join(publicDir, 'logo.png'));
   console.log('logo.png écrit (512 × 512)');
+  // Site 3.0, lot F7 : l'icône de l'onglet, réduite du logo (≈ 2 Ko au lieu de 12) ; le navigateur la demande pendant
+  // le chargement de chaque page. Le logo entier reste l'icône de l'écran d'accueil (apple-touch-icon) et celle des
+  // données structurées.
+  await sharp(join(publicDir, 'logo.png')).resize(64, 64).png({ compressionLevel: 9 }).toFile(join(publicDir, 'icone-64.png'));
+  console.log('icone-64.png écrit (64 × 64)');
 } catch (e) {
   console.error('logo.png impossible :', e.message);
   process.exitCode = 1;

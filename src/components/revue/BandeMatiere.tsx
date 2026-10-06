@@ -1,5 +1,5 @@
 import { texteCartel, type MatiereCartel } from "@/lib/cartel";
-import { urlEchantillon, urlVignette } from "@/lib/simulateur/generation-client";
+import { urlEchantillon, urlVignette } from "@/lib/simulateur/adresses-crm";
 import { Cartel } from "./Cartel";
 
 /**

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";

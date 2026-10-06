@@ -2,7 +2,8 @@
 
 import { PICTOS_ELEMENTS, Picto } from "@/components/espace/Illustrations";
 import { CartesPieces } from "@/components/simulation/CartesPieces";
-import { PHOTOS_PIECES } from "@/lib/images-pieces";
+import type { PieceId } from "@/lib/images-pieces";
+import type { PhotoCarte } from "@/lib/photos-cartes";
 import { ELEMENTS, type IdElement } from "@/lib/simulateur/elements";
 import type { ZonesSimulateur } from "@/lib/simulateur/zones";
 
@@ -21,7 +22,7 @@ const PHOTOS_IMMEDIATES = 3;
  * d'abord sa zone à l'écran des matières ; la porte d'entrée et le réfrigérateur sont rattachés côté site (portes du
  * dressing, façades de cuisine). Des raccourcis : ils font avancer, sans état « choisi » à eux.
  */
-export function EcranPiece({ zones, projet, onChoisir }: { zones: ZonesSimulateur; projet: string | null; onChoisir: (id: string, element?: IdElement) => void }) {
+export function EcranPiece({ zones, projet, onChoisir, photos }: { zones: ZonesSimulateur; projet: string | null; onChoisir: (id: string, element?: IdElement) => void; /** Les photos des cartes, résolues par la page (lot F7 : `photosDesCartes(PHOTOS_PIECES)`). */ photos?: Partial<Record<PieceId, PhotoCarte>> }) {
   // Un élément dont la pièce n'est plus publiée par le CRM n'est pas proposé.
   const elements = ELEMENTS.filter((e) => zones.pieces.some((p) => p.id === e.piece));
   return (
@@ -34,7 +35,7 @@ export function EcranPiece({ zones, projet, onChoisir }: { zones: ZonesSimulateu
         </h2>
         <p className="mt-1.5 text-[15px] leading-relaxed text-encre-2">Choisissez, puis prenez une photo : le rendu se fait sur votre propre photo, sans inscription.</p>
       </div>
-      <CartesPieces pieces={zones.pieces.map((p) => ({ id: p.id, libelle: p.libelle, description: p.zones.map((z) => z.libelle).join(", ") }))} valeur={projet} onChoisir={onChoisir} photosImmediates={PHOTOS_IMMEDIATES} photos={PHOTOS_PIECES} />
+      <CartesPieces pieces={zones.pieces.map((p) => ({ id: p.id, libelle: p.libelle, description: p.zones.map((z) => z.libelle).join(", ") }))} valeur={projet} onChoisir={onChoisir} photosImmediates={PHOTOS_IMMEDIATES} photos={photos} />
       {elements.length > 0 ? (
         <div className="pt-2">
           <h3 id="etape-element" className="text-[17px] font-semibold text-encre">

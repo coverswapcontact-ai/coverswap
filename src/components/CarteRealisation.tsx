@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { imageObjet } from "@/lib/donnees-images";

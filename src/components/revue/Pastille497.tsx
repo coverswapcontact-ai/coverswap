@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { NB_REFERENCES } from "@/lib/offre";
 
 /** Une chaîne entière (un nom de classe collé à `${…}` échapperait à Tailwind, qui ne le générerait pas). */

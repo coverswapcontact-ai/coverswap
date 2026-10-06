@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useFavoris } from "@/app/simulateur/_components/useFavoris";
 import { IconeCoeur, IconeLoupe } from "@/components/espace/Illustrations";

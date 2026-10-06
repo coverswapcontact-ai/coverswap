@@ -11,7 +11,8 @@ import { ligneCartel, type MatiereCartel } from "@/lib/cartel";
  *  - `encre` : sur un bloc encre, nom au papier, ligne en `sur-encre-2` (6,69:1) ;
  *  - `sur-photo` : posé sur une image (bande de matière, ambiance), sur un voile d'encre à 80 %, tout en blanc.
  *
- * Le nom est en `font-display-italique` (lot F6) : la seule italique du site, chargée à la demande (layout.tsx).
+ * Le nom est en `font-display-italique` (lot F6) : la seule italique du site, chargée à la demande (layout.tsx), en
+ * graisse 400 seulement (lot F7 : `font-normal`, quel que soit le parent ; la police italique n'a que cette graisse).
  *
  * Composant serveur. Un fin liseré à l'encre borde le filet : une matière blanche reste visible sur le papier.
  */
@@ -30,7 +31,7 @@ export function Cartel({ matiere, teinte, variante = "clair", balise: Balise = "
   return (
     <Balise className={`relative ${Balise === "span" ? "block " : ""}${v.boite}${className ? ` ${className}` : ""}`} style={style}>
       <span aria-hidden="true" className={`absolute w-[3px] bg-[color:var(--teinte,var(--color-encre))] ring-1 ring-encre/15 ring-inset ${variante === "sur-photo" ? "inset-y-2 left-2" : "inset-y-0 left-0"}`} />
-      <span className={`block font-display-italique text-[19px] leading-tight italic ${v.nom}`}>{matiere.nom}</span>
+      <span className={`block font-display-italique text-[19px] leading-tight font-normal italic ${v.nom}`}>{matiere.nom}</span>
       <span className={`cartel mt-1 block ${v.ligne}`}>
         <span className="sr-only"> · </span>
         {ligneCartel(matiere)}

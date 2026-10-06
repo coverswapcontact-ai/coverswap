@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CarteRealisation } from "@/components/CarteRealisation";
 import { CarteAmbiance } from "@/components/ambiances/CarteAmbiance";
@@ -13,6 +13,7 @@ import { ENTREPRISE } from "@/lib/entreprise";
 import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { photosDesCartes } from "@/lib/photos-cartes";
 import { imagePartage, realisationPartagee } from "@/lib/partage";
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 import { chargerPublications, libelleProjet, type Publication } from "@/lib/publications";
@@ -162,7 +163,7 @@ export default async function PageRealisations() {
 
       {/* Les cinq pièces → les pages par pièce ; les textes de l'ancien index /prestations. */}
       <Section large differee ton={avis.length > 0 ? "papier-2" : "papier"} titre="Ce que nous recouvrons" intro="Un film adhésif Cover Styl' posé à chaud sur vos surfaces existantes : la pièce change de style en une journée, sans démontage ni gravats, et le film se retire sans trace.">
-        <CartesPieces pieces={pieces} liens={liens} photos={PHOTOS_PIECES} nom="Les pièces que nous recouvrons" />
+        <CartesPieces pieces={pieces} liens={liens} photos={photosDesCartes(PHOTOS_PIECES)} nom="Les pièces que nous recouvrons" />
         <div className="texte-2 mt-8 max-w-2xl space-y-3">
           <p>
             Tarif au mètre linéaire, {PRIX_PLAGE} fourni et posé : le chiffre se détermine au devis selon la complexité de la pose. Devis gratuit {DELAI_REPONSE}. Aussi : les{" "}

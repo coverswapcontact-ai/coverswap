@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Bouton } from "@/components/simulation/Bouton";
 import { CHAMP } from "@/app/simulateur/_components/Formulaires";
 import { consentementPourEnvoi } from "@/lib/consentement";

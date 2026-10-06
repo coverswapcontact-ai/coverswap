@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Feuille, useLiensDeFeuille } from "@/components/simulation/Feuille";
 import { Lien } from "@/components/simulation/Lien";
 import { ENTREES_MENU, LIEN_CONTACT, LIEN_SIMULER } from "@/lib/navigation";

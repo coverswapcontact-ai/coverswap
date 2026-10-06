@@ -711,7 +711,9 @@ describe("« Être rappelé » : une feuille, un vrai formulaire, rien d'envoyé
   });
 
   test("l'envoi : /api/contact, formulaire coverswap.fr/rappel (source SITE_CONTACT), le créneau, le captcha, le consentement ; deux événements", () => {
-    const source = lire("src/components/accueil/FormulaireRappel.tsx");
+    // Lot F7 : le formulaire vit dans la feuille (`FeuilleRappel`, chargée au premier geste) ; le bouton calcule les créneaux.
+    const source = lire("src/components/accueil/FeuilleRappel.tsx");
+    const bouton = lire("src/components/accueil/FormulaireRappel.tsx");
     assert.equal(FORMULAIRE_RAPPEL, "coverswap.fr/rappel");
     assert.equal(resolveSource(FORMULAIRE_RAPPEL), "SITE_CONTACT");
     assert.match(source, /fetch\("\/api\/contact", \{/);
@@ -722,7 +724,10 @@ describe("« Être rappelé » : une feuille, un vrai formulaire, rien d'envoyé
     assert.match(source, /<CaseConsentement /);
     assert.match(source, /name="website"/, "pot de miel");
     assert.match(source, /envoyerEvenement\("CONTACT_ENVOYE", \{ formulaire: "rappel", depuis \}\);\s+envoyerEvenement\("RAPPEL_DEMANDE", \{ creneau, depuis \}\);/);
-    assert.match(source, /creneauxRappel\(new Date\(\)\)/, "créneaux calculés à l'ouverture, en heure de Paris");
+    assert.match(bouton, /const ouvrir = \(\) => \{[^}]*setOptions\(creneauxRappel\(new Date\(\)\)\);/, "créneaux calculés à l'ouverture, en heure de Paris");
+    assert.match(source, /export function FeuilleRappel\(\{ depuis, ouverte, onFermer, options \}/);
+    assert.match(source, /const creneau = choix \?\? options\[0\]\?\.code \?\? null;/, "le premier créneau par défaut, un choix gardé");
+    assert.match(source, /import \{ FORMULAIRE_RAPPEL \} from "\.\/FormulaireRappel";/);
     // La route transmet le créneau au CRM, validé comme dans /api/simulation/contact.
     assert.match(lire("src/app/api/contact/route.ts"), /\.\.\.\(estCreneauRappel\(body\.rappelCreneau\) \? \{ rappelCreneau: body\.rappelCreneau \} : \{\}\),/);
   });

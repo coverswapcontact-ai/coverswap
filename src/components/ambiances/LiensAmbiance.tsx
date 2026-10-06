@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { lienPrestation, prestationDeLaPiece } from "@/data/prestations";
 
 /**

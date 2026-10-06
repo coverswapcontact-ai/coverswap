@@ -1,4 +1,4 @@
-import { resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
+import { resoudreCas, type CasAmbiance } from "@/components/ambiances/cas";
 import { PHOTOS_UTILES } from "@/data/ambiances";
 import type { BlogArticle } from "@/data/blog-articles";
 import { ENTREPRISE } from "@/lib/entreprise";

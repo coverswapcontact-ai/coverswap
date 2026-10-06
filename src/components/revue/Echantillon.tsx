@@ -1,6 +1,6 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import type { MatiereCartel } from "@/lib/cartel";
-import { urlVignette } from "@/lib/simulateur/generation-client";
+import { urlVignette } from "@/lib/simulateur/adresses-crm";
 import { Cartel } from "./Cartel";
 
 /**

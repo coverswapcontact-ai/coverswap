@@ -1,5 +1,5 @@
 import type { ImgHTMLAttributes } from "react";
-import { MEDIA_TELEPHONE, plafonnerSrcset, type SourcesImage } from "@/lib/images-preparees";
+import { MEDIA_TELEPHONE, plafonnerSrcset, type SourcesImage } from "@/lib/sources-image";
 
 /**
  * Une image en `<picture>` (mission 16, partie 3) : AVIF et WebP en `<source>`,

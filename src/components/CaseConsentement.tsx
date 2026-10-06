@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { TEXTE_CONSENTEMENT_MAIL } from "@/lib/consentement";
 
 /**

@@ -1,4 +1,4 @@
-import { resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
+import { resoudreCas, type CasAmbiance } from "@/components/ambiances/cas";
 import { CAS_PRESTATIONS } from "@/data/cas-prestations";
 import type { ManifesteImages } from "@/lib/images-preparees";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";

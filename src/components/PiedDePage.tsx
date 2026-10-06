@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { LIENS_PIED } from "@/lib/navigation";
 

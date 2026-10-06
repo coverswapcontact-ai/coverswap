@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Logo } from "@/components/Logo";
 import { ENTREES_MENU, LIEN_SIMULER } from "@/lib/navigation";
 import MenuMobile from "./MenuMobile";

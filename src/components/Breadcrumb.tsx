@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { BreadcrumbSchema } from "@/components/JsonLd";
 import { urlAbsolue } from "@/lib/metadonnees";
 

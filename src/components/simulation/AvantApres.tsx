@@ -1,12 +1,19 @@
 "use client";
 
-import { useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
-import type { SourcesImage } from "@/lib/images-preparees";
+import { lazy, Suspense, useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
+import type { SourcesImage } from "@/lib/sources-image";
 import { CalqueMatieres, type MatiereCalque } from "@/components/ambiances/CalqueMatieres";
 import { positionAuClavier } from "./curseur-clavier";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
-import { PleinEcran } from "./PleinEcran";
+
+/**
+ * Lot F7 : le plein écran (et son zoom à pincer) n'est chargé qu'à la demande — au survol ou au focus de « Plein
+ * écran », au plus tard au clic. Il n'a rien à montrer tant qu'il est fermé (`PleinEcran` rend `null`), et son code
+ * partait avec chaque curseur de chaque page.
+ */
+const chargerPleinEcran = () => import("./PleinEcran");
+const PleinEcran = lazy(() => chargerPleinEcran().then((m) => ({ default: m.PleinEcran })));
 
 /**
  * Avant / après sur la photo du visiteur (mission 15, partie 4 ; déplacé
@@ -87,10 +94,14 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           Comparer
         </button>
       ) : null}
-      <button type="button" onClick={() => setPleinEcran(true)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile !== "tous" ? " max-md:hidden" : ""}`}>
+      <button type="button" onClick={() => setPleinEcran(true)} onPointerEnter={chargerPleinEcran} onFocus={chargerPleinEcran} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile !== "tous" ? " max-md:hidden" : ""}`}>
         Plein écran
       </button>
-      <PleinEcran ouvert={pleinEcran} onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
+      {pleinEcran ? (
+        <Suspense fallback={null}>
+          <PleinEcran ouvert onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
+        </Suspense>
+      ) : null}
     </div>
   );
 

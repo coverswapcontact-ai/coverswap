@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bouton } from "@/components/simulation/Bouton";
-import { FeuilleCatalogue } from "@/components/simulation/FeuilleCatalogue";
 import { FilEtapes } from "@/components/simulation/FilEtapes";
 import Turnstile, { TURNSTILE_SITE_KEY, reinitialiserTurnstile } from "@/components/Turnstile";
 import { consentementPourEnvoi } from "@/lib/consentement";
@@ -21,14 +20,16 @@ import { ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, 
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
 import { pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
 import type { ExempleSimulateur } from "@/lib/exemples-simulateur";
+import type { PieceId } from "@/lib/images-pieces";
+import type { PhotoCarte } from "@/lib/photos-cartes";
 import type { TarifsSite } from "@/lib/tarifs-site";
 import { acquisitionPourEnvoi, lireOrigine, sourceCourte } from "@/lib/utm";
-import { DemandeApresRendu, type DemandeEnvoyee } from "./DemandeApresRendu";
-import { EcranGeneration, EcranSansPhoto } from "./EcranGeneration";
+import { attendreLeMoment } from "@/lib/prechargement-liens";
+import type { DemandeEnvoyee } from "./DemandeApresRendu";
+import { DemandeApresRendu, EcranGeneration, EcranResultat, EcranSansPhoto, FeuilleCatalogue, prechargerLesEcrans } from "./ecrans-differes";
 import { EcranMatieres } from "./EcranMatieres";
 import { EcranPhoto } from "./EcranPhoto";
 import { EcranPiece } from "./EcranPiece";
-import EcranResultat from "./EcranResultat";
 import { FORMULAIRE_VIDE, type Formulaire } from "./Formulaires";
 import { useAnalyse } from "./useAnalyse";
 import { useFeuilleCatalogue } from "./useFeuilleCatalogue";
@@ -47,9 +48,14 @@ import { useSondage } from "./useSondage";
 type Echec = { message: string; raison: string };
 
 /** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. `exemples` : les pièces d'exemple de l'écran Photo (lot E3). */
-export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[] }) {
+export default function Simulateur({ zones, tarifs = null, exemples = [], photosPieces }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[]; /** Lot F7 : les photos des cartes de l'écran Pièce, résolues par la page (`photosDesCartes`). */ photosPieces?: Partial<Record<PieceId, PhotoCarte>> }) {
   const [charge, setCharge] = useState(false);
   const [ecran, setEcran] = useState<Ecran>(1);
+  // Lot F7 : les écrans chargés à part, préchargés au premier geste, trois secondes après `load`, ou dès l'écran Photo.
+  useEffect(() => attendreLeMoment(window, document, prechargerLesEcrans), []);
+  useEffect(() => {
+    if (ecran >= 2) prechargerLesEcrans();
+  }, [ecran]);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
   // L'état vide vaut `projet: "cuisine"` (repli) : la carte n'est montrée choisie que si la pièce l'a vraiment été (clic, `?projet=`, accueil, photo en mémoire).
   const [pieceChoisie, setPieceChoisie] = useState(false);
@@ -426,108 +432,114 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
       ) : null}
 
       <div className="mt-5">
-        {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} /> : null}
+        <Suspense fallback={null}>
+          {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} photos={photosPieces} /> : null}
 
-        {ecran === 2 ? (
-          <EcranPhoto
-            projet={projet}
-            photo={etat.photo}
-            rapport={rapportPhoto(etat)}
-            occupe={occupe === "photo"}
-            onFichier={(f, exemple) => void choisirPhoto(f, exemple)}
-            exemples={exemples}
-            onGarder={() => {
-              effacerEchec();
-              setEcran(3);
-            }}
-          />
-        ) : null}
-
-        {ecran === 3 && (enAttente || echecGeneration) ? (
-          <EcranGeneration
-            piece={piece}
-            photo={etat.photo}
-            selections={etat.selections}
-            analyse={etat.analyse}
-            sondage={sondage}
-            travail={etat.travailEnCours}
-            echec={echecGeneration}
-            peutReessayer={!!echecGeneration && !PANNES.includes(echecGeneration.raison) && !!etat.photo && selectionsActives.length > 0}
-            attenteReessai={attenteReessai}
-            onReessayer={() => {
-              rouvrir();
-              void generer();
-            }}
-            onPrevenir={enAttente ? prevenir : undefined}
-            envoye={!!envoye}
-            formulaire={formulaire}
-            onFormulaire={setFormulaire}
-            avecVille={!(etat.ville && etat.codePostal)}
-            envoiEnCours={occupe === "envoi"}
-            onEnvoyer={(e) => void envoyer(e, true)}
-            onRevenir={revenirAuxMatieres}
-            onNouvelle={() => {
-              effacerEchec();
-              setEcran(2);
-            }}
-            onJeton={setJetonCaptcha}
-            exemple={etat.exemple}
-          />
-        ) : null}
-
-        {ecran === 3 && !enAttente && !echecGeneration ? (
-          etat.photo ? (
-            <EcranMatieres
-              piece={piece}
+          {ecran === 2 ? (
+            <EcranPhoto
+              projet={projet}
               photo={etat.photo}
               rapport={rapportPhoto(etat)}
+              occupe={occupe === "photo"}
+              onFichier={(f, exemple) => void choisirPhoto(f, exemple)}
+              exemples={exemples}
+              onGarder={() => {
+                effacerEchec();
+                setEcran(3);
+              }}
+            />
+          ) : null}
+
+          {ecran === 3 && (enAttente || echecGeneration) ? (
+            <EcranGeneration
+              piece={piece}
+              photo={etat.photo}
               selections={etat.selections}
               analyse={etat.analyse}
-              conseilIgnore={conseilIgnore}
-              onIgnorerConseil={() => setConseilIgnore(true)}
-              onReprendrePhoto={() => setEcran(2)}
-              onOuvrir={setZoneOuverte}
-              onRetirer={retirer}
-              focusZone={focusZone}
-              zonesRefusees={zonesRefusees}
-              messageRefus={messageRefus}
-              peutGenerer={peutGenerer}
-              raisonBloque={raisonBloque}
-              occupe={occupe === "lancement"}
-              onGenerer={() => void generer()}
-              zonesMax={zones.zonesMax}
-              captcha={<Turnstile action="simulateur" theme="light" onToken={setJetonCaptcha} />}
-            />
-          ) : (
-            <EcranSansPhoto onPhoto={() => setEcran(2)} />
-          )
-        ) : null}
-
-        {ecran === 4 && rendu ? (
-          <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres} selections={etat.selections} onEchantillons={envoye ? undefined : () => setFormulaire((f) => ({ ...f, echantillons: true }))}>
-            <DemandeApresRendu
-              projet={projet.id}
-              rendu={rendu}
-              tarifs={tarifs}
+              sondage={sondage}
+              travail={etat.travailEnCours}
+              echec={echecGeneration}
+              peutReessayer={!!echecGeneration && !PANNES.includes(echecGeneration.raison) && !!etat.photo && selectionsActives.length > 0}
+              attenteReessai={attenteReessai}
+              onReessayer={() => {
+                rouvrir();
+                void generer();
+              }}
+              onPrevenir={enAttente ? prevenir : undefined}
+              envoye={!!envoye}
               formulaire={formulaire}
               onFormulaire={setFormulaire}
               avecVille={!(etat.ville && etat.codePostal)}
-              occupe={occupe === "envoi"}
-              envoye={envoye}
-              onEnvoyer={(extra) => void envoyer(null, false, extra)}
-              onEstimationVue={(meta) => {
-                if (estimationVue.current) return;
-                estimationVue.current = true;
-                envoyerEvenement("ESTIMATION_VUE", { ...meta, projet: projet.id });
+              envoiEnCours={occupe === "envoi"}
+              onEnvoyer={(e) => void envoyer(e, true)}
+              onRevenir={revenirAuxMatieres}
+              onNouvelle={() => {
+                effacerEchec();
+                setEcran(2);
               }}
-              captcha={<Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />}
-              onRecommencer={() => void recommencer()}
+              onJeton={setJetonCaptcha}
+              exemple={etat.exemple}
             />
-          </EcranResultat>
-        ) : null}
+          ) : null}
+
+          {ecran === 3 && !enAttente && !echecGeneration ? (
+            etat.photo ? (
+              <EcranMatieres
+                piece={piece}
+                photo={etat.photo}
+                rapport={rapportPhoto(etat)}
+                selections={etat.selections}
+                analyse={etat.analyse}
+                conseilIgnore={conseilIgnore}
+                onIgnorerConseil={() => setConseilIgnore(true)}
+                onReprendrePhoto={() => setEcran(2)}
+                onOuvrir={setZoneOuverte}
+                onRetirer={retirer}
+                focusZone={focusZone}
+                zonesRefusees={zonesRefusees}
+                messageRefus={messageRefus}
+                peutGenerer={peutGenerer}
+                raisonBloque={raisonBloque}
+                occupe={occupe === "lancement"}
+                onGenerer={() => void generer()}
+                zonesMax={zones.zonesMax}
+                captcha={<Turnstile action="simulateur" theme="light" onToken={setJetonCaptcha} />}
+              />
+            ) : (
+              <EcranSansPhoto onPhoto={() => setEcran(2)} />
+            )
+          ) : null}
+
+          {ecran === 4 && rendu ? (
+            <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres} selections={etat.selections} onEchantillons={envoye ? undefined : () => setFormulaire((f) => ({ ...f, echantillons: true }))}>
+              <DemandeApresRendu
+                projet={projet.id}
+                rendu={rendu}
+                tarifs={tarifs}
+                formulaire={formulaire}
+                onFormulaire={setFormulaire}
+                avecVille={!(etat.ville && etat.codePostal)}
+                occupe={occupe === "envoi"}
+                envoye={envoye}
+                onEnvoyer={(extra) => void envoyer(null, false, extra)}
+                onEstimationVue={(meta) => {
+                  if (estimationVue.current) return;
+                  estimationVue.current = true;
+                  envoyerEvenement("ESTIMATION_VUE", { ...meta, projet: projet.id });
+                }}
+                captcha={<Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />}
+                onRecommencer={() => void recommencer()}
+              />
+            </EcranResultat>
+          ) : null}
+        </Suspense>
       </div>
 
-      {feuille ? <FeuilleCatalogue {...feuille} /> : null}
+      {feuille ? (
+        <Suspense fallback={null}>
+          <FeuilleCatalogue {...feuille} />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

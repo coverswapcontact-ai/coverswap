@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { ContenuPrix } from "@/components/BlocPrix";
 import { Section } from "@/components/simulation/Section";
 import { ORDRE_AVIS, blocAvis, chargerAvisGoogle, formaterMoisAvis, formaterNote, type AvisGoogle, type BlocAvis } from "@/lib/avis-google";

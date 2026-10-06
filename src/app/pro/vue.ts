@@ -1,4 +1,4 @@
-import { resoudreCas, type CasAmbiance } from "@/components/ambiances/CarteAmbiance";
+import { resoudreCas, type CasAmbiance } from "@/components/ambiances/cas";
 import { choisirOuverture, type ChoixOuverture } from "@/components/accueil/etudes";
 import { versEtudeReelle, type EtudeReelle } from "@/lib/etude-de-cas";
 import type { ManifesteImages } from "@/lib/images-preparees";

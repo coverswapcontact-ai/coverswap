@@ -3,7 +3,9 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
 import { exemplesSimulateur } from "@/lib/exemples-simulateur";
+import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { photosDesCartes } from "@/lib/photos-cartes";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
 import { chargerTarifs } from "@/lib/tarifs-site";
@@ -48,7 +50,7 @@ export default async function PageSimulateur() {
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
-        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} />
+        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} photosPieces={photosDesCartes(PHOTOS_PIECES)} />
         {/* Site 3.0 (lot F4) : le fil d'Ariane, visible et balisé, sous l'outil — le premier écran reste au simulateur. */}
         <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Simulateur", href: "/simulateur" }]} className="mt-16 mb-0" />
         <section className="mt-4 max-w-2xl border-t border-trait pt-10">

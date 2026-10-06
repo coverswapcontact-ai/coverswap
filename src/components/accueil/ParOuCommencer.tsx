@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { PICTOS_ELEMENTS, PICTOS_FAMILLES, Picto } from "@/components/espace/Illustrations";
 import { Section } from "@/components/simulation/Section";
 import { lienSimuler } from "@/lib/liens-simulateur";

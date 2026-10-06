@@ -8,6 +8,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
 import HorsEspaceClient from "@/components/HorsEspaceClient";
 import HorsSimulateur from "@/components/HorsSimulateur";
+import PrechargementDiffere from "@/components/PrechargementDiffere";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
@@ -22,7 +23,7 @@ import { IMAGE_PARTAGE } from "@/lib/partage";
  * Lot F6 : l'italique de Playfair (38 Ko) n'est plus préchargée avec le droit. Elle ne sert qu'au nom des matières
  * des cartels (`font-display-italique`), le plus souvent sous le premier écran : préchargée, elle prenait la bande
  * passante du LCP sur chaque page. Une famille à part, demandée par le navigateur quand un cartel s'affiche, avec
- * sa propre police de repli ajustée.
+ * sa propre police de repli ajustée. Lot F7 : en graisse 400 seulement (la seule employée), fichier fixe plus léger.
  */
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -32,6 +33,9 @@ const playfair = Playfair_Display({
 
 const playfairItalique = Playfair_Display({
   subsets: ["latin"],
+  // Lot F7 : la seule graisse de l'italique (le nom des cartels est en `font-normal`, Cartel.tsx) — un fichier fixe de
+  // 400 au lieu de la police variable 400 à 900 (38 Ko).
+  weight: "400",
   style: ["italic"],
   variable: "--font-playfair-italique",
   display: "swap",
@@ -90,8 +94,10 @@ export const metadata: Metadata = {
     description: "Rénovez votre intérieur en 1 journée. Simulation IA gratuite.",
     images: [IMAGE_PARTAGE.url],
   },
+  // Lot F7 : l'icône de l'onglet en 64 px (2 Ko, `scripts/generate-assets.mjs`) — le navigateur la demande pendant le
+  // chargement de chaque page ; le logo de 512 px (12 Ko) reste celui de l'écran d'accueil.
   icons: {
-    icon: "/logo.png",
+    icon: { url: "/icone-64.png", type: "image/png", sizes: "64x64" },
     apple: "/logo.png",
   },
   robots: {
@@ -133,6 +139,8 @@ export default function RootLayout({
           </HorsSimulateur>
         </HorsEspaceClient>
         <main id="main-content">{children}</main>
+        {/* Lot F7 : le préchargement des liens, au geste puis après le chargement (les liens ne préchargent plus seuls). */}
+        <PrechargementDiffere />
         <HorsEspaceClient>
           <PiedDePage />
         </HorsEspaceClient>

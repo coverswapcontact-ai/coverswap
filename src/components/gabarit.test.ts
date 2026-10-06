@@ -120,7 +120,9 @@ describe("gabarit : une feuille fermée rend le focus (relecture des lots B et C
     assert.match(feuille, /const rendreLeFocus = retenirLeFocus\(document\.activeElement as HTMLElement \| null\);\s*boite\.current\?\.focus\(\{ preventScroll: true \}\);/);
     assert.match(feuille, /window\.removeEventListener\("keydown", surTouche\);\s*liberer\(\);\s*rendreLeFocus\(\);/);
     // « Être rappelé » ouvre une Feuille : il en profite (le bouton qui l'ouvre reprend le focus).
-    assert.match(lire("components/accueil/FormulaireRappel.tsx"), /<Feuille\s+ouverte=\{ouverte\}\s+onFermer=\{\(\) => setOuverte\(false\)\}/);
+    // Lot F7 : la feuille est dans `FeuilleRappel` (chargée au premier geste) ; le bouton la ferme par `onFermer`.
+    assert.match(lire("components/accueil/FeuilleRappel.tsx"), /<Feuille\s+ouverte=\{ouverte\}\s+onFermer=\{onFermer\}/);
+    assert.match(lire("components/accueil/FormulaireRappel.tsx"), /<FeuilleRappel depuis=\{depuis\} ouverte=\{ouverte\} onFermer=\{\(\) => setOuverte\(false\)\}/);
   });
 });
 

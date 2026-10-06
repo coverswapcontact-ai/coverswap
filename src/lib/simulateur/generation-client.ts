@@ -22,22 +22,10 @@ export const PANNES = ["service-indisponible", "global-quota", "ip-quota", "quot
 
 export const MESSAGE_NON_CONFIGURE = "Le simulateur n'est pas disponible pour l'instant. Votre photo et vos choix sont conservés : laissez-nous vos coordonnées, nous ferons la simulation pour vous.";
 
-export function baseCrm(): string {
-  return SIMULATE_URL.replace(/\/api\/simulate\/?$/, "");
-}
+export { baseCrm, urlEchantillon, urlVignette } from "./adresses-crm";
 
 export function urlImageTravail(travailId: string, parcoursId: string, quoi: "apres" | "avant"): string {
   return `${SIMULATE_URL}/image?id=${encodeURIComponent(travailId)}&p=${encodeURIComponent(parcoursId)}&quoi=${quoi}`;
-}
-
-/** Vignette de 320 px d'un échantillon (grille du catalogue), servie et mise en cache par le CRM. */
-export function urlVignette(ref: string): string {
-  return `${baseCrm()}/api/site/echantillons/${encodeURIComponent(ref)}?l=320`;
-}
-
-/** L'échantillon entier (« voir en grand »). */
-export function urlEchantillon(ref: string): string {
-  return `${baseCrm()}/api/site/echantillons/${encodeURIComponent(ref)}`;
 }
 
 export type Lancement = { ok: true; travailId: string; attenteEstimeeS: number } | { ok: false; raison: string; message: string; zones?: string[] };

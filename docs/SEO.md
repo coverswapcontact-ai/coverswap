@@ -1,7 +1,7 @@
 # SEO et performance du site — site 3.0
 
 Squelette posé au lot B0 (mission 21) ; carte des intentions, image de partage et hôte unique écrits au lot F1 et
-appliqués aux lots F2 et F3 ; données structurées au lot F4, maillage au lot F5 ; les mesures « après » aux lots F6 et G3.
+appliqués aux lots F2 et F3 ; données structurées au lot F4, maillage au lot F5 ; les mesures « après » aux lots F6, F7 et G3.
 
 ## Objectifs
 
@@ -390,6 +390,96 @@ processeur sont vraiment ralentis pendant le chargement, le LCP est celui qui s'
 - **`/inspirations`** : 739 Ko de HTML (52 cartes, chacune avec son curseur, ses cartels et son `ImageObject` ; la
   moitié est la charge RSC qui double le HTML). Pour aller plus loin, il faudrait alléger les 40 cartes de « Voir toutes
   les ambiances » (par exemple l'après seul jusqu'au clic) : un choix d'interface, laissé à Lucas.
+
+### Lot F7 (06/10/2026) — le JavaScript du démarrage, même méthode que B0 et F6
+
+Même poste, même méthode (Lighthouse 12.6.1, mobile par défaut, simulation « Lantern », Chrome 153 sans interface, build
+construit comme la CI, `next start -p 3100`, trois passages par page, le meilleur gardé), sur le build final du lot.
+
+| Page | Adresse | Performance | Accessibilité | Bonnes pratiques | SEO | LCP | CLS | TBT | Performance des 3 passages |
+|---|---|---|---|---|---|---|---|---|---|
+| accueil | `/` | 85 | 100 | 100 | 100 | 3,9 s | 0,000 | 155 ms | 85 / 83 / 83 |
+| simulateur | `/simulateur` | 85 | 100 | 100 | 100 | 3,8 s | 0,000 | 232 ms | 85 / 85 / 84 |
+| matieres | `/matieres` | 88 | 100 | 100 | 100 | 3,4 s | 0,000 | 146 ms | 88 / 86 / 86 |
+| realisations | `/realisations` | 88 | 100 | 100 | 100 | 3,7 s | 0,000 | 124 ms | 88 / 88 / 87 |
+| comment-ca-marche | `/comment-ca-marche` | 92 | 100 | 100 | 100 | 3,3 s | 0,000 | 101 ms | 92 / 91 / 90 |
+| pro | `/pro` | 86 | 100 | 100 | 100 | 3,8 s | 0,000 | 109 ms | 86 / 85 / 83 |
+| prestation-cuisine | `/prestations/cuisine` | 85 | 100 | 100 | 100 | 3,8 s | 0,000 | 140 ms | 85 / 84 / 84 |
+| matieres-nf13 | `/matieres?ref=NF13` | 85 | 100 | 100 | 100 | 3,4 s | 0,000 | 217 ms | 85 / 83 / 80 |
+| fiche-nf13 | `/matieres/couleur/NF13` | 91 | 100 | 100 | 100 | 3,0 s | 0,000 | 208 ms | 91 / 90 / 89 |
+| inspirations | `/inspirations` | 80 | 100 | 100 | 100 | 3,9 s | 0,000 | 329 ms | 80 / 79 / 79 |
+| contact | `/contact` | 92 | 100 | 100 | 100 | 2,7 s | 0,000 | 195 ms | 92 / 90 / 90 |
+
+**F6 → F7**, performance · accessibilité · SEO · LCP (bonnes pratiques à 100 partout, CLS 0 partout) :
+
+| Page | F6 | F7 | Écart |
+|---|---|---|---|
+| `/` | 82 · 100 · 100 · 4,8 s | 85 · 100 · 100 · 3,9 s | +3 · -0,9 s |
+| `/simulateur` | 88 · 100 · 100 · 3,8 s | 85 · 100 · 100 · 3,8 s | -3 · -0,0 s |
+| `/matieres` | 84 · 100 · 100 · 3,8 s | 88 · 100 · 100 · 3,4 s | +4 · -0,4 s |
+| `/realisations` | 89 · 100 · 100 · 3,7 s | 88 · 100 · 100 · 3,7 s | -1 · -0,0 s |
+| `/comment-ca-marche` | 91 · 100 · 100 · 3,5 s | 92 · 100 · 100 · 3,3 s | +1 · -0,2 s |
+| `/pro` | 83 · 100 · 100 · 4,5 s | 86 · 100 · 100 · 3,8 s | +3 · -0,8 s |
+| `/prestations/cuisine` | 78 · 100 · 100 · 5,2 s | 85 · 100 · 100 · 3,8 s | +7 · -1,4 s |
+| `/matieres?ref=NF13` | 80 · 100 · 100 · 4,0 s | 85 · 100 · 100 · 3,4 s | +5 · -0,6 s |
+| `/matieres/couleur/NF13` | 91 · 100 · 100 · 3,2 s | 91 · 100 · 100 · 3,0 s | +0 · -0,2 s |
+| `/inspirations` | 77 · 100 · 100 · 4,6 s | 80 · 100 · 100 · 3,9 s | +3 · -0,7 s |
+| `/contact` | 89 · 100 · 100 · 3,3 s | 92 · 100 · 100 · 2,7 s | +3 · -0,6 s |
+
+**Les 8 pages de la CI passent ses seuils** (performance ≥ 85, LCP ≤ 4 s, TBT ≤ 400 ms, CLS ≤ 0,05, les trois autres
+axes ≥ 95) en mesure locale, au meilleur des trois passages comme au meilleur des deux premiers (la CI en fait deux).
+La marge reste mince sur l'accueil, le simulateur et la prestation cuisine (85).
+
+**Complément : sans le calcul d'occultation des fenêtres de Windows** (`--disable-features=CalculateNativeWinOcclusion
+--disable-backgrounding-occluded-windows --disable-renderer-backgrounding`, 2 passages ; la machine Linux de la CI n'a
+pas ce calcul) :
+
+| Page | Performance (2 passages) | LCP | TBT |
+|---|---|---|---|
+| `/` | 84 / 80 | 3,9 s | 232 ms |
+| `/simulateur` | 87 / 82 | 3,8 s | 166 ms |
+| `/matieres` | 90 / 84 | 3,3 s | 183 ms |
+| `/realisations` | 87 / 87 | 3,6 s | 176 ms |
+| `/comment-ca-marche` | 91 / 87 | 3,4 s | 128 ms |
+| `/pro` | 80 / 78 | 4,0 s | 318 ms |
+| `/prestations/cuisine` | 84 / 79 | 4,0 s | 221 ms |
+| `/matieres/couleur/NF13` | 89 / 88 | 3,1 s | 259 ms |
+
+### À retenir (lot F7)
+
+- **Ce qui pesait sur le LCP simulé, trouvé** : sur ce poste, Chrome sans interface ne présente sa première image
+  qu'après 1,2 à 2,4 s (vraisemblablement le calcul d'occultation des fenêtres de Windows : la page est peinte vers
+  0,3 s, montrée au réveil suivant du compositeur ; sans ce calcul, vers 0,5 s). Lantern compte alors TOUT ce qui s'est téléchargé avant : le JavaScript, et
+  surtout les **préchargements de Next** (les liens visibles dès l'hydratation : sur l'accueil la charge RSC de « / »,
+  du simulateur et ≈ 57 Ko de JavaScript du simulateur ; sur la prestation cuisine, sept pages, ≈ 170 Ko). Ils
+  partent désormais au premier geste ou trois secondes après `load` (`LienSite`, `PrechargementDiffere`) : accueil
+  4,8 → 3,9 s, prestation cuisine 5,2 → 3,8 s, `/pro` 4,5 → 3,8 s.
+- **JavaScript au démarrage** (compressé, hors le polyfill `noModule` que les navigateurs actuels ne téléchargent pas) :
+  accueil 156,7 → 145,7 Ko, simulateur 193,3 → 174,2, « Comment ça marche » 155,0 → 140,8, prestation 155,1 → 144,0,
+  `/contact` 156,7 → 147,5, `/pro` 157,7 → 150,6, fiche 149,1 → 143,0, `/realisations` et `/inspirations` 148,9 →
+  143,0, `/matieres` 158,0 → 154,7. Le cadre de Next et React (≈ 127 Ko) est le même partout ; le code du site au
+  démarrage passe de ≈ 22-66 Ko à ≈ 14-47 Ko selon la page.
+- **Ce qui a été retiré du démarrage** : le curseur avant / après et son plein écran, son calque, le client de la
+  génération et le manifeste des images sur TOUTES les pages (le gabarit et `metadonneesPage` passaient par
+  `lib/partage` → `inspirations/ordre` → `CarteAmbiance` → `AvantApres` : 14 Ko compressés partout) ; le plein écran à
+  la demande ; la feuille « Être rappelé » et son captcha au premier geste ; sur le simulateur, le manifeste et les
+  données des ambiances (cartes de pièces résolues par la page) et les écrans d'attente, d'échec, de résultat, de
+  demande et la feuille du catalogue (préchargés dès l'écran Photo).
+- **Ailleurs** : l'italique de Playfair en graisse 400 seule (22 Ko au lieu de 38) ; l'icône de l'onglet en 64 px (2 Ko
+  au lieu de 12, demandée pendant le chargement de chaque page) ; les pastilles de 22 px des cartes de pièces en
+  `fetchPriority="low"` (huit vignettes de 320 px, ≈ 80 Ko, passaient en priorité haute au premier écran du simulateur).
+- **Rendu inchangé** : captures 390 / 1 440 de l'accueil, du simulateur, de `/realisations`, de la prestation cuisine et
+  de `/inspirations`, avant (0008036) et après le lot : aucun pixel changé.
+- **Objectifs 90 et 2,5 s : atteints sur « Comment ça marche » (92), la fiche (91) et `/contact` (92, LCP 2,7 s)
+  seulement.** Le plancher est le cadre de Next et React, les deux polices préchargées et le document : ≈ 340 Ko comptés
+  avant l'affichage observé, soit un LCP simulé de 3,8 à 3,9 s pour les pages à curseur d'ouverture. Descendre plus bas
+  demanderait de ne plus hydrater les pages (hors du site 3.0).
+- **Le TBT est devenu le facteur instable** (100 à 330 ms selon le passage, et plus haut sans le calcul d'occultation :
+  `/pro` 318 ms, performance 78-80 dans ce complément) : la première mise en page coûte 90 à 180 ms sur ce poste, puis
+  l'hydratation ≈ 70 ms. La CI de GitHub mesurera au premier passage sur `main` (G3) : l'accueil, `/pro` et la
+  prestation cuisine sont les pages à surveiller.
+- **`/inspirations`** (hors CI) : 77 → 80, LCP 4,6 → 3,9 s ; ses 52 curseurs et ses 727 Ko de HTML restent le choix
+  d'interface laissé à Lucas au lot F6.
 
 ### Lot G3 (coverswap.fr, après la fusion)
 

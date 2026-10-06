@@ -1,11 +1,11 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Picto } from "@/components/espace/Illustrations";
-import { photoDePiece, type PieceId } from "@/lib/images-pieces";
-import { imagePreparee } from "@/lib/images-preparees";
+import type { PieceId } from "@/lib/images-pieces";
+import type { PhotoCarte } from "@/lib/photos-cartes";
 import { pictoDeLaPiece } from "@/lib/simulateur/projets";
-import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
+import { Pastilles } from "@/components/ambiances/Pastilles";
 import { Etiquette } from "./Etiquette";
-import { Photo } from "./Photo";
+import { CadrePhoto } from "./CadrePhoto";
 
 /**
  * Les cinq cartes « Quelle pièce transformons-nous ? » (mission 15, partie 4),
@@ -35,6 +35,10 @@ import { Photo } from "./Photo";
  * Mission 19 : sur une photo, les pastilles des vraies matières de l'ambiance (`ambiances/PastillesMatieres`), en bas à
  * droite ; leurs noms au survol ou à l'appui.
  *
+ * Lot F7 : `photos` arrive RÉSOLU (`photosDesCartes` de `lib/photos-cartes`, appelé par la page serveur : sources du
+ * manifeste et matières des pastilles) ; ce composant, rendu dans le navigateur par le simulateur, n'importe plus ni le
+ * manifeste des images ni les données des ambiances (`CadrePhoto`, `Pastilles`). Même rendu.
+ *
  * Mission 16 (partie 6) : sans état, donc sans « use client » — rendu serveur quand la page est serveur (les cartes
  * en liens de `/realisations` n'envoient aucun JavaScript), rendu dans le paquet client quand un composant client
  * l'importe (simulateur, module d'accueil, espace : inchangés). Un bouton sans `onChoisir` n'a pas de gestionnaire
@@ -49,26 +53,25 @@ const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
  * Mission 16 (partie 5) : `liens` (pièce → adresse) fait de chaque carte un LIEN (`/realisations` mène aux pages par
  * pièce) au lieu d'un bouton de choix ; même dessin, même photo. Une pièce sans adresse garde son bouton.
  */
-type ProprietesCartesPieces = { pieces: PieceCarte[]; nom?: string; photos?: Partial<Record<PieceId, string>>; photosImmediates?: number } & ({ valeur: string | null; onChoisir: (id: string) => void; liens?: undefined } | { liens: Partial<Record<string, string>>; valeur?: undefined; onChoisir?: undefined });
+type ProprietesCartesPieces = { pieces: PieceCarte[]; nom?: string; photos?: Partial<Record<PieceId, PhotoCarte>>; photosImmediates?: number } & ({ valeur: string | null; onChoisir: (id: string) => void; liens?: undefined } | { liens: Partial<Record<string, string>>; valeur?: undefined; onChoisir?: undefined });
 
 export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce", photos, photosImmediates = 0, liens }: ProprietesCartesPieces) {
   return (
     <div role="group" aria-label={nom} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {pieces.map((p, rang) => {
         const choisie = valeur === p.id;
-        const photo = photoDePiece(photos, p.id);
-        const avecPhoto = photo !== null && imagePreparee(photo);
+        const photo = photos && Object.prototype.hasOwnProperty.call(photos, p.id) ? (photos[p.id as PieceId] ?? null) : null;
         const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-encre ring-1 ring-encre" : "border-trait hover:border-encre-2"}`;
         const lien = liens && Object.prototype.hasOwnProperty.call(liens, p.id) ? liens[p.id] : undefined;
         const contenu = (
           <>
-            {avecPhoto ? (
+            {photo ? (
               <span className="relative block w-full overflow-hidden rounded-[var(--rayon-sm)]">
-                <Photo nom={photo} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
+                <CadrePhoto sources={photo.sources} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
                 <span aria-hidden="true">
                   <Etiquette className="absolute bottom-2 left-2">Ambiance</Etiquette>
                 </span>
-                <PastillesMatieres image={photo} />
+                <Pastilles matieres={photo.matieres} />
               </span>
             ) : (
               <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>

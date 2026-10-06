@@ -48,9 +48,12 @@ describe("lot E1 : Simulateur.tsx allégé", () => {
     const s = lire("Simulateur.tsx");
     const lignes = s.split("\n").length;
     assert.ok(lignes < 560, `Simulateur.tsx : ${lignes} lignes`);
-    assert.match(s, /import \{ EcranGeneration, EcranSansPhoto \} from "\.\/EcranGeneration";/);
+    // Lot F7 : l'attente, l'échec, le résultat et la feuille sont chargés à part (`ecrans-differes.ts`, préchargés à l'écran Photo).
+    assert.match(s, /import \{ DemandeApresRendu, EcranGeneration, EcranResultat, EcranSansPhoto, FeuilleCatalogue, prechargerLesEcrans \} from "\.\/ecrans-differes";/);
+    assert.match(lire("ecrans-differes.ts"), /export const EcranGeneration = lazy\(\(\) => chargerGeneration\(\)\.then\(\(m\) => \(\{ default: m\.EcranGeneration \}\)\)\);/);
+    assert.match(s, /useEffect\(\(\) => \{\s*if \(ecran >= 2\) prechargerLesEcrans\(\);\s*\}, \[ecran\]\);/);
     assert.match(s, /useFeuilleCatalogue\(piece, etat\.selections, mettreAJour, /);
-    assert.match(s, /\{feuille \? <FeuilleCatalogue \{\.\.\.feuille\} \/> : null\}/);
+    assert.match(s, /\{feuille \? \(\s*<Suspense fallback=\{null\}>\s*<FeuilleCatalogue \{\.\.\.feuille\} \/>\s*<\/Suspense>\s*\) : null\}/);
     for (const parti of ["<EcranAttente", "formulaireSecours", "choisirTeinte", "useFavoris", "Commencez par une photo"]) assert.ok(!s.includes(parti), parti);
     // La feuille garde ses règles : les zones incompatibles vidées, le focus rendu sans défilement, les autres zones proposées.
     const h = lire("useFeuilleCatalogue.ts");

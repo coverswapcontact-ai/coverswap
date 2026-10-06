@@ -6,6 +6,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { PHOTOS_PIECES, photoDePiece } from "@/lib/images-pieces";
+import { photosDesCartes } from "@/lib/photos-cartes";
 import { PROJECT_TYPES } from "@/lib/simulateur/projets";
 import { CartesPieces, type PieceCarte } from "./CartesPieces";
 import { Photo } from "./Photo";
@@ -21,7 +22,8 @@ import { Photo } from "./Photo";
  */
 
 const PIECES: PieceCarte[] = PROJECT_TYPES.map((p) => ({ id: p.id, libelle: p.label, description: p.description }));
-const rendre = (photos?: Record<string, string>) => renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos }));
+// Lot F7 : les cartes reçoivent leurs photos résolues par la page (`photosDesCartes`), comme le simulateur et /realisations.
+const rendre = (photos?: Record<string, string>) => renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: photos ? photosDesCartes(photos) : undefined }));
 const boutons = (html: string) => html.split("<button").slice(1);
 /** Un nom réellement préparé (le manifeste du dépôt n'est pas vide : ouverture provisoire, illustrations). */
 const PREPAREE = Object.keys(MANIFESTE_IMAGES)[0];
@@ -65,7 +67,7 @@ describe("CartesPieces avec photos", () => {
 
   test("chargement : les N premières photos tout de suite (eager, sans fetchpriority), les autres en lazy ; lazy par défaut", { skip: PREPAREE ? false : "manifeste vide" }, () => {
     const toutes = Object.fromEntries(PIECES.map((p) => [p.id, PREPAREE]));
-    const images = (photosImmediates?: number) => boutons(renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: toutes, photosImmediates }))).map((b) => b.match(/<img [^>]*>/)?.[0] ?? "");
+    const images = (photosImmediates?: number) => boutons(renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: photosDesCartes(toutes), photosImmediates }))).map((b) => b.match(/<img [^>]*>/)?.[0] ?? "");
     const parDefaut = images();
     assert.equal(parDefaut.length, 5);
     for (const img of parDefaut) assert.match(img, /loading="lazy"/);
@@ -94,10 +96,13 @@ describe("les photos des pièces : un seul endroit", () => {
 
   test("le simulateur passe PHOTOS_PIECES ; l'espace client, non (ses cartes restent des dessins) ; l'accueil n'a plus de cartes (site 3.0 : des pictos)", () => {
     const lire = (f: string) => readFileSync(path.join(process.cwd(), f), "utf8");
-    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx"]) {
-      assert.match(lire(f), /<CartesPieces [^\n]*photos=\{PHOTOS_PIECES\}[^\n]*\/>/, f);
-      assert.match(lire(f), /from "@\/lib\/images-pieces"/, f);
-    }
+    // Lot F7 : la page du simulateur résout les photos (`photosDesCartes(PHOTOS_PIECES)`) et les passe jusqu'aux cartes ;
+    // l'écran Pièce (rendu dans le navigateur) n'importe ni les noms, ni le manifeste, ni les ambiances.
+    assert.match(lire("src/app/simulateur/page.tsx"), /<Simulateur [^\n]*photosPieces=\{photosDesCartes\(PHOTOS_PIECES\)\} \/>/);
+    assert.match(lire("src/app/simulateur/_components/Simulateur.tsx"), /<EcranPiece [^\n]*photos=\{photosPieces\} \/>/);
+    assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /<CartesPieces [^\n]*photos=\{photos\} \/>/);
+    assert.match(lire("src/app/realisations/page.tsx"), /<CartesPieces [^\n]*photos=\{photosDesCartes\(PHOTOS_PIECES\)\}/);
+    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.doesNotMatch(lire(f), /import \{[^}]*\b(PHOTOS_PIECES|sourcesPhoto|imagePreparee|PastillesMatieres|Photo)\b[^}]*\} from/, f);
     // Premier écran du simulateur : les photos du premier rang en chargement immédiat.
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /<CartesPieces [^\n]*photosImmediates=\{PHOTOS_IMMEDIATES\}/);
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /const PHOTOS_IMMEDIATES = 3;/);

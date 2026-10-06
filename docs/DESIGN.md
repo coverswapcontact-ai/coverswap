@@ -832,6 +832,28 @@ Lot E4 (énoncé, phase E point 3), sous l'image du résultat, dans cet ordre :
   liés, tuiles du présentoir avec « voir en grand » pour les lecteurs d'écran) ; le champ piège des formulaires est
   hors de l'ordre du clavier (`tabIndex={-1}`).
 
+## Le JavaScript du démarrage (lot F7)
+
+- **Liens** : tout lien interne passe par `components/LienSite.tsx` (seul import de `next/link`), une simple fonction qui
+  pose `prefetch={false}`. Le préchargement est fait une fois pour la page par `PrechargementDiffere` (gabarit) : au
+  survol, au toucher ou au focus d'un lien tout de suite, puis les liens visibles à partir du premier geste ou trois
+  secondes après `load` (`lib/prechargement-liens.ts`). Un `prefetch={false}` écrit dans le code reste « jamais ».
+- **Aucun composant client par une donnée** : un module lu par toutes les pages (`lib/partage.ts`, `metadonneesPage`,
+  le gabarit) n'importe jamais un fichier qui importe un composant client — `resoudreCas` vit dans
+  `components/ambiances/cas.ts`, pas à côté de `CarteAmbiance`. Un composant envoyé au navigateur n'importe ni le
+  manifeste des images (`lib/sources-image.ts` pour le `<picture>`, `CadrePhoto` avec des sources résolues) ni les
+  données des ambiances (`Pastilles` avec des matières résolues, `lib/photos-cartes.ts`) ni le client de la
+  génération (`lib/simulateur/adresses-crm.ts`). `perf.test.ts` suit les imports et le vérifie.
+- **À la demande** : le plein écran du curseur (au survol ou au clic de « Plein écran »), la feuille « Être rappelé »
+  et son captcha (au premier geste vers le bouton), les écrans du simulateur qui ne sont jamais le premier (attente,
+  échec, résultat, demande, feuille du catalogue : `ecrans-differes.ts`, préchargés dès l'écran Photo). Le rendu ne
+  change pas (captures identiques au pixel près, avant / après le lot).
+- **Images décoratives** : les pastilles de 22 px des cartes en `fetchPriority="low"` (sinon le navigateur les hisse
+  devant la photo de la carte). L'icône de l'onglet en 64 px (`icone-64.png`, 2 Ko) ; le logo de 512 px reste celui de
+  l'écran d'accueil.
+- **Polices** : l'italique de Playfair en graisse 400 seulement (22 Ko au lieu de 38), le nom du cartel en
+  `font-normal`.
+
 ## Ce qu'on a jeté de la maquette
 
 Tout ce qui fait « faux magazine » (énoncé, phase B) :

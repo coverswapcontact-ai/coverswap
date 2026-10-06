@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { SITE } from "@/lib/constants";
 import Breadcrumb from "@/components/Breadcrumb";
 import { metadonneesPage } from "@/lib/metadonnees";

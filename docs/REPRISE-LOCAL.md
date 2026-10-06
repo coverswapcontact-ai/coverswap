@@ -51,6 +51,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - F4, données structurées : fait (une entreprise locale, `Service` avec `@id` et image, `ImageObject` par avant / après, fil d'Ariane visible et balisé partout ; `docs/SEO.md` « Données structurées »).
 - F5, maillage : fait (ambiance → fiches et prestation, fiche → ambiances et prestations, prestation → 3 avant / après, vedettes, villes, ville → prestations et réalisations ; `docs/SEO.md` « Maillage »).
 - F6, performance, accessibilité, honnêteté : fait (Lighthouse après dans `docs/SEO.md` : accessibilité, SEO et bonnes pratiques à 100 sur 11 pages, CLS 0 ; performance 77 à 91 et LCP simulé 3,2 à 5,2 s, objectifs 90 et 2,5 s non atteints, expliqué ; `honnetete.test.ts`, `mots.test.ts`, 8 pages en CI).
+- F7, performance (le JavaScript du démarrage) : fait (préchargements de Next différés, curseur et plein écran hors du gabarit, « Être rappelé » et écrans secondaires du simulateur à la demande ; les 8 pages de la CI passent ses seuils en local, 85 à 92, LCP 3,0 à 3,9 s ; 90 et 2,5 s atteints sur 3 pages ; `docs/SEO.md` « Lot F7 »).
 
 ## Phase G : livraison
 
@@ -1825,3 +1826,97 @@ et les écrans d'échec du simulateur ne se capturent pas sans CRM ni générati
 
 **Problèmes** : aucun. La phrase de NF13 redit la voisine que sa note cite déjà (Jade Green NE83) ; sans gravité, à
 retoucher à la main si Lucas le souhaite.
+
+## F7 — performance : le JavaScript du démarrage (06/10/2026)
+
+**Mesuré d'abord** (scripts dans `scratchpad/m21/f7` : `chunks.mjs` lit les `<script>` des pages construites et
+compresse chaque morceau ; `req.js` liste ce que Lighthouse compte avant l'affichage observé ; `graphe.mjs` suit les
+imports statiques d'un module). Trois causes :
+1. **Les préchargements de Next** : sur ce poste, Chrome sans interface ne présente la première image qu'après 1,2 à
+   2,4 s (la page est peinte vers 0,3 s ; vraisemblablement l'occultation des fenêtres de Windows : sans ce calcul,
+   vers 0,5 s). Lantern compte tout ce qui s'est téléchargé avant, dont les préchargements que Next lance dès
+   l'hydratation pour chaque lien visible : ≈ 100 Ko sur l'accueil (charges RSC de « / » et du simulateur, ≈ 57 Ko de
+   JavaScript du simulateur), ≈ 170 Ko sur la prestation cuisine (sept pages). Mesure : les bloquer seuls faisait
+   passer le LCP simulé de l'accueil de 4,8 à 4,2 s.
+2. **Le curseur sur toutes les pages** : `layout.tsx` et `metadonneesPage` lisent `lib/partage`, qui lit
+   `inspirations/_components/ordre`, qui importait `resoudreCas` de `CarteAmbiance`, qui importe `AvantApres` : le
+   morceau du gabarit (14 Ko compressés) portait le curseur, son plein écran, son calque, le client de la génération
+   (messages de l'analyse de la photo) et tout le manifeste des images (via `ImagePreparee` → `images-preparees`),
+   même sur `/cgv`.
+3. **Ce qui ne sert qu'au clic** : la feuille « Être rappelé » et son captcha (6 Ko par page qui l'affiche), le plein
+   écran, et sur le simulateur les écrans d'attente, d'échec, de résultat, la demande et la feuille du catalogue, plus
+   les données des ambiances et le manifeste tirés par les cartes de pièces.
+
+**Fait** (aucun appel d'API, aucun envoi : captures et sondes avec les `POST` coupés)
+- `components/LienSite.tsx` : seul import de `next/link` (34 fichiers repris), une fonction (pas un composant client)
+  qui pose `prefetch={false}` (et `data-sans-prechargement` sur un `prefetch={false}` écrit dans le code).
+  `components/PrechargementDiffere.tsx` (gabarit, une instance) précharge par `router.prefetch` : au survol, au toucher
+  ou au focus d'un lien tout de suite, puis les liens visibles (200 px de marge, comme Next) au premier geste ou trois
+  secondes après `load` ; une fois par adresse ; jamais `/api/`, un fichier, un autre site, un nouvel onglet, la page
+  elle-même (`lib/prechargement-liens.ts`, pur et testé). Vérifié dans Edge sur le build : aucune requête RSC avant
+  load + 3 s, puis les liens visibles ; survol → préchargement ; la navigation vers le simulateur marche.
+  Première version écartée : un `LienSite` client (un `useSyncExternalStore` par lien) faisait monter le TBT de
+  `/inspirations` à 400-745 ms (deux composants à hydrater par lien, des centaines de liens).
+- `components/ambiances/cas.ts` : `resoudreCas`, `regrouperMatieres`, `imageObjetCas`, `CasAmbiance` (sans aucun
+  composant) ; `CarteAmbiance` les réexporte ; `ordre.ts`, `pro/vue.ts`, `realisations/paires.ts` et
+  `blog/[slug]/illustration.ts` les lisent là.
+- `lib/sources-image.ts` (type du `<picture>`, media, `plafonnerSrcset`, sans import) et `lib/simulateur/adresses-crm.ts`
+  (`baseCrm`, `urlVignette`, `urlEchantillon`, l'adresse lue à l'appel) : réexportés par `images-preparees` et
+  `generation-client`, lus directement par `ImagePreparee`, `AvantApres`, `CalqueMatieres`, `PastillesMatieres`,
+  `BandeMatiere`, `Echantillon`.
+- `AvantApres` : `PleinEcran` en `lazy`, chargé au survol ou au focus de « Plein écran », au plus tard au clic.
+- `FormulaireRappel` n'est plus que le bouton (même HTML) ; `FeuilleRappel` (la feuille, le formulaire, le captcha, les
+  événements `CONTACT_ENVOYE` / `RAPPEL_DEMANDE` / `FORMULAIRE_ECHEC` inchangés) est chargée au survol, au focus, au
+  toucher, au plus tard au clic, puis gardée (réponses et confirmation restent) ; les créneaux se calculent toujours à
+  l'ouverture (dans le bouton).
+- Simulateur : `CartesPieces` reçoit ses photos résolues (`lib/photos-cartes.ts › photosDesCartes`, appelé par
+  `simulateur/page.tsx` et `/realisations`) et rend `CadrePhoto` (le rendu de `Photo`, sources résolues) et `Pastilles`
+  (le rendu de `PastillesMatieres`, matières résolues) : ni manifeste ni ambiances dans son JavaScript (l'espace client
+  en profite). `ecrans-differes.ts` : `EcranGeneration`, `EcranSansPhoto`, `EcranResultat`, `DemandeApresRendu`,
+  `FeuilleCatalogue` en `lazy`, préchargés dès l'écran Photo, au premier geste ou trois secondes après `load` ;
+  `useMatiereDemandee` lit `chargerCatalogue` dans `lib/matieres`. Simulateur : 193 → 174 Ko compressés au démarrage.
+- Pastilles de 22 px en `fetchPriority="low"` ; icône de l'onglet `public/icone-64.png` (2 Ko, `generate-assets.mjs`) ;
+  italique de Playfair en graisse 400 seule (22 Ko au lieu de 38 ; nom du cartel en `font-normal`, la seule graisse
+  employée — relevé dans Edge sur 12 pages : 241 noms, tous en 400).
+- Polices vérifiées : Playfair et Libre Franklin préchargées, `font-display: swap`, replis ajustés ; l'italique à la
+  demande.
+- `docs/SEO.md` « Lot F7 » (tableaux, complément sans occultation, à retenir), `docs/DESIGN.md` « Le JavaScript du
+  démarrage ».
+
+**Lighthouse après** (même méthode que B0 / F6, 11 pages, meilleur de 3) : accueil 82 → 85 (LCP 4,8 → 3,9 s),
+simulateur 88 → 85 (3,8 s ; le TBT varie d'un passage à l'autre), `/matieres` 84 → 88, `/realisations` 89 → 88,
+« Comment ça marche » 91 → 92, `/pro` 83 → 86 (4,5 → 3,8 s), prestation cuisine 78 → 85 (5,2 → 3,8 s),
+`/matieres?ref=NF13` 80 → 85, fiche 91 → 91 (3,0 s), `/inspirations` 77 → 80, `/contact` 89 → 92 (2,7 s).
+Accessibilité, bonnes pratiques et SEO à 100 sur les 33 passages, CLS 0 partout.
+
+**Décisions prises seul**
+1. **Préchargement différé plutôt que supprimé** : la navigation reste aussi rapide après trois secondes ou un geste ;
+   avant, un clic charge la page comme un lien non préchargé. Le survol et le toucher préchargent toujours tout de suite.
+2. **Pas de curseur « statique puis hydraté à l'approche »** : la charge RSC devrait porter à la fois le rendu statique
+   et les propriétés du curseur (plus de HTML), et l'échange des `<img>` à l'approche recharge les images ; le gain
+   (l'hydratation de 7 curseurs sur l'accueil) ne le paie pas. Le plein écran, lui, est à la demande.
+3. **Le menu du téléphone reste chargé avec la page** (sa feuille ≈ 3 Ko) : le différer touchait `useLiensDeFeuille`
+   et ses tests pour un gain de l'ordre de l'écart de mesure.
+4. **Les exemples du simulateur restent dans la page** (60 Ko de la charge RSC, quelques Ko compressés) : les charger
+   à l'écran Photo changerait son affichage (une attente).
+5. **Seuils de la CI inchangés** ; complément de mesure sans le calcul d'occultation écrit dans `docs/SEO.md`.
+
+**Tests** : 588 → 598, tous réussis. `perf.test.ts` (+10, bloc « lot F7 ») : suivi des imports statiques (contrôle) ;
+gabarit et `metadonneesPage` sans curseur (liste exacte des composants clients du gabarit) ; le curseur sans
+manifeste, client de la génération ni plein écran au démarrage ; « Être rappelé » sans feuille ni captcha au
+démarrage ; `next/link` importé par `LienSite` seul, rendu du lien inchangé ; ce qui se précharge ; le moment (fenêtre
+factice) ; le simulateur au démarrage ; l'icône de 64 px ; l'italique en 400. Liste blanche : + `PrechargementDiffere`,
++ `FeuilleRappel`. Adaptés (intention gardée) : `perf.test.ts` (police italique), `accueil.test.ts` et
+`gabarit.test.ts` (le formulaire et la feuille lus dans `FeuilleRappel`), `cartes-pieces.test.ts` (photos résolues par
+`photosDesCartes`, la chaîne page → `Simulateur` → `EcranPiece` → `CartesPieces`), `ecran-generation.test.ts` (les
+écrans chargés à part, Simulateur.tsx toujours sous 560 lignes), `exemples.test.ts` et `pictos.test.ts` (nouvelle
+propriété `photosPieces` / `photos`). `npx eslint .` et `npm run build` passent. Captures 390 / 1 440 (accueil,
+simulateur, `/realisations`, prestation cuisine, `/inspirations`) comparées au build de 0008036 : aucun pixel changé ;
+aucun débordement à 360 px ; serveur arrêté. Événements de parcours : `SuiviParcours` intact, ceux du rappel et du
+simulateur émis par les mêmes lignes (déplacées pour le rappel).
+
+**Problèmes** : objectifs 90 et 2,5 s atteints sur 3 pages seulement (« Comment ça marche », fiche, `/contact`) ; marge
+de 0 à 1 point sur l'accueil, le simulateur et la prestation cuisine ; le TBT varie de 100 à 330 ms d'un passage à
+l'autre sur ce poste, et le complément sans occultation donne `/pro` 78-80 et la prestation 79-84 : **risque réel
+d'échec du plancher de 85 sur la CI de GitHub** au passage sur `main` (G3), à surveiller (pages : accueil, `/pro`,
+prestation cuisine). `/inspirations` (hors CI) reste à 80.
