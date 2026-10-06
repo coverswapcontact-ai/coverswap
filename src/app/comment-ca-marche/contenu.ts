@@ -1,6 +1,6 @@
 import { FAQ_EAU_CHALEUR, FAQ_GARANTIE, FAQ_GENERALE, FAQ_RETRAIT, type QuestionReponse } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
-import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS, fourchette } from "@/lib/offre";
+import { ACOMPTE_POURCENT, DELAI_RENDU, DELAI_REPONSE, DELAI_REPONSE_COURT, DUREE_POSE_TEXTE, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, VALIDITE_DEVIS_JOURS } from "@/lib/offre";
 
 /**
  * Les textes de « Comment ça marche » (mission 16, partie 5) : le procédé, le prix, les objections, les guides.
@@ -74,17 +74,6 @@ export const PRIX_MESURE = `Nous mesurons le film réellement posé et le factur
 export const PRIX_REGLE = PRIX_EXPLICATION;
 export const PRIX_COMPRIS = "Compris : le film, le nettoyage des surfaces, la pose et les finitions. Les teintes se valident sur échantillons avant la commande ; les frais de déplacement éventuels sont écrits dans le devis.";
 export const PRIX_CONDITIONS = `${ENTREPRISE.tvaMention}. Devis gratuit, valable ${VALIDITE_DEVIS_JOURS} jours, acompte de ${ACOMPTE_POURCENT} % à la commande.`;
-
-/** Les ordres de grandeur par pièce, fourni et posé (`FOURCHETTES`). */
-export const LEGENDE_FOURCHETTES = "Ordres de grandeur par type de projet, fourni et posé";
-const majuscule = (texte: string) => texte.charAt(0).toUpperCase() + texte.slice(1);
-export const LIGNES_FOURCHETTES: { projet: string; prix: string }[] = [
-  { projet: majuscule(FOURCHETTES.cuisine.libelle), prix: fourchette("cuisine") },
-  { projet: majuscule(FOURCHETTES.sdb.libelle), prix: fourchette("sdb") },
-  { projet: majuscule(FOURCHETTES.meuble.libelle), prix: fourchette("meuble") },
-  // « local professionnel : sur devis après visite » : le projet, puis le prix.
-  { projet: majuscule(FOURCHETTES.pro.libelle.split(" : ")[0]), prix: majuscule(FOURCHETTES.pro.libelle.split(" : ")[1] ?? fourchette("pro")) },
-];
 
 /** Une objection : sa question en une ligne, sa réponse ; `reprend` = l'entrée de `FAQ_GENERALE` dont elle lit la réponse. */
 export type Objection = QuestionReponse & { sujet: string; reprend?: QuestionReponse };

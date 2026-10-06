@@ -94,7 +94,7 @@ export const AMBIANCES_SERIE_2: readonly Ambiance[] = [
     avant: "cuisine-l-hetre-avant",
     piece: "cuisine",
     titre: "Cuisine en L, bleu roi, chêne pâle et marbre",
-    scene: "Cuisine en L des années 1970, meubles bas bleu roi, meubles hauts en chêne pâle, plan de travail effet marbre blanc",
+    scene: "Cuisine en L des années 2000, meubles bas bleu roi, meubles hauts en chêne pâle, plan de travail effet marbre blanc",
     inspiration: true,
     surfaces: [
       { surface: "meubles bas", ref: "RM23", nom: "Royal Blue", zone: "meubles-bas", ancre: { x: 50, y: 61 }, etiquette: { x: 50, y: 95, vers: "droite" } },
@@ -108,7 +108,7 @@ export const AMBIANCES_SERIE_2: readonly Ambiance[] = [
     avant: "cuisine-l-hetre-avant",
     piece: "cuisine",
     titre: "Cuisine en L, vert jade et pierre grise",
-    scene: "Cuisine en L des années 1970, meubles bas et hauts vert jade, plan de travail effet pierre grise",
+    scene: "Cuisine en L des années 2000, meubles bas et hauts vert jade, plan de travail effet pierre grise",
     inspiration: true,
     surfaces: [
       { surface: "meubles bas", ref: "NE83", nom: "Jade Green", zone: "meubles-bas", ancre: { x: 50, y: 61 }, etiquette: { x: 50, y: 95, vers: "droite" } },
@@ -527,7 +527,7 @@ export const PAIRES_SERIE_2: readonly PaireAmbiance[] = [
   { avant: "cuisine-bordeaux-brillante-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine en L d'appartement des années 2000, façades bordeaux brillantes, plan de travail gris moucheté", etiquette: "Ambiance · avant / après", apres: ["cuisine-bordeaux-brillante-apres-neutre", "cuisine-bordeaux-brillante-apres-couleur"] },
   { avant: "cuisine-blanche-jaunie-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine des années 1980 sur un mur, façades blanches jaunies par le temps, plan de travail effet bois brun, carrelage à frise", etiquette: "Ambiance · avant / après", apres: ["cuisine-blanche-jaunie-apres-bois", "cuisine-blanche-jaunie-apres-couleur"] },
   { avant: "cuisine-kitchenette-studio-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Kitchenette de studio, façades blanches brillantes, plan de travail effet hêtre, petit réfrigérateur sous le plan", etiquette: "Ambiance · avant / après", apres: ["cuisine-kitchenette-studio-apres-bois", "cuisine-kitchenette-studio-apres-couleur"] },
-  { avant: "cuisine-l-hetre-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine en L des années 1970, façades effet hêtre, plan de travail effet granit gris", etiquette: "Ambiance · avant / après", apres: ["cuisine-l-hetre-apres-bois", "cuisine-l-hetre-apres-couleur"] },
+  { avant: "cuisine-l-hetre-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine en L des années 2000, façades effet hêtre, plan de travail effet granit gris", etiquette: "Ambiance · avant / après", apres: ["cuisine-l-hetre-apres-bois", "cuisine-l-hetre-apres-couleur"] },
   { avant: "cuisine-u-pavillon-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine en U de pavillon des années 1990, façades effet chêne doré, plan de travail effet granit vert, sol en terre cuite", etiquette: "Ambiance · avant / après", apres: ["cuisine-u-pavillon-apres-neutre", "cuisine-u-pavillon-apres-bois"] },
   { avant: "cuisine-couloir-avant", piece: "cuisine", ratio: "1024 / 1536", scene: "Cuisine couloir d'un appartement ancien sous haut plafond, façades blanches usées, plans de travail gris foncé, carreaux de ciment", etiquette: "Ambiance · avant / après", apres: ["cuisine-couloir-apres-neutre", "cuisine-couloir-apres-couleur"] },
   { avant: "cuisine-ouverte-bar-avant", piece: "cuisine", ratio: "1536 / 1024", scene: "Cuisine ouverte avec bar d'un appartement récent, façades taupe et blanches brillantes, plan de travail noir", etiquette: "Ambiance · avant / après", apres: ["cuisine-ouverte-bar-apres-bois", "cuisine-ouverte-bar-apres-couleur"] },

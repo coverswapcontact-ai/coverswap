@@ -53,7 +53,7 @@ export const MANIFESTE_IMAGES: ManifesteImages = {
   "echantillons-table": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "f19beb9cba16" },
   "etape-photo": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "82c61105f42f" },
   "etape-pose": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "f746a037f3f4" },
-  "etape-simulation": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "4c219eac90ca" },
+  "etape-simulation": { largeur: 538, hauteur: 359, largeurs: [480, 538], empreinte: "73d354f50b42" },
   "etude-meubles-apres": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "b1fd9d73e99e" },
   "etude-meubles-avant": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "69ae53a19673" },
   "etude-salle-de-bain-apres": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "59597d4e564a" },

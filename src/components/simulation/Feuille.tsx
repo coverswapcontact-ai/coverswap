@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "re
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { apresHistorique, entrerFeuille } from "./historique-feuilles";
-import { ATTRIBUT_FEUILLE_OUVERTE } from "./saisie";
+import { ATTRIBUT_FEUILLE_OUVERTE, retenirLeFocus } from "./saisie";
 
 /**
  * Feuille plein écran pour le pouce (mission 15, partie 4 : extraite de
@@ -16,7 +16,9 @@ import { ATTRIBUT_FEUILLE_OUVERTE } from "./saisie";
  *    dernière fermée libère ;
  *  - z-index au-dessus de tout ce que le site pose (en-tête 50, bouton collé 40) ;
  *  - Échap ferme la feuille du dessus, glisser vers le bas depuis le haut du
- *    contenu aussi, et le geste retour du téléphone (historique).
+ *    contenu aussi, et le geste retour du téléphone (historique) ;
+ *  - fermée, elle rend le focus à l'élément qui l'avait à l'ouverture
+ *    (`retenirLeFocus`, relecture des lots B et C).
  */
 
 export const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(" ");
@@ -146,10 +148,12 @@ export function Feuille({ ouverte, onFermer, titre, sousTitre, children, pied, l
       if (e.key === "Escape" && feuilles[feuilles.length - 1] === boite.current) fermeture.current();
     };
     window.addEventListener("keydown", surTouche);
+    const rendreLeFocus = retenirLeFocus(document.activeElement as HTMLElement | null);
     boite.current?.focus({ preventScroll: true });
     return () => {
       window.removeEventListener("keydown", surTouche);
       liberer();
+      rendreLeFocus();
     };
   }, [ouverte]);
 

@@ -22,43 +22,53 @@ export const REALISATIONS_ACCUEIL_MAX = 3;
 /** La rangée « Ambiances » : séries 1 (dressing, salon) et 2 (buffet, cuisine familiale). */
 export const AMBIANCES_ACCUEIL = ["dressing-vert-tendre", "salon-marbre", "buffet-salle-a-manger-apres-couleur", "amb-cuisine-familiale"] as const;
 
-/** Les réalisations publiées montrées sur l'accueil : celles qui ont une photo après, dans l'ordre du CRM. */
-export function realisationsAccueil(realisations: readonly Publication[]): EtudeReelle[] {
+/**
+ * Les réalisations publiées montrées sur l'accueil : celles qui ont une photo après, dans l'ordre du CRM, sans celle de
+ * l'ouverture (`idOuverture` : déjà montrée en grand, comme sur les pages de prestation et `/pro`).
+ */
+export function realisationsAccueil(realisations: readonly Publication[], idOuverture?: string | null): EtudeReelle[] {
   return realisations
-    .filter((p): p is Publication & { photoApres: string } => p.type === "REALISATION" && !!p.photoApres)
+    .filter((p): p is Publication & { photoApres: string } => p.type === "REALISATION" && !!p.photoApres && p.id !== idOuverture)
     .slice(0, REALISATIONS_ACCUEIL_MAX)
-    .map(versEtudeReelle);
+    .map((p) => versEtudeReelle(p));
 }
 
 export function ambiancesAccueil(liste: readonly AmbianceResolue[] = ambiances()): AmbianceResolue[] {
   return AMBIANCES_ACCUEIL.flatMap((id) => liste.filter((a) => a.id === id));
 }
 
-export function RealisationsAccueil({ reelles, ambiancesRangee = ambiancesAccueil() }: { reelles: EtudeReelle[]; ambiancesRangee?: AmbianceResolue[] }) {
+/**
+ * `ouvertureReelle` : l'ouverture de l'accueil montre déjà une réalisation (retirée de `reelles`) ; sans autre carte, la
+ * section ne dit pas « en préparation » et garde « Voir les réalisations ».
+ */
+export function RealisationsAccueil({ reelles, ouvertureReelle = false, ambiancesRangee = ambiancesAccueil() }: { reelles: EtudeReelle[]; ouvertureReelle?: boolean; ambiancesRangee?: AmbianceResolue[] }) {
   const aDesReelles = reelles.length > 0;
+  const publiees = aDesReelles || ouvertureReelle;
   return (
     <Section
       id="realisations"
       large
       differee
-      titre={aDesReelles ? "Nos réalisations" : "Nos réalisations arrivent"}
-      intro={aDesReelles ? "Des chantiers posés chez nos clients, avec les matières et le prix." : "Les photos de nos premiers chantiers sont en préparation. En attendant, des ambiances composées avec les vraies matières du catalogue."}
+      titre={publiees ? "Nos réalisations" : "Nos réalisations arrivent"}
+      intro={aDesReelles ? "Des chantiers posés chez nos clients, avec les matières et le prix." : publiees ? "Notre premier chantier publié ouvre cette page. Ci-dessous, des ambiances composées avec les vraies matières du catalogue." : "Les photos de nos premiers chantiers sont en préparation. En attendant, des ambiances composées avec les vraies matières du catalogue."}
     >
-      {aDesReelles ? (
+      {publiees ? (
         <>
-          <div className="grid gap-5 md:grid-cols-3">
-            {reelles.map((e) => (
-              <CarteRealisation key={e.id} etude={e} tailles={TAILLES_CARTE} />
-            ))}
-          </div>
-          <div className="mt-8">
+          {aDesReelles ? (
+            <div className="grid gap-5 md:grid-cols-3">
+              {reelles.map((e) => (
+                <CarteRealisation key={e.id} etude={e} tailles={TAILLES_CARTE} />
+              ))}
+            </div>
+          ) : null}
+          <div className={aDesReelles ? "mt-8" : undefined}>
             <Lien href="/realisations" variante="secondaire">
               Voir les réalisations
             </Lien>
           </div>
         </>
       ) : null}
-      <div className={aDesReelles ? "mt-14" : undefined}>
+      <div className={publiees ? "mt-14" : undefined}>
         <h3 className="flex items-center gap-3">
           <Etiquette>Ambiance</Etiquette>
           <span className="text-[15px] text-encre-2">Images d&apos;ambiance, pas des chantiers : les teintes sont celles du catalogue.</span>
@@ -78,7 +88,7 @@ export function RealisationsAccueil({ reelles, ambiancesRangee = ambiancesAccuei
             </li>
           ))}
         </ul>
-        {aDesReelles ? null : (
+        {publiees ? null : (
           <div className="mt-8">
             <Lien href="/inspirations" variante="secondaire">
               Voir toutes les ambiances

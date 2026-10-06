@@ -4,7 +4,7 @@ import { PRESTATIONS, lienPrestation } from "@/data/prestations";
 import { articles } from "@/data/blog-articles";
 import { ZONES, getZoneSlug } from "@/data/zones";
 import { choixFamilles } from "@/lib/matieres";
-import { DELAI_RENDU, DELAI_REPONSE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, GARANTIE_ANS, NB_REFERENCES, PRIX_EXPLICATION, PRIX_PLAGE } from "@/lib/offre";
 
 /**
  * /llms.txt — la fiche de l'entreprise pour les moteurs génératifs : ce que
@@ -32,7 +32,7 @@ export function GET() {
     "",
     "## Faits vérifiables",
     "",
-    `- Prix : au mètre linéaire de film posé (jamais au mètre carré), fourni et posé, ${PRIX_PLAGE}. ${PRIX_EXPLICATION} Ordres de grandeur par projet : cuisine complète ${euros(FOURCHETTES.cuisine.min)} à ${euros(FOURCHETTES.cuisine.max)} ; salle de bain ${euros(FOURCHETTES.sdb.min)} à ${euros(FOURCHETTES.sdb.max)} ; meuble seul dès ${euros(FOURCHETTES.meuble.min)} ; locaux professionnels sur devis. ${ENTREPRISE.tvaMention}.`,
+    `- Prix : au mètre linéaire de film posé (jamais au mètre carré), fourni et posé, ${PRIX_PLAGE}. ${PRIX_EXPLICATION} Les tarifs par surface sont publiés sur ${ENTREPRISE.site}/comment-ca-marche#prix. ${ENTREPRISE.tvaMention}.`,
     `- Délais : devis gratuit ${DELAI_REPONSE} ; pose en une journée pour une cuisine ou une salle de bain courante ; pièce utilisable le soir même.`,
     `- Garantie : ${GARANTIE_ANS} ans sur les films et la pose (décollement, décoloration en usage normal).`,
     `- Matériaux : films Cover Styl', ${NB_REFERENCES} références — ${familles} —, résistants à l'humidité et au nettoyage courant ; retrait à chaud sans trace.`,

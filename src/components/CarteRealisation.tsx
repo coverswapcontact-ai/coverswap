@@ -10,7 +10,7 @@ import { sourcesPhotoCrm } from "@/lib/publications";
  * avant / après sans outils (la photo après seule s'il n'y a pas d'avant), en
  * WebP réduit par le CRM (`sourcesPhotoCrm`) ; titre, légende (type · ville),
  * texte (`avecTexte`), matières posées vers la page Matières, prix et durée
- * (`lignePrixDuree` : publiés, sinon habituels libellés comme tels).
+ * (`lignePrixDuree` : publiés ; sans prix publié, aucun, la durée habituelle libellée comme telle).
  * Composant serveur.
  */
 export const CLASSE_CARTE_REALISATION = "overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white";

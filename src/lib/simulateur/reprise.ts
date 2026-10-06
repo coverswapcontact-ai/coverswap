@@ -185,7 +185,7 @@ export type DecisionMontage =
   /** Un parcours récent existe : proposer de le reprendre, sans écraser. */
   | { ecran: "bandeau"; etape: 2 | 3 }
   /**
-   * Repartir directement à l'étape voulue (arrivée depuis l'accueil, ou rien à reprendre). `pieceChoisie` (site 3.0,
+   * Repartir directement à l'étape voulue (rien à reprendre). `pieceChoisie` (site 3.0,
    * lot B6) : la pièce de l'adresse a été CHOISIE par un picto de l'accueil (`?choix=1`) — le simulateur émet
    * `PIECE_CHOISIE` et ouvre l'écran Photo.
    */
@@ -200,7 +200,7 @@ const PARCOURS_ID = /^[0-9a-fA-F-]{16,64}$/;
  * Ouvert sur un autre appareil, sans mémoire locale, le site adopte ce parcours
  * avant de sonder — sinon il sonderait avec un parcours neuf et lirait 404.
  */
-export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; depuisAccueil?: boolean; choix?: boolean; maintenant?: number } = {}): DecisionMontage {
+export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; choix?: boolean; maintenant?: number } = {}): DecisionMontage {
   const maintenant = options.maintenant ?? Date.now();
   if (options.reprise && TRAVAIL_ID.test(options.reprise)) {
     const rendu = etat?.rendus.find((r) => r.travailId === options.reprise);
@@ -208,13 +208,14 @@ export function decisionAuMontage(etat: EtatSimulateur | null, options: { repris
     return { ecran: "attente", travail: { travailId: options.reprise, lanceLe: rendu?.le ?? maintenant, attenteEstimeeS: 0 }, ...(parcoursId ? { parcoursId } : {}) };
   }
   if (etat?.travailEnCours) return { ecran: "attente", travail: etat.travailEnCours };
-  // `choix` : une pièce valide choisie sur l'accueil (le simulateur vérifie la pièce), ni `suite=1` ni photo en mémoire.
-  if (options.choix && !options.depuisAccueil && !etat?.photo) return { ecran: "direct", etape: 1, pieceChoisie: true };
+  // `choix` : une pièce valide choisie sur l'accueil (le simulateur vérifie la pièce), sans photo en mémoire. Avec une
+  // photo, le bandeau de reprise passe d'abord (la pièce de l'adresse reste présélectionnée) : rien n'est écrasé.
+  if (options.choix && !etat?.photo) return { ecran: "direct", etape: 1, pieceChoisie: true };
   if (!etat) return { ecran: "direct", etape: 1 };
   const dernier = etat.rendus[etat.rendus.length - 1];
   const etape: 2 | 3 | 1 = dernier?.urlApres ? 3 : etat.photo ? 2 : 1;
   if (etape === 1) return { ecran: "direct", etape: 1 };
-  if (options.depuisAccueil || maintenant - etat.majLe < 0) return { ecran: "direct", etape: etat.photo ? 2 : 1 };
+  if (maintenant - etat.majLe < 0) return { ecran: "direct", etape: etat.photo ? 2 : 1 };
   if (maintenant - etat.majLe > REPRISE_MAX_MS) return { ecran: "direct", etape: 1 };
   return { ecran: "bandeau", etape };
 }

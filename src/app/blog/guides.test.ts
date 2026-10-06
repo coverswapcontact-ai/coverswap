@@ -115,6 +115,28 @@ describe("les trois guides du lot C7 : les données", () => {
     for (const f of ["data/blog-articles.ts", "app/blog/[slug]/page.tsx", "app/blog/[slug]/illustration.ts"]) assert.ok(!/\d+\s?€/.test(lire(f)), `${f} : un montant écrit`);
   });
 
+  test("relecture des lots B et C : aucun guide ne chiffre une pièce à la main ; ceux qui parlent du prix montrent les tarifs du CRM", () => {
+    for (const a of articles) {
+      // Seule la plage au mètre linéaire d'offre.ts peut s'écrire (« 50 à 150 € ») ; aucune fourchette par pièce.
+      const montants = [...texteGuide(a).matchAll(/(\d[\d\s]*)\s?€/g)].map((m) => Number(m[1].replace(/\D/g, "")));
+      assert.deepEqual(montants.filter((n) => n !== 50 && n !== 150), [], a.slug);
+      assert.doesNotMatch(texteGuide(a), /fourchettes? (réelles|constatées)|ordre de grandeur, une (cuisine|salle)/i, a.slug);
+    }
+    for (const slug of ["prix-renovation-cuisine-covering", "covering-adhesif-vs-peinture-cuisine", "covering-salle-de-bain-carrelage", "renovation-locataire-covering"]) {
+      assert.ok(guide(slug).content.sections.some((s) => s.prix?.length), `${slug} : les tarifs publiés`);
+    }
+  });
+
+  test("relecture des lots B et C : une image d'ambiance n'est jamais présentée comme une pièce où l'on a posé ou essayé", () => {
+    for (const a of NOUVEAUX) {
+      const texte = texteGuide(a);
+      assert.doesNotMatch(texte, /on a essayé|on a gardé|comme celle-ci|comme ici\b|Sur cette (cuisine|porte)\b/i, a.slug);
+      // Le texte qui commente l'image de sa section (« en haut de page », « ci-dessous », « sur cette… ») le dit : « image(s) d'ambiance ».
+      for (const s of a.content.sections.filter((x) => x.image && /en haut de page|ci-dessous|sur cette|ces deux/i.test(x.text))) assert.match(s.text, /images? d'ambiance/, `${a.slug} : ${s.title}`);
+      if (a.paire) assert.ok(a.content.sections.some((x) => x.image && /images? d'ambiance/.test(x.text)), `${a.slug} : la paire dite « images d'ambiance »`);
+    }
+  });
+
   test("le comparatif et ses voisins : liens réciproques, sans les doubler", () => {
     const comparatif = guide(COMPARATIF);
     for (const voisin of VOISINS) {
@@ -163,7 +185,7 @@ describe("les trois guides du lot C7 : la page rendue", () => {
     for (const nom of ["pose-mains", "outils-pose"]) assert.ok(html.includes(`alt="${PHOTOS_UTILES.find((p) => p.image === nom)?.alt}"`), nom);
   });
 
-  test("le maillage : « Essayer » depuis=blog avec la composition, un seul principal « Simuler ma cuisine », la prestation, les guides voisins", async () => {
+  test("le maillage : « Essayer » depuis=blog avec la composition, une seule action principale « Simuler ma cuisine » (sous le titre jusqu'à 1 024 px, puis dans la colonne), la prestation, les guides voisins", async () => {
     for (const a of NOUVEAUX) {
       const html = await rendreGuide(a.slug);
       for (const lien of essais(html)) {
@@ -173,7 +195,11 @@ describe("les trois guides du lot C7 : la page rendue", () => {
         assert.ok(lireComposition(parametres.get("ref")), lien);
       }
       assert.equal(essais(html).length, a.paire ? 2 : 0, a.slug);
-      assert.deepEqual(principaux(html), [["/simulateur?projet=cuisine&depuis=blog", "Simuler ma cuisine"]], a.slug);
+      // Relecture des lots B et C : au téléphone, la colonne arrivait après l'article (≈ 5 100 px) ; le même bouton est
+      // posé sous le titre, masqué dès 1 024 px (la colonne est alors à côté, au premier écran).
+      assert.deepEqual(principaux(html), [["/simulateur?projet=cuisine&depuis=blog", "Simuler ma cuisine"], ["/simulateur?projet=cuisine&depuis=blog", "Simuler ma cuisine"]], a.slug);
+      const sousLeTitre = html.indexOf('<div class="mt-6 lg:hidden"><a class="');
+      assert.ok(sousLeTitre > html.indexOf("</h1>") && sousLeTitre < html.indexOf("<article"), `${a.slug} : sous le titre, avant l'article`);
       assert.ok(html.includes('href="/prestations/cuisine"'), a.slug);
       for (const s of a.relatedSlugs) assert.ok(html.includes(`href="/blog/${s}"`), `${a.slug} → ${s}`);
     }
@@ -191,7 +217,7 @@ describe("les trois guides du lot C7 : la page rendue", () => {
     assert.ok(html.includes("Sur devis, après une visite ou sur vos photos."));
     tarifs = null;
     html = await rendreGuide(JAUNIE);
-    assert.ok(html.includes(PRIX_PLAGE) && html.includes(fourchette("cuisine")));
+    assert.ok(html.includes(PRIX_PLAGE) && !html.includes(fourchette("cuisine")), "le repli : la plage au mètre linéaire seule (relecture des lots B et C)");
     appels = [];
     await rendreGuide("entretenir-revetement-adhesif");
     assert.deepEqual(appels, []);

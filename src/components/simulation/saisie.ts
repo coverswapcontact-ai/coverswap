@@ -28,3 +28,18 @@ export function estChampDeSaisie(el: ElementFocalise): boolean {
 export function masquerPendantSaisie(feuilleOuverte: boolean, focus: ElementFocalise): boolean {
   return feuilleOuverte || estChampDeSaisie(focus);
 }
+
+/** Ce qu'il faut savoir de l'élément qui avait le focus avant une feuille (un `HTMLElement` du DOM convient). */
+export type ElementARendre = { tagName: string; isConnected: boolean; focus: (options?: FocusOptions) => void } | null | undefined;
+
+/**
+ * Relecture des lots B et C (WCAG 2.4.3) : une feuille fermée (Échap, « Fermer », geste retour) rend le focus à
+ * l'élément qui l'avait à l'ouverture — le bouton « Être rappelé », le menu… —, s'il est encore dans la page ; sans
+ * cela, le focus retombait sur `<body>`. Rien pour `<body>` lui-même (Safari ne donne pas le focus à un bouton cliqué).
+ * Rend la fonction à appeler à la fermeture.
+ */
+export function retenirLeFocus(el: ElementARendre): () => void {
+  return () => {
+    if (el && el.isConnected && el.tagName.toUpperCase() !== "BODY") el.focus({ preventScroll: true });
+  };
+}

@@ -20,7 +20,7 @@ const RESEAUX = [
   { href: ENTREPRISE.reseaux.tiktok, libelle: "TikTok" },
 ];
 
-const LIEN = "inline-flex min-h-[44px] items-center text-sur-encre-2 underline-offset-4 transition-colors duration-[var(--duree-courte)] hover:text-fond hover:underline";
+const LIEN = "inline-flex min-h-[44px] min-w-[44px] items-center text-sur-encre-2 underline-offset-4 transition-colors duration-[var(--duree-courte)] hover:text-fond hover:underline";
 /** Le téléphone et l'e-mail : au papier, soulignés au survol. */
 const CONTACT = "inline-flex min-h-[44px] items-center text-[17px] font-medium text-fond underline-offset-4 hover:underline";
 

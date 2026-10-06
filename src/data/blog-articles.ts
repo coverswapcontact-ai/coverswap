@@ -1,11 +1,15 @@
-import { DELAI_RENDU, DELAI_REPONSE, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN, euros } from "@/lib/offre";
+import { DELAI_RENDU, DELAI_REPONSE, DUREE_POSE_TEXTE, GARANTIE_ANS, PRIX_ML_MAX, PRIX_ML_MIN } from "@/lib/offre";
 import { lienSimuler } from "@/lib/liens-simulateur";
 import type { IdFamilleTarifs } from "@/lib/tarifs-site";
 
 /**
  * Guides : les vraies questions que les gens posent avant un covering, avec
- * des réponses vérifiables. Les chiffres viennent de lib/offre (grille réelle
- * au mètre linéaire) ; ce qui n'est pas sûr n'est pas écrit.
+ * des réponses vérifiables. Les chiffres viennent de lib/offre (la plage au
+ * mètre linéaire) ; ce qui n'est pas sûr n'est pas écrit. Aucun montant par
+ * pièce (relecture des lots B et C : les fourchettes d'`offre.ts` contredisaient
+ * les tarifs du CRM) : les guides qui parlent du prix montrent les tarifs
+ * publiés (`prix` d'une section). Une image d'ambiance est dite telle quelle,
+ * jamais présentée comme une pièce où l'on a posé.
  *
  * Site 3.0, lot C7 : trois guides écrits avec la bibliothèque d'images (`paire` : l'« après » d'une paire de la
  * série 2, en curseur « Ambiance · avant / après » ; `imagePreparee` : une photo utile, « Ambiance » ; noms du
@@ -69,10 +73,6 @@ export type BlogArticle = IllustrationArticle & {
 
 const MAJ = "2026-09-17";
 const MAJ_TEXTE = "17 septembre 2026";
-const cuisineMin = euros(FOURCHETTES.cuisine.min);
-const cuisineMax = euros(FOURCHETTES.cuisine.max);
-const sdbMin = euros(FOURCHETTES.sdb.min);
-const sdbMax = euros(FOURCHETTES.sdb.max);
 
 const C7 = "2026-10-06";
 const C7_TEXTE = "6 octobre 2026";
@@ -104,7 +104,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Deux directions pour la même cuisine",
-          text: "Sur cette cuisine en L, on a essayé deux partis. En haut de page, un vert profond mat sur les façades et un chêne pâle sur le plan : la cuisine garde du caractère, sans le reflet. Ci-dessous, un gris clair mat et un chêne plus soutenu : la pièce paraît plus grande et plus calme. Dans les deux cas, le carrelage blanc et les poignées inox ne bougent pas. Les matières posées sont écrites sous chaque image ; vous pouvez les essayer sur la photo de votre cuisine.",
+          text: "Ces deux images d'ambiance montrent deux partis pour une même cuisine en L. En haut de page, un vert profond mat sur les façades et un chêne pâle sur le plan : la cuisine garde du caractère, sans le reflet. Ci-dessous, un gris clair mat et un chêne plus soutenu : la pièce paraît plus grande et plus calme. Dans les deux cas, le carrelage blanc et les poignées inox ne bougent pas. Les matières posées sont écrites sous chaque image ; vous pouvez les essayer sur la photo de votre cuisine.",
           image: "cuisine-bordeaux-brillante-apres-neutre",
         },
         {
@@ -113,11 +113,11 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Le plan de travail et la crédence",
-          text: "Le plan gris moucheté vieillit lui aussi la cuisine. Il s'habille sans dépose, en bois, en pierre ou en béton, chants finis. Près des plaques de cuisson, on vérifie sur place ce qui est possible et on pose les références prévues pour la chaleur. La crédence carrelée peut rester telle quelle, comme ici, ou se recouvrir sans casser un carreau.",
+          text: "Le plan gris moucheté vieillit lui aussi la cuisine. Il s'habille sans dépose, en bois, en pierre ou en béton, chants finis. Près des plaques de cuisson, on vérifie sur place ce qui est possible et on pose les références prévues pour la chaleur. La crédence carrelée peut rester telle quelle, comme sur ces images, ou se recouvrir sans casser un carreau.",
         },
         {
           title: "Comment se fait le prix",
-          text: `On facture au mètre linéaire de film posé, fourni et posé. Le prix dépend surtout de la pose (le nombre de découpes, l'accès, l'état du support, le métrage), bien plus que de la teinte choisie. Une cuisine en L comme celle-ci, façades et plan de travail, se chiffre sur vos photos : le devis est gratuit, il arrive ${DELAI_REPONSE} et détaille chaque surface. Voici les prix que nous publions.`,
+          text: `On facture au mètre linéaire de film posé, fourni et posé. Le prix dépend surtout de la pose (le nombre de découpes, l'accès, l'état du support, le métrage), bien plus que de la teinte choisie. Une cuisine en L, façades et plan de travail, se chiffre sur vos photos : le devis est gratuit, il arrive ${DELAI_REPONSE} et détaille chaque surface. Voici les prix que nous publions.`,
           prix: ["CUISINE"],
         },
       ],
@@ -155,7 +155,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Les signes à regarder de près",
-          text: "Sur cette porte, trois choses : le chant qui se décolle, de petits éclats, une poignée en plastique qui a jauni elle aussi. Un chant décollé ou un éclat se reprennent souvent avant la pose ; on vous le dit au devis, sur vos photos. Un panneau qui a gonflé à l'eau, sous l'évier par exemple, ou qui s'effrite, ne se répare pas avec un film : il faut changer la pièce. Les poignées restent en place pendant la pose ; si les vôtres ont jauni, c'est le bon moment pour les changer.",
+          text: "Sur cette image d'ambiance, trois choses à repérer : le chant qui se décolle, de petits éclats, une poignée en plastique qui a jauni elle aussi. Un chant décollé ou un éclat se reprennent souvent avant la pose ; on vous le dit au devis, sur vos photos. Un panneau qui a gonflé à l'eau, sous l'évier par exemple, ou qui s'effrite, ne se répare pas avec un film : il faut changer la pièce. Les poignées restent en place pendant la pose ; si les vôtres ont jauni, c'est le bon moment pour les changer.",
           image: "usure-detail",
         },
         {
@@ -164,7 +164,7 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Deux directions pour la même cuisine",
-          text: "En haut de page, des façades en chêne pâle et un plan effet marbre noir : la cuisine des années 1980 prend la chaleur du bois. Ci-dessous, un bleu nuit mat et un plan en chêne. Dans les deux cas, on a gardé le carrelage à frise : il peut se recouvrir aussi, mais rien n'y oblige. Et si vous tenez au blanc, un blanc neuf, mat ou satiné, se pose de la même façon.",
+          text: "En haut de page, des façades en chêne pâle et un plan effet marbre noir : la cuisine des années 1980 prend la chaleur du bois. Ci-dessous, un bleu nuit mat et un plan en chêne. Sur ces deux images d'ambiance, le carrelage à frise reste tel quel : il peut se recouvrir aussi, mais rien n'y oblige. Et si vous tenez au blanc, un blanc neuf, mat ou satiné, se pose de la même façon.",
           image: "cuisine-blanche-jaunie-apres-couleur",
         },
         {
@@ -238,7 +238,7 @@ export const articles: BlogArticle[] = [
   {
     slug: "prix-renovation-cuisine-covering",
     title: "Combien coûte une rénovation de cuisine par covering ?",
-    excerpt: `Prix au mètre linéaire, fourchettes réelles (${cuisineMin} à ${cuisineMax} pour une cuisine complète), ce qui fait varier le devis et ce qu'il contient.`,
+    excerpt: "Prix au mètre linéaire, nos tarifs publiés, ce qui fait varier le devis et ce qu'il contient.",
     category: "Prix",
     date: MAJ_TEXTE,
     dateIso: MAJ,
@@ -246,7 +246,7 @@ export const articles: BlogArticle[] = [
     readTime: "5 min",
     image: "/images/fonds/photo-1758315417321-83eb30a39710",
     content: {
-      intro: `Le covering se facture au mètre linéaire de film posé, fourni et posé. Chez CoverSwap, le prix au mètre va de ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € : il se détermine au devis selon la complexité de la pose, pas selon le seul revêtement choisi. En ordre de grandeur, une cuisine complète — façades, plan de travail, crédence — se situe entre ${cuisineMin} et ${cuisineMax}. Voici comment ce chiffre se construit, pour lire un devis sans surprise.`,
+      intro: `Le covering se facture au mètre linéaire de film posé, fourni et posé. Chez CoverSwap, le prix au mètre va de ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € : il se détermine au devis selon la complexité de la pose, pas selon le seul revêtement choisi. Une cuisine se chiffre surface par surface — façades, plan de travail, crédence. Voici comment ce chiffre se construit, pour lire un devis sans surprise.`,
       sections: [
         {
           title: "Pourquoi au mètre linéaire, et pas au mètre carré",
@@ -257,8 +257,9 @@ export const articles: BlogArticle[] = [
           text: `La complexité de la pose, avant tout. Le nombre de découpes : des façades planes se posent vite ; des tiroirs nombreux, des moulures, des prises, un îlot avec retours prennent du temps. L'accessibilité : une surface dégagée à hauteur d'homme ne se travaille pas comme un dessus de meuble haut ou un recoin derrière une vasque. L'état du support : une surface saine et lisse est prête ; un support abîmé se répare et se prépare avant la pose. Le métrage : plus il est grand, plus le prix au mètre baisse. Le revêtement choisi compte aussi, mais moins qu'on ne le croit. Résultat : de grandes surfaces planes sans découpe se situent vers ${PRIX_ML_MIN} €/ml, une pose complexe monte jusqu'à ${PRIX_ML_MAX} €/ml, et aucun des deux n'est la règle. C'est pour cela que le devis détaille chaque surface avec son métrage.`,
         },
         {
-          title: "Les fourchettes constatées",
-          text: `Cuisine complète (façades + plan de travail + crédence) : ${cuisineMin} à ${cuisineMax}. Façades seules d'une cuisine courante : souvent ${euros(900)} à ${euros(1800)}. Plan de travail et crédence seuls : ${euros(600)} à ${euros(1200)}. Ces montants sont fournis et posés, TVA non applicable (article 293 B du CGI). Un devis précis demande vos photos ou une visite ; il est gratuit et vous répond ${DELAI_REPONSE}.`,
+          title: "Nos tarifs publiés",
+          text: `Voici nos tarifs pour une cuisine, surface par surface, fournis et posés, TVA non applicable (article 293 B du CGI). Une surface sans prix se chiffre sur vos photos. Un devis précis demande vos photos ou une visite ; il est gratuit et vous répond ${DELAI_REPONSE}.`,
+          prix: ["CUISINE"],
         },
         {
           title: "Ce que comprend le devis",
@@ -270,7 +271,7 @@ export const articles: BlogArticle[] = [
         },
       ],
       tip: "Envoyez des photos de face avec un objet de taille connue (une feuille A4 posée sur le plan de travail) : le métrage se lit mieux et le devis est plus juste dès le premier envoi.",
-      conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € le mètre linéaire posé selon la complexité de la pose, ${cuisineMin} à ${cuisineMax} pour une cuisine complète. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
+      conclusion: `Retenez l'ordre de grandeur : ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € le mètre linéaire posé selon la complexité de la pose, et une cuisine chiffrée surface par surface. Pour un chiffre exact, le simulateur montre le rendu et le devis dit le prix, surface par surface.`,
     },
     relatedSlugs: ["covering-peinture-remplacement-comparatif", "covering-adhesif-vs-peinture-cuisine", "comment-se-passe-une-pose-de-covering", "covering-adhesif-durabilite"],
   },
@@ -347,7 +348,8 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Le prix",
-          text: `Repeindre soi-même coûte peu en matériel, beaucoup en temps et en risque de résultat inégal ; faire repeindre par un peintre revient souvent au niveau du covering. Le covering se chiffre au mètre linéaire, ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € posé selon la complexité de la pose, soit en ordre de grandeur ${cuisineMin} à ${cuisineMax} pour une cuisine complète.`,
+          text: `Repeindre soi-même coûte peu en matériel, beaucoup en temps et en risque de résultat inégal ; faire repeindre par un peintre revient souvent au niveau du covering. Le covering se chiffre au mètre linéaire, ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € posé selon la complexité de la pose. Voici nos tarifs publiés pour une cuisine.`,
+          prix: ["CUISINE"],
         },
         {
           title: "Quand la peinture reste le bon choix",
@@ -427,7 +429,8 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Combien de temps, combien ça coûte",
-          text: `Une journée de pose pour une salle de bain courante ; nous conseillons d'attendre 24 h avant une douche très chaude côté murs traités. Au mètre linéaire, une salle de bain (meuble vasque, murs carrelés, contour de baignoire) se situe généralement entre ${sdbMin} et ${sdbMax}, fournie et posée.`,
+          text: `Une journée de pose pour une salle de bain courante ; nous conseillons d'attendre 24 h avant une douche très chaude côté murs traités. Au mètre linéaire, fournie et posée, une salle de bain se chiffre surface par surface (meuble vasque, murs carrelés, contour de baignoire) : voici nos tarifs publiés.`,
+          prix: ["SDB"],
         },
         {
           title: "L'entretien",
@@ -585,7 +588,8 @@ export const articles: BlogArticle[] = [
         },
         {
           title: "Budget",
-          text: `Au mètre linéaire, fourni et posé : ${cuisineMin} à ${cuisineMax} pour une cuisine complète, ${sdbMin} à ${sdbMax} pour une salle de bain, un meuble seul dès ${euros(FOURCHETTES.meuble.min)}. Devis gratuit ${DELAI_REPONSE} sur photos.`,
+          text: `Au mètre linéaire, fourni et posé, de ${PRIX_ML_MIN} à ${PRIX_ML_MAX} € selon la complexité de la pose ; voici nos tarifs publiés. Devis gratuit ${DELAI_REPONSE} sur photos.`,
+          prix: ["CUISINE", "SDB", "MEUBLES"],
         },
       ],
       conclusion: "Réversible, rapide, sans gravats : le covering est la rénovation qui ne pose pas de problème à l'état des lieux de sortie.",

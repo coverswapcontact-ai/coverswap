@@ -4,6 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { CartesAtouts, EtapesPrestation, QuestionsPrestation } from "@/components/BlocsPrestation";
 import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
+import { ContenuPrix } from "@/components/BlocPrix";
 import { BreadcrumbSchema, FAQSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Lien } from "@/components/simulation/Lien";
@@ -15,6 +16,7 @@ import { ENTREPRISE } from "@/lib/entreprise";
 import { lienSimuler } from "@/lib/liens-simulateur";
 import { matiereCartel } from "@/lib/matieres-vedettes";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { chargerTarifs } from "@/lib/tarifs-site";
 import {
   A_PREPARER,
   DEROULE,
@@ -25,8 +27,6 @@ import {
   INTRO_DEROULE,
   INTRO_GUIDES,
   INTRO_PAGE,
-  LEGENDE_FOURCHETTES,
-  LIGNES_FOURCHETTES,
   MOTS_CLES_GUIDES,
   NOTE_ETAPES,
   OBJECTIONS,
@@ -50,14 +50,16 @@ import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, 
 /**
  * « Comment ça marche » (mission 16, partie 5 ; site 3.0, lot C3) : la page qui RASSURE — le procédé, les délais, ce qui
  * reste en place, l'entretien, le prix, les objections —, puis une seule action, « Simuler ma pièce »
- * (`depuis=comment-ca-marche`), en haut des étapes et au dernier appel.
- *  1. Ouverture : le titre, une phrase (« Pas de travaux » de l'ancien accueil) ;
+ * (`depuis=comment-ca-marche`), sous le titre, sous les étapes et au dernier appel.
+ *  1. Ouverture : le titre, une phrase (« Pas de travaux » de l'ancien accueil), le bouton principal (relecture des
+ *     lots B et C : il n'était pas au premier écran, ni à 390 ni à 1 440 px) ;
  *  2. `#comment-ca-marche` : les quatre étapes de l'accueil (`CommentOnTravaille` : votre photo, la simulation,
  *     `echantillons-table`, `pose-mains`), la preuve de finition (`detail-chant`), les garanties, le bouton principal ;
  *  3. `#deroule` : le déroulé complet et ses délais (`mesure-visite`, `outils-pose`) ;
  *  4. `#en-place` : ce qui reste en place, ce que vous préparez ;
  *  5. `#entretien` : quatre gestes et le guide ; puis la bande de chêne AG13 ;
- *  6. `#prix` : au mètre linéaire, ce qui est compris, les fourchettes par pièce, le lien vers l'estimation ;
+ *  6. `#prix` : au mètre linéaire, ce qui est compris, les tarifs du CRM (`ContenuPrix`, ceux de l'accueil ; la table
+ *     des fourchettes d'`offre.ts` les contredisait), le lien vers l'estimation ;
  *  7. `#objections` : une ligne et deux phrases au plus par objection, puis la FAQ générale (`#faq`, repliée) sans les
  *     questions que les objections reprennent ; UN balisage `FAQPage` pour les deux (`QUESTIONS_BALISEES`) ;
  *  8. `#quand-renover` : l'encart « Quand rénover ? » (`usure-detail`) ;
@@ -65,8 +67,11 @@ import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, 
  * 10. `#guides` : les guides `/blog/<slug>` (hors menu ; l'index /blog est redirigé ici) et les films pour vitrages ;
  * 11. le dernier appel, en encre : le même principal, « Être rappelé » en `sur-encre`.
  * Chacune des six photos utiles une fois, étiquetée « Ambiance » ; la capture du simulateur, « Simulation ». Les blocs
- * prennent les filets (plus de cartes blanches). Composant serveur, synchrone (le rappel seul est client).
+ * prennent les filets (plus de cartes blanches). Composant serveur (le rappel seul est client) ; les tarifs, relus au
+ * plus une fois par heure.
  */
+export const revalidate = 3600;
+
 const CHEMIN = "/comment-ca-marche";
 const DEPUIS = "comment-ca-marche";
 const LIEN_SIMULER = lienSimuler({ depuis: DEPUIS });
@@ -83,7 +88,8 @@ const TAILLES_DEROULE = "(min-width: 1024px) 420px, (min-width: 768px) 50vw, cal
 const BANDE = matiereCartel("AG13");
 const GUIDE = articles.find((a) => a.slug === GUIDE_ENTRETIEN);
 
-export default function PageCommentCaMarche() {
+export default async function PageCommentCaMarche() {
+  const tarifs = await chargerTarifs();
   return (
     <div>
       <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Comment ça marche", url: `${ENTREPRISE.site}${CHEMIN}` }]} />
@@ -95,6 +101,9 @@ export default function PageCommentCaMarche() {
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Comment ça marche" }]} />
           <h1 className="titre-1 max-w-3xl text-encre">Comment ça marche</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">{INTRO_PAGE}</p>
+          <div className="mt-6">
+            <Lien href={LIEN_SIMULER}>Simuler ma pièce</Lien>
+          </div>
         </div>
       </section>
 
@@ -169,19 +178,7 @@ export default function PageCommentCaMarche() {
             <p>{PRIX_CONDITIONS}</p>
           </div>
           <div>
-            <table className="w-full border-collapse border-b border-encre text-left">
-              <caption className="mb-3 text-left text-[15px] font-semibold text-encre">{LEGENDE_FOURCHETTES}</caption>
-              <tbody>
-                {LIGNES_FOURCHETTES.map((l) => (
-                  <tr key={l.projet} className="border-t border-encre">
-                    <th scope="row" className="py-3 pr-4 text-[15px] font-normal text-encre-2">
-                      {l.projet}
-                    </th>
-                    <td className="py-3 text-right text-[15px] font-semibold whitespace-nowrap text-encre tabular-nums">{l.prix}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ContenuPrix tarifs={tarifs} sansIntro />
             <div className="mt-6">
               <Lien href={LIEN_SIMULER} variante="secondaire">
                 Estimer sur ma photo

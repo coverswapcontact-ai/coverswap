@@ -13,14 +13,14 @@ import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import type { ManifesteImages } from "@/lib/images-preparees";
 import { avecDepuis, lienSimuler } from "@/lib/liens-simulateur";
 import { MATIERES_VEDETTES, lienMatiere, matiereCartel, matieresVedettes, referenceDeLAdresse } from "@/lib/matieres-vedettes";
-import { DELAI_REPONSE, DUREE_POSE, DUREE_POSE_TEXTE, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_REPONSE, DUREE_POSE, DUREE_POSE_TEXTE, FOURCHETTES, GARANTIE_ANS, NB_REFERENCES, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
 import { LARGEURS_PHOTO_CRM, sourcesPhotoCrm, type Publication } from "@/lib/publications";
 import { lireDepuis } from "@/lib/simulateur/entonnoir";
 import { lireComposition, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
 import { ZONES_REPLI } from "@/lib/simulateur/zones";
 import type { TarifsSite } from "@/lib/tarifs-site";
 import { MESSAGE_WHATSAPP_DEVIS, lienWhatsApp } from "@/lib/whatsapp";
-import { ContenuPrix, prixAffiche } from "@/components/BlocPrix";
+import { ContenuPrix, REPLI_PAR_PIECE, prixAffiche, tarifDeLaFamille } from "@/components/BlocPrix";
 import { classesBouton } from "@/components/simulation/Bouton";
 import { ContenuAvisPrix, LIGNE_GARANTIE, LIGNE_ZONE } from "./AvisPrix";
 import { BoutonWhatsApp } from "./BoutonWhatsApp";
@@ -283,6 +283,17 @@ describe("2. Par où commencer ?", () => {
 });
 
 describe("3. Des cuisines comme la vôtre", () => {
+  test("relecture des lots B et C : « Hêtre des années 2000 » (le nom de l'énoncé) et sa scène disent la même décennie", () => {
+    const reglages = JSON.parse(lire("scripts/bibliotheque/reglages.json")) as { images: Record<string, { scene?: string }> };
+    const hetre = Object.entries(reglages.images).filter(([nom]) => nom.startsWith("cuisine-l-hetre-"));
+    assert.equal(hetre.length, 3, "l'avant et ses deux après");
+    for (const [nom, r] of hetre) assert.match(r.scene ?? "", /^Cuisine en L des années 2000, /, nom);
+    // Le fichier généré suit (src/lib/bibliotheque.test.ts vérifie qu'il est exactement la sortie du script).
+    const donnees = lire("src/data/ambiances-serie-2.ts");
+    assert.equal((donnees.match(/Cuisine en L des années 2000/g) ?? []).length, 3);
+    assert.doesNotMatch(donnees, /Cuisine en L des années 1970/);
+  });
+
   test("six avant / après nommés par ce que les gens ont chez eux, l'après au plus petit ΔE affiché", () => {
     assert.deepEqual(
       CUISINES_ACCUEIL.map((c) => [c.nom, c.apres]),
@@ -329,6 +340,13 @@ describe("3. Des cuisines comme la vôtre", () => {
 describe("4. Comment on travaille", () => {
   test("quatre étapes numérotées en grand, chacune avec sa photo étiquetée ; la preuve de finition ; les garanties", () => {
     assert.deepEqual(ETAPES_TRAVAIL.map((e) => [e.image, e.etiquette]), [["etape-photo", "Ambiance"], ["etape-simulation", "Simulation"], ["echantillons-table", "Ambiance"], ["pose-mains", "Ambiance"]]);
+    // Relecture des lots B et C : la capture du simulateur montrait une fourchette de prix écrite dans l'image, qui
+    // contredisait les tarifs du CRM ; elle est recadrée en local (sharp, sans génération) sur le curseur avant / après
+    // seul. Le manifeste suit (`npm run images`) : 538 × 359, au rapport 3 / 2 du cadre, plus jamais l'écran entier.
+    const capture = MANIFESTE_IMAGES["etape-simulation"];
+    assert.deepEqual([capture.largeur, capture.hauteur, capture.largeurs], [538, 359, [480, 538]]);
+    assert.ok(Math.abs(capture.largeur / capture.hauteur - 3 / 2) < 0.01);
+    assert.equal(capture.empreinte, "73d354f50b42", "l'original recadré, commité dans public/images/sources");
     assert.deepEqual(ETAPES_TRAVAIL.map((e) => e.titre), ["Votre photo", "La simulation", "Les échantillons chez vous", `La pose en ${DUREE_POSE_TEXTE}`]);
     assert.deepEqual(GARANTIES.map((g) => g.titre), ["Sans démontage", "Sans poussière", "Devis gratuit", "Un seul interlocuteur"]);
     assert.ok(GARANTIES[2].texte.includes(DELAI_REPONSE) && DELAI_REPONSE === "sous 48 h");
@@ -427,11 +445,21 @@ describe("6. Réalisations : les vraies d'abord, puis la rangée « Ambiances »
     ];
     const reelles = realisationsAccueil(pubs);
     assert.deepEqual(reelles.map((e) => e.id), ["p1", "p2", "p3"]);
+    // Relecture des lots B et C : la réalisation de l'ouverture n'est pas répétée en première carte (comme sur les pages
+    // de prestation et /pro).
+    assert.deepEqual(realisationsAccueil(pubs, "p1").map((e) => e.id), ["p2", "p3", "p4"]);
+    assert.match(lire("src/app/page.tsx"), /<RealisationsAccueil reelles=\{realisationsAccueil\(realisations, ouverture\?\.idPublication\)\} ouvertureReelle=\{ouverture\?\.type === "realisation"\} \/>/);
+    // La seule réalisation est à l'ouverture : la section ne dit pas « en préparation » et garde « Voir les réalisations ».
+    const seule = rendre(createElement(RealisationsAccueil, { reelles: [], ouvertureReelle: true }));
+    assert.ok(seule.includes(">Nos réalisations</h2>") && !seule.includes("arrivent") && !seule.includes("en préparation"));
+    assert.match(seule, /href="\/realisations"/);
+    assert.equal(compter(seule, "<article"), 0);
     const html = rendre(createElement(RealisationsAccueil, { reelles }));
     assert.equal(compter(html, "<article"), 3);
     assert.ok(html.indexOf("<article") < html.indexOf('href="/inspirations#'), "les vraies avant les ambiances");
     assert.ok(html.includes(`${euros(2400)} · 1 journée`), "les chiffres publiés passent avant");
-    assert.equal(compter(html, `Prix habituel : ${fourchette("cuisine")} · pose en ${DUREE_POSE_TEXTE} en général`), 2, "sans prix publié : le prix habituel, libellé comme tel");
+    assert.equal(compter(html, `>pose en ${DUREE_POSE_TEXTE} en général<`), 2, "sans prix publié : la durée habituelle seule, libellée comme telle");
+    assert.ok(!html.includes("Prix habituel"), "jamais une fourchette fixe à la place du prix d'un chantier (relecture des lots B et C)");
     assert.ok(html.includes(`href="${lienMatiere("K1")}"`));
     assert.match(html, /srcSet="\/a1\?l=480 480w, \/a1\?l=960 960w, \/a1\?l=1600 1600w"/, "WebP réduits par le CRM");
     assert.equal(boutons(html, "secondaire"), 1);
@@ -439,12 +467,13 @@ describe("6. Réalisations : les vraies d'abord, puis la rangée « Ambiances »
     assert.ok(!html.includes('fetchPriority="high"'), "une seule image prioritaire par page : l'ouverture");
   });
 
-  test("prix et durée d'une réalisation : publiés, sinon habituels selon le type de projet, rien pour un local pro", () => {
+  test("prix et durée d'une réalisation : publiés ; sans prix publié, aucun (relecture des lots B et C), la durée habituelle selon le type de projet, rien pour un local pro", () => {
     const etude = (p: Partial<Publication>) => versEtudeReelle(publication({ id: "e", photoApres: "/a", ...p }));
     assert.equal(lignePrixDuree(etude({ prix: 2400, duree: "2 jours" })), `${euros(2400)} · 2 jours`);
     assert.equal(lignePrixDuree(etude({ prix: 2400 })), `${euros(2400)} · pose en ${DUREE_POSE_TEXTE} en général`);
-    assert.equal(lignePrixDuree(etude({ typeProjet: "SDB" })), `Prix habituel : ${fourchette("sdb")} · pose en ${DUREE_POSE_TEXTE} en général`);
-    assert.equal(lignePrixDuree(etude({ typeProjet: "MEUBLES" })), `Prix habituel : ${fourchette("meuble")}`, "aucune durée habituelle annoncée pour un meuble");
+    assert.equal(lignePrixDuree(etude({ typeProjet: "SDB" })), `pose en ${DUREE_POSE_TEXTE} en général`, "le CRM met la salle de bain « Sur devis » : aucune fourchette inventée");
+    assert.equal(lignePrixDuree(etude({ typeProjet: "MEUBLES" })), null, "aucune durée habituelle annoncée pour un meuble, aucun prix habituel");
+    assert.equal(lignePrixDuree(etude({ typeProjet: "MEUBLES", prix: 480 })), euros(480));
     for (const typeProjet of ["PRO", "AUTRE", null]) assert.equal(lignePrixDuree(etude({ typeProjet })), null, String(typeProjet));
     for (const prix of [0, -5, Number.NaN]) assert.equal(etude({ prix }).prix, null);
   });
@@ -560,10 +589,44 @@ describe("8. Avis Google et prix", () => {
     assert.equal(prixAffiche({ prixUnitaire: null, unite: "ml" }), null);
   });
 
-  test("le CRM ne répond pas : le repli documenté, la plage au mètre linéaire et les fourchettes d'offre.ts", () => {
+  test("le CRM ne répond pas : le repli documenté, la plage au mètre linéaire seule — plus aucune fourchette par pièce (relecture des lots B et C)", () => {
     const html = rendre(createElement(ContenuPrix, { tarifs: null }));
-    assert.ok(html.includes(PRIX_PLAGE));
-    for (const cle of ["cuisine", "sdb", "meuble", "pro"] as const) assert.ok(html.includes(fourchette(cle)), cle);
+    assert.ok(html.includes(PRIX_PLAGE) && html.includes(REPLI_PAR_PIECE));
+    // Les fourchettes d'offre.ts contredisaient le CRM (une salle de bain chiffrée là où il dit « Sur devis ») : aucune n'est montrée.
+    for (const cle of ["cuisine", "sdb", "meuble"] as const) assert.ok(!html.includes(fourchette(cle)), cle);
+    assert.doesNotMatch(html, /<dl>(?:(?!<\/dl>)[\s\S])*<p/, "pas de paragraphe dans la liste de définitions");
+  });
+
+  test("le tarif d'une famille en une ligne (relecture des lots B et C) : un prix, le plus bas, « sur devis », sinon la plage", () => {
+    const sp = (id: string, prixUnitaire: number | null, unite: "ml" | "jour" | "forfait" = "ml") => ({ id, libelle: id, metrage: true, prixUnitaire, unite });
+    const tarifs: TarifsSite = {
+      version: 1,
+      familles: [
+        { id: "CUISINE", sousParties: [sp("facades-hautes", 110), sp("facades-basses", 110), sp("credence", null)], formats: [] },
+        { id: "MEUBLES", sousParties: [sp("dressing", 50), sp("tv", 65), sp("bar", 55)], formats: [] },
+        { id: "SDB", sousParties: [sp("meuble-vasque", null)], formats: [] },
+        { id: "PRO", sousParties: [sp("comptoir", 55), sp("pose", 300, "jour")], formats: [] },
+      ],
+    };
+    assert.equal(tarifDeLaFamille(tarifs, "CUISINE"), "110 €/ml");
+    assert.equal(tarifDeLaFamille(tarifs, "MEUBLES"), "dès 50 €/ml");
+    assert.equal(tarifDeLaFamille(tarifs, "SDB"), null, "aucun prix publié : sur devis");
+    assert.equal(tarifDeLaFamille(tarifs, "PRO"), "dès 55 €/ml", "deux unités : l'unité du premier prix, « dès »");
+    assert.equal(tarifDeLaFamille({ version: 1, familles: [] }, "CUISINE"), null);
+    assert.equal(tarifDeLaFamille(null, "SDB"), PRIX_PLAGE, "sans le CRM : la plage au mètre linéaire, jamais une fourchette par pièce");
+  });
+
+  test("relecture des lots B et C : les fourchettes par pièce d'offre.ts ne servent plus qu'au repli de l'estimation du simulateur", () => {
+    const fichiers = (dossier: string): string[] => readdirSync(dossier, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? fichiers(path.join(dossier, e.name)) : /\.tsx?$/.test(e.name) && !/\.test\.tsx?$/.test(e.name) ? [path.join(dossier, e.name)] : []));
+    const utilisateurs = fichiers(path.join(process.cwd(), "src"))
+      .filter((f) => /\bFOURCHETTES\b|\bfourchette\(/.test(readFileSync(f, "utf8")))
+      .map((f) => path.relative(process.cwd(), f).split(path.sep).join("/"))
+      .sort();
+    assert.deepEqual(utilisateurs, ["src/lib/estimation.ts", "src/lib/offre-legere.ts", "src/lib/offre.ts"]);
+    // Et aucun de leurs montants dans les textes servis (FAQ, prestations, guides).
+    const montants = [FOURCHETTES.cuisine.min, FOURCHETTES.cuisine.max, FOURCHETTES.sdb.max, FOURCHETTES.meuble.min].map((n) => euros(n));
+    const textes = JSON.stringify([FAQ_GENERALE, FAQ_SIMULATEUR]);
+    for (const m of montants) assert.ok(!textes.includes(m), m);
   });
 
   test("aucun prix, aucune note écrite dans les sources de l'accueil : tout vient du CRM ou d'offre.ts", () => {

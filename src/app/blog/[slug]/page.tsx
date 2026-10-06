@@ -145,6 +145,10 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mt-4 text-[14px] text-encre-2">
             {article.date} · {article.readTime} de lecture
           </p>
+          {/* Au téléphone (et jusqu'à 1 024 px), la colonne passe sous l'article : son bouton principal aussi au premier écran (relecture des lots B et C). */}
+          <div className="mt-6 lg:hidden">
+            <Lien href={action.href}>{action.libelle}</Lien>
+          </div>
         </div>
       </section>
 

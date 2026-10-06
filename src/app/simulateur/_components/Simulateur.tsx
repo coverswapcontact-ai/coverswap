@@ -97,14 +97,13 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       const demande = parametres.get("projet");
       const reprise = parametres.get("reprise");
       const parcoursDuLien = parametres.get("p");
-      const depuisAccueil = parametres.get("suite") === "1";
       depuisLien.current = lireDepuis(parametres.get("depuis"));
       if (annule) return;
       const base = memoire ?? ETAT_VIDE;
       // Une génération en cours fige la pièce : l'adresse ne la change pas (les choix serviraient encore à « Réessayer »).
       const projetInitial = !base.travailEnCours && demande && zones.pieces.some((p) => p.id === demande) ? demande : base.projet;
       const memeProjet = projetInitial === base.projet;
-      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil, choix: parametres.get("choix") === "1" && projetInitial === demande });
+      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, choix: parametres.get("choix") === "1" && projetInitial === demande });
       zoneDemandee.current = zoneDeLElement(lireElementDemande(parametres.get("element")), projetInitial);
       const parcoursId = (decision.ecran === "attente" && decision.parcoursId) || base.parcoursId || obtenirParcoursId() || crypto.randomUUID();
       adopterParcoursId(parcoursId);
@@ -121,11 +120,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       } else {
         setEcran(decision.pieceChoisie ? 2 : ecranDepuisEtape(decision.etape, repris));
       }
-      if (depuisAccueil) {
-        // Le module d'accueil vient d'émettre PIECE_CHOISIE et PHOTO_CHARGEE : ici, elles comptent comme déjà émises (jamais deux fois par parcours).
-        emetteur.current = creerEmetteur((type, meta) => envoyerEvenement(type, meta), ["PIECE_CHOISIE", ...(repris.photo ? (["PHOTO_CHARGEE"] as const) : [])]);
-      }
-      setPieceChoisie(depuisAccueil || !!repris.photo || (!!demande && projetInitial === demande));
+      // Le retour `?suite=1` du module photo de l'accueil (mission 15, retiré au lot B6) n'est plus lu (relecture des lots B et C).
+      setPieceChoisie(!!repris.photo || (!!demande && projetInitial === demande));
       setRenduAffiche(repris.rendus[repris.rendus.length - 1]?.travailId ?? null);
       setEtat(repris);
       chargerFavoris();

@@ -338,7 +338,8 @@ function BarreOnglets({ etat, vue, aller }: { etat: Etat; vue: Vue; aller: (vue:
                 aria-label={`${libelle}${etatDit}`}
                 className={cx(
                   "relative flex h-[62px] w-full flex-col items-center justify-center gap-[5px] text-[12.5px] leading-none font-semibold tracking-[-0.02em] transition-colors active:bg-fond-2",
-                  actif ? "text-encre" : verrou ? "text-encre-2/70" : "text-encre-2",
+                  // Verrouillé : le libellé reste lisible (encre-2, ≥ 4,5:1 ; il était à 2,91:1), le cadenas dit l'état.
+                  actif ? "text-encre" : "text-encre-2",
                   FOCUS
                 )}
               >

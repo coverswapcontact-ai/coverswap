@@ -9,6 +9,7 @@ import { Etiquette } from "@/components/simulation/Etiquette";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { lienPiece } from "@/data/prestations";
+import { lienSimuler } from "@/lib/liens-simulateur";
 import { ENTREPRISE } from "@/lib/entreprise";
 import { versEtudeReelle } from "@/lib/etude-de-cas";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
@@ -16,6 +17,7 @@ import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
 import { chargerPublications, libelleProjet, type Publication } from "@/lib/publications";
 import { chargerZonesSimulateur } from "@/lib/simulateur/zones";
+import { chargerTarifs } from "@/lib/tarifs-site";
 import { styleTeinte, teintePrestation } from "@/lib/teintes-prestations";
 import { pairesRealisations } from "./paires";
 
@@ -27,7 +29,8 @@ import { pairesRealisations } from "./paires";
  *    arrivent », le lien Instagram et le même bouton.
  *  - Puis, SÉPARÉE et clairement étiquetée, la section « Avant / après en ambiance » : quatre paires de la série 2
  *    (cuisine, salle de bain, meubles, pro ; `./paires`), chacune « Ambiance · avant / après », à la teinte de sa
- *    prestation, avec ses cartels, le prix habituel et « Essayer cette composition chez moi » (`depuis=realisations`).
+ *    prestation, avec ses cartels, le tarif de sa famille lu au CRM et « Essayer cette composition chez moi »
+ *    (`depuis=realisations`).
  *    Jamais présentées comme des chantiers, jamais « Simulation ».
  *  - Les avis publiés (`PublicationSite` ne relie pas un avis à une réalisation : ils ont leur section).
  *  - En bas : les cinq pièces (`CartesPieces`, photos d'ambiance) → les pages par pièce (/prestations/cuisine,
@@ -37,6 +40,8 @@ import { pairesRealisations } from "./paires";
 export const revalidate = 300;
 
 const CHEMIN = "/realisations";
+/** « Simuler ma pièce » de la page (relecture des lots B et C : il partait sans `depuis`). */
+const LIEN_SIMULER = lienSimuler({ depuis: "realisations" });
 
 const TITRE = "Réalisations et avis — covering adhésif à Montpellier | CoverSwap";
 const SUJET = "Cuisines, salles de bain, meubles et locaux recouverts d'un film Cover Styl'";
@@ -52,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     realisations.length > 0
       ? `${SUJET} : photos après chantier publiées avec l'accord des clients${avis.length > 0 ? ", et leurs avis" : ""}.`
-      : `${SUJET} : des exemples en ambiance, étiquetés comme tels, et les prix par projet.`;
+      : `${SUJET} : des exemples en ambiance, étiquetés comme tels, et nos tarifs.`;
   return metadonneesPage({ titre: TITRE, description, chemin: CHEMIN });
 }
 
@@ -70,8 +75,8 @@ function CarteAvis({ p }: { p: Publication }) {
 }
 
 export default async function PageRealisations() {
-  const [{ realisations, avis }, zones] = await Promise.all([chargerPublications(), chargerZonesSimulateur()]);
-  const paires = pairesRealisations();
+  const [{ realisations, avis }, zones, tarifs] = await Promise.all([chargerPublications(), chargerZonesSimulateur(), chargerTarifs()]);
+  const paires = pairesRealisations(tarifs);
   const pieces = zones.pieces.map((piece) => ({ id: piece.id, libelle: piece.libelle, description: piece.zones.map((z) => z.libelle).join(", ") }));
   const liens = Object.fromEntries(pieces.map((piece) => [piece.id, lienPiece(piece.id)]));
   const lienTexte = "text-encre underline underline-offset-4";
@@ -84,7 +89,7 @@ export default async function PageRealisations() {
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Réalisations" }]} />
           <h1 className="titre-1 max-w-3xl text-encre">Ce que ça donne</h1>
           <p className="texte mt-4 max-w-2xl text-encre-2">
-            {realisations.length > 0 ? "Photos prises à la fin des chantiers, publiées avec l'accord des personnes. Pas d'image de catalogue présentée comme une pose." : "Des avant / après en ambiance, étiquetés comme tels, avec les prix habituels par projet, en attendant les photos de nos chantiers."}
+            {realisations.length > 0 ? "Photos prises à la fin des chantiers, publiées avec l'accord des personnes. Pas d'image de catalogue présentée comme une pose." : "Des avant / après en ambiance, étiquetés comme tels, avec nos tarifs, en attendant les photos de nos chantiers."}
           </p>
         </div>
       </section>
@@ -99,7 +104,7 @@ export default async function PageRealisations() {
             ))}
           </div>
           <div className="mt-8 md:mt-10">
-            <Lien href="/simulateur">Simuler ma pièce</Lien>
+            <Lien href={LIEN_SIMULER}>Simuler ma pièce</Lien>
           </div>
         </Section>
       ) : (
@@ -113,7 +118,7 @@ export default async function PageRealisations() {
           </>
         }>
           <div>
-            <Lien href="/simulateur">Simuler ma pièce</Lien>
+            <Lien href={LIEN_SIMULER}>Simuler ma pièce</Lien>
           </div>
         </Section>
       )}

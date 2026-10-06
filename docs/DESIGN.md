@@ -372,6 +372,7 @@ feuille avant de naviguer (`useLiensDeFeuille`). L'espace client reste au pied d
 Playfair, le téléphone et l'e-mail au papier (15,42:1) ; les liens (inchangés : `LIENS_PIED`, réseaux, pages
 légales) et le secondaire en `sur-encre-2` (6,69:1), au papier et soulignés au survol ; jamais le gris chaud
 (2,92:1) ni l'encre en texte ; filets au papier à 20 %. Le focus passe au papier (`.ton-encre :focus-visible`).
+Chaque lien fait au moins 44 × 44 px (`min-h-[44px] min-w-[44px]` : « Pro » et « CGV » étaient plus étroits).
 
 ### Le bouton collé — `simulation/BoutonColle.tsx`
 
@@ -487,25 +488,30 @@ les images d'ambiance ensuite, dans une section à part :
 
 - Les quatre paires sont les ouvertures des pages de prestation (cuisine bordeaux → NF13, salle de bain → NF13,
   buffet → NH29 + AA14) et le comptoir de `/pro` : une paire raconte la même histoire partout.
-- Chaque paire : titre, curseur, cartels (filet à la teinte ; D1 pour le pro), **prix habituel** d'`offre.ts` libellé
-  comme tel (« Prix habituel : … fourni et posé », « Sur devis » pour le pro, jamais le prix d'un chantier), « Essayer
-  cette composition chez moi » (`depuis=realisations`).
+- Chaque paire : titre, curseur, cartels (filet à la teinte ; D1 pour le pro), **le tarif de sa famille lu au CRM**
+  (`tarifDeLaFamille` de `BlocPrix.tsx` : « Notre tarif : 110 €/ml, fourni et posé », « dès … » quand la famille a
+  plusieurs prix, « Sur devis » quand le CRM n'en publie aucun, la plage au mètre linéaire sans le CRM ; jamais le prix
+  d'un chantier), « Essayer cette composition chez moi » (`depuis=realisations`). Relecture des lots B et C : les
+  fourchettes d'`offre.ts` (« Prix habituel : … ») contredisaient l'accueil ; plus aucune page ne les affiche, et une
+  carte de chantier sans prix publié n'en montre aucun (la durée habituelle reste).
+- « Simuler ma pièce » de la page part avec `depuis=realisations` (il partait sans).
 
 ## La page Comment ça marche
 
 Lot C3, `src/app/comment-ca-marche/page.tsx`, textes dans `contenu.ts` (énoncé, § C.2). La page qui rassure : le procédé,
 les délais, ce qui reste en place, l'entretien, le prix, les objections ; une seule action, « Simuler ma pièce »
-(`depuis=comment-ca-marche`), sous les étapes et au dernier appel. Captures de référence :
+(`depuis=comment-ca-marche`), sous le titre (relecture des lots B et C : elle n'était au premier écran ni à 390 ni à
+1 440 px), sous les étapes et au dernier appel. Captures de référence :
 `docs/captures/site-3-0/comment-ca-marche-390.jpg` et `comment-ca-marche-1440.jpg`.
 
 | Section | Ton | Ce qui la porte |
 |---|---|---|
-| 1. Titre | papier | « Comment ça marche », une phrase |
+| 1. Titre | papier | « Comment ça marche », une phrase, le principal |
 | 2. De la photo à la pose (`#comment-ca-marche`) | papier | `CommentOnTravaille enTete` : les quatre étapes de l'accueil (photo de la première prioritaire, section non différée), la ligne « pas de démontage… », la preuve de finition `detail-chant`, les garanties, le principal |
 | 3. Le déroulé, et ses délais (`#deroule`) | papier-2 | six moments entre filets d'encre : le quand en petites capitales, le titre en Playfair, `mesure-visite` à la visite, `outils-pose` au jour de la pose (à droite dès 1 024 px) |
 | 4. Ce qui reste en place (`#en-place`) | papier | quatre choses qui ne bougent pas, puis « Ce que vous préparez » |
 | 5. L'entretien (`#entretien`) | papier-2 | quatre gestes, le guide ; puis la bande de chêne AG13 |
-| 6. Le prix (`#prix`) | papier | le tableau des ordres de grandeur entre filets d'encre, chiffres en `tabular-nums` |
+| 6. Le prix (`#prix`) | papier | les tarifs du CRM (`ContenuPrix`, ceux de l'accueil, quatre familles, chiffres en `tabular-nums`) ; le tableau des ordres de grandeur d'`offre.ts`, qui les contredisait, est retiré |
 | 7. Vos questions (`#objections`, `#faq`) | papier-2 | les objections entre filets, puis la FAQ repliée ; un seul `FAQPage` |
 | 8. Quand rénover ? (`#quand-renover`) | papier | l'encart entre deux filets d'encre : `usure-detail`, les signes, et quand le film ne suffit pas |
 | 9. Le devis en ligne (`#devis`) | papier-2 | étapes à grand numéro et atouts sous filets |
@@ -513,7 +519,9 @@ les délais, ce qui reste en place, l'entretien, le prix, les objections ; une s
 | 11. Dernier appel | encre | principal rouge, « Être rappelé » en `sur-encre` |
 
 - **Chaque photo une fois** : les six photos utiles (« Ambiance ») et la capture du simulateur (« Simulation ») ; les
-  photos du déroulé et de l'encart sont décrites (texte de la bibliothèque), celles des étapes sont décoratives.
+  photos du déroulé et de l'encart sont décrites (texte de la bibliothèque), celles des étapes sont décoratives. La
+  capture (`etape-simulation`) est recadrée sur le curseur avant / après (538 × 359) : l'écran entier montrait une
+  fourchette de prix écrite dans l'image.
 - **Aucun délai inventé** : ceux d'`offre.ts` (rendu, devis, validité, acompte, pose) ; le temps entre la commande et la
   pose n'est pas promis (la date se fixe avec le client).
 
@@ -546,6 +554,8 @@ Lot C4, `src/app/inspirations/page.tsx`, ordre dans `_components/ordre.ts`, filt
   sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres` en est
   un depuis le lot D2). La page passe de 18 800 à 3 700 px de haut à
   1 440 px de large, et mesure 8 800 px à 390 px.
+- **L'action principale** (relecture des lots B et C : la page n'en avait pas) : « Simuler ma pièce »
+  (`depuis=inspirations`) après la grille, « Voir les matières » à côté en secondaire.
 
 ## Le présentoir — `/matieres`
 
@@ -590,9 +600,13 @@ colonne de 300 px à droite ; au téléphone, la colonne passe sous l'article.
   photo utile « Ambiance » décrite par le texte de la bibliothèque.
 - **Dans le texte** : une section peut porter une image de plus (le second « après » de la paire en `CarteAmbiance`,
   une photo utile) et les prix publiés de la cuisine (`ContenuPrix`, sans intro : la section dit déjà comment on
-  facture). Aucun montant écrit dans le texte (testé).
+  facture). Aucun montant écrit dans le texte (testé). Relecture des lots B et C : aucun guide ne chiffre plus une
+  pièce à la main (les anciens écrivaient les fourchettes d'`offre.ts`) ; ceux qui parlent du prix montrent les tarifs
+  publiés. Le texte qui commente une image le dit : « ces deux images d'ambiance », jamais « sur cette cuisine, on a
+  essayé ».
 - **Une seule action principale** : « Simuler ma cuisine » (guide de cuisine) ou « Simuler ma pièce », dans la
-  colonne, `depuis=blog` ; le reste en liens de texte entre filets (prestation, simulateur, guides voisins).
+  colonne, `depuis=blog`, et la même sous le titre jusqu'à 1 024 px (`lg:hidden` : au téléphone, la colonne arrive
+  après l'article) ; le reste en liens de texte entre filets (prestation, simulateur, guides voisins).
 - **Typographie** : l'espace devant « : ; ? ! » est insécable dans tout ce que la page affiche (`insecables`) : jamais
   un deux-points en début de ligne d'un titre.
 

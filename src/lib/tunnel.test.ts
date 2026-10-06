@@ -374,7 +374,15 @@ describe("/pro et /contact", () => {
 
   test("les textes de l'ancienne /devis et l'ancien titre de /contact sont repris (/comment-ca-marche, métadonnées du simulateur)", async () => {
     const { default: PageCommentCaMarche, metadata } = await import("@/app/comment-ca-marche/page");
-    const html = renderToStaticMarkup(createElement(PageCommentCaMarche)).replace(/&#x27;/g, "'");
+    // La page lit les tarifs du CRM (relecture des lots B et C) : rien ne part, le repli suffit ici.
+    const fetchOrigine = globalThis.fetch;
+    globalThis.fetch = (async () => new Response("{}", { status: 404 })) as typeof fetch;
+    let html: string;
+    try {
+      html = renderToStaticMarkup(await PageCommentCaMarche()).replace(/&#x27;/g, "'");
+    } finally {
+      globalThis.fetch = fetchOrigine;
+    }
     for (const t of [TITRE_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, LIEN_DEVIS_EN_LIGNE, ...ETAPES_DEVIS_EN_LIGNE.flatMap((e) => [e.titre, e.texte]), ...AVANTAGES_DEVIS_EN_LIGNE.flatMap((a) => [a.titre, a.texte])]) assert.ok(html.includes(t.replace(/&/g, "&amp;")), `repris : ${t.slice(0, 40)}`);
     assert.match(html, /href="\/contact"/);
     assert.match(String(metadata.keywords), /devis covering en ligne/);

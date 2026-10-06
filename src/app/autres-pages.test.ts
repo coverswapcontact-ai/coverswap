@@ -53,10 +53,22 @@ function balisage(html: string): Record<string, unknown>[] {
 
 /** Le CRM simulé : les publications demandées, rien d'autre (zones, avis : 404 → replis). */
 let publications: Partial<Publication>[] = [];
+/** Les tarifs publiés par le CRM simulé (`null` : 404, le repli). Ceux de la production au 6 octobre 2026, en partie. */
+let tarifsCrm: TarifsSite | null = null;
+const TARIFS_CRM: TarifsSite = {
+  version: 1,
+  familles: [
+    { id: "CUISINE", sousParties: [{ id: "facades-hautes", libelle: "Façades hautes", metrage: true, prixUnitaire: 110, unite: "ml" }, { id: "credence", libelle: "Crédence", metrage: false, prixUnitaire: null, unite: "ml" }], formats: [] },
+    { id: "SDB", sousParties: [{ id: "meuble-vasque", libelle: "Meuble vasque", metrage: true, prixUnitaire: null, unite: "ml" }], formats: [] },
+    { id: "MEUBLES", sousParties: [{ id: "portes-dressing", libelle: "Portes de dressing", metrage: false, prixUnitaire: 50, unite: "ml" }, { id: "meuble-tv", libelle: "Meuble TV", metrage: false, prixUnitaire: 65, unite: "ml" }], formats: [] },
+    { id: "PRO", sousParties: [{ id: "comptoir", libelle: "Comptoir", metrage: true, prixUnitaire: 55, unite: "ml" }], formats: [] },
+  ],
+};
 const fetchOrigine = globalThis.fetch;
 before(() => {
   globalThis.fetch = (async (url: string | URL) => {
     if (String(url).endsWith("/api/site/publications")) return new Response(JSON.stringify({ publications }), { status: 200 });
+    if (String(url).endsWith("/api/site/tarifs") && tarifsCrm) return new Response(JSON.stringify(tarifsCrm), { status: 200 });
     return new Response("{}", { status: 404 });
   }) as typeof fetch;
 });
@@ -87,8 +99,9 @@ describe("/realisations", () => {
     assert.equal(compter(html, "<article"), 4);
     assert.equal(compter(html, ">Ambiance · avant / après</span>"), 4 + 1);
     assert.ok(!html.includes(">Simulation</span>") && !/simulés?/.test(html), "des images générées, jamais présentées comme des rendus du simulateur");
-    assert.ok(html.includes(`${fourchette("cuisine")} fourni et posé`));
-    assert.deepEqual(boutons(html, "principal"), [["/simulateur", "Simuler ma pièce"]]);
+    // Sans le CRM : la plage au mètre linéaire, jamais une fourchette par pièce (relecture des lots B et C).
+    assert.ok(html.includes(`Notre tarif : ${PRIX_PLAGE}, fourni et posé`) && !html.includes(fourchette("cuisine")));
+    assert.deepEqual(boutons(html, "principal"), [["/simulateur?depuis=realisations", "Simuler ma pièce"]], "le principal dit d'où il vient (relecture des lots B et C)");
     assert.ok(!/Lattes|Réalisation, |>Réalisation</.test(html), "jamais une ville, jamais « Réalisation » sur une image d'ambiance");
     // La description (Open Graph, carte de partage) ne promet pas de photos de chantier qui n'existent pas.
     const { generateMetadata } = await import("@/app/realisations/page");
@@ -98,16 +111,24 @@ describe("/realisations", () => {
     assert.equal((m.openGraph as { description?: string }).description, m.description);
   });
 
-  test("« Avant / après en ambiance » : une section séparée, après les vrais chantiers ; quatre paires (cuisine, salle de bain, meubles, pro), leurs cartels, le prix habituel, « Essayer » depuis=realisations", async () => {
-    const { PAIRES_REALISATIONS, pairesRealisations, prixHabituel } = await import("@/app/realisations/paires");
-    const paires = pairesRealisations();
+  test("« Avant / après en ambiance » : une section séparée, après les vrais chantiers ; quatre paires (cuisine, salle de bain, meubles, pro), leurs cartels, le tarif du CRM, « Essayer » depuis=realisations", async () => {
+    const { PAIRES_REALISATIONS, pairesRealisations, prixPaire } = await import("@/app/realisations/paires");
+    tarifsCrm = TARIFS_CRM;
+    const paires = pairesRealisations(TARIFS_CRM);
     assert.deepEqual(paires.map((p) => p.id), ["cuisine", "salle-de-bain", "meubles", "professionnel"], "les quatre paires sont préparées");
     // Les mêmes paires que les ouvertures des pages de prestation, et le comptoir de /pro : une paire, une histoire.
     assert.deepEqual(PAIRES_REALISATIONS.map((p) => p.apres), [CAS_PRESTATIONS.cuisine.ouverture.apres, CAS_PRESTATIONS["salle-de-bain"].ouverture.apres, CAS_PRESTATIONS.meubles.ouverture.apres, "pro-comptoir-accueil-apres-bois"]);
     assert.ok(paires.every((p) => p.cas.preparees.avant), "des paires, jamais un avant seul ni un après seul");
-    assert.equal(prixHabituel({ cle: "cuisine", enUneJournee: true }), `Prix habituel : ${fourchette("cuisine")} fourni et posé · pose en une journée en général`);
-    assert.equal(prixHabituel({ cle: "meuble", enUneJournee: false }), `Prix habituel : ${fourchette("meuble")} fourni et posé`);
-    assert.equal(prixHabituel({ cle: "pro", enUneJournee: false }), "Sur devis, après une visite ou sur vos photos", "aucun prix inventé pour un local pro");
+    // Relecture des lots B et C : le tarif de la famille LU AU CRM — plus la fourchette d'offre.ts qui le contredisait
+    // (une salle de bain chiffrée là où le CRM dit « Sur devis », un comptoir « sur devis » là où il publie un prix).
+    assert.deepEqual(paires.map((p) => p.prix), [
+      `Notre tarif : ${euros(110)}/ml, fourni et posé · pose en une journée en général`,
+      "Sur devis, après une visite ou sur vos photos · pose en une journée en général",
+      `Notre tarif : dès ${euros(50)}/ml, fourni et posé`,
+      `Notre tarif : ${euros(55)}/ml, fourni et posé`,
+    ]);
+    assert.equal(prixPaire({ famille: "SDB", enUneJournee: false }, null), `Notre tarif : ${PRIX_PLAGE}, fourni et posé`, "sans le CRM : la plage au mètre linéaire");
+    for (const p of paires) for (const cle of ["cuisine", "sdb", "meuble"] as const) assert.ok(!p.prix.includes(fourchette(cle)), `${p.id} : ${cle}`);
 
     for (const avecChantiers of [false, true]) {
       publications = avecChantiers ? [publication({ id: "r1" })] : [];
@@ -139,6 +160,7 @@ describe("/realisations", () => {
     }
     // La valeur `depuis` est documentée au suivi.
     assert.ok(readFileSync(join(process.cwd(), "docs", "SUIVI.md"), "utf8").includes("`realisations`"));
+    tarifsCrm = null;
   });
 
   test("les cinq pièces → les pages par pièce ; les textes de l'ancien index /prestations sont repris", async () => {
@@ -161,10 +183,11 @@ describe("/realisations", () => {
     assert.ok(html.indexOf("/api/site/photos/r2/apres") < html.indexOf('id="en-ambiance"'), "les vraies d'abord");
     assert.ok(html.includes("/api/site/photos/r1/apres?l=480 480w"));
     assert.ok(html.includes(euros(2400)));
-    assert.ok(html.includes(`Prix habituel : ${fourchette("cuisine")}`));
+    assert.ok(!html.includes("Prix habituel"), "sans prix publié, aucun prix sur la carte d'un chantier (relecture des lots B et C)");
     assert.ok(html.includes("Avis clients") && html.includes("« Très propre. »"));
     assert.ok(!html.includes("Les premières réalisations arrivent"));
-    assert.deepEqual(boutons(html, "principal"), [["/simulateur", "Simuler ma pièce"]]);
+    assert.deepEqual(boutons(html, "principal"), [["/simulateur?depuis=realisations", "Simuler ma pièce"]]);
+    assert.equal(lireDepuis(new URLSearchParams(boutons(html, "principal")[0][0].split("?")[1]).get("depuis")), "realisations");
     // Plan de titres : h1, puis un h2 (masqué à l'œil) au-dessus des titres h3 des cartes.
     const titres = [...html.matchAll(/<h([1-6])/g)].map((t) => Number(t[1]));
     assert.deepEqual(titres.slice(0, 3), [1, 2, 3], JSON.stringify(titres));
@@ -285,7 +308,7 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
       // Les villes : une page chacune.
       for (const z of ZONES) assert.ok(html.includes(`href="/zones/${getZoneSlug(z)}"`), `${slug} : ${z.ville}`);
     }
-    // Les prix : les tarifs du CRM de la famille, tels quels (sans le CRM : la plage et la fourchette de la famille).
+    // Les prix : les tarifs du CRM de la famille, tels quels (sans le CRM : la plage au mètre linéaire seule).
     const tarifs: TarifsSite = {
       version: 1,
       familles: [
@@ -299,7 +322,13 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
     assert.ok(!prix.includes("Crédence") && !prix.includes("Meuble TV"), "un prix nul est masqué ; les autres familles n'y sont pas");
     const sans = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: null })));
     const repli = sans.slice(sans.indexOf('id="prix"'), sans.indexOf('id="villes"'));
-    assert.ok(repli.includes(PRIX_PLAGE) && repli.includes(fourchette("sdb")) && !repli.includes(fourchette("cuisine")), "le repli d'offre.ts : la plage et la fourchette de la famille");
+    assert.ok(repli.includes(PRIX_PLAGE) && !repli.includes(fourchette("sdb")) && !repli.includes(fourchette("cuisine")), "le repli : la plage au mètre linéaire, aucune fourchette par pièce (relecture des lots B et C)");
+    // Ni le texte de la page, ni sa FAQ, ni sa description ne chiffrent la pièce : le bloc du CRM est le seul prix.
+    for (const slug of ["cuisine", "salle-de-bain", "meubles"]) {
+      const p = getPrestation(slug)!;
+      const texte = JSON.stringify([p.descriptionSeo, p.prix, p.faq]);
+      for (const n of [FOURCHETTES.cuisine.min, FOURCHETTES.cuisine.max, FOURCHETTES.sdb.max, FOURCHETTES.meuble.min]) assert.ok(!texte.includes(euros(n)), `${slug} : ${euros(n)}`);
+    }
     const sdbCrm = texteHtml(renderToStaticMarkup(createElement(ContenuPrestation, { p: getPrestation("salle-de-bain")!, url: "https://coverswap.fr/prestations/salle-de-bain", fil: [], filSchema: [], tarifs: { version: 1, familles: [{ id: "SDB", sousParties: [{ id: "meuble-vasque", libelle: "Meuble vasque", metrage: true, prixUnitaire: null, unite: "ml" }], formats: [] }] } })));
     assert.ok(sdbCrm.includes("Sur devis, après une visite ou sur vos photos."), "une famille sans aucun prix : « Sur devis »");
   });
@@ -404,7 +433,7 @@ describe("pages par pièce (site 3.0, lot C1)", () => {
 describe("/comment-ca-marche", () => {
   const rendre = async () => {
     const { default: Page } = await import("@/app/comment-ca-marche/page");
-    return texteHtml(renderToStaticMarkup(createElement(Page)));
+    return texteHtml(renderToStaticMarkup(await Page()));
   };
 
   test("procédé, déroulé, prix, objections, FAQ, quand rénover, devis, guides : dans cet ordre, ancres d'avant gardées ; une seule action principale", async () => {
@@ -415,12 +444,15 @@ describe("/comment-ca-marche", () => {
     assert.ok(ordre.every((i) => i > 0), JSON.stringify(ordre));
     assert.deepEqual([...ordre].sort((a, b) => a - b), ordre);
     assert.equal(compter(html, "<h1"), 1);
-    // Une seule action, deux fois (sous les étapes, au dernier appel) : « Simuler ma pièce », qui dit d'où elle vient
-    // (avant le lot C3 : « Simuler ma cuisine », /simulateur?projet=cuisine).
+    // Une seule action, trois fois (sous le titre, sous les étapes, au dernier appel) : « Simuler ma pièce », qui dit
+    // d'où elle vient (avant le lot C3 : « Simuler ma cuisine », /simulateur?projet=cuisine).
     const principaux = boutons(html, "principal");
-    assert.ok(principaux.length === 2 && principaux.every(([href, libelle]) => href === "/simulateur?depuis=comment-ca-marche" && libelle === "Simuler ma pièce"), JSON.stringify(principaux));
+    assert.ok(principaux.length === 3 && principaux.every(([href, libelle]) => href === "/simulateur?depuis=comment-ca-marche" && libelle === "Simuler ma pièce"), JSON.stringify(principaux));
     assert.equal(lireDepuis(new URLSearchParams(principaux[0][0].split("?")[1]).get("depuis")), "comment-ca-marche");
-    assert.ok(html.indexOf(principaux[0][0]) < html.indexOf('id="deroule"'), "le premier principal sous les étapes");
+    // Relecture des lots B et C : le premier au premier écran, sous le titre et sa phrase, avant les étapes.
+    const premier = html.indexOf(`href="${principaux[0][0]}"`);
+    assert.ok(premier > html.indexOf("</h1>") && premier < html.indexOf('id="comment-ca-marche"'), "le premier principal sous le titre");
+    assert.ok(html.indexOf(`href="${principaux[0][0]}"`, premier + 1) < html.indexOf('id="deroule"'), "le deuxième sous les étapes");
     // Les huit photos (3 avant le lot C3) : les quatre étapes, la preuve de finition, les deux du déroulé, l'encart.
     assert.equal(compter(html, "<picture"), 8);
     const photos = [...html.matchAll(/<picture>[\s\S]*?<\/picture>/g)].map((m) => m[0]);
@@ -478,14 +510,21 @@ describe("/comment-ca-marche", () => {
     assert.ok(!existsSync(join(SRC, "components", "accueil", "CommentCaMarche.tsx")), "les trois étapes d'avant sont retirées");
   });
 
-  test("le prix : au mètre linéaire, ce qui est compris, les fourchettes d'offre.ts, le lien vers l'estimation", async () => {
+  test("le prix : au mètre linéaire, ce qui est compris, les tarifs du CRM (ceux de l'accueil, plus les fourchettes d'offre.ts qui les contredisaient), le lien vers l'estimation", async () => {
+    tarifsCrm = TARIFS_CRM;
     const html = await rendre();
-    for (const texte of [PRIX_PLAGE, PRIX_EXPLICATION, "Nous mesurons le film réellement posé", `Devis gratuit, valable ${VALIDITE_DEVIS_JOURS} jours, acompte de ${ACOMPTE_POURCENT} % à la commande.`, "Ordres de grandeur par type de projet, fourni et posé", "Compris : le film"]) assert.ok(html.includes(texte), texte.slice(0, 40));
-    assert.equal(compter(html, '<th scope="row"'), 4);
-    for (const cle of ["cuisine", "sdb", "meuble"] as const) assert.ok(html.includes(fourchette(cle)), cle);
-    assert.ok(html.includes("Sur devis après visite"));
-    assert.ok(html.includes(FOURCHETTES.cuisine.libelle.slice(1)));
+    tarifsCrm = null;
+    for (const texte of [PRIX_PLAGE, PRIX_EXPLICATION, "Nous mesurons le film réellement posé", `Devis gratuit, valable ${VALIDITE_DEVIS_JOURS} jours, acompte de ${ACOMPTE_POURCENT} % à la commande.`, "Compris : le film"]) assert.ok(html.includes(texte), texte.slice(0, 40));
+    const prix = html.slice(html.indexOf('id="prix"'), html.indexOf('id="objections"'));
+    // Les quatre familles du CRM, chaque prix tel quel ; la salle de bain sans prix : « Sur devis ».
+    for (const famille of ["Cuisine", "Salle de bain", "Meubles", "Professionnels"]) assert.ok(prix.includes(`>${famille}</h3>`), famille);
+    assert.ok(prix.includes(`>${euros(110)}/ml</dd>`) && prix.includes(`>${euros(55)}/ml</dd>`) && prix.includes("Sur devis, après une visite ou sur vos photos."));
+    for (const cle of ["cuisine", "sdb", "meuble"] as const) assert.ok(!html.includes(fourchette(cle)), cle);
+    assert.equal(compter(html, "<table"), 0, "plus de table des ordres de grandeur");
     assert.ok(boutons(html, "secondaire").some(([href, libelle]) => href === "/simulateur?depuis=comment-ca-marche" && libelle === "Estimer sur ma photo"));
+    // Sans le CRM : la plage au mètre linéaire seule.
+    const repli = await rendre();
+    assert.ok(repli.includes(PRIX_PLAGE) && !repli.includes(fourchette("cuisine")));
   });
 
   test("les objections : une ligne, deux phrases au plus ; la FAQ générale fondue dedans, sans doublon (un seul FAQPage)", async () => {

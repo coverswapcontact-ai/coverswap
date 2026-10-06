@@ -268,6 +268,17 @@ describe("site 3.0, lot B2 : le rouge réservé aux actions", () => {
     }
   });
 
+  test("relecture des lots B et C : l'onglet verrouillé de l'espace client reste lisible (encre-2 plein, ≥ 4,5:1), le cadenas dit l'état", () => {
+    const JETONS = lireJetons();
+    const espace = lire(join(SRC, "components", "espace", "EspaceClient.tsx"));
+    assert.doesNotMatch(espace, /text-encre-2\/\d+/, "un gris chaud éclairci (encre-2/70 : 2,91:1)");
+    assert.match(espace, /actif \? "text-encre" : "text-encre-2",/);
+    // La barre est blanche à 95 % sur le papier ; l'appui passe au fond-2.
+    for (const fond of ["blanc", "fond", "fond-2"]) assert.ok(contraste(JETONS["encre-2"], JETONS[fond]) >= 4.5, `encre-2 sur ${fond}`);
+    assert.match(espace, /\) : verrou \? \(\s*<span [^>]*bg-encre-2 text-blanc[^>]*>\s*<IconeCadenas taille=\{10\} \/>/);
+    assert.match(espace, /verrou \? " : pas encore ouvert"/);
+  });
+
   test("sélections et favoris à l'encre", () => {
     assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /choisie \? "border-encre ring-1 ring-encre"/);
     assert.match(lire(join(SRC, "components", "simulation", "ElementsCatalogue.tsx")), /favori \? "text-encre" : "text-encre-2"/);

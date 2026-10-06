@@ -1,16 +1,19 @@
-import { FOURCHETTES, PRIX_PLAGE, UNITE_PRIX, euros, fourchette } from "@/lib/offre-legere";
+import { PRIX_PLAGE, UNITE_PRIX, euros } from "@/lib/offre-legere";
 import { chargerTarifs, type IdFamilleTarifs, type SousPartieTarif, type TarifsSite, type UniteTarif } from "@/lib/tarifs-site";
 
 /**
  * Les prix (site 3.0, lot B6 ; énoncé, § C.1 : « tels quels, jamais inventés ») : les tarifs publics du CRM
  * (`chargerTarifs`, relus au plus une fois par heure), famille par famille, chaque sous-partie à son prix et à son unité
  * — une sous-partie sans prix (`null`) n'est pas montrée, une famille sans aucun prix dit « Sur devis ». Si le CRM ne
- * répond pas, le repli documenté de `tarifs-site.ts` : la plage au mètre linéaire et les fourchettes d'`offre.ts`.
+ * répond pas : la plage au mètre linéaire d'`offre.ts` seule (relecture des lots B et C : les fourchettes par pièce
+ * d'`offre.ts` contredisaient les tarifs du CRM — une fourchette chiffrée pour une salle de bain que le CRM met « Sur
+ * devis » —, plus aucune page ne les affiche).
  * Aucun chiffre écrit ici. Montants en chiffres alignés (`tabular-nums`). Partagé : l'accueil (lot B6), puis les pages
  * de prestation et le blog (lots C). `ContenuPrix` est pur (testé) ; `BlocPrix` lit le CRM. Composants serveur.
  *
- * Lot C1 : `familles` restreint aux familles d'une page (la cuisine sur `/prestations/cuisine`) — en repli, la plage
- * au mètre linéaire et la seule fourchette de la famille ; `sansIntro` quand la page dit déjà comment on facture.
+ * Lot C1 : `familles` restreint aux familles d'une page (la cuisine sur `/prestations/cuisine`) ; `sansIntro` quand la
+ * page dit déjà comment on facture. `tarifDeLaFamille` : le même tarif en une ligne (les avant / après en ambiance de
+ * `/realisations`).
  */
 export const NOMS_FAMILLES_PRIX: Readonly<Record<IdFamilleTarifs, string>> = { CUISINE: "Cuisine", SDB: "Salle de bain", MEUBLES: "Meubles", PRO: "Professionnels" };
 
@@ -33,14 +36,28 @@ export function lignesPrix(tarifs: TarifsSite, familles?: readonly IdFamilleTari
   }));
 }
 
-/** La fourchette d'`offre.ts` de chaque famille du CRM (repli). */
-export const FOURCHETTE_DE_LA_FAMILLE: Readonly<Record<IdFamilleTarifs, keyof typeof FOURCHETTES>> = { CUISINE: "cuisine", SDB: "sdb", MEUBLES: "meuble", PRO: "pro" };
+/**
+ * Le tarif d'une famille en une ligne, lu au CRM : « <prix> €/ml » (un seul prix), « dès <prix> €/ml » (plusieurs : le
+ * plus bas, à l'unité du premier prix publié) ; `null` quand le CRM n'en publie aucun (« Sur devis ») ; sans le CRM, la
+ * plage au mètre linéaire. Jamais une fourchette par pièce écrite à la main.
+ */
+export function tarifDeLaFamille(tarifs: TarifsSite | null, famille: IdFamilleTarifs): string | null {
+  if (!tarifs) return PRIX_PLAGE;
+  const publies = (tarifs.familles.find((f) => f.id === famille)?.sousParties ?? []).filter((s): s is SousPartieTarif & { prixUnitaire: number } => s.prixUnitaire !== null);
+  if (publies.length === 0) return null;
+  const memeUnite = publies.filter((s) => s.unite === publies[0].unite);
+  const plusBas = memeUnite.reduce((a, b) => (b.prixUnitaire < a.prixUnitaire ? b : a));
+  const unSeul = publies.every((s) => s.unite === plusBas.unite && s.prixUnitaire === plusBas.prixUnitaire);
+  return `${unSeul ? "" : "dès "}${prixAffiche(plusBas)}`;
+}
+
+/** Sans le CRM : ce qui remplace le détail par pièce (aucun chiffre). */
+export const REPLI_PAR_PIECE = "Le détail par pièce se fait au devis, sur vos photos ou après une visite.";
 
 const LIGNE = "flex items-baseline justify-between gap-4 border-t border-trait py-2.5 text-[15.5px]";
 const MONTANT = "font-sans font-semibold whitespace-nowrap tabular-nums text-encre";
 
 export function ContenuPrix({ tarifs, familles, sansIntro = false, className }: { tarifs: TarifsSite | null; familles?: readonly IdFamilleTarifs[]; sansIntro?: boolean; className?: string }) {
-  const retenues = (Object.keys(FOURCHETTES) as (keyof typeof FOURCHETTES)[]).filter((cle) => !familles || familles.some((f) => FOURCHETTE_DE_LA_FAMILLE[f] === cle));
   return (
     <div className={className}>
       {sansIntro ? null : (
@@ -69,18 +86,15 @@ export function ContenuPrix({ tarifs, familles, sansIntro = false, className }: 
           ))}
         </div>
       ) : (
-        <dl className={`${sansIntro ? "" : "mt-6 "}max-w-xl`}>
-          <div className={LIGNE}>
-            <dt className="text-encre-2">Au mètre linéaire</dt>
-            <dd className={MONTANT}>{PRIX_PLAGE}</dd>
-          </div>
-          {retenues.map((cle) => (
-            <div key={cle} className={LIGNE}>
-              <dt className="text-encre-2">{FOURCHETTES[cle].libelle.charAt(0).toUpperCase() + FOURCHETTES[cle].libelle.slice(1)}</dt>
-              <dd className={MONTANT}>{fourchette(cle)}</dd>
+        <div className={`${sansIntro ? "" : "mt-6 "}max-w-xl`}>
+          <dl>
+            <div className={LIGNE}>
+              <dt className="text-encre-2">Au mètre linéaire</dt>
+              <dd className={MONTANT}>{PRIX_PLAGE}</dd>
             </div>
-          ))}
-        </dl>
+          </dl>
+          <p className="border-t border-trait py-2.5 text-[15.5px] text-encre-2">{REPLI_PAR_PIECE}</p>
+        </div>
       )}
     </div>
   );

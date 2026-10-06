@@ -992,3 +992,72 @@ lecture : vignettes ; `NEXT_PUBLIC_SANS_EVENEMENTS=1`), `next start -p 3100` arr
 **Problèmes** : aucun bloquant. Le menu de la teinte au téléphone est le `<select>` natif (lisible, accessible, sans
 JavaScript de plus) ; à revoir seulement si Lucas veut des pastilles.
 
+
+## Relecture adverse des phases B et C — corrections (06/10/2026)
+
+Les constats de la relecture (a7dd5a6..1b271b4), un par un, et leur sort. Aucune image générée, aucun appel d'API
+d'images, aucun formulaire envoyé.
+
+**Importants**
+1. **Prix écrits en dur contre le CRM** — corrigé. `tarifDeLaFamille` (`BlocPrix.tsx`) donne le tarif d'une famille
+   lu au CRM (« 110 €/ml », « dès 50 €/ml », `null` = « Sur devis », la plage au mètre linéaire sans le CRM) ; les
+   paires de `/realisations` l'affichent (« Notre tarif : … », `chargerTarifs` dans la page). `/comment-ca-marche` :
+   la table des fourchettes est remplacée par `ContenuPrix` (les tarifs de l'accueil ; page `async`, revalidée à
+   l'heure). Repli de `BlocPrix` : la plage au mètre linéaire seule et une phrase, plus de fourchette par pièce (et
+   plus de `<p>` dans le `<dl>`). Vérifiés au passage et corrigés de même : le texte, la FAQ et la description des
+   pages de prestation (la salle de bain disait « 1 200 € à 2 500 € » juste au-dessus du « Sur devis » du CRM), la
+   FAQ générale, `llms.txt`, les guides (`prix-renovation-cuisine-covering` : section « Nos tarifs publiés » avec
+   `prix: ["CUISINE"]`, plus de `euros(900)`… ; peinture, salle de bain, location : idem), et la carte d'un chantier
+   publié sans prix (plus de « Prix habituel : fourchette », la durée habituelle reste). `FOURCHETTES` ne sert plus
+   qu'au repli de l'estimation du simulateur (`lib/estimation.ts`, testé).
+2. **Blog : ambiance présentée comme un essai réel** — corrigé : « Ces deux images d'ambiance montrent deux partis… »,
+   « comme sur ces images », « Une cuisine en L, façades et plan de travail… », « Sur ces deux images d'ambiance, le
+   carrelage à frise reste tel quel », et « Sur cette image d'ambiance, trois choses à repérer » (usure-detail).
+3. **/inspirations sans action principale** — corrigé : « Simuler ma pièce » (`depuis=inspirations`) après la grille,
+   « Voir les matières » à côté en secondaire.
+4. **`etape-simulation` montrait « Cuisine : 1200 à 3 500 € »** — corrigé par recadrage local (sharp, `extract` 195,
+   185, 538 × 359, au rapport 3/2 du cadre) sur le curseur avant / après seul ; source remplacée dans
+   `public/images/sources`, `npm run images` (480 et 538 px, manifeste réécrit, empreinte `73d354f50b42`).
+   Limite : 538 px de large, un peu doux sur un écran de téléphone à forte densité ; l'étiquette « Simulation » du
+   site recouvre le « Avant » de la capture.
+
+**Mineurs**
+1. **Accueil : la réalisation de l'ouverture répétée en 1re carte** — corrigé : `realisationsAccueil(realisations,
+   ouverture?.idPublication)` ; si c'était la seule, la section dit « Nos réalisations » (plus « arrivent ») et garde
+   « Voir les réalisations » (`ouvertureReelle`).
+2. **Pied de page : « Pro » 25 × 44, « CGV » 30 × 44** — corrigé : `min-w-[44px]` sur tous les liens (mesuré 44 × 44).
+3. **/realisations : « Simuler ma pièce » sans `depuis`** — corrigé : `lienSimuler({ depuis: "realisations" })`.
+4. **Pas de principal au premier écran** — corrigé : `/comment-ca-marche` le pose sous le titre (bas du bouton à
+   363 px à 1 440, dans le premier écran à 390) ; les guides le posent sous le titre jusqu'à 1 024 px (`lg:hidden`, à
+   298 px à 390), la colonne le garde au-delà (478 px à 1 440).
+5. **Focus perdu à la fermeture d'« Être rappelé »** — corrigé pour toutes les feuilles : `retenirLeFocus`
+   (`simulation/saisie.ts`) retient l'élément actif à l'ouverture et le lui rend après `liberer()` (s'il est encore
+   dans la page, jamais `<body>`). Vérifié : Échap → `BUTTON « Être rappelé »` à 390 et 1 440 px.
+6. **« Hêtre des années 2000 » contre « Cuisine en L des années 1970 »** — corrigé dans
+   `scripts/bibliotheque/reglages.json` (l'avant et ses deux après), `npm run bibliotheque` (0 image produite, seul
+   `ambiances-serie-2.ts` change ; il reste égal à la sortie du script, `bibliotheque.test.ts`).
+7. **`suite=1` mort** — corrigé : retiré de `Simulateur.tsx` et de `decisionAuMontage` (`depuisAccueil`), l'émetteur
+   n'est plus pré-marqué ; `docs/SUIVI.md` le dit (`PHOTO_CHARGEE` ne part que du simulateur, sans `depuis`).
+8. **Picto sans effet avec une photo en mémoire** — gardé (décision la plus simple) : ce n'est pas « sans effet » —
+   la pièce de l'adresse est présélectionnée et le bandeau de reprise passe d'abord, rien n'est écrasé ; photo trop
+   vieille : écran 1, pièce présélectionnée. Documenté dans `reprise.ts` et `SUIVI.md`, verrouillé par les tests.
+9. **Onglet verrouillé de l'espace à 2,91:1** — corrigé : `text-encre-2` plein (≥ 4,5:1 sur blanc, papier, fond-2),
+   le cadenas et l'`aria-label` « pas encore ouvert » disent l'état.
+
+**Noté, non corrigé** : l'ordre du § C.1 (« Des cuisines comme la vôtre » avant les réalisations) reste celui de
+l'énoncé.
+
+**Tests** : 440 → 451, tous réussis. Nouveaux : tarif d'une famille ; `FOURCHETTES` limité à l'estimation et absent de
+la FAQ ; tarifs du CRM sur les paires, `/comment-ca-marche` (plus de table) et le repli ; aucun montant par pièce dans
+les prestations ni les guides, tarifs publiés dans les quatre guides de prix ; aucune ambiance présentée comme un
+essai ; principal de `/inspirations` ; Hêtre / années 2000 ; capture recadrée (538 × 359, empreinte) ; pied à 44 px ;
+focus rendu (fonction et branchement) ; onglet verrouillé ; `suite=1` retiré. Adaptés en gardant leur intention :
+`/realisations` (principal avec `depuis`, tarif du CRM), `/comment-ca-marche` (trois principaux, le premier sous le
+titre ; page `async`), guides (le même principal deux fois, sous le titre et en colonne), réalisations de l'accueil
+(sans prix publié : aucun prix), `reprise.test.ts` (sans `depuisAccueil`), `tunnel.test.ts` (page `async`, CRM coupé).
+`npx eslint .` et `npm run build` passent.
+
+**Vérification visuelle** : build local (CRM de production en lecture), `next start -p 3100` arrêté ensuite ;
+`scripts/captures.mjs` (Edge) à 390 et 1 440 px sur l'accueil, `/realisations`, `/comment-ca-marche`, `/inspirations`,
+deux guides et `/prestations/salle-de-bain` : aucun débordement à 360 px, 0 requête coupée. Captures de référence
+`accueil-*` et `comment-ca-marche-*` de `docs/captures/site-3-0` refaites ; les autres dans `scratchpad/m21/rbc`.

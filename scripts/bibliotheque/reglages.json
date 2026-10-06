@@ -15,9 +15,9 @@
   "cuisine-kitchenette-studio-apres-bois": { "titre": "Kitchenette de studio, chêne pâle et marbre blanc", "scene": "Kitchenette de studio, façades en chêne pâle, plan de travail effet marbre blanc, petit réfrigérateur sous le plan" },
   "cuisine-kitchenette-studio-apres-couleur": { "titre": "Kitchenette de studio, vert tendre et chêne", "scene": "Kitchenette de studio, façades vert tendre, plan de travail en chêne, petit réfrigérateur sous le plan" },
 
-  "cuisine-l-hetre-avant": { "scene": "Cuisine en L des années 1970, façades effet hêtre, plan de travail effet granit gris" },
-  "cuisine-l-hetre-apres-bois": { "titre": "Cuisine en L, bleu roi, chêne pâle et marbre", "scene": "Cuisine en L des années 1970, meubles bas bleu roi, meubles hauts en chêne pâle, plan de travail effet marbre blanc" },
-  "cuisine-l-hetre-apres-couleur": { "titre": "Cuisine en L, vert jade et pierre grise", "scene": "Cuisine en L des années 1970, meubles bas et hauts vert jade, plan de travail effet pierre grise" },
+  "cuisine-l-hetre-avant": { "scene": "Cuisine en L des années 2000, façades effet hêtre, plan de travail effet granit gris" },
+  "cuisine-l-hetre-apres-bois": { "titre": "Cuisine en L, bleu roi, chêne pâle et marbre", "scene": "Cuisine en L des années 2000, meubles bas bleu roi, meubles hauts en chêne pâle, plan de travail effet marbre blanc" },
+  "cuisine-l-hetre-apres-couleur": { "titre": "Cuisine en L, vert jade et pierre grise", "scene": "Cuisine en L des années 2000, meubles bas et hauts vert jade, plan de travail effet pierre grise" },
 
   "cuisine-u-pavillon-avant": { "scene": "Cuisine en U de pavillon des années 1990, façades effet chêne doré, plan de travail effet granit vert, sol en terre cuite" },
   "cuisine-u-pavillon-apres-neutre": { "titre": "Cuisine en U, grège et pierre claire", "scene": "Cuisine en U de pavillon ouverte sur le jardin, façades grège, plan de travail effet pierre claire, sol en terre cuite" },

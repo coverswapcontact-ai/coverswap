@@ -1,9 +1,11 @@
-import { DELAI_REPONSE, FACTEURS_PRIX, FOURCHETTES, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE, euros, fourchette } from "@/lib/offre";
+import { DELAI_REPONSE, FACTEURS_PRIX, GARANTIE_ANS, PRIX_EXPLICATION, PRIX_PLAGE } from "@/lib/offre";
 import type { QuestionReponse } from "./faq";
 
 /**
  * Les prestations : une entrée par page /prestations/<slug>, rendue par un
  * seul gabarit. Tout ce qui est écrit ici est vrai ou renvoie au devis.
+ * Aucun montant par pièce (site 3.0, relecture des lots B et C) : les tarifs se lisent au CRM, dans le bloc des prix
+ * de la page (`ContenuPrix`) ; ici, seulement la plage au mètre linéaire et ce qui la fait varier.
  */
 export type Prestation = {
   slug: string;
@@ -26,6 +28,7 @@ export type Prestation = {
   surfaces: { titre: string; texte: string }[];
   atouts: { titre: string; texte: string }[];
   deroulement: { titre: string; texte: string }[];
+  /** `fourchette` : affichée seulement sans famille de tarifs au CRM (vitrages) ; jamais un montant écrit ici. */
   prix: { texte: string; fourchette: string };
   faq: QuestionReponse[];
   /** Identifiant du projet dans le simulateur (null : pas de simulation). */
@@ -46,7 +49,7 @@ export const PRESTATIONS: Prestation[] = [
     nom: "Covering cuisine",
     court: "Cuisine",
     titreSeo: "Covering cuisine à Montpellier — rénover sans casser",
-    descriptionSeo: `Façades, plan de travail, crédence recouverts d'un film Cover Styl' en une journée. Prix au mètre linéaire, ${fourchette("cuisine")} pour une cuisine complète. Devis ${DELAI_REPONSE}.`,
+    descriptionSeo: `Façades, plan de travail, crédence recouverts d'un film Cover Styl' en une journée. Prix au mètre linéaire, fourni et posé. Devis ${DELAI_REPONSE}.`,
     h1: "Rénover sa cuisine sans la casser",
     titreCourt: "Rénover sa cuisine sans la casser",
     libelleSimuler: "Simuler ma cuisine",
@@ -70,8 +73,8 @@ export const PRESTATIONS: Prestation[] = [
     ],
     deroulement: DEROULEMENT_PARTICULIER,
     prix: {
-      texte: `Nous facturons au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE}. ${PRIX_EXPLICATION} En ordre de grandeur, une cuisine complète (façades, plan de travail, crédence) se situe entre ${euros(FOURCHETTES.cuisine.min)} et ${euros(FOURCHETTES.cuisine.max)}.`,
-      fourchette: fourchette("cuisine"),
+      texte: `Nous facturons au mètre linéaire de film posé, fourni et posé : ${PRIX_PLAGE}. ${PRIX_EXPLICATION} Une cuisine se chiffre surface par surface : façades, plan de travail, crédence.`,
+      fourchette: "sur devis",
     },
     faq: [
       { q: "Peut-on recouvrir des façades en mélaminé ou en stratifié ?", a: "Oui, ce sont les supports les plus courants et les mieux adaptés : lisses et stables. Les façades d'une cuisine en kit (mélaminé blanc ou gris) se recouvrent très bien." },
@@ -79,7 +82,7 @@ export const PRESTATIONS: Prestation[] = [
       { q: "Et la chaleur des plaques de cuisson ?", a: "Le film supporte la chaleur d'un usage courant. Pour la bande de plan de travail et de crédence située au contact direct des plaques, nous vérifions sur place ce qui est possible et utilisons les références prévues pour les hautes températures ; un dessous-de-plat reste conseillé pour les casseroles sortant du feu." },
       { q: "Peut-on ne recouvrir que les façades ?", a: "Oui. Beaucoup de projets ne concernent que les façades, ou seulement le plan de travail et la crédence. Le devis détaille chaque surface séparément." },
       { q: "Combien de temps dure un covering de cuisine ?", a: `Films et pose sont garantis ${GARANTIE_ANS} ans contre le décollement et la décoloration. Passé ce délai, le film peut être retiré ou recouvert à nouveau.` },
-      { q: "Combien ça coûte ?", a: `Entre ${euros(FOURCHETTES.cuisine.min)} et ${euros(FOURCHETTES.cuisine.max)} pour une cuisine complète, façades + plan de travail + crédence. Le chiffre dépend de la complexité de la pose (${FACTEURS_PRIX}), pas du seul revêtement choisi. Le devis est gratuit et vous répond ${DELAI_REPONSE}.` },
+      { q: "Combien ça coûte ?", a: `Au mètre linéaire de film posé, aux tarifs publiés sur cette page, surface par surface : façades, plan de travail, crédence. Le chiffre dépend de la complexité de la pose (${FACTEURS_PRIX}), pas du seul revêtement choisi. Le devis est gratuit et vous répond ${DELAI_REPONSE}.` },
     ],
     simulateur: "cuisine",
     crmTypeProjet: "CUISINE",
@@ -89,7 +92,7 @@ export const PRESTATIONS: Prestation[] = [
     nom: "Covering salle de bain",
     court: "Salle de bain",
     titreSeo: "Covering salle de bain à Montpellier — sans casser le carrelage",
-    descriptionSeo: `Meuble vasque, murs carrelés, contour de baignoire recouverts d'un film Cover Styl' résistant à l'humidité. ${fourchette("sdb")} selon le projet. Devis ${DELAI_REPONSE}.`,
+    descriptionSeo: `Meuble vasque, murs carrelés, contour de baignoire recouverts d'un film Cover Styl' résistant à l'humidité. Prix au mètre linéaire, fourni et posé. Devis ${DELAI_REPONSE}.`,
     h1: "Rénover sa salle de bain sans casser le carrelage",
     titreCourt: "Une salle de bain rénovée, sans casse",
     libelleSimuler: "Simuler ma salle de bain",
@@ -113,15 +116,15 @@ export const PRESTATIONS: Prestation[] = [
     ],
     deroulement: DEROULEMENT_PARTICULIER,
     prix: {
-      texte: `Au mètre linéaire de film posé, ${PRIX_PLAGE} fourni et posé. ${PRIX_EXPLICATION} En ordre de grandeur, une salle de bain (meuble vasque, murs carrelés, contour de baignoire) se situe entre ${euros(FOURCHETTES.sdb.min)} et ${euros(FOURCHETTES.sdb.max)}.`,
-      fourchette: fourchette("sdb"),
+      texte: `Au mètre linéaire de film posé, ${PRIX_PLAGE} fourni et posé. ${PRIX_EXPLICATION} Une salle de bain se chiffre surface par surface : meuble vasque, murs carrelés, contour de baignoire.`,
+      fourchette: "sur devis",
     },
     faq: [
       { q: "Le film tient-il sur du carrelage ?", a: "Oui, sur un carrelage sain et propre. Les joints creux sont lissés au préalable pour que le film reste plan ; un carrelage très en relief est étudié au cas par cas." },
       { q: "Peut-on recouvrir l'intérieur d'une douche ?", a: "Nous ne recouvrons pas les zones d'immersion permanente (bac et parois intérieures d'une douche à l'italienne). Les murs autour de la baignoire, le tablier et le meuble vasque, oui." },
       { q: "Comment l'entretenir ?", a: "Éponge douce et produit ménager courant. Pas d'abrasif, pas de solvant, pas de nettoyeur vapeur sur les joints." },
       { q: "Combien de temps dure la pose ?", a: "Une journée pour une salle de bain courante. La pièce est utilisable le soir même ; nous conseillons d'attendre 24 h avant une douche très chaude côté murs traités." },
-      { q: "Combien ça coûte ?", a: `Entre ${euros(FOURCHETTES.sdb.min)} et ${euros(FOURCHETTES.sdb.max)} selon les surfaces retenues et la complexité de la pose (découpes autour de la robinetterie, accès, état du carrelage). Devis gratuit ${DELAI_REPONSE}.` },
+      { q: "Combien ça coûte ?", a: `Au mètre linéaire de film posé, selon les surfaces retenues et la complexité de la pose (découpes autour de la robinetterie, accès, état du carrelage). Devis gratuit ${DELAI_REPONSE}.` },
     ],
     simulateur: "salle-de-bain",
     crmTypeProjet: "SDB",
@@ -131,7 +134,7 @@ export const PRESTATIONS: Prestation[] = [
     nom: "Covering meubles",
     court: "Meubles",
     titreSeo: "Covering meubles à Montpellier — relooker sans poncer ni peindre",
-    descriptionSeo: `Commodes, buffets, dressings, meubles TV, têtes de lit recouverts d'un film Cover Styl'. ${fourchette("meuble")} par meuble. Devis ${DELAI_REPONSE}.`,
+    descriptionSeo: `Commodes, buffets, dressings, meubles TV, têtes de lit recouverts d'un film Cover Styl'. Prix au mètre linéaire, fourni et posé. Devis ${DELAI_REPONSE}.`,
     h1: "Donner un nouveau style à un meuble, sans poncer ni peindre",
     titreCourt: "Un meuble relooké, sans poncer ni peindre",
     libelleSimuler: "Simuler mes meubles",
@@ -155,15 +158,15 @@ export const PRESTATIONS: Prestation[] = [
     ],
     deroulement: DEROULEMENT_PARTICULIER,
     prix: {
-      texte: `Au mètre linéaire de film posé, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose. Un meuble seul démarre à ${euros(FOURCHETTES.meuble.min)} ; le prix dépend du nombre de faces, de tiroirs, de moulures et de découpes. Plusieurs meubles dans la même intervention font baisser le prix au mètre.`,
-      fourchette: fourchette("meuble"),
+      texte: `Au mètre linéaire de film posé, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose. Le prix d'un meuble dépend du nombre de faces, de tiroirs, de moulures et de découpes. Plusieurs meubles dans la même intervention font baisser le prix au mètre.`,
+      fourchette: "sur devis",
     },
     faq: [
       { q: "Sur quels matériaux le film tient-il ?", a: "Sur les surfaces lisses et saines : mélaminé, stratifié, bois verni ou laqué, MDF peint, métal. Un bois brut ou une surface poreuse doit être préparé au préalable." },
       { q: "Les meubles en kit se recouvrent-ils ?", a: "Oui, c'est même le cas le plus fréquent : les panneaux mélaminés des meubles de grande distribution sont un support idéal." },
       { q: "Et les moulures ou les arrondis ?", a: "Le film se pose à chaud et suit les reliefs légers et les arrondis. Les moulures très profondes sont étudiées au cas par cas." },
       { q: "Peut-on recouvrir un plateau de table ?", a: "Oui. Le plateau résiste à l'usage courant et au nettoyage ; protégez-le des objets brûlants et des coupures." },
-      { q: "Combien ça coûte ?", a: `${euros(FOURCHETTES.meuble.min)} et plus par meuble, selon sa taille et la complexité de la pose (tiroirs, moulures, découpes). Devis gratuit ${DELAI_REPONSE} sur photos.` },
+      { q: "Combien ça coûte ?", a: `Au mètre linéaire de film posé, aux tarifs publiés sur cette page, selon la taille du meuble et la complexité de la pose (tiroirs, moulures, découpes). Devis gratuit ${DELAI_REPONSE} sur photos.` },
     ],
     simulateur: "meubles",
     crmTypeProjet: "MEUBLES",
@@ -203,7 +206,7 @@ export const PRESTATIONS: Prestation[] = [
     ],
     prix: {
       texte: `Au mètre linéaire de film posé, ${PRIX_PLAGE} fourni et posé. De grandes surfaces planes sans découpe se situent en bas de la plage ; un comptoir cintré, des découpes nombreuses ou un accès difficile la font monter. Chaque projet professionnel est chiffré sur devis après visite ou sur plans.`,
-      fourchette: fourchette("pro"),
+      fourchette: "sur devis",
     },
     faq: [
       { q: "Pouvez-vous intervenir de nuit ou le week-end ?", a: "Oui, le planning est fixé avec vous au devis : soirée, nuit ou jour de fermeture." },

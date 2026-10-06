@@ -4,6 +4,7 @@ import path from "node:path";
 import { describe, test } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { classesBouton } from "@/components/simulation/Bouton";
 import { AMBIANCES_ACCUEIL } from "@/components/accueil/RealisationsAccueil";
 import { PAIRES_SERIE_2 } from "@/data/ambiances";
 import { PIECES_INSPIRATION, inspirations } from "@/lib/ambiances";
@@ -115,6 +116,16 @@ describe("/inspirations : la page rendue", () => {
       if (ref) assert.ok(lireRefDemandee(ref) === ref && lireComposition(ref), ref);
       assert.ok(compter(c, 'href="/matieres?ref=') >= 1, "les cartels mènent à leur matière");
     }
+  });
+
+  test("relecture des lots B et C : une action principale, « Simuler ma pièce » depuis=inspirations, après la grille ; « Voir les matières » en secondaire", async () => {
+    const html = await rendre();
+    const echapper = (t: string) => t.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+    const boutons = (variante: "principal" | "secondaire") => [...html.matchAll(new RegExp(`<a class="${echapper(classesBouton(variante))}[^"]*" href="([^"]*)"[^>]*>([^<]*)</a>`, "g"))].map((m) => [m[1], m[2]]);
+    assert.deepEqual(boutons("principal"), [["/simulateur?depuis=inspirations", "Simuler ma pièce"]]);
+    assert.equal(lireDepuis(new URLSearchParams(boutons("principal")[0][0].split("?")[1]).get("depuis")), "inspirations");
+    assert.deepEqual(boutons("secondaire"), [["/matieres", "Voir les matières"]]);
+    assert.ok(html.indexOf('href="/simulateur?depuis=inspirations"') > html.lastIndexOf("data-inspiration="), "après la grille");
   });
 
   test("une seule image prioritaire, la première carte (une photo seule) ; les paires jamais ; rien d'autre au premier chargement", async () => {

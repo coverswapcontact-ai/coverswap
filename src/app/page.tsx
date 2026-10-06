@@ -59,7 +59,7 @@ export default async function PageAccueil() {
     cuisines: <CuisinesCommeLaVotre />,
     comment: <CommentOnTravaille depuis="accueil-etapes" idBouton={ANCRES_ACCUEIL.boutonEtapes} preuve />,
     presentoir: <Presentoir />,
-    realisations: <RealisationsAccueil reelles={realisationsAccueil(realisations)} />,
+    realisations: <RealisationsAccueil reelles={realisationsAccueil(realisations, ouverture?.idPublication)} ouvertureReelle={ouverture?.type === "realisation"} />,
     pro: <ProAccueil />,
     "avis-prix": <AvisPrix />,
     questions: <QuestionsAccueil />,

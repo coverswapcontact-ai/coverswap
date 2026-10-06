@@ -7,6 +7,7 @@ import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { PIECES_INSPIRATION, TEINTES, type AmbianceResolue } from "@/lib/ambiances";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { lienSimuler } from "@/lib/liens-simulateur";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { FiltresInspirations, VoirLaSuite, reglesFiltres, reglesSuite, suitesDesAmbiances, teinteJeton } from "./_components/FiltresInspirations";
 import { cartesInspirations } from "./_components/ordre";
@@ -23,8 +24,12 @@ import { cartesInspirations } from "./_components/ordre";
  * « Voir toutes les ambiances » (`reglesSuite`, toujours sans JavaScript). Le serveur rend les 52 (référencement,
  * ancres `#<id>` de l'accueil et des matières, montrées même dans la suite) ; les images de la suite, différées, ne se
  * chargent pas. La première carte est une photo seule : la seule image prioritaire de la page.
+ *
+ * L'action principale (relecture des lots B et C : la page n'en avait pas) : « Simuler ma pièce » en fin de grille
+ * (`depuis=inspirations`, comme les « Essayer » des cartes), « Voir les matières » à côté, en secondaire.
  */
 const CHEMIN = "/inspirations";
+const LIEN_SIMULER = lienSimuler({ depuis: "inspirations" });
 const TITRE = "Inspirations : cuisines, salles de bain, meubles et locaux en film adhésif | CoverSwap";
 const DESCRIPTION =
   "Des ambiances composées avec les vraies matières Cover Styl' : chaque photo dit ses références, surface par surface. Filtrez par pièce et par teinte, puis essayez la composition chez vous.";
@@ -102,10 +107,13 @@ export default function PageInspirations() {
         </ul>
         <VoirLaSuite />
         <div className="mt-14 flex flex-col items-start gap-3">
-          <p className="texte-2">Une matière vous plaît seule ? Elles sont toutes dans le catalogue.</p>
-          <Lien href="/matieres" variante="secondaire">
-            Voir les matières
-          </Lien>
+          <p className="texte-2">Une ambiance vous plaît ? Essayez ses matières sur la photo de votre pièce. Une matière seule ? Elles sont toutes dans le catalogue.</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Lien href={LIEN_SIMULER}>Simuler ma pièce</Lien>
+            <Lien href="/matieres" variante="secondaire">
+              Voir les matières
+            </Lien>
+          </div>
         </div>
       </Section>
     </div>

@@ -7,7 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { contraste, lireJetons } from "../../scripts/jetons.mjs";
 import { LIENS_PIED } from "@/lib/navigation";
 import PiedDePage from "./PiedDePage";
-import { ATTRIBUT_FEUILLE_OUVERTE, estChampDeSaisie, masquerPendantSaisie } from "./simulation/saisie";
+import { ATTRIBUT_FEUILLE_OUVERTE, estChampDeSaisie, masquerPendantSaisie, retenirLeFocus } from "./simulation/saisie";
 
 /**
  * Site 3.0, lot B5 — le gabarit (docs/DESIGN.md, « Le gabarit ») : l'en-tête (60 px, filet d'encre, menu en petites
@@ -89,8 +89,38 @@ describe("gabarit : le pied de page en ton encre", () => {
     assert.ok(contraste(JETONS["sur-encre-2"], JETONS.encre) >= 4.5);
   });
 
+  test("relecture des lots B et C : chaque lien du pied fait au moins 44 × 44 px (« Pro » faisait 25 px de large, « CGV » 30)", () => {
+    // Les liens du pied (navigation, réseaux, pages légales) : la même classe, hauteur ET largeur de 44 px au moins.
+    const liens = [...html.matchAll(/<a [^>]*class="([^"]*text-sur-encre-2[^"]*)"[^>]*>([^<]*)<\/a>/g)];
+    assert.equal(liens.length, LIENS_PIED.length + 3 + 3, "navigation, trois réseaux, trois pages légales");
+    for (const [, classes, libelle] of liens) assert.ok(/(^| )min-h-\[44px\]( |$)/.test(classes) && /(^| )min-w-\[44px\]( |$)/.test(classes), libelle);
+    for (const libelle of ["Pro", "CGV"]) assert.match(html, new RegExp(`<a [^>]*class="[^"]*min-w-\\[44px\\][^"]*"[^>]*>${libelle}</a>`), libelle);
+  });
+
   test("le focus clavier se voit sur l'encre : la règle .ton-encre passe le contour au papier", () => {
     assert.match(lire("app/globals.css"), /\.ton-encre :focus-visible \{ outline-color: var\(--color-fond\); \}/);
+  });
+});
+
+describe("gabarit : une feuille fermée rend le focus (relecture des lots B et C)", () => {
+  test("l'élément qui avait le focus à l'ouverture le retrouve, s'il est encore dans la page ; jamais <body>", () => {
+    const appels: string[] = [];
+    const element = (tagName: string, isConnected = true) => ({ tagName, isConnected, focus: (o?: FocusOptions) => appels.push(`${tagName}:${o?.preventScroll}`) });
+    retenirLeFocus(element("BUTTON"))();
+    retenirLeFocus(element("A"))();
+    retenirLeFocus(element("BUTTON", false))();
+    retenirLeFocus(element("BODY"))();
+    retenirLeFocus(null)();
+    retenirLeFocus(undefined)();
+    assert.deepEqual(appels, ["BUTTON:true", "A:true"], "rendu sans défilement ; ni un élément retiré, ni le corps de la page");
+  });
+
+  test("la feuille retient le focus avant de le prendre, et le rend après avoir libéré la page (Échap, « Fermer », retour)", () => {
+    const feuille = lire("components/simulation/Feuille.tsx");
+    assert.match(feuille, /const rendreLeFocus = retenirLeFocus\(document\.activeElement as HTMLElement \| null\);\s*boite\.current\?\.focus\(\{ preventScroll: true \}\);/);
+    assert.match(feuille, /window\.removeEventListener\("keydown", surTouche\);\s*liberer\(\);\s*rendreLeFocus\(\);/);
+    // « Être rappelé » ouvre une Feuille : il en profite (le bouton qui l'ouvre reprend le focus).
+    assert.match(lire("components/accueil/FormulaireRappel.tsx"), /<Feuille\s+ouverte=\{ouverte\}\s+onFermer=\{\(\) => setOuverte\(false\)\}/);
   });
 });
 
