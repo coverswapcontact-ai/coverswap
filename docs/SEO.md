@@ -580,7 +580,7 @@ d'environnement : les échantillons du CRM répondent 404 des deux côtés, d'o�
 |---|---|---|---|
 | `/` | 86 · 3,9 s · 147 ms (85 / 83 / 86) | 83 · 3,9 s · 234 ms (79 / 81 / 83) | -3 (série sous charge, voir l'A/B) |
 | `/comment-ca-marche` | 92 · 3,3 s · 99 ms (91 / 92 / 92) | 91 · 3,4 s · 91 ms (91 / 90 / 90) | -1 ; le LCP est l'affiche du film (AVIF 960) |
-| `/matieres` | 87 · 3,6 s · 103 ms (87 / 85 / 86) | 86 · 3,7 s · 98 ms (73 / 86 / 86) | -1 ; la boucle (1 Mo) se charge après `load`, à l'écran |
+| `/matieres` | 87 · 3,6 s · 103 ms (87 / 85 / 86) | 87 · 3,7 s · 106 ms (87 / 86 / 86), après la règle du premier geste (ci-dessous) | 0 ; sans la règle : 73 / 86 / 86 en local, 70 / 83 / 69 en production |
 | `/simulateur` | 83 · 3,9 s · 254 ms (83 / 82 / 80) | 87 · 3,8 s · 178 ms (85 / 87 / 86) | +4 |
 
 **A/B alterné sur l'accueil** (les deux builds servis en même temps, 3100 et 3101, un passage de chaque à tour de
@@ -594,6 +594,19 @@ et `/simulateur` (les affiches seulement, en AVIF, 480 ou 960 px) ; sur `/matier
 `/matieres`, Lighthouse a retenu le `<video>` comme élément LCP (3,7 s, même instant que l'affiche) et mesuré 633 ms de
 TBT : le décodage de la première image en logiciel sur ce poste ; les deux autres passages donnent l'affiche en LCP et
 98-113 ms.
+
+**`/matieres`, deuxième mesure : le lecteur vidéo coûte 600 ms de fil principal dans Chrome sans GPU.** La première
+série (73 / 86 / 86) cachait un piège vu en production juste après la mise en ligne (70 / 83 / 69, TBT 633-684 ms sur
+deux passages sur trois) : une tâche « Unattributable » de ≈ 600 ms vers 1,3 s, dès que la boucle monte son `<video>`
+— **que le fichier soit bloqué ou non** (`--blocked-url-patterns=*.mp4*` : 70 / 69 / 70, même tâche), et absente avec
+`--force-prefers-reduced-motion` (88 / 86 / 86, la boucle ne monte jamais). C'est la création du lecteur (pipeline
+média) sur un navigateur sans décodage matériel, pas le téléchargement ni le décodage. Différer le montage à
+`requestIdleCallback` n'y changeait rien (76 / 73 / 66 : le moment creux arrive avant la fin de la fenêtre du TBT).
+Correction retenue : la boucle démarre au premier geste du visiteur (défilement, souris, toucher, clavier, molette, ou
+« Lire »), en plus d'être à l'écran après `load` ; une page qui vient d'arriver ne paie jamais le lecteur. Mesure
+après correction (build local, 3 passages) : **87 / 86 / 86**, LCP 3,7 s, TBT 106-116 ms — égal à l'AVANT (87). Vérifié
+avec Edge (Playwright) : sans geste, l'affiche et « Lire » ; après un mouvement de souris, le film part (requête à
+1,8 s) et joue en boucle, muet ; avec moins de mouvement, rien ; hors écran, rien.
 
 **Accessibilité : 100 → 97 sur l'accueil, un artefact de laboratoire.** L'audit `target-size` d'axe signale le bouton
 « Simuler ma pièce » des étapes (`#etapes-simuler`) comme chevauché par le bouton « L'offre pro » de la section

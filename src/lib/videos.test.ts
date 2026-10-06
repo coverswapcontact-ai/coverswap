@@ -132,6 +132,8 @@ describe("le composant Video (serveur) et ses parts clientes", () => {
     assert.match(source, /prefers-reduced-motion: reduce/);
     assert.match(source, /new IntersectionObserver\(/);
     assert.match(source, /document\.readyState === "complete"/);
+    assert.match(source, /const GESTES = \["pointermove", "pointerdown", "touchstart", "keydown", "wheel", "scroll"\] as const;/, "la boucle attend le premier geste du visiteur");
+    assert.match(source, /const active = lecture && visible && chargee && geste;/);
     assert.match(source, /el\.muted = true;\s*el\.play\(\)/);
     assert.doesNotMatch(source, /autoPlay/, "la lecture se lance à la main, une fois les conditions réunies");
   });

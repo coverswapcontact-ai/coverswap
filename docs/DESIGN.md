@@ -354,7 +354,7 @@ composant serveur, `Video`, par `id` et par `mode` ; il pose le `VideoObject` de
 | Mode | Ce qu'on voit | Où |
 |---|---|---|
 | `clic` | l'affiche (AVIF préparé, étiquette d'honnêteté, place réservée au rapport du film) ; tout le cadre est un bouton blanc centré « Voir en 30 s » | « Comment on travaille » (accueil, au-dessus des étapes) ; le bloc de tête de `/comment-ca-marche` (`priorite` : l'affiche est le LCP) ; la démo du simulateur dans un cadre de téléphone (`cadre="telephone"`, bord d'encre de 6 px, coins 28 px) |
-| `boucle` | l'affiche, puis le film en boucle muette par-dessus, en fondu, dès qu'il est à l'écran ; bouton « Pause » / « Lire » (44 px, en bas à droite) | le présentoir, à droite du titre de `/matieres` dès 1 024 px (420 px), sous le titre au téléphone |
+| `boucle` | l'affiche, puis le film en boucle muette par-dessus, en fondu, dès qu'il est à l'écran et que le visiteur a fait un premier geste ; bouton « Pause » / « Lire » (44 px, en bas à droite, l'état réel) | le présentoir, à droite du titre de `/matieres` dès 1 024 px (420 px), sous le titre au téléphone |
 | `lien` | un lien de texte souligné, sans affiche | « Voir le présentoir en 20 s » (Le présentoir), « Voir la démo · 20 s » (Par où commencer ?, écran Pièce du simulateur au téléphone) |
 
 - **La visionneuse** : le clic ouvre `PleinEcran` en mode `video` — le film centré sur le fond sombre, `controls
@@ -363,8 +363,12 @@ composant serveur, `Video`, par `id` et par `mode` ; il pose le `VideoObject` de
   chargés qu'au premier geste vers le bouton (`BoutonVideo`, comme « Plein écran » du curseur).
 - **Aucun octet de vidéo au premier affichage** : aucun `<video>` dans le HTML des pages (le mode `clic` n'en crée
   qu'au clic, dans la visionneuse ; la boucle ne monte le sien que dans le navigateur, quand son cadre est à l'écran,
-  après le `load` de la page, `preload="none"`) ; seules les affiches partent, en AVIF, différées sauf `priorite` /
-  `immediat`. Elle se met en pause hors écran (IntersectionObserver).
+  après le `load` de la page **et après le premier geste du visiteur** — défilement, souris, toucher, clavier, molette,
+  ou le bouton « Lire » —, `preload="none"`) ; seules les affiches partent, en AVIF, différées sauf `priorite` /
+  `immediat`. Elle se met en pause hors écran (IntersectionObserver). Pourquoi le geste : créer un lecteur vidéo coûte
+  jusqu'à 600 ms de fil principal sur un navigateur sans décodage matériel (Lighthouse, Chrome sans GPU : `/matieres`
+  tombait de 86 à 70) ; une page qui vient d'arriver ne le paie pas, et un visiteur qui bouge ne voit pas la
+  différence (la souris bouge dès l'arrivée, le pouce défile).
 - **Moins de mouvement** (`prefers-reduced-motion`) : la boucle ne joue pas ; on voit l'affiche et « Lire ».
 - **Le rouge reste au bouton principal de la page** : les boutons vidéo sont blancs à l'encre (le dessin des outils du
   curseur), 44 px au moins ; `Video.tsx` est dans `revue/` (jamais « use client », jamais une couleur en dur) ; ses parts

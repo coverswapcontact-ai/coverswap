@@ -2052,7 +2052,8 @@ aucun formulaire touché)
   `accueil.test`, `autres-pages.test`, `donnees-structurees.test`, `honnetete.test`, `images-depot.test` (88 images,
   `public/videos/` = les cinq films), `exemples.test`, `pictos.test`). Lint propre, build passé.
 - Lighthouse avant → après (build local, méthode G3) : `/` 86 → 83 puis **-1 en A/B alterné** (87 / 87 / 86 → 86 / 86 /
-  86), `/comment-ca-marche` 92 → 91, `/matieres` 87 → 86, `/simulateur` 83 → 87 ; tableaux dans `docs/SEO.md`,
+  86), `/comment-ca-marche` 92 → 91, `/matieres` 87 → 87 (après la règle du premier geste ; 86 puis 70 en production
+  sans elle), `/simulateur` 83 → 87 ; tableaux dans `docs/SEO.md`,
   « Mission 22, partie B ». Captures 390 et 1 440 dans `docs/captures/site-3-0/videos/` (Edge, mouvement réduit : la
   boucle y montre son affiche ; aucun débordement à 360 px).
 - Vérifié dans le navigateur intégré sur le build local : aucun `<video>` ni fichier `.mp4` au premier affichage de
@@ -2078,8 +2079,11 @@ aucun formulaire touché)
    `CommentOnTravaille video={false}` ne le répète pas au-dessus des étapes.
 6. Un `VideoObject` par vidéo portée par la page (quatre sur l'accueil) ; `/matieres` décrit la boucle qu'elle joue,
    pas le film entier (qui est sur l'accueil).
-7. La boucle attend aussi le `load` de la page (en plus d'être à l'écran) : elle ne concurrence jamais le premier
-   affichage. Le `<video>` n'est pas monté par le serveur, seulement dans le navigateur.
+7. La boucle attend le `load` de la page ET le premier geste du visiteur (en plus d'être à l'écran) : créer le lecteur
+   vidéo coûte jusqu'à 600 ms de fil principal dans Chrome sans GPU (mesuré : `/matieres` 86 → 70 en laboratoire, le
+   fichier bloqué ou non ; 88 / 86 / 86 avec `prefers-reduced-motion` forcé, donc sans lecteur). Un premier essai à
+   `requestIdleCallback` n'y changeait rien (76 / 73 / 66). Le `<video>` n'est pas monté par le serveur, seulement dans
+   le navigateur ; le bouton dit l'état réel (« Lire » tant que ça ne joue pas).
 8. Au téléphone, `/matieres` montre la boucle sous le titre et l'intro : la première rangée d'échantillons sort du
    premier écran (l'énoncé le demande).
 9. Le simulateur garde `max-w-3xl` : la colonne de droite (200 px) vit dans `EcranPiece` (grille dès 1 024 px).
