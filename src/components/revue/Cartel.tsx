@@ -21,18 +21,18 @@ const VARIANTES: Record<VarianteCartel, { boite: string; nom: string; ligne: str
   "sur-photo": { boite: "w-fit max-w-full rounded-[4px] bg-encre/80 py-2 pr-3 pl-[23px]", nom: "text-blanc", ligne: "text-blanc" },
 };
 
-export function Cartel({ matiere, teinte, variante = "clair", className }: { matiere: MatiereCartel; /** La teinte du filet (hexadécimal du catalogue) ; par défaut, celle de la matière. */ teinte?: string; variante?: VarianteCartel; className?: string }) {
+export function Cartel({ matiere, teinte, variante = "clair", balise: Balise = "p", className }: { matiere: MatiereCartel; /** La teinte du filet (hexadécimal du catalogue) ; par défaut, celle de la matière. */ teinte?: string; variante?: VarianteCartel; /** `span` dans un bouton ou un lien (un paragraphe n'y a pas sa place) ; même rendu. */ balise?: "p" | "span"; className?: string }) {
   const v = VARIANTES[variante];
   const couleur = teinte ?? matiere.hex;
   const style = couleur ? ({ "--teinte": couleur } as CSSProperties) : undefined;
   return (
-    <p className={`relative ${v.boite}${className ? ` ${className}` : ""}`} style={style}>
+    <Balise className={`relative ${Balise === "span" ? "block " : ""}${v.boite}${className ? ` ${className}` : ""}`} style={style}>
       <span aria-hidden="true" className={`absolute w-[3px] bg-[color:var(--teinte,var(--color-encre))] ring-1 ring-encre/15 ring-inset ${variante === "sur-photo" ? "inset-y-2 left-2" : "inset-y-0 left-0"}`} />
       <span className={`block font-display text-[19px] leading-tight italic ${v.nom}`}>{matiere.nom}</span>
       <span className={`cartel mt-1 block ${v.ligne}`}>
         <span className="sr-only"> · </span>
         {ligneCartel(matiere)}
       </span>
-    </p>
+    </Balise>
   );
 }

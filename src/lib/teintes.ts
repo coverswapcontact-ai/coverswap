@@ -82,6 +82,31 @@ export function deltaE(lab1: Lab, lab2: Lab): number {
 /** ΔE 2000 entre deux hexadécimaux. */
 export const deltaEHex = (hex1: string, hex2: string) => deltaE(labDeHex(hex1), labDeHex(hex2));
 
+/** Les teintes du filtre de /inspirations et du présentoir de /matieres, dans l'ordre des pastilles. */
+export const TEINTES = ["Bois clair", "Bois foncé", "Vert", "Bleu", "Blanc", "Noir", "Beige et taupe", "Terre cuite", "Pierre et marbre"] as const;
+export type Teinte = (typeof TEINTES)[number];
+
+/**
+ * La teinte d'une matière, pour les filtres : la famille d'abord (bois clair ou foncé, sauf un bois teinté de vert ;
+ * pierre et marbre), puis la couleur (clarté, saturation, angle de teinte en Lab). Venue de `lib/ambiances` (lot D2).
+ */
+export function teinteDe(famille: string, hex: string): Teinte {
+  const { L, C, h } = lchDeHex(hex);
+  // Un bois teinté de vert (Smokey Green) se cherche avec les verts.
+  if (famille === "bois") return C >= 5 && h >= 95 && h < 200 ? "Vert" : L >= 55 ? "Bois clair" : "Bois foncé";
+  if (famille === "pierre") return L >= 85 && C < 6 ? "Blanc" : "Pierre et marbre";
+  const vert = h >= 95 && h < 200;
+  const bleu = h >= 200 && h < 300;
+  if (L >= 85 && C < 8) return "Blanc";
+  // Lot D2 : un vert ou un bleu très foncé mais franc (Deep Green NF13, Midnight Blue M9, Deep Blue NF14) se cherche
+  // avec sa couleur, plus avec les noirs.
+  if (L < 22 && C < 12 && !(C >= 6 && (vert || bleu))) return "Noir";
+  if (C >= 5 && vert) return "Vert";
+  if (C >= (L < 22 ? 6 : 8) && bleu) return "Bleu";
+  if (C >= 14 && (h < 70 || h >= 330)) return "Terre cuite";
+  return "Beige et taupe";
+}
+
 /** Sous ce chroma, une matière est un neutre (blanc, gris, noir) : son angle de teinte ne veut rien dire. */
 export const CHROMA_NEUTRE = 8;
 /** La largeur d'une case de teinte du nuancier, en degrés : dans une case, du plus clair au plus foncé. */

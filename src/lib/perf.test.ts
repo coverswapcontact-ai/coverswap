@@ -354,7 +354,7 @@ describe("INP : la recherche des matières est différée, les vignettes en lazy
     }
   });
 
-  test("/matieres : le champ suit la frappe, le filtre attend ; les vignettes des tuiles sont en lazy", () => {
+  test("/matieres : le champ suit la frappe, le filtre attend ; les vignettes des échantillons sont en lazy, sauf la première rangée", () => {
     const page = lire("src/app/matieres/_components/Matieres.tsx");
     assert.match(page, /useState\(\(\) => differer\(setRecherche, DELAI_RECHERCHE_MS\)\)/);
     assert.match(page, /value=\{saisie\} onChange=\{\(e\) => saisir\(e\.target\.value\)\}/);
@@ -362,7 +362,11 @@ describe("INP : la recherche des matières est différée, les vignettes en lazy
     // « Effacer » disparaît avec la saisie : le focus revient dans le champ (sinon il tombe sur <body>).
     assert.match(page, /<input ref=\{champRecherche\} id="recherche-matieres"/);
     assert.match(page, /const effacer = \(\) => \{[^}]*champRecherche\.current\?\.focus\(\);\n  \};/);
-    assert.match(page, /filtrerMatieres\(catalogue, \{ filtre, recherche, favoris \}\)/);
+    // Site 3.0, lot D2 : l'affinage (teinte, finition, ambiance) passe par le même filtre ; le tri par teinte, hors du filtre, se fait une fois par changement (`useMemo`).
+    assert.match(page, /useMemo\(\(\) => \(catalogue \? trierParTeinte\(filtrerMatieres\(catalogue, \{ filtre, recherche, favoris, teinte, finition, ambiance \}\)\) : null\)/);
+    assert.match(page, /const PREMIERE_RANGEE = 5;/);
+    assert.match(page, /<VignetteEchantillon matiere=\{m\} priorite=\{rang < PREMIERE_RANGEE\}/);
+    assert.match(lire("src/components/revue/Echantillon.tsx"), /width=\{320\} height=\{320\} loading=\{priorite \? "eager" : "lazy"\}/);
     assert.match(lire("src/components/simulation/TuileFilm.tsx"), /width=\{320\} height=\{320\} loading="lazy"/);
   });
 });

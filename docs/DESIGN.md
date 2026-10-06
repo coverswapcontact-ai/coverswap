@@ -2,7 +2,7 @@
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
 prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
-(`/realisations`), C6 (l'espace client) et C7 (les guides du blog).
+(`/realisations`), C6 (l'espace client), C7 (les guides du blog) et D2 (le présentoir de `/matieres`).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
@@ -543,9 +543,37 @@ Lot C4, `src/app/inspirations/page.tsx`, ordre dans `_components/ordre.ts`, filt
   qu'il reste : « 40 de plus »). Le tout sans JavaScript : une case à cocher et des règles CSS écrites par le serveur
   (`reglesSuite`), comme les filtres. Les 52 sont dans la page (référencement) ; la suite est masquée, ses images ne se
   chargent pas. Une ambiance visée par l'adresse (`#<id>`, `:target`) se montre toujours : les liens qui y mènent
-  sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres`, qui
-  navigue par le routeur, est à passer en lien de page avec la phase D). La page passe de 18 800 à 3 700 px de haut à
+  sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres` en est
+  un depuis le lot D2). La page passe de 18 800 à 3 700 px de haut à
   1 440 px de large, et mesure 8 800 px à 390 px.
+
+## Le présentoir — `/matieres`
+
+Lot D2, `src/app/matieres/page.tsx` (serveur) et `_components/Matieres.tsx` (client) ; règles pures dans `lib/matieres`
+(`tiroirs`, `choixFinitions`, `filtrerMatieres`, `etatListeMatieres`) et `lib/teintes` (énoncé, phase D). Un meuble
+d'échantillons, pas une grille de produits.
+
+- **Les tiroirs** : « Tout », les sept familles de la plus fournie à la moins fournie (bois 267, couleurs 89, textiles
+  41, pierres 36, métaux 31, bétons et stucs 17, paillettes 16), « Favoris ». Une pastille chacun : quatre teintes de
+  son nuancier en disques CSS (le `hex` du catalogue, aucune image), son nom au pluriel, son nombre. Le tiroir ouvert
+  est à l'encre pleine ; la barre est collée sous l'en-tête, elle défile au téléphone et passe sur deux rangées dès
+  1 024 px.
+- **Les filtres** : teinte (les neuf de /inspirations, `teinteDe`), finition (seulement Structurée, Rustique,
+  Pailletée : 474 matières sur 497 sont « Standard »), « Vue dans une ambiance » (49), combinables avec le tiroir et
+  la recherche par nom ou référence ; « Effacer les filtres » quand l'un est choisi. Le compte les dit (« 7 matières
+  dans Bois (Bois clair, vues dans une ambiance) »).
+- **L'échantillon** : `VignetteEchantillon` (la vraie vignette du CRM en `?l=320`, carrée, coin arrondi, ombre légère,
+  posée sur la couleur de la matière, qui reste si la vignette ne répond pas) et son `Cartel` « Nom · RÉF · famille ·
+  finition » (balise `span` : il est dans le bouton). 2 colonnes au téléphone, 3 dès 640 px, 5 dès 1 024 px
+  (`GRILLE_ECHANTILLONS`) ; le cœur des favoris dans le coin.
+- **Rangé par teinte, comme un nuancier** (`trierParTeinte`, hors du filtre) : les couleurs case de teinte après case
+  (15°), du clair au foncé, puis les neutres du blanc au noir. Le serveur rend les 30 premières (la première rangée en
+  chargement immédiat, le reste à la demande), puis 30 par 30.
+- **La matière en grand** : l'échantillon entier, son cartel, « Vue dans » (liens de page vers `/inspirations#<id>` :
+  une ambiance de la suite masquée s'ouvre), « Essayer sur ma photo » (le seul bouton principal, `depuis=matieres`),
+  les favoris.
+- Une **bande de matière** (chêne Original Oak AA14) ferme le présentoir, avant le pied de page : en tête, elle aurait
+  repoussé la première rangée d'échantillons hors du premier écran du téléphone.
 
 ## Les guides du blog
 

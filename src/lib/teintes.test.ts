@@ -4,7 +4,7 @@ import { AMBIANCES } from "@/data/ambiances";
 import revetements from "@/data/revetements.json";
 import { lab } from "./ambiances";
 import { estFicheIndexee, fichesIndexees, prestationsDeFamille, referencesVedettes, vueDans } from "./indexation-matieres";
-import { CHROMA_NEUTRE, cleDeTeinte, deltaE, deltaEHex, labDeHex, lchDeHex, matieresProches, trierParTeinte } from "./teintes";
+import { CHROMA_NEUTRE, TEINTES, cleDeTeinte, deltaE, deltaEHex, labDeHex, lchDeHex, matieresProches, teinteDe, trierParTeinte } from "./teintes";
 
 /**
  * Site 3.0, lot D1 — les teintes des matières (Lab, ΔE 2000, nuancier, matières proches) et l'indexation des fiches
@@ -50,6 +50,17 @@ describe("Lab et ΔE 2000", () => {
       assert.ok(deltaEHex(a, b) >= 0);
     }
     assert.ok(deltaEHex("#FFFFFF", "#000000") > 99);
+  });
+});
+
+describe("la teinte du filtre (lot D2)", () => {
+  test("un vert ou un bleu très foncé mais franc va avec sa couleur ; les noirs restent noirs", () => {
+    const teinte = (id: string) => {
+      const m = CATALOGUE.find((x) => x.id === id)!;
+      return teinteDe(m.famille, m.hex);
+    };
+    assert.deepEqual(["NF13", "M9", "NF14", "K1", "R9"].map(teinte), ["Vert", "Bleu", "Bleu", "Noir", "Noir"]);
+    assert.ok(TEINTES.includes(teinte("D1")));
   });
 });
 

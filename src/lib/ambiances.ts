@@ -1,6 +1,6 @@
 import { AMBIANCES, type Ambiance, type PieceAmbiance, type SurfaceAmbiance } from "@/data/ambiances";
 import revetements from "@/data/revetements.json";
-import { labDeHex } from "./teintes";
+import { labDeHex, teinteDe, type Teinte } from "./teintes";
 
 /**
  * Ce qu'on tire des ambiances (mission 19, `data/ambiances.ts`) : les matières de chaque photo résolues dans le
@@ -26,30 +26,13 @@ export type AmbianceResolue = Omit<Ambiance, "surfaces"> & {
 
 /* ── Teintes ─────────────────────────────────────────────────────── */
 
-export const TEINTES = ["Bois clair", "Bois foncé", "Vert", "Bleu", "Blanc", "Noir", "Beige et taupe", "Terre cuite", "Pierre et marbre"] as const;
-export type Teinte = (typeof TEINTES)[number];
-
+/**
+ * Les teintes du filtre (/inspirations, et /matieres depuis le lot D2) et la conversion Lab vivent dans `lib/teintes`
+ * (sans dépendance : le présentoir les lit dans le navigateur sans tirer les ambiances) ; réexportées ici.
+ */
+export { TEINTES, teinteDe, type Teinte } from "./teintes";
 /** sRGB → Lab (D65) : la conversion de `lib/teintes`, la seule du site. */
 export const lab = labDeHex;
-
-/**
- * La teinte d'une matière, pour le filtre de /inspirations : la famille d'abord (bois clair ou foncé, sauf un bois
- * teinté de vert ; pierre et marbre), puis la couleur (clarté, saturation, angle de teinte en Lab).
- */
-export function teinteDe(famille: string, hex: string): Teinte {
-  const [L, a, b] = lab(hex);
-  const C = Math.hypot(a, b);
-  const h = ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
-  // Un bois teinté de vert (Smokey Green) se cherche avec les verts.
-  if (famille === "bois") return C >= 5 && h >= 95 && h < 200 ? "Vert" : L >= 55 ? "Bois clair" : "Bois foncé";
-  if (famille === "pierre") return L >= 85 && C < 6 ? "Blanc" : "Pierre et marbre";
-  if (L >= 85 && C < 8) return "Blanc";
-  if (L < 22 && C < 12) return "Noir";
-  if (C >= 5 && h >= 95 && h < 200) return "Vert";
-  if (C >= 8 && h >= 200 && h < 300) return "Bleu";
-  if (C >= 14 && (h < 70 || h >= 330)) return "Terre cuite";
-  return "Beige et taupe";
-}
 
 /* ── Résolution ─────────────────────────────────────────────────── */
 

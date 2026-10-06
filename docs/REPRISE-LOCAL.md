@@ -32,7 +32,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 ## Phase D : le catalogue des matières
 
 - D1, teinte, ΔE, indexation : fait (`lib/teintes.ts`, `lib/indexation-matieres.ts` : 52 fiches indexées).
-- D2 à D5 : à venir.
+- D2, `/matieres` le présentoir : fait (7 tiroirs, filtres teinte / finition / ambiance, échantillons rangés par teinte ; `docs/DESIGN.md` « Le présentoir »).
+- D3 à D5 : à venir.
 
 ## Phase E : le simulateur
 
@@ -931,4 +932,63 @@ rangé (permutation, liste reçue intacte, couleurs avant neutres, clé croissan
 oubli, `memeFamille` ; 52 fiches (écrit en dur), AF02 absente, NF27 / J3 / Q1 présentes, les 49 vues ; « Vue dans »
 sur les deux séries, inspiration seulement, image et pièce exactes, ordre de `data/ambiances` ; prestations par
 famille. `ambiances.test.ts` inchangé et vert (réexport de `vueDans`).
+
+## D2 — `/matieres`, le présentoir (06/10/2026)
+
+**Fait** (aucune image générée, aucun envoi ; `docs/DESIGN.md` « Le présentoir », `docs/SUIVI.md`)
+- **Les tiroirs** (`tiroirs()` de `lib/matieres`) : « Tout », puis bois 267, couleurs 89, textiles 41, pierres 36,
+  métaux 31, bétons et stucs 17, paillettes 16 (vérifiés dans `revetements.json`, écrits en dur dans le test), puis
+  « Favoris » ; quatre teintes du nuancier de chaque famille en pastilles CSS. Barre collée, qui défile au téléphone et
+  passe sur deux rangées dès 1 024 px (sur une seule, Paillettes et Favoris sortaient de l'écran à 1 440 px).
+- **Filtres** : teinte (`<select>`, les neuf teintes de /inspirations), finition (`choixFinitions` : Structurée 6,
+  Rustique 1, Pailletée 16), « Vue dans une ambiance » (49), combinables entre eux, avec le tiroir et la recherche par
+  nom ou référence (inchangée, différée de 150 ms) ; « Effacer les filtres » ; le compte dit l'affinage.
+- **Les échantillons** : `VignetteEchantillon` (extraite d'`Echantillon`, rendu inchangé) dans un bouton, avec le
+  `Cartel` (nouvelle option `balise="span"`) ; 2 / 3 / 5 colonnes (`GRILLE_ECHANTILLONS` remplace
+  `GRILLE_TUILES_GRANDES`, squelette au gabarit du cartel) ; 5 premières vignettes en chargement immédiat, le reste
+  `lazy` ; 30 par 30. Tri `trierParTeinte(filtrerMatieres(…))`, hors du filtre (la feuille du simulateur garde l'ordre
+  du catalogue) ; le serveur rend `premieresDuPresentoir` (les 30 premières du nuancier).
+- **La matière en grand** : son cartel, « Vue dans » en **liens de page** `<a href="/inspirations#<id>">` (signalé en
+  C4 : une ambiance de la suite masquée s'ouvre maintenant ; vérifié avec `amb-couloir-portes`, affichée en haut
+  d'écran), « Essayer sur ma photo » → `lienEssayer(ref, "matieres")` (`&depuis=matieres` ; `lienEssayer("K1")`
+  inchangé).
+- Page : plus de `bg-fond` (le grain du gabarit passe), h1 et intro gardés (« … rangées par teinte. Touchez-en une pour
+  la voir. »), bande de matière Original Oak AA14 en fin de page. `teinteDe` et `TEINTES` passent dans `lib/teintes`
+  (réexportés par `lib/ambiances`) : le présentoir les lit dans le navigateur sans tirer les ambiances ni le catalogue.
+
+**Décisions prises seul**
+1. La bande de matière **ferme** le présentoir au lieu de l'ouvrir : en tête, elle repoussait la première rangée
+   d'échantillons hors du premier écran à 390 px (elle commence à 652 px) et risquait de devenir le LCP (image du CRM,
+   chargée en différé).
+2. Grille à **2 colonnes au téléphone** (3 avant) : le cartel « Nom · RÉF · famille · finition » a besoin de 170 px.
+3. **Teinte des verts et bleus très foncés** : Deep Green NF13, Midnight Blue M9 et Deep Blue NF14 étaient classés
+   « Noir » (clarté < 22) ; ils vont maintenant avec « Vert » / « Bleu » (chroma ≥ 6 dans ces teintes). Vaut aussi pour
+   les filtres de /inspirations (la cuisine vert profond se trouve sous « Vert »). K1 et Black Disco restent noirs.
+4. Pas de « Voir la fiche » dans la matière en grand : les fiches arrivent en D4 (le lien y sera ajouté), un lien vers
+   une page qui n'existe pas encore serait cassé sur la prévisualisation.
+5. Noms des tiroirs au pluriel (`TIROIRS`), libellés de l'énoncé ; les familles du simulateur (`FAMILLES`) gardent les
+   leurs. Les finitions disent seulement le mot français (« Structurée ») : le terme du fabricant n'apporte rien au
+   visiteur.
+6. `TuileFilm taille="grand"` n'est plus utilisé par /matieres ; laissé tel quel (son test de chargement différé reste).
+
+**Tests** : 436 → 440, tous réussis. `matieres.test.ts` (+3, adaptés en gardant leur intention) : l'affinage (teinte,
+finition — les 6 structurées, AA15 rustique, 16 pailletées —, « vue dans » = les 49 références, combinés, ordre du
+catalogue gardé par le filtre), les tiroirs et finitions écrits en dur, un affinage avant le catalogue attend et son
+message ; page rendue : grille seule comptée (30 vignettes), ordre du nuancier, 5 `eager` / 25 `lazy`, échantillon
+arrondi à l'ombre sur la couleur de la matière, cartel dans le bouton (aucun `<p>`), tiroirs et 32 pastilles, filtres,
+bande AA14 après la grille, « Voir plus (467) » ; regex « Essayer » avec `depuis`, `Cartel`, « Vue dans » en lien de
+page (plus par `aller`) ; squelette au gabarit du cartel ; `scroll-mt` à 200 px dès 1 024 px. `perf.test.ts` : la
+nouvelle signature (tri hors du filtre, en `useMemo`), première rangée immédiate, vignettes de l'échantillon en `lazy`.
+`teintes.test.ts` +1 (verts et bleus très foncés). `npx eslint .` et `npm run build` passent.
+
+**Vérification visuelle** : build local construit comme la CI (`NEXT_PUBLIC_SIMULATE_URL` = CRM de production, en
+lecture : vignettes ; `NEXT_PUBLIC_SANS_EVENEMENTS=1`), `next start -p 3100` arrêté ensuite ; `scripts/captures.mjs`
+(Edge) à 390 et 1 440 px → `docs/captures/site-3-0/matieres-390.jpg` et `matieres-1440.jpg` ; aucun débordement à
+360 px, 0 requête coupée. Essai scripté (Playwright + Edge, POST et routes du simulateur coupés : rien n'est parti) à
+390 et 1 440 px : vignettes de la première rangée chargées (320 px), Bois 267 → Bois clair 172 → vues dans une ambiance
+7, Structurée 6, recherche « NF13 » 1, matière en grand avec ses 4 « Vue dans », lien vers `#amb-couloir-portes`
+(dans la suite masquée) montré, `?ref=D1` ouvre la matière, aucune erreur de page.
+
+**Problèmes** : aucun bloquant. Le menu de la teinte au téléphone est le `<select>` natif (lisible, accessible, sans
+JavaScript de plus) ; à revoir seulement si Lucas veut des pastilles.
 
