@@ -57,7 +57,10 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 - G1, captures : fait (16 captures 390 / 1 440 dans `docs/captures/site-3-0/`, `--etat-resultat` et `--controle-plan` dans `scripts/captures.mjs`, pages hautes par tranches ; aucun débordement à 360 px sur les 95 adresses du plan du site).
 - G2, tests : fait (605 tests, lint, build ; `LAST_BUILD` au 06/10/2026 ; relecture du ton, `ton.test.ts` « jargon » ; docs à jour).
-- G3 (fusion, vérification en ligne, Lighthouse sur coverswap.fr) et G4 (rapport) : à venir.
+- G3 : fait. `site-3-0` fusionnée dans `main` (aea81f4), poussée le 06/10/2026 à 10:33, en ligne à 10:35 ; CI de
+  `main` verte ; vérifié en ligne : 11 redirections en 301, pages en 200, simulateur avec une pièce d'exemple (aucun
+  appel), espace client par le lien d'aperçu ; Lighthouse production dans `docs/SEO.md` (lot G3, 829495b).
+- G4 : rapport final envoyé à Lucas le 06/10 ; bilan aussi dans `crm-coverswap/docs/REPRISE-LOCAL.md`.
 
 ---
 
