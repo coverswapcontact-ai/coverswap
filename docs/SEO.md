@@ -73,7 +73,7 @@ voisins ; « mène à » : accueil, `/comment-ca-marche`, simulateur, `/matieres
 
 | Guide | Requête cible | H1 (inchangé) | Title (car.) | Description (car.) |
 |---|---|---|---|---|
-| `/blog/cuisine-bordeaux-brillante-renover-sans-changer` | « rénover cuisine bordeaux brillante » | Cuisine bordeaux brillante : la rénover sans la changer | Rénover une cuisine bordeaux brillante \| CoverSwap (50) | Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux directions possibles et comment se fait le prix. (135) |
+| `/blog/cuisine-bordeaux-brillante-renover-sans-changer` | « rénover cuisine bordeaux brillante » | Cuisine bordeaux brillante : la rénover sans la changer | Rénover une cuisine bordeaux brillante \| CoverSwap (50) | Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux idées de matières et comment se fait le prix. (132) |
 | `/blog/cuisine-blanche-jaunie-que-faire` | « cuisine blanche jaunie que faire » | Cuisine blanche qui a jauni : que faire ? | Cuisine blanche qui a jauni : que faire ? \| CoverSwap (53) | Pourquoi le blanc jaunit, ce que le nettoyage peut faire, les signes qui comptent sur le meuble, et trois façons d'en sortir sans casser. (137) |
 | `/blog/covering-peinture-remplacement-comparatif` (commerciale) | « covering ou peinture ou changer cuisine » | Covering, peinture ou remplacement : le vrai comparatif | Covering, peinture ou remplacement de cuisine \| CoverSwap (57) | Trois façons de changer une cuisine, comparées sur le délai, la poussière, la réversibilité et la durée. Et quand nous déconseillons le covering. (145) |
 | `/blog/covering-adhesif-vs-peinture-cuisine` (commerciale) | « covering ou peinture cuisine » | Covering adhésif ou peinture : quel choix pour votre cuisine ? | Covering adhésif ou peinture en cuisine ? \| CoverSwap (53) | Deux façons de changer une cuisine sans la remplacer. Durée du chantier, tenue dans le temps, rendu, prix, réversibilité : la comparaison honnête. (146) |
@@ -248,6 +248,18 @@ Vérifié sur les pages rendues par `src/app/maillage.test.ts` :
 Les trois guides mènent à `/prestations/cuisine`, au simulateur (`depuis=blog`) et entre eux ; ils sont listés à
 `/comment-ca-marche#guides`, au plan du site et dans `llms.txt`. Balisage `Article` sur leur image de la bibliothèque
 (`/images/prep/<nom>-1536.jpg`).
+
+### Plan du site : les dates (lot G2, 06/10/2026)
+
+`src/app/sitemap.ts` : `LAST_BUILD` passe au **6 octobre 2026**, le jour de la mise en ligne du site 3.0 (toutes les
+pages ont changé : gabarit, textes, images) ; les sept familles et les 52 fiches gardent `DATE_CATALOGUE` (le même
+jour) ; les guides gardent leur `dateModifiedIso`. 95 adresses, aucune redirigée (`sitemap.test.ts`). À la prochaine
+modification réelle d'une page, on avance sa date, pas celle de tout le site.
+
+Relecture du ton (lot G2) : la description par défaut du gabarit et les textes de partage par défaut perdent
+« premium » et « Simulation IA » (« par covering adhésif, posé sur place », « Simulation gratuite sur votre photo ») ;
+le mot « covering adhésif » reste dans la description (testé). Les pages gardent chacune leur title et leur
+description de la carte ci-dessus.
 
 ## Lighthouse avant (lot B0, 05/10/2026)
 

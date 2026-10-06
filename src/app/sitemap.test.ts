@@ -83,10 +83,10 @@ describe("sitemap.xml", () => {
     }
   });
 
-  test("dates : le jour de la partie 5 pour les pages, la date de modification pour les guides", () => {
+  test("dates : le jour de la mise en ligne du site 3.0 pour les pages (lot G2), la date de modification pour les guides", () => {
     for (const e of sitemap().filter((x) => !x.url.includes("/matieres/"))) {
       const guide = articles.find((a) => e.url.endsWith(`/blog/${a.slug}`));
-      assert.equal((e.lastModified as Date).toISOString(), guide ? new Date(guide.dateModifiedIso).toISOString() : "2026-09-30T00:00:00.000Z", e.url);
+      assert.equal((e.lastModified as Date).toISOString(), guide ? new Date(guide.dateModifiedIso).toISOString() : "2026-10-06T00:00:00.000Z", e.url);
     }
   });
 });

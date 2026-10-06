@@ -22,10 +22,11 @@ import { SLUGS_FAMILLES } from '@/lib/pages-familles';
  *
  * Site 3.0 (lot D5) : les sept familles de matières (`/matieres/<famille>`) et les 52 fiches indexées
  * (`fichesIndexees` : les matières vues dans une ambiance et les vedettes) ; les 445 autres fiches sont servies en
- * `noindex, follow` et n'y figurent pas. Leur date est celle du catalogue du site 3.0 (`DATE_CATALOGUE`) ; à la
- * fusion de la branche (lot G3), `LAST_BUILD` et `DATE_CATALOGUE` passent au jour de la mise en ligne.
+ * `noindex, follow` et n'y figurent pas. Leur date est celle du catalogue du site 3.0 (`DATE_CATALOGUE`).
+ * Lot G2 : `LAST_BUILD` passe au jour de la mise en ligne du site 3.0 (le 6 octobre 2026) — toutes les pages ont
+ * changé (gabarit, textes, images) ; les guides gardent leur propre date de modification.
  */
-const LAST_BUILD = new Date('2026-09-30T00:00:00Z');
+const LAST_BUILD = new Date('2026-10-06T00:00:00Z');
 const DATE_CATALOGUE = new Date('2026-10-06T00:00:00Z');
 
 export default function sitemap(): MetadataRoute.Sitemap {

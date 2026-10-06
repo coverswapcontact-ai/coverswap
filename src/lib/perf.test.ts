@@ -8,7 +8,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import sharp from "sharp";
 import nextConfig from "../../next.config";
-import { FORMAT_CAPTURE, LARGEUR_CONTROLE, LARGEURS_CAPTURES, PAGES_CAPTURES, echelle, hotesCrm, lireOptions, nomCapture, nomDeChemin, requeteCoupee } from "../../scripts/captures.mjs";
+import { FORMAT_CAPTURE, HAUTEUR_MAX_CAPTURE, LARGEUR_CONTROLE, LARGEURS_CAPTURES, PAGE_RESULTAT, PAGES_CAPTURES, cheminsDuPlan, echelle, hotesCrm, lireOptions, nomCapture, nomDeChemin, requeteCoupee, tranchesCapture } from "../../scripts/captures.mjs";
 import { comparerCaptures, lireNomCapture, resumeMarkdown } from "../../scripts/comparer-captures.mjs";
 import { ContenuAvisPrix } from "@/components/accueil/AvisPrix";
 import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
@@ -509,7 +509,51 @@ describe("intégration continue", () => {
     assert.throws(() => lireOptions(["--pages"]), /attend une liste/);
     assert.throws(() => lireOptions(["--hauteur=3"]), /option inconnue/);
     assert.throws(() => lireOptions(["a", "b"]), /argument en trop/);
-    assert.throws(() => lireOptions(["--etat-resultat"]), /G1/);
+    assert.throws(() => lireOptions(["--etat-resultat=oui"]), /ne prend pas de valeur/);
+  });
+
+  test("captures, lot G1 : --etat-resultat (le résultat, seul ou en plus des pages), --controle-plan (le plan du site à 360 px)", () => {
+    assert.deepEqual(lireOptions(["--etat-resultat"]).pages, [PAGE_RESULTAT], "seul : le résultat seulement");
+    assert.equal(PAGE_RESULTAT.nom, "simulateur-resultat");
+    assert.equal(PAGE_RESULTAT.chemin, "/simulateur");
+    const avec = lireOptions(["sortie", "--pages=accueil,simulateur-exemples", "--etat-resultat", "--largeurs=390,1440"]);
+    assert.deepEqual(avec.pages.map((p: { nom: string }) => p.nom), ["accueil", "simulateur-exemples", "simulateur-resultat"]);
+    assert.equal(avec.pages[1].chemin, "/simulateur?projet=cuisine&choix=1", "l'écran Photo, cuisine choisie (« Pas de photo sous la main ? »)");
+    assert.equal(lireOptions([]).controlePlan, false);
+    assert.equal(lireOptions(["--controle-plan"]).controlePlan, true);
+    assert.throws(() => lireOptions(["--controle-plan=1"]), /ne prend pas de valeur/);
+    const xml = "<urlset><url><loc>https://coverswap.fr</loc></url><url><loc> https://coverswap.fr/matieres/couleur/NF13 </loc></url><url><loc>https://coverswap.fr/zones/montpellier?a=1&amp;b=2</loc></url></urlset>";
+    assert.deepEqual(cheminsDuPlan(xml), ["/", "/matieres/couleur/NF13", "/zones/montpellier?a=1&b=2"], "les chemins, ouverts sur le site mesuré");
+    assert.deepEqual(cheminsDuPlan(""), []);
+    const script = lire("scripts/captures.mjs");
+    // L'état est écrit là où le simulateur le lit (lib/simulateur/stockage.ts), et l'écran ouvert par « Reprendre ».
+    const stockage = lire("src/lib/simulateur/stockage.ts");
+    assert.match(stockage, /const BASE = "coverswap-simulateur";/);
+    assert.match(stockage, /const MAGASIN = "etat";/);
+    assert.match(stockage, /const CLE = "courant";/);
+    assert.match(stockage, /const VERSION = 2;/);
+    assert.match(script, /indexedDB\.open\("coverswap-simulateur", 2\)/);
+    assert.match(script, /objectStore\("etat"\)\.put\(\{ \.\.\.etatSansPhoto, photo \}, "courant"\)/);
+    assert.match(script, /getByRole\("button", \{ name: "Reprendre", exact: true \}\)/);
+    assert.ok(!/Recevoir mon devis|Essayer d'autres matières|\.fill\(|\.check\(/.test(script), "aucun formulaire touché, aucune génération");
+  });
+
+  test("captures, lot G1 : une page trop haute pour une capture d'un seul tenant est prise par tranches recollées", () => {
+    // Passé 16 384 px d'image, le navigateur recommence le haut de la page dans le bas de la capture (accueil à 390 px).
+    assert.ok(HAUTEUR_MAX_CAPTURE <= 16_384);
+    for (const [hauteur, echelleRendu] of [[14_886, 2], [5_100, 1], [8_000, 2], [1, 1], [40_001, 2]]) {
+      const tranches = tranchesCapture(hauteur, echelleRendu);
+      assert.equal(tranches[0].y, 0);
+      assert.equal(tranches.reduce((total: number, t: { hauteur: number }) => total + t.hauteur, 0), hauteur, "toute la page, sans trou ni recouvrement");
+      tranches.forEach((t: { y: number; hauteur: number }, i: number) => {
+        if (i > 0) assert.equal(t.y, tranches[i - 1].y + tranches[i - 1].hauteur);
+        assert.ok(t.hauteur * echelleRendu <= HAUTEUR_MAX_CAPTURE, `${hauteur} px × ${echelleRendu}`);
+      });
+    }
+    const script = lire("scripts/captures.mjs");
+    assert.match(script, /capturerPageEntiere\(page, fichier, echelle\(format\.largeur\)\)/);
+    assert.match(script, /hauteur \* echelleRendu <= HAUTEUR_MAX_CAPTURE/);
+    assert.match(script, /\.jpeg\(\{ quality: FORMAT_CAPTURE\.quality \}\)/, "même format que la capture d'un seul tenant");
   });
 
   test("captures : rien ne part (aucun POST, aucun appel au CRM ni à la génération) ; les images du CRM passent en lecture", () => {

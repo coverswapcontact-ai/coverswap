@@ -37,7 +37,7 @@ export const PAIRE_COMPTOIR_PRO = {
 export const PAIRE_COMPTOIR_PRO_COULEUR = {
   apres: "pro-comptoir-accueil-apres-couleur",
   titre: "Le même comptoir, en clair",
-  ligne: "Le même accueil, autre direction : vert sauge et marbre blanc. On compare les deux sur échantillons, sur place.",
+  ligne: "Le même accueil, d'autres matières : vert sauge et marbre blanc. On compare les deux sur échantillons, sur place.",
 } as const;
 
 /** Mission 19 : la paire avant / après du restaurant (l'« après » ; son « avant » est dans `data/ambiances`). */

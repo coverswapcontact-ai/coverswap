@@ -18,7 +18,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - B1, jetons et polices : fait (`docs/DESIGN.md` commencé).
 - B2, le rouge réservé aux actions : fait.
 - B3, composants de base : fait (`src/components/revue/`, `lib/teintes-prestations.ts`, `docs/DESIGN.md` complet).
-- B4 à B7 : à venir.
+- B4 à B6 : faits (bibliothèque série 2, gabarit, accueil). B7 (prévisualisation et arrêt) : pas de lot à part, l'arrêt est levé par les consignes ; la branche est poussée à chaque lot, Lighthouse local et captures repris en F6, F7 et G1.
 
 ## Phase C : le tunnel, page par page
 
@@ -27,7 +27,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 - C5, `/realisations` : fait (les vraies d'abord, puis « Avant / après en ambiance », quatre paires).
 - C3, `/comment-ca-marche` : fait (étapes de l'accueil, déroulé et délais, en place, entretien, « Quand rénover ? », blocs aux filets).
 - C4, `/inspirations` : fait (52 ambiances en cartes de prestation, pièces mêlées, 12 premières puis « Voir toutes les ambiances », sans JavaScript).
-- C0, C6, C7 : à venir.
+- C6, espace client aux jetons, et C7, le blog : faits. C0 (retouches de Lucas) : levé par les consignes, aucune retouche reçue.
 
 ## Phase D : le catalogue des matières
 
@@ -41,7 +41,7 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 - E1, alléger `Simulateur.tsx` : fait (594 → 522 lignes ; `EcranGeneration.tsx`, `useFeuilleCatalogue.ts`).
 - E2, les pictos partout : fait (écrans Pièce, Photo, Matières, Estimation ; `CuisineDeFace` supprimé ; `docs/DESIGN.md` « Les pictos du simulateur »).
-- E3 à E5 : à venir.
+- E3, « Pas de photo sous la main ? », et E4, après le rendu : faits. E5 (test des modèles, CRM) : pas fait sur cette branche.
 
 ## Phase F : SEO et performance
 
@@ -55,7 +55,9 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 
 ## Phase G : livraison
 
-À venir (G1 à G4).
+- G1, captures : fait (16 captures 390 / 1 440 dans `docs/captures/site-3-0/`, `--etat-resultat` et `--controle-plan` dans `scripts/captures.mjs`, pages hautes par tranches ; aucun débordement à 360 px sur les 95 adresses du plan du site).
+- G2, tests : fait (605 tests, lint, build ; `LAST_BUILD` au 06/10/2026 ; relecture du ton, `ton.test.ts` « jargon » ; docs à jour).
+- G3 (fusion, vérification en ligne, Lighthouse sur coverswap.fr) et G4 (rapport) : à venir.
 
 ---
 
@@ -1920,3 +1922,77 @@ de 0 à 1 point sur l'accueil, le simulateur et la prestation cuisine ; le TBT v
 l'autre sur ce poste, et le complément sans occultation donne `/pro` 78-80 et la prestation 79-84 : **risque réel
 d'échec du plancher de 85 sur la CI de GitHub** au passage sur `main` (G3), à surveiller (pages : accueil, `/pro`,
 prestation cuisine). `/inspirations` (hors CI) reste à 80.
+
+## G1 et G2 — captures de livraison, tests, ton (06/10/2026)
+
+**G1, captures** (build local construit comme la CI — `NEXT_PUBLIC_SIMULATE_URL` du CRM de production,
+`NEXT_PUBLIC_SANS_EVENEMENTS=1` —, `next start -p 3100` lancé avec une limite de temps puis arrêté ; Playwright + Edge ;
+toute requête hors GET/HEAD, `/api/simulate*`, `/api/simulation/*` et le CRM hors images coupés ; aucune génération,
+aucun formulaire touché)
+- `scripts/captures.mjs` :
+  - `--etat-resultat` (annoncé en B0) : ajoute `simulateur-resultat`. L'état est écrit dans la mémoire locale du
+    simulateur (même base, magasin et clé que `lib/simulateur/stockage.ts`) : photo = l'avant « bordeaux » de la
+    bibliothèque lu en data URL, rendu = son après « couleur » (NF13, AG13), `exemple` posé ; la page est rechargée et
+    « Reprendre » cliqué. Étiquette « Ambiance · avant / après ». La seule requête que l'état déclenche, l'analyse de
+    la photo (`POST /api/simulate/analyse`), est coupée.
+  - page `simulateur-exemples` (`/simulateur?projet=cuisine&choix=1`) : l'écran Photo avec « Pas de photo sous la
+    main ? » et ses 11 cuisines.
+  - `--controle-plan` : lit `/sitemap.xml` et ouvre ses 95 adresses à 360 px, sans capture.
+  - **Pages hautes par tranches** : passé 16 384 px d'image, Edge recommençait le haut de la page dans le bas de la
+    capture (l'accueil à 390 px fait 29 772 px à l'échelle 2 : la deuxième moitié répétait l'ouverture). Les captures
+    d'avant ce lot de l'accueil, de « Comment ça marche », de la prestation cuisine et de `/pro` à 390 px avaient ce
+    défaut. Au-delà de 16 000 px, la page est prise par tranches (`clip`) recollées avec sharp, même JPEG qualité 80.
+- Captures remplacées dans `docs/captures/site-3-0/` (390 et 1 440 px, pages entières) : `accueil`,
+  `simulateur-exemples`, `simulateur-resultat`, `matieres`, `matiere-fiche` (NF13), `prestation-cuisine`,
+  `comment-ca-marche`, `pro`. Chacune regardée (planches en colonnes, plus une recherche automatique des bandes
+  uniformes) : aucune section blanche, échantillons du CRM chargés ; la seule bande uniforme est le bas encre de `/pro`
+  (marge du dernier appel). `matieres-bois-*` (D3) gardées telles quelles.
+- **Contrôle à 360 px** : aucun débordement sur les 95 adresses du plan du site, ni sur l'écran Photo et l'écran de
+  résultat.
+
+**G2, tests et relecture**
+- `npm test` : 605 tests, tous réussis (598 → 605) ; `npx eslint .` et `npm run build` passent.
+- Couverture vérifiée des nouveaux composants : étiquettes et honnêteté (`honnetete.test.ts`,
+  `exemple-honnete.test.ts`, `revue.test.ts`), bibliothèque (`bibliotheque.test.ts`, `ambiances.test.ts`,
+  `images-manifeste.test.ts`), filtres (`matieres.test.ts`, `familles.test.ts`, `inspirations.test.ts`), exemples du
+  simulateur (`exemples.test.ts`), redirections et hôte (`redirections.test.ts`, `metadonnees.test.ts`), plus teintes
+  et ΔE, maillage, fiches, 300 mots, jetons et rouge réservé (`theme.test.ts`). Ajoutés : `perf.test.ts` (+2 :
+  `--etat-resultat`, `--controle-plan`, `cheminsDuPlan`, l'état écrit là où le simulateur le lit, aucun formulaire ni
+  génération dans le script ; tranches sans trou ni recouvrement), `src/lib/simulateur/etat-resultat.test.ts` (3 : le
+  simulateur relit l'état et ouvre le résultat — bandeau, étape 3, écran 4 ; « Ambiance · avant / après » ; images de
+  la bibliothèque sur le disque, composition = celle de l'ambiance, zones et films du catalogue), `ton.test.ts` (+2 :
+  le jargon écarté ne revient pas). Adapté (intention gardée) : `perf.test.ts` (`--etat-resultat` n'est plus refusé),
+  `sitemap.test.ts` (les pages au 06/10/2026).
+- Plan du site : `LAST_BUILD` 30/09 → **06/10/2026** (jour de la mise en ligne prévue) ; `DATE_CATALOGUE` déjà au
+  06/10 ; les guides gardent leur date.
+- **Relecture du ton** (≈ 1 150 textes ajoutés par la branche, extraits du diff avec `main`) : direct, concret, « on »,
+  rien de « faux magazine » (déjà verrouillé). Corrigé :
+  - gabarit : description par défaut et textes de partage par défaut sans « premium » ni « Simulation IA » (« par
+    covering adhésif, posé sur place », « Simulation gratuite sur votre photo ») ; title par défaut « Covering adhésif,
+    rénovation en une journée » ;
+  - `/pro` : « Le même accueil, autre direction » → « d'autres matières » ;
+  - guide bordeaux : « deux directions possibles » → « deux idées de matières », « deux partis » → « deux choix » ;
+    titre de section des deux guides de cuisine « Deux directions… » → « Deux idées pour la même cuisine » ;
+  - notes de fiche : « un camaïeu de clairs » (NH47) → « des teintes claires qui se suivent », « plus graphique »
+    (NF14) → « plus net » ;
+  - résultat sur une pièce d'exemple : « générée, habillée par une intelligence artificielle » → « générée par une
+    intelligence artificielle ».
+- Docs : `docs/SEO.md` (dates du plan du site, description du guide bordeaux 135 → 132 signes, relecture du ton),
+  `docs/DESIGN.md` (captures de référence du simulateur et méthode de l'écran de résultat), `docs/SUIVI.md` (options
+  des captures, tranches), ce fichier (état des phases B, C, E, G mis à jour).
+
+**Décisions prises seul**
+1. `--etat-resultat` seul ne capture que le résultat ; avec `--pages`, il s'ajoute aux pages données.
+2. Tranches de 16 000 px d'image au plus (8 000 px CSS au téléphone) : sous la limite de 16 384 px du navigateur.
+3. Les « nous » des textes (« Nous facturons… », « Nous n'avons pas encore d'image… ») restent : c'est aussi la
+   première personne du pluriel, et les remplacer partout touchait des dizaines de textes testés mot pour mot pour un
+   gain nul. Les phrases neuves écrites au fil des lots sont déjà en « on ».
+4. « covering adhésif » reste dans la description par défaut (mot-clé exigé par `relecture-def.test.ts`) ; les
+   `keywords` du gabarit, invisibles, ne sont pas relus.
+
+**Problèmes**
+- Hors de mes lots : E5 (test des modèles au CRM) n'a ni commit ni section sur cette branche.
+- En prévisualisation Vercel, sans `NEXT_PUBLIC_SIMULATE_URL`, `baseCrm()` rend `""` : les échantillons du CRM y sont
+  des images cassées (relevé en local sur un build sans la variable). La production a la variable ; le repli prévu au
+  plan B7 n'a pas été fait.
+

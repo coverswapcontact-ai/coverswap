@@ -90,7 +90,7 @@ export const articles: BlogArticle[] = [
     slug: "cuisine-bordeaux-brillante-renover-sans-changer",
     title: "Cuisine bordeaux brillante : la rénover sans la changer",
     titreSeo: "Rénover une cuisine bordeaux brillante",
-    excerpt: "Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux directions possibles et comment se fait le prix.",
+    excerpt: "Façades bordeaux laquées, plan gris moucheté : ce qu'on garde, ce qu'on recouvre, deux idées de matières et comment se fait le prix.",
     category: "Cuisine",
     date: C7_TEXTE,
     dateIso: C7,
@@ -110,8 +110,8 @@ export const articles: BlogArticle[] = [
           text: "Les caissons, les portes, les tiroirs, les poignées et les charnières, l'évier, la plaque, la hotte, le carrelage. Rien n'est démonté ni emporté. On pose le film façade par façade, chants compris, puis on habille le plan de travail sans le déposer. Il n'y a ni poussière ni séchage : la cuisine sert le soir même.",
         },
         {
-          title: "Deux directions pour la même cuisine",
-          text: "Ces deux images d'ambiance montrent deux partis pour une même cuisine en L. En haut de page, un vert profond mat sur les façades et un chêne pâle sur le plan : la cuisine garde du caractère, sans le reflet. Ci-dessous, un gris clair mat et un chêne plus soutenu : la pièce paraît plus grande et plus calme. Dans les deux cas, le carrelage blanc et les poignées inox ne bougent pas. Les matières posées sont écrites sous chaque image ; vous pouvez les essayer sur la photo de votre cuisine.",
+          title: "Deux idées pour la même cuisine",
+          text: "Ces deux images d'ambiance montrent deux choix pour une même cuisine en L. En haut de page, un vert profond mat sur les façades et un chêne pâle sur le plan : la cuisine garde du caractère, sans le reflet. Ci-dessous, un gris clair mat et un chêne plus soutenu : la pièce paraît plus grande et plus calme. Dans les deux cas, le carrelage blanc et les poignées inox ne bougent pas. Les matières posées sont écrites sous chaque image ; vous pouvez les essayer sur la photo de votre cuisine.",
           image: "cuisine-bordeaux-brillante-apres-neutre",
         },
         {
@@ -170,7 +170,7 @@ export const articles: BlogArticle[] = [
           text: "Repeindre : c'est possible, mais sur un mélaminé il faut poncer, poser une sous-couche d'accroche, deux couches, et attendre le séchage entre chacune ; plusieurs jours, et la peinture s'use vite aux poignées et aux arêtes. Remplacer : justifié si les caissons sont abîmés, mais c'est le chantier le plus lourd. Recouvrir : un film posé à chaud sur les façades saines, sans démontage, la cuisine utilisable le soir même. Le comparatif complet des trois est dans un guide à part.",
         },
         {
-          title: "Deux directions pour la même cuisine",
+          title: "Deux idées pour la même cuisine",
           text: "En haut de page, des façades en chêne pâle et un plan effet marbre noir : la cuisine des années 1980 prend la chaleur du bois. Ci-dessous, un bleu nuit mat et un plan en chêne. Sur ces deux images d'ambiance, le carrelage à frise reste tel quel : il peut se recouvrir aussi, mais rien n'y oblige. Et si vous tenez au blanc, un blanc neuf, mat ou satiné, se pose de la même façon.",
           image: "cuisine-blanche-jaunie-apres-couleur",
         },

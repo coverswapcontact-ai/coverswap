@@ -799,6 +799,9 @@ lien souligné vers lui dans le cadre des boutons (« Pas de photo sous la main 
 - L'étiquette d'honnêteté du curseur passe au-dessus de son trait blanc (`AvantApres`) : à 390 px le trait la
   coupait quand le curseur était près de la moitié.
 
+Captures de référence (lot G1) : `docs/captures/site-3-0/simulateur-exemples-390.jpg` et `-1440.jpg` (l'écran Photo,
+cuisine choisie : `/simulateur?projet=cuisine&choix=1`).
+
 ## Après le rendu
 
 Lot E4 (énoncé, phase E point 3), sous l'image du résultat, dans cet ordre :
@@ -814,6 +817,12 @@ Lot E4 (énoncé, phase E point 3), sous l'image du résultat, dans cet ordre :
   (Façades), AG13 (Plan de travail) ». Le lien disparaît une fois la demande envoyée.
 - Puis, sans changement : la note sur le rendu, « Essayer d'autres matières », « Télécharger », « Partager »,
   l'estimation, la demande et son **seul** bouton principal, « Recevoir mon devis ».
+
+Captures de référence (lot G1) : `docs/captures/site-3-0/simulateur-resultat-390.jpg` et `-1440.jpg`, faites **sans
+aucune génération** par `node scripts/captures.mjs --etat-resultat` : la mémoire locale du simulateur reçoit l'avant
+« bordeaux » de la bibliothèque comme photo et son après « couleur » (NF13, AG13) comme rendu, la pièce d'exemple
+posée, puis « Reprendre ». L'image porte donc « Ambiance · avant / après », et la note dit « Image d'ambiance : une
+pièce d'exemple, générée par une intelligence artificielle avec vos matières. »
 
 ## Performance et accessibilité (lot F6)
 

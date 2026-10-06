@@ -168,7 +168,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
 
       <CartelComposition references={rendu.references} selections={selections} onEchantillons={onEchantillons} />
       <p className="text-[13px] leading-relaxed text-encre-2">
-        {exemple ? "Image d'ambiance : une pièce d'exemple, générée, habillée par une intelligence artificielle avec vos matières. " : "Rendu indicatif produit par une intelligence artificielle. "}
+        {exemple ? "Image d'ambiance : une pièce d'exemple, générée par une intelligence artificielle avec vos matières. " : "Rendu indicatif produit par une intelligence artificielle. "}
         Les teintes exactes se valident sur échantillons avant la pose.
       </p>
 

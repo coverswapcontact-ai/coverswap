@@ -68,3 +68,42 @@ describe("le ton : rien de « faux magazine » dans les textes du site", () => {
     }
   });
 });
+
+/**
+ * Site 3.0, lot G2 — relecture du ton de tous les textes neufs : direct, concret, sans jargon de décorateur ni
+ * argument de vente creux. Les formules corrigées à la relecture ne reviennent pas dans un texte (les commentaires du
+ * code, qui parlent aux développeurs, ne sont pas lus).
+ */
+const JARGON: [string, RegExp][] = [
+  ["« premium »", /\bpremium\b/i],
+  ["« Simulation IA » (on dit ce que c'est : une simulation sur votre photo)", /\b[Ss]imulation IA\b/],
+  ["« camaïeu »", /camaïeu/i],
+  ["« parti pris » / « deux partis »", /\bpartis? pris\b|\bdeux partis\b/i],
+  ["« autre direction » (d'autres matières)", /\b(?:autres?|deux) directions?\b/i],
+  ["« graphique » pour une teinte", /\bplus graphique\b/i],
+  ["« sublimer »", /\bsublim/i],
+  ["« intemporel »", /\bintemporel(?:le)?s?\b/i],
+  ["« cosy »", /\bcosy\b/i],
+];
+const estCommentaire = (ligne: string) => /^\s*(?:\/\/|\/?\*|\{\/\*)/.test(ligne);
+
+describe("le ton : pas de jargon de décorateur dans les textes du site (lot G2)", () => {
+  test("aucune formule écartée à la relecture, hors commentaires du code", () => {
+    const constats: string[] = [];
+    for (const f of sources(SRC)) {
+      readFileSync(f, "utf8")
+        .split("\n")
+        .forEach((ligne, i) => {
+          if (estCommentaire(ligne) || /^\s*keywords:|^\s*"covering adhésif, /.test(ligne)) return;
+          for (const [quoi, motif] of JARGON) if (motif.test(ligne)) constats.push(`${relative(SRC, f).split(sep).join("/")}:${i + 1} ${quoi}`);
+        });
+    }
+    assert.deepEqual(constats, []);
+  });
+
+  test("les formules attrapent le jargon et épargnent le reste", () => {
+    const touche = (texte: string) => JARGON.some(([, motif]) => motif.test(texte));
+    for (const oui of ["Covering adhésif premium", "Simulation IA gratuite", "un camaïeu de clairs", "deux partis pour une même cuisine", "un parti pris audacieux", "Le même accueil, autre direction", "deux directions possibles", "le rend plus graphique", "pour sublimer votre cuisine", "un chêne intemporel", "une ambiance cosy"]) assert.ok(touche(oui), oui);
+    for (const non of ["Le même accueil, d'autres matières", "deux idées de matières", "le rend plus net", "On pose en une journée", "Simulation gratuite sur votre photo", "la direction artistique", "une intelligence artificielle"]) assert.ok(!touche(non), non);
+  });
+});
