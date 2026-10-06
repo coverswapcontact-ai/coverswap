@@ -1,5 +1,6 @@
 import Link from "@/components/LienSite";
 import { PICTOS_ELEMENTS, PICTOS_FAMILLES, Picto } from "@/components/espace/Illustrations";
+import { Video } from "@/components/revue/Video";
 import { Section } from "@/components/simulation/Section";
 import { lienSimuler } from "@/lib/liens-simulateur";
 import { ELEMENTS } from "@/lib/simulateur/elements";
@@ -16,6 +17,8 @@ import { ANCRES_ACCUEIL } from "./sections";
  *
  * Pictos de 64 px au moins (80 px dès 768 px), décoratifs (`alt=""`), libellé visible dessous ; un filet de 3 px à la
  * teinte de la prestation au-dessus de chaque carte. Composant serveur.
+ * Mission 22 (partie B) : sous les pictos, le lien de texte « Voir la démo · 20 s » (`revue/Video` en mode `lien`)
+ * ouvre la démo du simulateur dans la visionneuse — le même lien que l'écran d'accueil de `/simulateur`.
  */
 export type PictoAccueil = { cle: string; libelle: string; picto: string; projet: string; element?: string };
 
@@ -65,6 +68,9 @@ export function ParOuCommencer() {
           <Carte key={p.cle} p={p} />
         ))}
       </ul>
+      <div className="mt-10">
+        <Video id="demoSimulateur" mode="lien" />
+      </div>
     </Section>
   );
 }

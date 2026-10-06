@@ -1,6 +1,7 @@
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
 import { Echantillon } from "@/components/revue/Echantillon";
 import { Pastille497 } from "@/components/revue/Pastille497";
+import { Video } from "@/components/revue/Video";
 import { Lien } from "@/components/simulation/Lien";
 import { lienMatiere, matiereCartel, matieresVedettes } from "@/lib/matieres-vedettes";
 import { NB_REFERENCES } from "@/lib/offre";
@@ -12,6 +13,8 @@ import { BANDES_ACCUEIL } from "./sections";
  * vers sa fiche (`/matieres/<famille>/<REF>`, lot D4), et l'entrée vers tout le catalogue (secondaire). Il remplace les tuiles de la
  * mission 16. Il se ferme sur la bande de matière vert profond NF13 (en tête, elle aurait suivi la bande de marbre
  * sans rien entre les deux). Papier foncé, sans grain. Composant serveur.
+ * Mission 22 (partie B) : un lien de texte « Voir le présentoir en 20 s » (`revue/Video` en mode `lien`) ouvre le film
+ * du présentoir (20 s, entier) dans la visionneuse ; la boucle courte vit sur `/matieres`.
  */
 export function Presentoir() {
   const bande = BANDES_ACCUEIL.find((b) => b.apres === "dans-presentoir");
@@ -31,6 +34,9 @@ export function Presentoir() {
                 {NB_REFERENCES} matières, à voir en vrai
               </h2>
               <p className="texte-2 mt-3">Bois, pierre, béton, métal, couleurs unies : des films Cover Styl&apos;, mats ou texturés. En voici huit ; on apporte les échantillons chez vous.</p>
+              <div className="mt-3">
+                <Video id="presentoir" mode="lien" />
+              </div>
             </div>
             <Pastille497 className="shrink-0" />
           </div>

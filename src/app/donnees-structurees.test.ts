@@ -54,16 +54,18 @@ const parametres = (cle: string, valeur: string) => ({ params: Promise.resolve({
 
 /** Les pages publiques, leur adresse et les types attendus (comptés). */
 const PAGES: { chemin: string; module: string; props?: Record<string, unknown>; attendus: Record<string, number | "curseurs"> }[] = [
-  { chemin: "/", module: "@/app/page", attendus: { Service: 1, FAQPage: 1, ImageObject: "curseurs" } },
-  { chemin: "/simulateur", module: "@/app/simulateur/page", attendus: { HowTo: 1, FAQPage: 1, BreadcrumbList: 1 } },
-  { chemin: "/matieres", module: "@/app/matieres/page", attendus: { BreadcrumbList: 1 } },
+  // Mission 22 (partie B) : un `VideoObject` par vidéo portée par la page — l'accueil en porte quatre (le reel de
+  // l'ouverture, « Comment ça marche », le présentoir en lien, la démo en lien), les trois autres pages une chacune.
+  { chemin: "/", module: "@/app/page", attendus: { Service: 1, FAQPage: 1, ImageObject: "curseurs", VideoObject: 4 } },
+  { chemin: "/simulateur", module: "@/app/simulateur/page", attendus: { HowTo: 1, FAQPage: 1, BreadcrumbList: 1, VideoObject: 1 } },
+  { chemin: "/matieres", module: "@/app/matieres/page", attendus: { BreadcrumbList: 1, VideoObject: 1 } },
   { chemin: "/matieres/bois", module: "@/app/matieres/[famille]/page", props: parametres("famille", "bois"), attendus: { BreadcrumbList: 1, ImageObject: "curseurs" } },
   { chemin: "/matieres/metal", module: "@/app/matieres/[famille]/page", props: parametres("famille", "metal"), attendus: { BreadcrumbList: 1 } },
   { chemin: "/matieres/couleur/NF13", module: "@/app/matieres/[famille]/[ref]/page", props: { params: Promise.resolve({ famille: "couleur", ref: "NF13" }) }, attendus: { BreadcrumbList: 1 } },
   ...["cuisine", "salle-de-bain", "meubles"].map((slug) => ({ chemin: `/prestations/${slug}`, module: "@/app/prestations/[slug]/page", props: parametres("slug", slug), attendus: { Service: 1, FAQPage: 1, HowTo: 1, BreadcrumbList: 1, ImageObject: "curseurs" as const } })),
   { chemin: "/prestations/vitrages", module: "@/app/prestations/[slug]/page", props: parametres("slug", "vitrages"), attendus: { Service: 1, FAQPage: 1, HowTo: 1, BreadcrumbList: 1 } },
   { chemin: "/pro", module: "@/app/pro/page", attendus: { Service: 1, FAQPage: 1, HowTo: 1, BreadcrumbList: 1, ImageObject: "curseurs" } },
-  { chemin: "/comment-ca-marche", module: "@/app/comment-ca-marche/page", attendus: { FAQPage: 1, BreadcrumbList: 1 } },
+  { chemin: "/comment-ca-marche", module: "@/app/comment-ca-marche/page", attendus: { FAQPage: 1, BreadcrumbList: 1, VideoObject: 1 } },
   { chemin: "/inspirations", module: "@/app/inspirations/page", attendus: { BreadcrumbList: 1, ImageObject: "curseurs" } },
   { chemin: "/realisations", module: "@/app/realisations/page", attendus: { BreadcrumbList: 1, ImageObject: "curseurs" } },
   { chemin: "/zones", module: "@/app/zones/page", attendus: { BreadcrumbList: 1 } },

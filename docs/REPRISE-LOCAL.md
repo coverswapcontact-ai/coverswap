@@ -2019,3 +2019,77 @@ aucun formulaire touché)
 - Performance sous 90 sur 8 pages sur 11, LCP au-dessus de 2,5 s sur les 11 : objectifs toujours non atteints
   (F6, F7).
 
+
+## Mission 22, partie B — les vidéos motion design (06/10/2026)
+
+Énoncé : `~/coverswap-photos/missions/prompt-mission-22.md`, § 6 (c'est la loi). Un seul commit « Site, mission 22 B :
+… » sur `main`, poussé, vérifié en ligne.
+
+**Fait**
+- `public/videos/` : les cinq films (`reel-avant-apres.mp4` 1 070 Ko, `comment-ca-marche.mp4` 1 546 Ko,
+  `presentoir.mp4` 1 572 Ko, `presentoir-boucle.mp4` 1 019 Ko, `demo-simulateur.mp4` 1 418 Ko ; H.264 crf 24 slow
+  yuv420p faststart sans son, 1080 au plus grand côté), décrits par `src/lib/videos.ts` (module pur : fichier,
+  empreinte sha1, dimensions, durée, affiche, étiquette, titre, description, libellés des boutons). Cache : règle
+  `/videos/:path*` immuable un an dans `next.config.ts`, adresses `?v=<empreinte>` ; `videos.test.ts` vérifie
+  l'empreinte de chaque fichier, son poids (≤ 3,5 Mo / 2,5 Mo), `moov` avant `mdat`, H.264 sans piste son.
+- Affiches : `public/images/sources/affiche-*.jpg` (1080 de large, JPEG progressif), préparées par `npm run images`
+  (AVIF / WebP / JPEG en 480, 960, 1080 ; manifeste à 88 images) ; rendues par `CadrePhoto` avec leur étiquette.
+- Composants : `revue/Video.tsx` (serveur : `id`, `mode` clic / boucle / lien, `libelle`, `priorite`, `immediat`,
+  `tailles`, `cadre="telephone"` ; pose le `VideoObject`), `simulation/CadreVideo.tsx` (sans état, sources résolues),
+  `simulation/BoutonVideo.tsx` (client : quatre dessins, ouvre `PleinEcran` chargé au geste), `simulation/VideoBoucle.tsx`
+  (client : IntersectionObserver, `load`, `prefers-reduced-motion` par `useSyncExternalStore`, « Pause » / « Lire »),
+  `PleinEcran` en mode `video` (`<video controls autoplay playsinline muted>`, bouton « Son », modal), `AvantApres film`.
+- Les quatre emplacements : ouverture (« Voir en 15 s » dans les outils dès 768 px, petit bouton sur l'image au
+  téléphone), « Comment on travaille » (le film au-dessus des étapes ; sur `/comment-ca-marche`, dans le bloc de tête
+  après le bouton principal, affiche prioritaire = LCP, première étape en `immediat`), `/matieres` (la boucle à droite
+  du titre dès 1 024 px, sous l'intro au téléphone ; « Voir le présentoir en 20 s » en lien dans « Le présentoir »),
+  simulateur (cadre de téléphone à droite dès 1 024 px dans l'écran Pièce, lien sous les cartes au téléphone ; même lien
+  sous « Par où commencer ? »).
+- `VideoObject` : `VideoSchema` dans `JsonLd.tsx` ; `/` × 4, `/comment-ca-marche`, `/matieres` (la boucle), `/simulateur`.
+- Étiquette « Démonstration » (`Etiquette`, `CadrePhoto`, `honnetete.test.ts`, DESIGN.md) pour l'affiche de la démo.
+- Tests 605 → 616 (nouveau `src/lib/videos.test.ts` : fichiers, composant, aucun octet de vidéo au premier affichage des
+  quatre pages ; adaptations : `revue.test` (six composants, sept textes), `perf.test` (liste blanche, cache),
+  `accueil.test`, `autres-pages.test`, `donnees-structurees.test`, `honnetete.test`, `images-depot.test` (88 images,
+  `public/videos/` = les cinq films), `exemples.test`, `pictos.test`). Lint propre, build passé.
+- Lighthouse avant → après (build local, méthode G3) : `/` 86 → 83 puis **-1 en A/B alterné** (87 / 87 / 86 → 86 / 86 /
+  86), `/comment-ca-marche` 92 → 91, `/matieres` 87 → 86, `/simulateur` 83 → 87 ; tableaux dans `docs/SEO.md`,
+  « Mission 22, partie B ». Captures 390 et 1 440 dans `docs/captures/site-3-0/videos/` (Edge, mouvement réduit : la
+  boucle y montre son affiche ; aucun débordement à 360 px).
+- Vérifié dans le navigateur intégré sur le build local : aucun `<video>` ni fichier `.mp4` au premier affichage de
+  `/`, `/comment-ca-marche`, `/simulateur` ; sur `/matieres`, la boucle monte après `load` (requête à 7,1 s sur ce
+  poste), joue muette en boucle, « Pause » l'arrête ; « Voir en 30 s » et « Voir en 15 s » ouvrent la visionneuse (le
+  film demandé à ce moment-là seulement, muet, bouton « Son », Échap ferme et retire le `<video>`, le curseur de
+  l'ouverture ne bouge pas au clic sur le petit bouton).
+- Docs : `docs/DESIGN.md` (section « Vidéos », règle 5, table de l'étiquette, tableaux de l'accueil et de
+  `/comment-ca-marche`), `docs/SEO.md` (`VideoObject`, types par page, Lighthouse), `docs/SUIVI.md` § 7.
+
+**Décisions prises seul**
+1. Versionnement des vidéos par `?v=<empreinte>` + règle de cache immuable (comme les images préparées), plutôt que
+   l'empreinte dans le nom du fichier : les noms restent en français sans numéro, et `videos.test.ts` refuse une vidéo
+   remplacée sans nouvelle empreinte.
+2. Les affiches passent par `public/images/sources/` + `npm run images` (AVIF, `CadrePhoto`, étiquette, tests
+   d'honnêteté) ; l'affiche du reel ne sert qu'au `poster` du plein écran et au `VideoObject` (l'ouverture n'admet pas
+   d'image de plus : deux `fetchpriority="high"` exactement).
+3. Les boutons vidéo sont blancs à l'encre (le dessin de « Comparer » / « Plein écran »), jamais rouges : le rouge
+   reste au bouton principal de la page (un par écran, compté par les tests).
+4. Au téléphone, le reel de l'ouverture s'ouvre par un petit bouton posé sur l'image (en bas à droite), pas par une
+   ligne de plus sous l'image : le titre et les deux boutons restent au premier écran (390 × 660).
+5. Sur `/comment-ca-marche`, le film vient après le bouton principal (le bouton reste au premier écran), et
+   `CommentOnTravaille video={false}` ne le répète pas au-dessus des étapes.
+6. Un `VideoObject` par vidéo portée par la page (quatre sur l'accueil) ; `/matieres` décrit la boucle qu'elle joue,
+   pas le film entier (qui est sur l'accueil).
+7. La boucle attend aussi le `load` de la page (en plus d'être à l'écran) : elle ne concurrence jamais le premier
+   affichage. Le `<video>` n'est pas monté par le serveur, seulement dans le navigateur.
+8. Au téléphone, `/matieres` montre la boucle sous le titre et l'intro : la première rangée d'échantillons sort du
+   premier écran (l'énoncé le demande).
+9. Le simulateur garde `max-w-3xl` : la colonne de droite (200 px) vit dans `EcranPiece` (grille dès 1 024 px).
+10. Lighthouse : la première série APRÈS de l'accueil (-3) a tourné pendant un lint ; refaite en A/B alterné avec un
+    build du `main` d'avant dans un worktree (-1). Accessibilité 97 sur l'accueil : artefact de `content-visibility`
+    (SEO.md), laissé tel quel.
+
+**Problèmes**
+- `label-content-name-mismatch` (Pastille497) : déjà en échec avant la mission, poids nul ; à décider par Lucas.
+- `npx lighthouse` lancé hors du dépôt prend la 12.8.2 (cache npx), pas la 12.6.1 du dépôt : même version des deux
+  côtés de la comparaison, mais pas celle de G3.
+- Le navigateur intégré ne sait pas simuler `prefers-reduced-motion` : vérifié par les captures (mouvement réduit →
+  affiche + « Lire ») et par le code (`VideoBoucle`).

@@ -91,6 +91,8 @@ const CLIENTS_ADMIS: Record<string, string> = {
   "src/components/Prechargements.tsx": "le préchargement de l'image du premier écran, hors de la charge RSC (site 3.0, lot F6)",
   "src/components/PrechargementDiffere.tsx": "le préchargement des liens, au geste puis après le chargement (site 3.0, lot F7)",
   "src/components/accueil/FeuilleRappel.tsx": "la feuille « Être rappelé », chargée au premier geste vers son bouton (site 3.0, lot F7)",
+  "src/components/simulation/BoutonVideo.tsx": "le bouton qui ouvre une vidéo dans le plein écran, chargé au premier geste (mission 22, partie B)",
+  "src/components/simulation/VideoBoucle.tsx": "la vidéo en boucle de /matieres : lecture à l'écran seulement, jamais avec moins de mouvement (mission 22, partie B)",
 };
 /** La directive seule sur sa ligne (une mention dans un commentaire ne compte pas). */
 const estClient = (source: string) => /^["']use client["'];?\s*$/m.test(source);
@@ -335,9 +337,9 @@ describe("CSS et rendu différé", () => {
 });
 
 describe("cache et images", () => {
-  test("next.config : /images/prep et /fonts en cache immuable d'un an ; images.unoptimized reste", async () => {
+  test("next.config : /images/prep, /fonts et /videos (mission 22) en cache immuable d'un an ; images.unoptimized reste", async () => {
     const entetes = await nextConfig.headers!();
-    for (const source of ["/images/prep/:path*", "/fonts/:path*"]) {
+    for (const source of ["/images/prep/:path*", "/fonts/:path*", "/videos/:path*"]) {
       const regle = entetes.find((r) => r.source === source);
       assert.ok(regle, source);
       assert.deepEqual(regle.headers, [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }]);

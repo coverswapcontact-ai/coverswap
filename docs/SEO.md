@@ -191,19 +191,30 @@ Tout le balisage part de `src/components/JsonLd.tsx` (et de `lib/donnees-images.
   « Image d'ambiance aux teintes du catalogue » ; un « avant » dit la pièce d'origine ; une réalisation, « Après la
   pose — <titre>, <matières publiées> ». Seules restent muettes (`alt=""`) les images posées dans un lien qui a déjà
   son texte (rangée « Ambiances » de l'accueil, cartes des pièces) et les pictos.
+- **`VideoObject` par vidéo portée par la page** (mission 22, partie B ; `VideoSchema`, posé par `revue/Video`, par
+  l'ouverture de l'accueil et par la page du simulateur) : `name`, `description`, `thumbnailUrl` (le plus grand JPEG
+  préparé de l'affiche, 1 080 px), `uploadDate` (`DATE_VIDEOS`, 2026-10-06), `duration` en ISO 8601 (secondes
+  entières : `PT15S`, `PT30S`, `PT20S`, `PT9S`, `PT21S`), `contentUrl` (le fichier de `/videos/`, avec son empreinte
+  `?v=`), `width` / `height`, `creditText` honnête (« Film d'ambiance : images générées aux teintes du catalogue », ou
+  « Démonstration du simulateur, images de l'outil »), `publisher` (l'organisation). L'accueil en porte quatre (le
+  reel de l'ouverture, « Comment ça marche », le présentoir en lien, la démo en lien) ; `/matieres` décrit la boucle
+  courte qu'elle joue (9,6 s), pas le film entier. `src/app/donnees-structurees.test.ts` compte les blocs par page ;
+  `src/lib/videos.test.ts` vérifie le contenu.
 
-Types par page (rendu du 06/10/2026, gabarit en plus : `HomeAndConstructionBusiness`, `Organization`) :
+Types par page (rendu du 06/10/2026, gabarit en plus : `HomeAndConstructionBusiness`, `Organization` ; `VideoObject`
+depuis la mission 22) :
 
 | Page | Types |
 |---|---|
-| `/` | `Service`, `FAQPage`, `ImageObject` × 8 |
-| `/simulateur` | `HowTo`, `FAQPage`, `BreadcrumbList` |
-| `/matieres`, familles sans avant / après, fiches | `BreadcrumbList` |
+| `/` | `Service`, `FAQPage`, `ImageObject` × 8, `VideoObject` × 4 |
+| `/simulateur` | `HowTo`, `FAQPage`, `BreadcrumbList`, `VideoObject` |
+| `/matieres` | `BreadcrumbList`, `VideoObject` (la boucle du présentoir) |
+| familles sans avant / après, fiches | `BreadcrumbList` |
 | familles avec avant / après (bois, couleur…) | `BreadcrumbList`, `ImageObject` × curseurs |
 | `/prestations/cuisine`, `salle-de-bain`, `meubles` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 11 / 3 / 5 |
 | `/prestations/vitrages` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList` |
 | `/pro` | `Service`, `FAQPage`, `HowTo`, `BreadcrumbList`, `ImageObject` × 3 (2 au lot F4, 3 depuis F5) |
-| `/comment-ca-marche` | `FAQPage`, `BreadcrumbList` |
+| `/comment-ca-marche` | `FAQPage`, `BreadcrumbList`, `VideoObject` |
 | `/inspirations` | `BreadcrumbList`, `ImageObject` × 41 |
 | `/realisations` | `BreadcrumbList`, `ImageObject` × 4 (+ un par chantier publié avec avant) |
 | `/zones` | `BreadcrumbList` ; une ville : `Service`, `FAQPage`, `BreadcrumbList` |
@@ -556,3 +567,42 @@ côtés) — B0 : coverswap.fr le 05/10/2026, `main` a7dd5a6, le site d'avant le
   atteints, pour les raisons écrites en F6 et F7.
 - **Écart entre passages** : jusqu'à 7 points sur une même page (`/inspirations` 84 / 79 / 77, `contact` 90 / 86 / 83),
   toujours par le TBT (`/inspirations` : 263 à 472 ms).
+
+### Mission 22, partie B (06/10/2026) — les vidéos, build local avant / après
+
+Même méthode que G3 (mobile par défaut, trois passages par page, le meilleur gardé : performance la plus haute, puis
+LCP le plus court ; `--blocked-url-patterns=*/api/site/evenements*`), Lighthouse 12.8.2 (celui que `npx` a pris hors du
+dépôt ; 12.6.1 en CI), Chrome 153 sans interface, même poste, sur le build local (`next start -p 3100`, sans variable
+d'environnement : les échantillons du CRM répondent 404 des deux côtés, d'où « bonnes pratiques » 96 en local). AVANT :
+`main` 8016ca4 ; APRÈS : le build de la mission (vidéos, affiches, `VideoObject`).
+
+| Page | AVANT perf · LCP · TBT (3 passages) | APRÈS perf · LCP · TBT (3 passages) | Écart |
+|---|---|---|---|
+| `/` | 86 · 3,9 s · 147 ms (85 / 83 / 86) | 83 · 3,9 s · 234 ms (79 / 81 / 83) | -3 (série sous charge, voir l'A/B) |
+| `/comment-ca-marche` | 92 · 3,3 s · 99 ms (91 / 92 / 92) | 91 · 3,4 s · 91 ms (91 / 90 / 90) | -1 ; le LCP est l'affiche du film (AVIF 960) |
+| `/matieres` | 87 · 3,6 s · 103 ms (87 / 85 / 86) | 86 · 3,7 s · 98 ms (73 / 86 / 86) | -1 ; la boucle (1 Mo) se charge après `load`, à l'écran |
+| `/simulateur` | 83 · 3,9 s · 254 ms (83 / 82 / 80) | 87 · 3,8 s · 178 ms (85 / 87 / 86) | +4 |
+
+**A/B alterné sur l'accueil** (les deux builds servis en même temps, 3100 et 3101, un passage de chaque à tour de
+rôle, machine au repos — la première série APRÈS de l'accueil avait tourné pendant un lint) : AVANT 87 / 87 / 86 (LCP
+3,9 / 3,6 / 3,9 s, TBT 101 / 125 / 140 ms) → APRÈS 86 / 86 / 86 (3,9 / 3,9 / 3,9 s, TBT 151 / 147 / 148 ms) :
+**-1 point**, +30 à 50 ms de TBT (l'hydratation des cinq boutons vidéo). Aucune page ne recule de plus de 2 points.
+
+**Ce qui part au premier affichage** (requêtes réseau des passages) : aucun fichier vidéo sur `/`, `/comment-ca-marche`
+et `/simulateur` (les affiches seulement, en AVIF, 480 ou 960 px) ; sur `/matieres`, la boucle `presentoir-boucle.mp4`
+(1 019 Ko) part après `load`, parce que son cadre est à l'écran — c'est voulu. Sur l'un des trois passages de
+`/matieres`, Lighthouse a retenu le `<video>` comme élément LCP (3,7 s, même instant que l'affiche) et mesuré 633 ms de
+TBT : le décodage de la première image en logiciel sur ce poste ; les deux autres passages donnent l'affiche en LCP et
+98-113 ms.
+
+**Accessibilité : 100 → 97 sur l'accueil, un artefact de laboratoire.** L'audit `target-size` d'axe signale le bouton
+« Simuler ma pièce » des étapes (`#etapes-simuler`) comme chevauché par le bouton « L'offre pro » de la section
+Professionnels. Les deux sont à des milliers de pixels l'un de l'autre à l'écran ; mais ces sections sont sous
+`content-visibility: auto` (`sous-la-ligne`, `contain-intrinsic-size: auto 640px`) : hors écran, chacune mesure 768 px
+(placeholder), et quand axe demande la géométrie d'un élément d'une section sautée, Chrome la calcule à partir du haut
+du placeholder (mesuré dans le navigateur à 412 px : section « Comment on travaille » posée à 2 368 px, son bouton à
+5 406 ; section Pro posée à 4 736, son bouton à 5 424). Le film de 214 px au-dessus des étapes décale ce bouton de
+≈ 250 px, et il tombe à 18 px de l'autre. Aucun chevauchement réel ; pas de correction qui ne soit une bidouille de
+géométrie (les décalages dépendent des polices et du contenu). La CI garde son seuil (≥ 0,95). À relire en production.
+L'audit `label-content-name-mismatch` (la pastille « 497 matières », nom accessible « Voir les 497 matières ») était
+déjà en échec avant, sans effet sur le score (poids nul).

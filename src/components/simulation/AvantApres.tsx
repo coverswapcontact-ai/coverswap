@@ -3,6 +3,7 @@
 import { lazy, Suspense, useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
 import type { SourcesImage } from "@/lib/sources-image";
 import { CalqueMatieres, type MatiereCalque } from "@/components/ambiances/CalqueMatieres";
+import { BoutonVideo, type FilmBouton } from "./BoutonVideo";
 import { positionAuClavier } from "./curseur-clavier";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
@@ -54,6 +55,11 @@ const PleinEcran = lazy(() => chargerPleinEcran().then((m) => ({ default: m.Plei
  *
  * Mission 19 : `matieres` (les étiquettes matière d'une ambiance, `ambiances/CalqueMatieres`) sont posées sur l'image ;
  * elles décrivent l'« après » : une étiquette ne se montre que si son point est à droite du curseur.
+ *
+ * Mission 22 (partie B) : `film` — le reel avant / après de l'ouverture (`BoutonVideo`). Dès 768 px, un troisième
+ * bouton « Voir en 15 s » à côté de « Comparer » et « Plein écran » ; au téléphone (où ces outils sont cachés), un
+ * petit bouton posé en bas à droite de l'image, qui ne déplace pas le curseur. Il ouvre le film dans la visionneuse
+ * plein écran ; le curseur reste tel quel, rien de plus ne part avec la page.
  */
 export type ImagesPreparees = { avant?: SourcesImage | null; apres?: SourcesImage | null; /** L'attribut `sizes`. */ tailles: string };
 
@@ -68,7 +74,7 @@ function ImageCadre({ src, sources, tailles, alt, ...props }: ProprietesImage) {
   return <ImagePreparee sources={sources} tailles={tailles} alt={alt} {...props} />;
 }
 
-export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer" | "aucun"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres, film }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer" | "aucun"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[]; film?: FilmBouton }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
@@ -80,6 +86,8 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
   const chargementApres = priorite ? ({ loading: "eager", fetchPriority: "high" } as const) : ({ loading: "lazy" } as const);
   const chargementAvant = priorite ? ({ loading: "eager", fetchPriority: "high" } as const) : ({ loading: "lazy" } as const);
   const pastille = etiquette ? <Etiquette className="pointer-events-none absolute bottom-3 left-3">{etiquette}</Etiquette> : null;
+  // Le film au téléphone : sur l'image, là où les outils ne s'affichent pas.
+  const filmMobile = film ? <BoutonVideo {...film} variante="pastille" className={outilsMobile === "tous" ? "hidden" : "md:hidden"} /> : null;
 
   const suivre = useCallback((clientX: number) => {
     const rect = boite.current?.getBoundingClientRect();
@@ -97,6 +105,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
       <button type="button" onClick={() => setPleinEcran(true)} onPointerEnter={chargerPleinEcran} onFocus={chargerPleinEcran} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile !== "tous" ? " max-md:hidden" : ""}`}>
         Plein écran
       </button>
+      {film ? <BoutonVideo {...film} variante="bouton" className={outilsMobile === "tous" ? "" : "max-md:hidden"} /> : null}
       {pleinEcran ? (
         <Suspense fallback={null}>
           <PleinEcran ouvert onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
@@ -112,6 +121,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           <ImageCadre src={apres} sources={preparees?.apres} tailles={preparees?.tailles} alt={alt} className={classesApres} {...chargementApres} referrerPolicy="no-referrer" />
           {matieres ? <CalqueMatieres matieres={matieres} /> : null}
           {pastille}
+          {filmMobile}
         </div>
         {outils}
       </div>
@@ -149,6 +159,7 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
         <div className="pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_4px_rgba(0,0,0,0.35)]" style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }} />
         {/* L'étiquette passe au-dessus du trait du curseur (lot E3 : à 390 px, le trait la coupait). */}
         {pastille}
+        {filmMobile}
         <div
           role="slider"
           tabIndex={0}

@@ -369,16 +369,21 @@ describe("4. Comment on travaille", () => {
     assert.equal(compter(html, "<li"), 4);
     for (const n of ["01", "02", "03", "04"]) assert.ok(html.includes(`aria-hidden="true">${n}</span>`), n);
     assert.equal(compter(html, 'class="grand-numero '), 4);
-    assert.equal(compter(html, "<picture>"), 5, "quatre étapes et la preuve de finition");
+    assert.equal(compter(html, "<picture>"), 6, "l'affiche du film (mission 22), quatre étapes et la preuve de finition");
     assert.ok(html.includes("/images/prep/detail-chant-"));
     // Images décoratives (le texte de l'étape dit tout) : leur étiquette n'est pas lue seule.
-    assert.equal(compter(html, 'alt=""'), 5);
+    assert.equal(compter(html, 'alt=""'), 6);
     assert.equal(compter(html, ">Simulation</span>"), 1, "la capture du simulateur, seule");
-    assert.equal(compter(html, ">Ambiance</span>"), 4);
+    assert.equal(compter(html, ">Ambiance</span>"), 5, "l'affiche du film et quatre photos");
+    // Mission 22 : le film au-dessus des étapes, au clic ; son affiche avant la première étape, aucun <video> dans la page.
+    assert.ok(html.indexOf("/images/prep/affiche-comment-ca-marche-") < html.indexOf("/images/prep/etape-photo-"));
+    assert.match(html, /aria-label="Voir en 30 s : Comment ça marche, en 30 secondes"/);
+    assert.ok(!html.includes("<video"));
     assert.equal(boutons(html, "principal"), 1);
     assert.match(html, /id="etapes-simuler"[^>]*><a [^>]*href="\/simulateur\?depuis=accueil-etapes"[^>]*>Simuler ma pièce<\/a>/);
     // Sans la preuve (une autre page) : les quatre étapes et le bouton.
-    assert.equal(compter(rendre(createElement(CommentOnTravaille, {})), "<picture>"), 4);
+    assert.equal(compter(rendre(createElement(CommentOnTravaille, {})), "<picture>"), 5);
+    assert.equal(compter(rendre(createElement(CommentOnTravaille, { video: false })), "<picture>"), 4, "sans le film (/comment-ca-marche le pose en tête)");
   });
 
   test("le covering n'est expliqué qu'une fois sur l'accueil : dans « Comment on travaille »", () => {

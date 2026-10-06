@@ -101,8 +101,11 @@ function cadres(html: string): Cadre[] {
   return sortie;
 }
 
-/** L'étiquette due à une image du manifeste : la capture du simulateur est une « Simulation », tout le reste est généré. */
-const etiquettesPermises = (nom: string) => (nom === "etape-simulation" ? ["Simulation"] : ["Ambiance", "Ambiance · avant / après"]);
+/**
+ * L'étiquette due à une image du manifeste : la capture du simulateur est une « Simulation », l'affiche de la démo du
+ * simulateur (mission 22) une « Démonstration », tout le reste est généré (les affiches des autres films aussi).
+ */
+const etiquettesPermises = (nom: string) => (nom === "etape-simulation" ? ["Simulation"] : nom === "affiche-demo-simulateur" ? ["Démonstration"] : ["Ambiance", "Ambiance · avant / après"]);
 
 const SERIE_2 = new Set([...AMBIANCES_SERIE_2.flatMap((a) => [a.image, a.avant ?? a.image]), ...PAIRES_SERIE_2.map((p) => p.avant), ...PHOTOS_UTILES.map((p) => p.image)]);
 const ADRESSES = sitemap().map((e) => e.url.slice(ENTREPRISE.site.length) || "/");
@@ -118,6 +121,7 @@ describe("honnêteté des images (site 3.0, lot F6)", () => {
       { noms: ["detail-chant"], alts: ["detail-chant"], etiquette: "Ambiance" },
     ]);
     assert.deepEqual(etiquettesPermises("etape-simulation"), ["Simulation"]);
+    assert.deepEqual(etiquettesPermises("affiche-demo-simulateur"), ["Démonstration"]);
     assert.ok(SERIE_2.has("cuisine-bordeaux-brillante-avant") && SERIE_2.has("usure-detail") && SERIE_2.has("pro-comptoir-accueil-apres-bois"));
     for (const nom of SERIE_2) assert.ok(nom in MANIFESTE_IMAGES, `${nom} : au manifeste`);
   });

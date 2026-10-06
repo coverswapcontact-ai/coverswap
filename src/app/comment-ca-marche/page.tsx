@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
 import { CartesAtouts, EtapesPrestation, QuestionsPrestation } from "@/components/BlocsPrestation";
-import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
+import { CommentOnTravaille, TAILLES_VIDEO_LARGE } from "@/components/accueil/CommentOnTravaille";
 import { FormulaireRappel } from "@/components/accueil/FormulaireRappel";
 import { ContenuPrix } from "@/components/BlocPrix";
 import { FAQSchema } from "@/components/JsonLd";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
+import { Video } from "@/components/revue/Video";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
 import { Section } from "@/components/simulation/Section";
@@ -102,11 +103,14 @@ export default async function PageCommentCaMarche() {
           <div className="mt-6">
             <Lien href={LIEN_SIMULER}>Simuler ma pièce</Lien>
           </div>
+          {/* Mission 22 (partie B) : le film « Comment ça marche » (30 s) sous le titre, au clic ; son affiche est l'image
+              prioritaire de la page (le LCP), la première étape passe en `immediat`. */}
+          <Video id="commentCaMarche" mode="clic" priorite tailles={TAILLES_VIDEO_LARGE} className="mt-8 md:mt-10" />
         </div>
       </section>
 
       {/* ── 2. Les quatre étapes, la preuve de finition, les garanties, le bouton principal ── */}
-      <CommentOnTravaille id="comment-ca-marche" titre="De la photo à la pose" intro={null} note={NOTE_ETAPES} depuis={DEPUIS} idBouton="etapes-simuler" preuve enTete />
+      <CommentOnTravaille id="comment-ca-marche" titre="De la photo à la pose" intro={null} note={NOTE_ETAPES} depuis={DEPUIS} idBouton="etapes-simuler" preuve enTete video={false} />
 
       {/* ── 3. Le déroulé complet et ses délais ── */}
       <Section id="deroule" large differee ton="papier-2" titre={TITRE_DEROULE} intro={INTRO_DEROULE}>

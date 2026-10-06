@@ -1,14 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
-import { FAQSchema, HowToSchema } from "@/components/JsonLd";
+import { FAQSchema, HowToSchema, VideoSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
 import { exemplesSimulateur } from "@/lib/exemples-simulateur";
 import { PHOTOS_PIECES } from "@/lib/images-pieces";
+import { sourcesPhoto } from "@/lib/images-preparees";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { photosDesCartes } from "@/lib/photos-cartes";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
 import { chargerTarifs } from "@/lib/tarifs-site";
+import { LIBELLES_VIDEO, VIDEOS } from "@/lib/videos";
 import { MOTS_CLES_DEVIS_EN_LIGNE } from "../comment-ca-marche/devis-en-ligne";
 import { EnteteSimulateur } from "./_components/EnteteSimulateur";
 import Simulateur from "./_components/Simulateur";
@@ -18,6 +20,9 @@ import Simulateur from "./_components/Simulateur";
  * engagement ») passe dans la description et les mots-clés. Ses textes entiers sont sur /comment-ca-marche.
  * Partie 5 : métadonnées par `metadonneesPage` (Open Graph propre, description de 160 caractères au plus) ; la phrase
  * « coordonnées demandées seulement pour recevoir le rendu » reste dans la page (étape 4 du HowTo, FAQ).
+ * Mission 22 (partie B) : la démo du simulateur (21 s, verticale) sur l'écran Pièce, au clic (« Voir la démo · 20 s »),
+ * dans un cadre de téléphone à droite dès 1 024 px, en lien sous les cartes au téléphone ; l'affiche est résolue ici
+ * (`sourcesPhoto`, comme les photos des cartes : le simulateur n'emporte pas le manifeste) et le `VideoObject` posé ici.
  */
 const DESCRIPTION_SIMULATEUR = `Votre pièce avec une matière Cover Styl', sur votre photo, en ${DELAI_RENDU}. Puis un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`;
 
@@ -43,14 +48,17 @@ export default async function PageSimulateur() {
   const ETAPES = etapesDe(zones.zonesMax);
   // Lot E3 : les pièces d'exemple de l'écran Photo, seulement pour les pièces que le simulateur publie.
   const exemples = exemplesSimulateur({ pieces: zones.pieces.map((p) => p.id) });
+  // Mission 22 (partie B) : la démo en vidéo de l'écran Pièce, son affiche résolue ici (le simulateur n'emporte pas le manifeste).
+  const demo = { video: VIDEOS.demoSimulateur, affiche: sourcesPhoto(VIDEOS.demoSimulateur.affiche), libelle: LIBELLES_VIDEO.demoSimulateur };
   return (
     <div data-theme="simulation" data-page="simulateur" className="min-h-[100dvh] bg-fond text-encre">
       <HowToSchema name="Simuler un covering sur sa propre photo" description="Quatre étapes, sans inscription." etapes={ETAPES} dureeTotale="PT3M" />
       <FAQSchema faqs={FAQ_SIMULATEUR} />
+      <VideoSchema video={VIDEOS.demoSimulateur} />
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
-        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} photosPieces={photosDesCartes(PHOTOS_PIECES)} />
+        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} demo={demo} photosPieces={photosDesCartes(PHOTOS_PIECES)} />
         {/* Site 3.0 (lot F4) : le fil d'Ariane, visible et balisé, sous l'outil — le premier écran reste au simulateur. */}
         <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Simulateur", href: "/simulateur" }]} className="mt-16 mb-0" />
         <section className="mt-4 max-w-2xl border-t border-trait pt-10">

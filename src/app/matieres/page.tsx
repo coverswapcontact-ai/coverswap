@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BandeMatiere } from "@/components/revue/BandeMatiere";
+import { Video } from "@/components/revue/Video";
 import { Section } from "@/components/simulation/Section";
 import revetements from "@/data/revetements.json";
 import { ENTREPRISE } from "@/lib/entreprise";
@@ -23,6 +24,9 @@ import { Matieres } from "./_components/Matieres";
  * repousserait la première rangée d'échantillons hors du premier écran du téléphone.
  * Textes de `/revetements` repris : sa description (qui porte sa phrase « bois, pierre, béton, métal, couleur, textile,
  * paillettes » ; à l'écran, ce sont les tiroirs) et ses mots-clés.
+ * Mission 22 (partie B) : le présentoir en boucle (`VIDEOS.presentoirBoucle`, 9,6 s, muet, `revue/Video` en mode
+ * `boucle`) à droite du titre dès 1 024 px, sous le titre et l'intro au téléphone ; il ne joue qu'à l'écran, jamais
+ * avec `prefers-reduced-motion` (affiche + « Lire »). Rien de différé sur cette page (barre collée).
  */
 const CATALOGUE = revetements as Matiere[];
 const CHEMIN = "/matieres";
@@ -51,10 +55,15 @@ export default function PageMatieres() {
       <section className="px-4 pt-10 md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
           <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Matières", href: CHEMIN }]} />
-          <p className="surtitre">Catalogue Cover Styl&apos;</p>
-          <h1 className="titre-1 mt-2 text-encre">Choisissez votre matière</h1>
-          {/* Deux lignes au plus à 390 px (la première rangée d'échantillons reste dans le premier écran) ; les familles sont dans les tiroirs. */}
-          <p className="texte mt-4 max-w-2xl text-encre-2">{NB_REFERENCES} références Cover Styl&apos;, rangées par teinte. Touchez-en une pour la voir.</p>
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_420px] lg:items-center lg:gap-12">
+            <div>
+              <p className="surtitre">Catalogue Cover Styl&apos;</p>
+              <h1 className="titre-1 mt-2 text-encre">Choisissez votre matière</h1>
+              {/* Deux lignes au plus à 390 px ; les familles sont dans les tiroirs. */}
+              <p className="texte mt-4 max-w-2xl text-encre-2">{NB_REFERENCES} références Cover Styl&apos;, rangées par teinte. Touchez-en une pour la voir.</p>
+            </div>
+            <Video id="presentoirBoucle" mode="boucle" immediat tailles="(min-width: 1024px) 420px, calc(100vw - 32px)" className="mt-6 lg:mt-0" />
+          </div>
         </div>
       </section>
       <Section large className="pt-6 md:pt-6">

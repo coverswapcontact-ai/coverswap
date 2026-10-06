@@ -29,7 +29,7 @@ import type { DemandeEnvoyee } from "./DemandeApresRendu";
 import { DemandeApresRendu, EcranGeneration, EcranResultat, EcranSansPhoto, FeuilleCatalogue, prechargerLesEcrans } from "./ecrans-differes";
 import { EcranMatieres } from "./EcranMatieres";
 import { EcranPhoto } from "./EcranPhoto";
-import { EcranPiece } from "./EcranPiece";
+import { EcranPiece, type DemoSimulateur } from "./EcranPiece";
 import { FORMULAIRE_VIDE, type Formulaire } from "./Formulaires";
 import { useAnalyse } from "./useAnalyse";
 import { useFeuilleCatalogue } from "./useFeuilleCatalogue";
@@ -48,7 +48,7 @@ import { useSondage } from "./useSondage";
 type Echec = { message: string; raison: string };
 
 /** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. `exemples` : les pièces d'exemple de l'écran Photo (lot E3). */
-export default function Simulateur({ zones, tarifs = null, exemples = [], photosPieces }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[]; /** Lot F7 : les photos des cartes de l'écran Pièce, résolues par la page (`photosDesCartes`). */ photosPieces?: Partial<Record<PieceId, PhotoCarte>> }) {
+export default function Simulateur({ zones, tarifs = null, exemples = [], photosPieces, demo }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[]; /** Lot F7 : les photos des cartes de l'écran Pièce, résolues par la page (`photosDesCartes`). */ photosPieces?: Partial<Record<PieceId, PhotoCarte>>; /** Mission 22 : la démo en vidéo de l'écran Pièce, son affiche résolue par la page. */ demo?: DemoSimulateur }) {
   const [charge, setCharge] = useState(false);
   const [ecran, setEcran] = useState<Ecran>(1);
   // Lot F7 : les écrans chargés à part, préchargés au premier geste, trois secondes après `load`, ou dès l'écran Photo.
@@ -433,7 +433,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [], photos
 
       <div className="mt-5">
         <Suspense fallback={null}>
-          {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} photos={photosPieces} /> : null}
+          {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} demo={demo} photos={photosPieces} /> : null}
 
           {ecran === 2 ? (
             <EcranPhoto

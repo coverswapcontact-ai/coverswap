@@ -463,15 +463,19 @@ describe("/comment-ca-marche", () => {
     const premier = html.indexOf(`href="${principaux[0][0]}"`);
     assert.ok(premier > html.indexOf("</h1>") && premier < html.indexOf('id="comment-ca-marche"'), "le premier principal sous le titre");
     assert.ok(html.indexOf(`href="${principaux[0][0]}"`, premier + 1) < html.indexOf('id="deroule"'), "le deuxième sous les étapes");
-    // Les huit photos (3 avant le lot C3) : les quatre étapes, la preuve de finition, les deux du déroulé, l'encart.
-    assert.equal(compter(html, "<picture"), 8);
+    // Les huit photos (3 avant le lot C3) : les quatre étapes, la preuve de finition, les deux du déroulé, l'encart ;
+    // plus l'affiche du film « Comment ça marche » (mission 22), sous le titre, l'image prioritaire de la page.
+    assert.equal(compter(html, "<picture"), 9);
+    assert.ok(html.indexOf("/images/prep/affiche-comment-ca-marche-") < html.indexOf('id="comment-ca-marche"'), "le film sous le titre, avant les étapes");
+    assert.equal(compter(html, 'fetchpriority="high"') + compter(html, 'fetchPriority="high"'), 1, "une seule image prioritaire : l'affiche");
+    assert.ok(!html.includes("<video"), "aucun <video> au premier affichage");
     const photos = [...html.matchAll(/<picture>[\s\S]*?<\/picture>/g)].map((m) => m[0]);
     for (const nom of ["etape-photo", "etape-simulation", "echantillons-table", "pose-mains", "detail-chant", "mesure-visite", "outils-pose", "usure-detail"]) assert.equal(photos.filter((p) => p.includes(`/images/prep/${nom}-`)).length, 1, `${nom} : une fois`);
   });
 
   test("les six photos utiles, chacune une fois et étiquetée « Ambiance » ; la capture du simulateur seule en « Simulation » ; jamais « Réalisation »", async () => {
     const html = await rendre();
-    assert.equal(compter(html, ">Ambiance</span>"), 7, "étape 1 et les six photos utiles");
+    assert.equal(compter(html, ">Ambiance</span>"), 8, "l'affiche du film (mission 22), étape 1 et les six photos utiles");
     assert.equal(compter(html, ">Simulation</span>"), 1);
     assert.ok(!html.includes(">Réalisation<"));
     const photos = [...html.matchAll(/<picture>[\s\S]*?<\/picture>/g)].map((m) => m[0]);
@@ -482,10 +486,11 @@ describe("/comment-ca-marche", () => {
     for (const nom of ["detail-chant", "echantillons-table", "pose-mains"]) assert.ok(section("comment-ca-marche").includes(`/images/prep/${nom}-`), nom);
     // Les photos du déroulé et de l'encart sont décrites (texte alternatif de la bibliothèque) : leur étiquette est lue.
     for (const p of PHOTOS_UTILES.filter((x) => ["mesure-visite", "outils-pose", "usure-detail"].includes(x.image))) assert.ok(html.includes(`alt="${p.alt}"`), p.image);
-    // Pas d'image d'ouverture : la première photo des étapes est au premier écran, c'est le LCP — la seule prioritaire,
-    // et la section des étapes n'est pas différée.
+    // Mission 22 : l'affiche du film, sous le titre, est au premier écran, c'est le LCP — la seule prioritaire ; la
+    // première photo des étapes charge tout de suite (`immediat`), et la section des étapes n'est pas différée.
     assert.equal(compter(html, 'fetchPriority="high"'), 1);
-    assert.ok(photos.find((p) => p.includes('fetchPriority="high"'))!.includes("/images/prep/etape-photo-"));
+    assert.ok(photos.find((p) => p.includes('fetchPriority="high"'))!.includes("/images/prep/affiche-comment-ca-marche-"));
+    assert.ok(photos.find((p) => p.includes("/images/prep/etape-photo-"))!.includes('loading="eager"'));
     assert.doesNotMatch(html.slice(html.lastIndexOf("<section", html.indexOf('id="comment-ca-marche"') + 20), html.indexOf('id="comment-ca-marche"') + 200), /sous-la-ligne/);
   });
 

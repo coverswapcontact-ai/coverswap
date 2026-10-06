@@ -1,4 +1,5 @@
 import { GrandNumero } from "@/components/revue/GrandNumero";
+import { Video } from "@/components/revue/Video";
 import { Lien } from "@/components/simulation/Lien";
 import { Photo } from "@/components/simulation/Photo";
 import { Section } from "@/components/simulation/Section";
@@ -20,6 +21,10 @@ import type { DepuisAccueil } from "./sections";
  * une ligne sous les étapes, `enTete` la rend au premier écran (sans rendu différé, première photo prioritaire), et
  * `depuis` accepte `comment-ca-marche`.
  * Composant serveur, sans JavaScript.
+ *
+ * Mission 22 (partie B) : le film « Comment ça marche » (30 s, 16/9, `revue/Video` au clic : l'affiche étiquetée
+ * « Ambiance » et « Voir en 30 s ») au-dessus des quatre étapes. `video={false}` : `/comment-ca-marche` le pose dans
+ * son bloc de tête, sous le titre (son affiche est alors l'image prioritaire : la première étape passe en `immediat`).
  */
 export const PHRASE_COVERING = "Le covering, c'est un film adhésif haute résistance qu'on pose sur vos meubles, vos portes ou vos murs.";
 
@@ -42,11 +47,14 @@ export const GARANTIES: readonly { titre: string; texte: string }[] = [
 ];
 
 const TAILLES_ETAPE = "(min-width: 1024px) 330px, (min-width: 640px) 45vw, calc(100vw - 32px)";
+/** L'affiche du film : toute la largeur de la section (1 152 px au plus), comme l'ouverture. */
+export const TAILLES_VIDEO_LARGE = "(min-width: 1200px) 1152px, (min-width: 768px) calc(100vw - 48px), calc(100vw - 32px)";
 
-export function CommentOnTravaille({ id = "comment-on-travaille", depuis, idBouton, preuve = false, titre = "Comment on travaille", intro = PHRASE_COVERING, note, enTete = false }: { id?: string; /** La section ouvre la page (`/comment-ca-marche`) : rendue tout de suite, la photo de la première étape prioritaire (c'est le LCP). */ enTete?: boolean; depuis?: DepuisAccueil | "comment-ca-marche"; idBouton?: string; preuve?: boolean; titre?: string; /** `null` : pas de phrase sous le titre. */ intro?: string | null; /** Une ligne sous les étapes (`/comment-ca-marche`). */ note?: string }) {
+export function CommentOnTravaille({ id = "comment-on-travaille", depuis, idBouton, preuve = false, titre = "Comment on travaille", intro = PHRASE_COVERING, note, enTete = false, video = true }: { id?: string; /** La section ouvre la page (`/comment-ca-marche`) : rendue tout de suite, la photo de la première étape chargée tout de suite (l'affiche du film, posée par la page, est le LCP). */ enTete?: boolean; depuis?: DepuisAccueil | "comment-ca-marche"; idBouton?: string; preuve?: boolean; titre?: string; /** `null` : pas de phrase sous le titre. */ intro?: string | null; /** Une ligne sous les étapes (`/comment-ca-marche`). */ note?: string; /** Le film au-dessus des étapes (mission 22) ; `false` quand la page le pose elle-même. */ video?: boolean }) {
   const lien = lienSimuler({ depuis: depuis ?? "accueil-etapes" });
   return (
     <Section id={id} large differee={!enTete} titre={titre} intro={intro ?? undefined}>
+      {video ? <Video id="commentCaMarche" mode="clic" priorite={enTete} tailles={TAILLES_VIDEO_LARGE} className="mb-10 md:mb-14" /> : null}
       <ol className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
         {ETAPES_TRAVAIL.map((etape, i) => (
           <li key={etape.image} className="flex flex-col">
@@ -54,7 +62,7 @@ export function CommentOnTravaille({ id = "comment-on-travaille", depuis, idBout
               <GrandNumero valeur={i + 1} />
               <h3 className="font-display text-[22px] leading-tight font-semibold text-encre">{etape.titre}</h3>
             </div>
-            <Photo nom={etape.image} alt="" ratio="3 / 2" tailles={TAILLES_ETAPE} priorite={enTete && i === 0} etiquette={etape.etiquette} className="mt-4 rounded-[var(--rayon-md)]" />
+            <Photo nom={etape.image} alt="" ratio="3 / 2" tailles={TAILLES_ETAPE} immediat={enTete && i === 0} etiquette={etape.etiquette} className="mt-4 rounded-[var(--rayon-md)]" />
             <p className="texte-2 mt-3">{etape.texte}</p>
           </li>
         ))}

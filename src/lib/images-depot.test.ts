@@ -4,6 +4,7 @@ import path from "node:path";
 import { describe, test } from "node:test";
 import { FORMATS, empreinteOriginal, listerSources, nomSortie, planifierSorties } from "../../scripts/preparer-images.mjs";
 import { MANIFESTE_IMAGES } from "./images-manifeste";
+import { VIDEOS } from "./videos";
 
 /**
  * Mission 16 (partie 2) — les images du dépôt, telles qu'elles sont commitées :
@@ -12,7 +13,8 @@ import { MANIFESTE_IMAGES } from "./images-manifeste";
  *  - l'empreinte au manifeste est celle de l'original (un original remplacé sous le même nom sans `npm run images`
  *    fait échouer ici : ses sorties seraient les anciennes) ;
  *  - les fonds Unsplash gardés sont ceux que le code sert encore (aucune paire orpheline, aucune paire incomplète) ;
- *  - la vidéo de l'ancienne ouverture et les images à la racine du dépôt ne reviennent pas.
+ *  - la vidéo de l'ancienne ouverture et les images à la racine du dépôt ne reviennent pas ; `public/videos/` ne
+ *    contient que les films de la mission 22 (`lib/videos`, vérifiés par `videos.test.ts`).
  */
 
 const RACINE = process.cwd();
@@ -72,10 +74,11 @@ describe("la série 2 (site 3.0, lot B4)", () => {
     }
   });
 
-  test("le manifeste : 22 images de la série 1 et 62 de la série 2, rien d'autre (ni originaux, ni essais ratés, ni planches)", () => {
+  test("le manifeste : 22 images de la série 1, 62 de la série 2 et les 4 affiches des films (mission 22), rien d'autre (ni originaux, ni essais ratés, ni planches)", () => {
     const noms = Object.keys(MANIFESTE_IMAGES);
-    assert.equal(noms.length, 84);
+    assert.equal(noms.length, 88);
     assert.equal(noms.filter((n) => photos.includes(n)).length, 62);
+    assert.deepEqual(noms.filter((n) => n.startsWith("affiche-")).sort(), [...new Set(Object.values(VIDEOS).map((v) => v.affiche))].sort());
     assert.deepEqual(noms.filter((n) => /brut|retouche|rate|planche|essai|-\d$/.test(n)), []);
   });
 });
@@ -100,9 +103,10 @@ describe("les fonds Unsplash gardés", () => {
 });
 
 describe("ce qui ne revient pas", () => {
-  test("plus de vidéo d'ouverture (remplacée par une image et le curseur avant / après)", () => {
-    assert.equal(existsSync(path.join(PUBLIC, "videos")), false);
-    assert.deepEqual(fichiers(PUBLIC, /\.(mp4|webm|mov)$/i), []);
+  test("plus de vidéo d'ouverture (remplacée par une image et le curseur avant / après) : public/videos/ ne contient que les films de la mission 22", () => {
+    const films = fichiers(PUBLIC, /\.(mp4|webm|mov)$/i).map((f) => path.relative(PUBLIC, f).split(path.sep).join("/"));
+    assert.deepEqual(films.sort(), Object.values(VIDEOS).map((v) => `videos/${v.fichier}`).sort());
+    assert.ok(!films.some((f) => /ouverture|hero/i.test(f)));
   });
 
   test("aucune image à la racine du dépôt : les originaux vivent dans public/images/sources/", () => {

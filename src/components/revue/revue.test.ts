@@ -40,8 +40,8 @@ const lire = (f: string) => readFileSync(join(DOSSIER, f), "utf8").replace(/\r\n
 const TOUTES_LES_TEINTES = Object.values(TEINTES_PRESTATIONS).flatMap((p) => (p.seconde ? [p.teinte, p.seconde] : [p.teinte]));
 
 describe("revue : des composants serveur, aux jetons", () => {
-  test("les cinq composants, sans « use client » ni couleur écrite en dur", () => {
-    assert.deepEqual(SOURCES.sort(), ["BandeMatiere.tsx", "Cartel.tsx", "Echantillon.tsx", "GrandNumero.tsx", "Pastille497.tsx"]);
+  test("les six composants (mission 22 : la vidéo), sans « use client » ni couleur écrite en dur", () => {
+    assert.deepEqual(SOURCES.sort(), ["BandeMatiere.tsx", "Cartel.tsx", "Echantillon.tsx", "GrandNumero.tsx", "Pastille497.tsx", "Video.tsx"]);
     for (const f of SOURCES) {
       const source = lire(f);
       assert.doesNotMatch(source, /^["']use client["'];?\s*$/m, f);
@@ -228,9 +228,9 @@ describe("la pastille « 497 matières » : rouge, parce que c'est une action", 
   });
 });
 
-describe("l'étiquette d'honnêteté : six textes, un seul dessin", () => {
-  test("Réalisation, Simulation, Ambiance, Ambiance · avant / après, Avant, Après", () => {
-    assert.deepEqual([...TEXTES_ETIQUETTE], ["Réalisation", "Simulation", "Ambiance", "Ambiance · avant / après", "Avant", "Après"]);
+describe("l'étiquette d'honnêteté : sept textes, un seul dessin", () => {
+  test("Réalisation, Simulation, Ambiance, Ambiance · avant / après, Démonstration (mission 22), Avant, Après", () => {
+    assert.deepEqual([...TEXTES_ETIQUETTE], ["Réalisation", "Simulation", "Ambiance", "Ambiance · avant / après", "Démonstration", "Avant", "Après"]);
     const classes = new Set(TEXTES_ETIQUETTE.map((t) => rendre(createElement(Etiquette, {} as Parameters<typeof Etiquette>[0], t)).match(/class="([^"]*)"/)?.[1]));
     assert.equal(classes.size, 1, "le même dessin pour toutes");
     assert.match(rendre(createElement(Etiquette, {} as Parameters<typeof Etiquette>[0], "Ambiance · avant / après")), />Ambiance · avant \/ après</);

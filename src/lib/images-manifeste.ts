@@ -11,6 +11,10 @@
 import type { ManifesteImages } from "./images-preparees";
 
 export const MANIFESTE_IMAGES: ManifesteImages = {
+  "affiche-comment-ca-marche": { largeur: 1080, hauteur: 608, largeurs: [480, 960, 1080], empreinte: "c26a3f8be880" },
+  "affiche-demo-simulateur": { largeur: 1080, hauteur: 1920, largeurs: [480, 960, 1080], empreinte: "ae1b04d9f433" },
+  "affiche-presentoir": { largeur: 1080, hauteur: 608, largeurs: [480, 960, 1080], empreinte: "07bcd0c65402" },
+  "affiche-reel-avant-apres": { largeur: 1080, hauteur: 1920, largeurs: [480, 960, 1080], empreinte: "12142f836d1b" },
   "amb-couloir-portes": { largeur: 1024, hauteur: 1536, largeurs: [480, 960, 1024], empreinte: "62b740414cd3" },
   "amb-cuisine-familiale": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "ae5f715ca305" },
   "buffet-salle-a-manger-apres-couleur": { largeur: 1536, hauteur: 1024, largeurs: [480, 960, 1536], empreinte: "ba550097f890" },

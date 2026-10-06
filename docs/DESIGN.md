@@ -2,14 +2,14 @@
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
 prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
-(`/realisations`), C6 (l'espace client), C7 (les guides du blog), D2 (le présentoir de `/matieres`), D3 (les pages de famille) et D4 (les fiches de matière).
+(`/realisations`), C6 (l'espace client), C7 (les guides du blog), D2 (le présentoir de `/matieres`), D3 (les pages de famille) et D4 (les fiches de matière) ; mission 22, partie B (les vidéos motion design : « Vidéos », dans les composants de base).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
 matière, blocs papier et encre), pas un gabarit à recopier.
 
 Plan : [Jetons et contrastes](#jetons-et-contrastes) · [Les règles](#les-règles) · [Le rouge
-réservé aux actions](#le-rouge-réservé-aux-actions) · [Les composants de base](#les-composants-de-base) · [L'espace client](#lespace-client) · [Ce qu'on a
+réservé aux actions](#le-rouge-réservé-aux-actions) · [Les composants de base](#les-composants-de-base) (dont [Vidéos](#vidéos--revuevideotsx)) · [L'espace client](#lespace-client) · [Ce qu'on a
 jeté de la maquette](#ce-quon-a-jeté-de-la-maquette).
 
 ## Jetons et contrastes
@@ -182,7 +182,9 @@ recomposée au lot F2.
 4. **Les teintes sur les filets, les cartels et les bandes.** Du texte en teinte seulement là où il tient 4,5:1
    (tableau plus haut).
 5. **Toute image générée porte son étiquette** (« Ambiance », « Ambiance · avant / après ») ; « Simulation » pour les
-   rendus du simulateur seulement ; « Réalisation » pour les vrais chantiers, qui passent toujours en premier.
+   rendus du simulateur seulement ; « Réalisation » pour les vrais chantiers, qui passent toujours en premier ;
+   « Démonstration » pour l'affiche de la démo du simulateur (mission 22 : elle montre l'outil, pas un chantier). Les
+   affiches des films d'ambiance portent « Ambiance ».
 6. **Téléphone d'abord** : chaque écran est pensé à 390 px avant 1 440 px, rien ne déborde à 360 px ; cibles
    tactiles de 44 px au moins.
 7. **Le ton est direct et concret**, à la première personne du pluriel (« on pose en une journée », « on vient avec
@@ -317,6 +319,7 @@ pour « Avant ») :
 | Simulation | un rendu du simulateur, rien d'autre |
 | Ambiance | une image générée (photos d'ambiance, photos utiles) |
 | Ambiance · avant / après | un avant / après généré |
+| Démonstration | l'affiche de la démo du simulateur (mission 22) : l'outil filmé, ni chantier ni ambiance |
 | Avant, Après | les deux côtés d'un curseur |
 
 Les pictos (dessins) n'en portent pas. Une étiquette décorative sur une image `alt=""` est muette (`muette`).
@@ -338,6 +341,40 @@ défile ailleurs), un toucher sur l'image place le curseur.
 - **Place réservée** : `ratio` obligatoire hors espace client (testé), les deux images remplissent le cadre de la même
   façon.
 - Pastilles « Avant » / « Après » en haut, l'étiquette d'honnêteté en bas à gauche.
+- Mission 22 (partie B), `film` : le reel avant / après de l'ouverture — un troisième bouton « Voir en 15 s » à côté de
+  « Comparer » et « Plein écran » dès 768 px ; au téléphone (outils cachés), un petit bouton blanc en bas à droite de
+  l'image, qui ne déplace pas le curseur. Il ouvre le film dans la visionneuse (section suivante).
+
+### Vidéos — `revue/Video.tsx`
+
+Mission 22, partie B (énoncé, § 6). Quatre films motion design, muets, dans `public/videos/` (`lib/videos.ts` : fichier,
+empreinte, dimensions, durée, affiche, étiquette, titre, description), plus la boucle courte du présentoir. Un seul
+composant serveur, `Video`, par `id` et par `mode` ; il pose le `VideoObject` de la page (docs/SEO.md) et rend :
+
+| Mode | Ce qu'on voit | Où |
+|---|---|---|
+| `clic` | l'affiche (AVIF préparé, étiquette d'honnêteté, place réservée au rapport du film) ; tout le cadre est un bouton blanc centré « Voir en 30 s » | « Comment on travaille » (accueil, au-dessus des étapes) ; le bloc de tête de `/comment-ca-marche` (`priorite` : l'affiche est le LCP) ; la démo du simulateur dans un cadre de téléphone (`cadre="telephone"`, bord d'encre de 6 px, coins 28 px) |
+| `boucle` | l'affiche, puis le film en boucle muette par-dessus, en fondu, dès qu'il est à l'écran ; bouton « Pause » / « Lire » (44 px, en bas à droite) | le présentoir, à droite du titre de `/matieres` dès 1 024 px (420 px), sous le titre au téléphone |
+| `lien` | un lien de texte souligné, sans affiche | « Voir le présentoir en 20 s » (Le présentoir), « Voir la démo · 20 s » (Par où commencer ?, écran Pièce du simulateur au téléphone) |
+
+- **La visionneuse** : le clic ouvre `PleinEcran` en mode `video` — le film centré sur le fond sombre, `controls
+  autoplay playsinline`, modal (page verrouillée, focus gardé, Échap et geste retour) ; **muet par défaut**, le bouton
+  « Son » de l'en-tête l'active (une voix off viendra peut-être), jamais d'office. Le plein écran et son code ne sont
+  chargés qu'au premier geste vers le bouton (`BoutonVideo`, comme « Plein écran » du curseur).
+- **Aucun octet de vidéo au premier affichage** : aucun `<video>` dans le HTML des pages (le mode `clic` n'en crée
+  qu'au clic, dans la visionneuse ; la boucle ne monte le sien que dans le navigateur, quand son cadre est à l'écran,
+  après le `load` de la page, `preload="none"`) ; seules les affiches partent, en AVIF, différées sauf `priorite` /
+  `immediat`. Elle se met en pause hors écran (IntersectionObserver).
+- **Moins de mouvement** (`prefers-reduced-motion`) : la boucle ne joue pas ; on voit l'affiche et « Lire ».
+- **Le rouge reste au bouton principal de la page** : les boutons vidéo sont blancs à l'encre (le dessin des outils du
+  curseur), 44 px au moins ; `Video.tsx` est dans `revue/` (jamais « use client », jamais une couleur en dur) ; ses parts
+  clientes, `simulation/BoutonVideo.tsx` et `simulation/VideoBoucle.tsx`, sont sur la liste blanche de `perf.test.ts`.
+- **L'étiquette d'honnêteté sur chaque affiche** : « Ambiance » (reel, présentoir, « Comment ça marche » : des ambiances
+  générées), « Démonstration » (la démo du simulateur). `honnetete.test.ts` le tient sur les pages rendues.
+- **Cache** : `/videos/*` immuable un an (`next.config.ts`), chaque adresse avec l'empreinte de son fichier (`?v=`,
+  vérifiée par `videos.test.ts` : une vidéo remplacée sans nouvelle empreinte fait échouer le test).
+- Captures de référence : `docs/captures/site-3-0/videos/` (accueil, comment-ca-marche, matieres, simulateur à 390 et
+  1 440 px ; mouvement réduit : la boucle y montre son affiche).
 
 ### Les sections et leurs tons — `simulation/Section.tsx`
 
@@ -409,13 +446,13 @@ référence : `docs/captures/site-3-0/accueil-390.jpg` et `accueil-1440.jpg`.
 
 | Section | Ton | Ce qui la porte |
 |---|---|---|
-| 1. Ouverture | papier | l'avant / après en pleine largeur (1 152 px au plus, jamais plus haut que `100svh`), titre `titre-0` hors de la photo, principal + « Être rappelé » |
+| 1. Ouverture | papier | l'avant / après en pleine largeur (1 152 px au plus, jamais plus haut que `100svh`), titre `titre-0` hors de la photo, principal + « Être rappelé » ; « Voir en 15 s » (le reel, mission 22) à côté de « Comparer » et « Plein écran », sur l'image au téléphone |
 | — bande | chêne AG13 | |
-| 2. Par où commencer ? | papier | douze pictos de 64 px (80 dès 768), un filet de 3 px à la teinte de la prestation au-dessus de chacun |
+| 2. Par où commencer ? | papier | douze pictos de 64 px (80 dès 768), un filet de 3 px à la teinte de la prestation au-dessus de chacun ; le lien « Voir la démo · 20 s » (mission 22) |
 | 3. Des cuisines comme la vôtre | papier-2 | six curseurs, les cartels des matières sous chaque image |
-| 4. Comment on travaille | papier | grands numéros à l'encre, photos étiquetées, preuve de finition, garanties entre filets d'encre, principal |
+| 4. Comment on travaille | papier | le film « Comment ça marche » au clic (affiche « Ambiance », « Voir en 30 s », mission 22), grands numéros à l'encre, photos étiquetées, preuve de finition, garanties entre filets d'encre, principal |
 | — bande | marbre NE31 | |
-| 5. Le présentoir | papier-2 | pastille « 497 matières », 8 échantillons, secondaire ; il se ferme sur la bande vert profond NF13 |
+| 5. Le présentoir | papier-2 | pastille « 497 matières », le lien « Voir le présentoir en 20 s » (mission 22), 8 échantillons, secondaire ; il se ferme sur la bande vert profond NF13 |
 | 6. Réalisations | papier | les vraies d'abord, puis la rangée « Ambiances » (étiquette en tête de rangée et sur chaque image) |
 | — bande | terracotta NH12 | |
 | 7. Professionnels | encre | curseur, cartels `encre`, secondaire `sur-encre` |
@@ -538,8 +575,8 @@ les délais, ce qui reste en place, l'entretien, le prix, les objections ; une s
 
 | Section | Ton | Ce qui la porte |
 |---|---|---|
-| 1. Titre | papier | « Comment ça marche », une phrase, le principal |
-| 2. De la photo à la pose (`#comment-ca-marche`) | papier | `CommentOnTravaille enTete` : les quatre étapes de l'accueil (photo de la première prioritaire, section non différée), la ligne « pas de démontage… », la preuve de finition `detail-chant`, les garanties, le principal |
+| 1. Titre | papier | « Comment ça marche », une phrase, le principal, puis le film « Comment ça marche » au clic (mission 22 : son affiche est l'image prioritaire de la page) |
+| 2. De la photo à la pose (`#comment-ca-marche`) | papier | `CommentOnTravaille enTete video={false}` : les quatre étapes de l'accueil (photo de la première en `immediat`, section non différée), la ligne « pas de démontage… », la preuve de finition `detail-chant`, les garanties, le principal |
 | 3. Le déroulé, et ses délais (`#deroule`) | papier-2 | six moments entre filets d'encre : le quand en petites capitales, le titre en Playfair, `mesure-visite` à la visite, `outils-pose` au jour de la pose (à droite dès 1 024 px) |
 | 4. Ce qui reste en place (`#en-place`) | papier | quatre choses qui ne bougent pas, puis « Ce que vous préparez » |
 | 5. L'entretien (`#entretien`) | papier-2 | quatre gestes, le guide ; puis la bande de chêne AG13 |

@@ -1,5 +1,8 @@
+import { VideoSchema } from "@/components/JsonLd";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Lien } from "@/components/simulation/Lien";
+import { sourcesPhoto } from "@/lib/images-preparees";
+import { LIBELLES_VIDEO, VIDEOS } from "@/lib/videos";
 import { FormulaireRappel } from "./FormulaireRappel";
 import { ANCRES_ACCUEIL, LIGNE_ACCUEIL, TITRE_ACCUEIL, lienSimulerAccueil } from "./sections";
 import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
@@ -19,6 +22,11 @@ import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
  * L'image « avant » est le LCP (`fetchpriority="high"`, AVIF préparé ; WebP réduit par le CRM pour une réalisation) ;
  * la page d'accueil la précharge (`prechargementsOuverture`, mêmes `srcset` et `sizes`). Composant serveur (le curseur
  * et la feuille de rappel sont clients). Jamais `100vh` : la photo ne dépasse pas `100svh` (`LARGEUR_OUVERTURE`).
+ *
+ * Mission 22 (partie B) : le reel avant / après (`VIDEOS.reel`, 15 s, vertical) s'ouvre par « Voir en 15 s », à côté
+ * de « Comparer » et « Plein écran » (au téléphone : un petit bouton sur l'image), dans la visionneuse plein écran ;
+ * le curseur reste tel quel. Son affiche ne sert que de `poster` au plein écran (aucune image de plus au premier
+ * écran) ; le `VideoObject` est posé ici (le bouton vit dans le curseur, client).
  */
 /**
  * La largeur du bloc : toute la largeur de la page (1 152 px au plus, celle de l'en-tête et des sections), mais jamais une photo plus haute que l'écran utile — `100svh`
@@ -28,8 +36,10 @@ import { TAILLES_OUVERTURE, type ChoixOuverture } from "./etudes";
 export const LARGEUR_OUVERTURE = "min(72rem, calc((100svh - 84px) * 1.5))";
 
 export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
+  const reel = { video: VIDEOS.reel, affiche: sourcesPhoto(VIDEOS.reel.affiche)?.src ?? "", libelle: LIBELLES_VIDEO.reel };
   return (
     <section aria-labelledby="titre-accueil" className="px-4 pt-4 pb-2 md:px-6 md:pt-10 md:pb-6">
+      <VideoSchema video={VIDEOS.reel} />
       <div className="mx-auto flex w-full flex-col" style={{ maxWidth: LARGEUR_OUVERTURE }}>
         <div className="mt-4 md:mt-0">
           <h1 id="titre-accueil" className="titre-0 max-w-[15ch] text-balance text-encre md:max-w-none">
@@ -57,6 +67,7 @@ export function Ouverture({ choix }: { choix: ChoixOuverture | null }) {
               priorite
               outilsMobile="aucun"
               etiquette={choix.etiquette}
+              film={reel}
             />
             <figcaption className="mt-2 max-w-3xl text-[14px] leading-snug text-encre-2 md:mt-3 md:text-[15px]">{choix.legende}</figcaption>
           </figure>

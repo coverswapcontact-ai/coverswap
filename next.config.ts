@@ -58,10 +58,13 @@ const nextConfig: NextConfig = {
     // garde son nom de fichier, mais chaque adresse d'image préparée porte l'empreinte de son original (`?v=`,
     // `sourcesPhoto` de src/lib/images-preparees.ts) : une image refaite change d'adresse. Les polices de next/font
     // sont servies par /_next/static (déjà immuables) ; /fonts/* couvre une police posée à la main dans public/fonts.
+    // Mission 22 (partie B) : les vidéos de public/videos/ aussi — chaque adresse porte l'empreinte de son fichier
+    // (`?v=`, `adresseVideo` de src/lib/videos.ts, vérifiée par videos.test.ts) : une vidéo refaite change d'adresse.
     const IMMUABLE = [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }];
     return [
       { source: "/images/prep/:path*", headers: IMMUABLE },
       { source: "/fonts/:path*", headers: IMMUABLE },
+      { source: "/videos/:path*", headers: IMMUABLE },
       {
         source: "/:path*",
         headers: [

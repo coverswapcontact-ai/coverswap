@@ -66,7 +66,7 @@ describe("lot E3 : les pièces d'exemple", () => {
     assert.equal(exemplesSimulateur({ pieces: ZONES_REPLI.pieces.map((p) => p.id) }).length, 18);
     assert.equal(exemplesSimulateur({ pieces: ["mur-plafond"] }).length, 0);
     assert.match(lire("app/simulateur/page.tsx"), /exemplesSimulateur\(\{ pieces: zones\.pieces\.map\(\(p\) => p\.id\) \}\)/);
-    assert.match(lire("app/simulateur/page.tsx"), /<Simulateur zones=\{zones\} tarifs=\{tarifs\} exemples=\{exemples\} photosPieces=\{photosDesCartes\(PHOTOS_PIECES\)\} \/>/);
+    assert.match(lire("app/simulateur/page.tsx"), /<Simulateur zones=\{zones\} tarifs=\{tarifs\} exemples=\{exemples\} demo=\{demo\} photosPieces=\{photosDesCartes\(PHOTOS_PIECES\)\} \/>/);
   });
 
   test("l'avant en pleine taille : la plus grande largeur du manifeste (1536 en paysage, 1024 en portrait), versionnée, présente sur le disque", () => {

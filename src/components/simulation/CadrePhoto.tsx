@@ -20,7 +20,8 @@ export type ProprietesCommunes = {
   /** L'attribut `sizes`. */
   tailles?: string;
   className?: string;
-  etiquette?: "Ambiance" | "Simulation";
+  /** « Démonstration » (mission 22) : l'affiche de la démo du simulateur. */
+  etiquette?: "Ambiance" | "Simulation" | "Démonstration";
   /** Mission 19 : un calque posé sur l'image, dans son cadre (les étiquettes matière, `ambiances/CalqueMatieres`). */
   calque?: ReactNode;
   /** Cadre en `span` (bloc) au lieu d'un `div` : pour une photo posée dans un bouton ou un lien, qui n'admettent pas de `div`. */

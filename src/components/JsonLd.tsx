@@ -3,6 +3,9 @@ import { ZONES } from "@/data/zones";
 import { GARANTIE_ANS, PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
 import { Script } from "./ScriptJsonLd";
 import { IMAGE_PARTAGE } from "@/lib/partage";
+import { adresseImage } from "@/lib/donnees-images";
+import { sourcesPhoto } from "@/lib/images-preparees";
+import { DATE_VIDEOS, adresseVideo, dureeIso, type VideoSite } from "@/lib/videos";
 
 /**
  * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
@@ -12,7 +15,8 @@ import { IMAGE_PARTAGE } from "@/lib/partage";
  * Site 3.0 (lot F4) : UNE entreprise locale (`LOCAL_BUSINESS`, posée par le gabarit, jamais par une page) ; un
  * `Service` par prestation avec son `@id` et son image ; le `BreadcrumbList` posé par le fil d'Ariane visible lui-même
  * (`Breadcrumb.tsx`, une seule liste pour les deux) ; un `ImageObject` par avant / après rendu (`imageObjet`), légendé,
- * avec un `creditText` honnête sur les images d'ambiance.
+ * avec un `creditText` honnête sur les images d'ambiance. Mission 22 (partie B) : un `VideoObject` par vidéo portée
+ * par une page (`VideoSchema`).
  */
 export { DonneesStructurees } from "./ScriptJsonLd";
 export { CREDIT_AMBIANCE, adresseImage, imageObjet, legendeAmbiance, refImage } from "@/lib/donnees-images";
@@ -181,6 +185,36 @@ export function BreadcrumbSchema({ items }: { items: { name: string; url: string
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         itemListElement: items.map((item, i) => ({ "@type": "ListItem", position: i + 1, name: item.name, item: item.url })),
+      }}
+    />
+  );
+}
+
+/**
+ * Mission 22 (partie B) : le `VideoObject` d'une vidéo du site (`lib/videos`) — nom, description, affiche (le plus
+ * grand JPEG préparé), date de mise en ligne, durée ISO 8601, `contentUrl` (l'adresse du fichier, avec son empreinte).
+ * Posé par `revue/Video` à chaque vidéo rendue, et par l'ouverture de l'accueil et la page du simulateur (leur vidéo
+ * est dans un composant client). `creditText` dit ce que montrent les images : des ambiances générées, ou la démo de
+ * l'outil.
+ */
+export function VideoSchema({ video }: { video: VideoSite }) {
+  const affiche = sourcesPhoto(video.affiche);
+  return (
+    <Script
+      data={{
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: video.titre,
+        description: video.description,
+        thumbnailUrl: [adresseImage(affiche?.src ?? `/images/prep/${video.affiche}-960.jpg`, affiche)],
+        uploadDate: DATE_VIDEOS,
+        duration: dureeIso(video),
+        contentUrl: `${ENTREPRISE.site}${adresseVideo(video)}`,
+        width: video.largeur,
+        height: video.hauteur,
+        inLanguage: "fr-FR",
+        creditText: video.etiquette === "Démonstration" ? "Démonstration du simulateur, images de l'outil" : "Film d'ambiance : images générées aux teintes du catalogue",
+        publisher: { "@id": `${ENTREPRISE.site}/#organisation` },
       }}
     />
   );
