@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
 import { ENTREPRISE } from "@/lib/entreprise";
+import { exemplesSimulateur } from "@/lib/exemples-simulateur";
 import { metadonneesPage } from "@/lib/metadonnees";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
@@ -38,6 +39,8 @@ export default async function PageSimulateur() {
   // Mission 16 (partie 4) : les tarifs publics du CRM pour l'estimation après le rendu (une heure en cache ; null → fourchettes).
   const [zones, tarifs] = await Promise.all([chargerZonesSimulateur(), chargerTarifs()]);
   const ETAPES = etapesDe(zones.zonesMax);
+  // Lot E3 : les pièces d'exemple de l'écran Photo, seulement pour les pièces que le simulateur publie.
+  const exemples = exemplesSimulateur({ pieces: zones.pieces.map((p) => p.id) });
   return (
     <div data-theme="simulation" data-page="simulateur" className="min-h-[100dvh] bg-fond text-encre">
       <HowToSchema name="Simuler un covering sur sa propre photo" description="Quatre étapes, sans inscription." etapes={ETAPES} dureeTotale="PT3M" />
@@ -46,7 +49,7 @@ export default async function PageSimulateur() {
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
-        <Simulateur zones={zones} tarifs={tarifs} />
+        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} />
         <section className="mt-16 max-w-2xl border-t border-trait pt-10">
           <h2 className="font-display text-[22px] font-semibold">Comment ça marche</h2>
           <ol className="mt-5 space-y-4">

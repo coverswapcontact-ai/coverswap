@@ -744,6 +744,29 @@ moins** partout, jamais d'étiquette d'honnêteté.
 - « De face » et « Lumière du jour » restent deux schémas d'interface (pas des pièces), à la couleur du texte
   (`currentColor`) et aux jetons : plus aucune couleur écrite dans `EcranPhoto.tsx`.
 
+## Les pièces d'exemple du simulateur
+
+Lot E3 (énoncé, phase E point 2) : « Pas de photo sous la main ? », sous les trois conseils de l'écran Photo, et un
+lien souligné vers lui dans le cadre des boutons (« Pas de photo sous la main ? Prenez une pièce d'exemple »).
+
+- **Les 18 avants de la série 2** (`lib/exemples-simulateur.ts`, côté serveur, passés par la page) : cuisine 11, salle
+  de bain 3, meubles 3, pro 1 ; aucun pour les murs (la cuisine s'ouvre alors). Choisis par pièce (pastilles à
+  l'encre, `aria-pressed`, le nombre d'exemples) puis par **aspect**, écrit à la main avec la forme : « Hêtre · Cuisine
+  en L », « Blanc jauni · Cuisine sur un mur », « Bordeaux brillant », « Merisier »…
+- **Vignettes** : 2 colonnes au téléphone, 3 dès 640 px, au rapport 3 / 2 (un avant portrait y est recadré),
+  `loading="lazy"`, la pastille « Ambiance » (muette : l'image est décorative, le bouton porte l'aspect et la forme).
+- **Un exemple choisi** (état local, rien ne part) : son titre reçoit le focus ; « Version 1 / Version 2 »
+  (`aria-pressed`, le titre de l'après à côté) ; le curseur avant / après « Ambiance · avant / après » (un portrait
+  plafonné à `max-w-sm`) ; les cartels de l'après, chacun lien vers sa fiche (sans préchargement : choisir un exemple
+  ne fait aucune requête hors ses images) ; « Voir les autres pièces ».
+- **« Essayer d'autres matières sur cette pièce »** : bouton **secondaire** pleine largeur (le principal de l'écran
+  reste « Prendre une photo »), avec dessous « Le résultat reste une image d'ambiance : la pièce n'est pas la vôtre. »
+  Il charge l'avant en pleine taille et suit le chemin d'une photo du visiteur jusqu'à l'écran des matières.
+- **Le résultat** d'une pièce d'exemple porte « Ambiance · avant / après », jamais « Simulation » ; le rendu sur la
+  photo du visiteur porte désormais « Simulation » (pastille en bas à gauche, aussi pendant le chargement).
+- L'étiquette d'honnêteté du curseur passe au-dessus de son trait blanc (`AvantApres`) : à 390 px le trait la
+  coupait quand le curseur était près de la moitié.
+
 ## Ce qu'on a jeté de la maquette
 
 Tout ce qui fait « faux magazine » (énoncé, phase B) :

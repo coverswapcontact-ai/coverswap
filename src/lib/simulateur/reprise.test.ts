@@ -207,3 +207,19 @@ describe("écran d'attente", () => {
     assert.equal(texteAttente(0), "environ 15 s");
   });
 });
+
+describe("site 3.0, lot E3 : la pièce d'exemple dans la mémoire", () => {
+  test("un état d'avant le lot (sans `exemple`) se relit tel quel ; un exemple lisible est gardé, avec la photo seulement ; celui d'un rendu aussi", () => {
+    const ancien = { version: 2, projet: "cuisine", photo: PHOTO, selections: {}, parcoursId: "p", rendus: [{ travailId: "cmun000000000002", simulationSiteId: null, urlApres: "https://crm/x", urlAvant: null, references: [], le: 7 }], majLe: 9 };
+    const relu = migrerEtat(ancien);
+    assert.ok(relu);
+    assert.ok(!("exemple" in relu), "pas de champ ajouté à un état ancien");
+    assert.ok(!("exemple" in relu.rendus[0]));
+    assert.equal(decisionAuMontage(relu, { maintenant: 10 }).ecran, "bandeau", "la reprise ne change pas");
+    const avecExemple = migrerEtat({ ...ancien, exemple: "cuisine-merisier", rendus: [{ ...ancien.rendus[0], exemple: "cuisine-merisier" }] });
+    assert.equal(avecExemple?.exemple, "cuisine-merisier");
+    assert.equal(avecExemple?.rendus[0].exemple, "cuisine-merisier");
+    assert.ok(!("exemple" in (migrerEtat({ ...ancien, photo: null, exemple: "cuisine-merisier" }) ?? {})), "sans photo, pas d'exemple");
+    for (const illisible of ["<script>", "A B", 42, "x".repeat(61)]) assert.ok(!("exemple" in (migrerEtat({ ...ancien, exemple: illisible }) ?? {})), String(illisible));
+  });
+});

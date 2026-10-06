@@ -21,6 +21,8 @@ export type RenduSimulateur = {
   references: ReferenceRendu[];
   /** Horodatage (ms) de l'arrivée du rendu. */
   le: number;
+  /** Site 3.0 (lot E3) : la pièce d'exemple du rendu (« cuisine-bordeaux-brillante ») ; absent sur la photo du visiteur. */
+  exemple?: string | null;
 };
 
 export type TravailEnCours = { travailId: string; lanceLe: number; attenteEstimeeS: number };
@@ -75,6 +77,11 @@ export type EtatSimulateur = {
   codePostal: string | null;
   /** Mission 16 (partie 4) : la matière demandée par l'adresse (`?ref=`, depuis /matieres), posée à l'écran des matières. */
   refDemandee: string | null;
+  /**
+   * Site 3.0 (lot E3) : la photo est une pièce d'exemple de la bibliothèque (« Pas de photo sous la main ? »), pas
+   * celle du visiteur. Facultatif : un état d'avant le lot se relit sans.
+   */
+  exemple?: string | null;
   majLe: number;
 };
 
@@ -127,6 +134,14 @@ function lireReferences(v: unknown): ReferenceRendu[] {
   return Array.isArray(v) ? v.filter(estObjet).map((r) => ({ zone: String(r.zone ?? ""), libelle: String(r.libelle ?? ""), ref: String(r.ref ?? ""), nom: String(r.nom ?? "") })) : [];
 }
 
+/** L'identifiant d'une pièce d'exemple (minuscules, chiffres, tirets), ou null. */
+const lireExemple = (v: unknown): string | null => (typeof v === "string" && /^[a-z0-9-]{1,60}$/.test(v) ? v : null);
+/** `{ exemple }` seulement s'il est lisible : un état (ou un rendu) sans exemple se relit tel qu'avant le lot E3. */
+const avecExemple = (v: unknown): { exemple?: string } => {
+  const exemple = lireExemple(v);
+  return exemple ? { exemple } : {};
+};
+
 const listeDeTextes = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
 
 function lireAnalyse(v: unknown): EtatAnalyse | null {
@@ -157,14 +172,14 @@ export function migrerEtat(brut: unknown): EtatSimulateur | null {
   const projet = typeof brut.projet === "string" && brut.projet ? brut.projet : "cuisine";
   const majLe = typeof brut.majLe === "number" ? brut.majLe : 0;
   const photo = texteOuNull(brut.photo);
-  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), parcoursNeLe: typeof brut.parcoursNeLe === "number" && brut.parcoursNeLe > 0 ? brut.parcoursNeLe : majLe, travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), majLe };
+  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), parcoursNeLe: typeof brut.parcoursNeLe === "number" && brut.parcoursNeLe > 0 ? brut.parcoursNeLe : majLe, travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), ...avecExemple(photo ? brut.exemple : null), majLe };
   if (brut.version === 2) {
     const t = brut.travailEnCours;
     return {
       ...base,
       travailEnCours: estObjet(t) && typeof t.travailId === "string" ? { travailId: t.travailId, lanceLe: typeof t.lanceLe === "number" ? t.lanceLe : majLe, attenteEstimeeS: typeof t.attenteEstimeeS === "number" ? t.attenteEstimeeS : ATTENTE_PAR_DEFAUT_S } : null,
       rendus: Array.isArray(brut.rendus)
-        ? brut.rendus.filter(estObjet).filter((r) => typeof r.travailId === "string").map((r) => ({ travailId: String(r.travailId), simulationSiteId: texteOuNull(r.simulationSiteId), urlApres: String(r.urlApres ?? ""), urlAvant: texteOuNull(r.urlAvant), references: lireReferences(r.references), le: typeof r.le === "number" ? r.le : majLe }))
+        ? brut.rendus.filter(estObjet).filter((r) => typeof r.travailId === "string").map((r) => ({ travailId: String(r.travailId), simulationSiteId: texteOuNull(r.simulationSiteId), urlApres: String(r.urlApres ?? ""), urlAvant: texteOuNull(r.urlAvant), references: lireReferences(r.references), le: typeof r.le === "number" ? r.le : majLe, ...avecExemple(r.exemple) }))
         : [],
     };
   }

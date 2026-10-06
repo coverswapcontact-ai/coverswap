@@ -3,7 +3,11 @@
 import { useRef, useState } from "react";
 import { Bouton, FOCUS_FICHIER, TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { Picto } from "@/components/espace/Illustrations";
+import type { ExempleSimulateur } from "@/lib/exemples-simulateur";
 import type { ProjectType } from "@/lib/simulateur/projets";
+import type { ExempleCharge } from "@/lib/simulateur/photo";
+import { ExemplesPhoto } from "./ExemplesPhoto";
+import { useExemple } from "./useExemple";
 
 /**
  * Écran 2 — la photo : « Prendre une photo » (appareil, `capture`) et « Choisir
@@ -14,6 +18,9 @@ import type { ProjectType } from "@/lib/simulateur/projets";
  * Site 3.0, lot E2 : le conseil « Toute la zone visible » montre le picto de la pièce choisie (64 px au moins) au lieu
  * de la cuisine dessinée au trait ; « De face » et « Lumière du jour » restent deux petits schémas d'interface, à la
  * couleur du texte (`currentColor`) et aux jetons du thème, plus aucune couleur écrite ici.
+ *
+ * Site 3.0, lot E3 : sous les conseils, « Pas de photo sous la main ? » (`ExemplesPhoto`) ; un lien y mène depuis le
+ * cadre des boutons. Une pièce d'exemple essayée arrive par `onFichier(fichier, exemple)` (`useExemple`).
  */
 function SchemaDeFace() {
   return (
@@ -54,8 +61,9 @@ const ENTREE = "sr-only";
 const CONTOUR_FICHIER = "border border-encre bg-white text-encre hover:bg-fond-2";
 const BOUTON_FICHIER = `flex min-h-[56px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-[var(--rayon-sm)] text-[16px] font-medium transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${FOCUS_FICHIER}`;
 
-export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder }: { projet: ProjectType; photo: string | null; /** `aspect-ratio` de la photo en mémoire, null si inconnu. */ rapport: string | null; occupe: boolean; onFichier: (file: File) => void; onGarder: () => void }) {
+export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder, exemples = [] }: { projet: ProjectType; photo: string | null; /** `aspect-ratio` de la photo en mémoire, null si inconnu. */ rapport: string | null; occupe: boolean; onFichier: (file: File, exemple?: ExempleCharge) => void; onGarder: () => void; exemples?: readonly ExempleSimulateur[] }) {
   const [survol, setSurvol] = useState(false);
+  const exemple = useExemple(onFichier);
   const appareil = useRef<HTMLInputElement>(null);
   const galerie = useRef<HTMLInputElement>(null);
   const prendre = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,6 +129,13 @@ export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder
         <p className="mt-3 text-center text-[13.5px] text-encre-2">
           JPEG, PNG ou HEIC, 25 Mo au plus. <span className="hidden sm:inline">Ou glissez votre photo ici.</span> La photo est réduite avant l&apos;envoi.
         </p>
+        {exemples.length > 0 ? (
+          <p className="mt-1 text-center">
+            <a href="#exemples" className="inline-flex min-h-[44px] items-center text-[14.5px] font-medium text-encre underline underline-offset-4 hover:text-encre-2">
+              Pas de photo sous la main ? Prenez une pièce d&apos;exemple
+            </a>
+          </p>
+        ) : null}
       </div>
 
       <ul className="grid grid-cols-3 gap-2 sm:gap-3" aria-label="Trois conseils pour la photo">
@@ -132,6 +147,8 @@ export function EcranPhoto({ projet, photo, rapport, occupe, onFichier, onGarder
           </li>
         ))}
       </ul>
+
+      <ExemplesPhoto exemples={exemples} projet={projet.id} occupe={occupe} charge={exemple.charge} erreur={exemple.erreur} onEssayer={(e) => void exemple.essayer(e)} />
     </section>
   );
 }

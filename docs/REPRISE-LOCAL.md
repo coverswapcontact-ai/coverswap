@@ -1353,3 +1353,71 @@ Captures dans le dossier de travail (pas dans le dépôt).
 - En local, la feuille des matières affiche « Visuel indisponible » (vignettes du CRM non servies à ce build local) :
   sans rapport avec le lot, à revoir sur la prévisualisation.
 - L'écran 4 (estimation) ne s'atteint pas sans génération : couvert par les rendus des tests.
+
+## E3 — « Pas de photo sous la main ? » (06/10/2026)
+
+**Fait** (aucune image générée, aucune génération lancée, aucun envoi ; l'analyse déclenchée par l'essai local a été
+coupée avant de partir)
+- `src/lib/exemples-simulateur.ts` (serveur) : les 18 avants de `PAIRES_SERIE_2` (cuisine 11, salle de bain 3, meubles
+  3, pro 1, murs 0), chacun avec son **aspect** et sa **forme** écrits à la main (« Hêtre · Cuisine en L », « Blanc
+  jauni · Cuisine sur un mur », « Bordeaux brillant · Cuisine en L », « Merisier · Cuisine sur un mur »…), ses deux
+  après résolus (titre, texte alternatif, sources préparées, cartels du catalogue et lien de leur fiche), et
+  `fichier`, l'avant en pleine taille pris au manifeste (`fichierPleineTaille` : `-1536.jpg` en paysage, `-1024.jpg`
+  en portrait, `?v=` de l'empreinte). `simulateur/page.tsx` les passe au simulateur, filtrés sur les pièces publiées
+  par le CRM ; le catalogue et le manifeste ne partent pas dans le navigateur (≈ 72 Ko de données, 8 Ko compressés).
+- `ExemplesPhoto.tsx` (sous les conseils de l'écran Photo, `id="exemples"`, et un lien vers lui dans le cadre des
+  boutons) : pastilles de pièce (`aria-pressed`, la pièce choisie à l'écran 1 d'abord, la cuisine pour les murs),
+  vignettes « Ambiance » (2 colonnes, 3 dès 640 px) ; un exemple choisi = **état local** : « Version 1 / Version 2 »,
+  curseur « Ambiance · avant / après », cartels liés aux fiches (`prefetch={false}`), « Voir les autres pièces ».
+  Jamais `etat.photo`, ni analyse, ni CRM, ni événement.
+- « Essayer d'autres matières sur cette pièce » (secondaire ; le principal reste « Prendre une photo ») →
+  `useExemple.ts` : `fetch` de l'image du site, `fichierExemple` (JPEG), puis `choisirPhoto(fichier, { id, piece })`
+  dans `Simulateur.tsx` : la préparation, l'analyse, Turnstile, `limite-abus.ts` et les quotas d'une photo de visiteur.
+  La pièce de l'exemple devient celle du parcours (choix vidés si elle change). `PHOTO_CHARGEE` porte
+  `exemple: <nom>` (`docs/SUIVI.md`).
+- `EtatSimulateur.exemple?` et `RenduSimulateur.exemple?` (facultatifs ; `migrerEtat` ne les écrit que s'ils sont
+  lisibles, et l'exemple de l'état seulement avec une photo) ; le rendu arrivé garde l'exemple de la photo.
+- Résultat (`EcranResultat`) : `etiquetteDuRendu` → « Ambiance · avant / après » sur une pièce d'exemple (jamais
+  « Simulation »), « Simulation » sur la photo du visiteur (nouvelle pastille, aussi pendant le chargement) ; texte de
+  l'image, avant, fichier téléchargé (`coverswap-ambiance-…`), partage et note sous l'image le disent.
+- Demande de devis : `messageDemande` → `message` « Simulation sur une pièce d'exemple : <nom> » (la route le
+  transmet déjà au CRM ; aucun changement côté CRM).
+- `AvantApres` : l'étiquette d'honnêteté passe au-dessus du trait du curseur (à 390 px il la coupait).
+- `docs/DESIGN.md` : « Les pièces d'exemple du simulateur ».
+
+**Décisions prises seul**
+1. Choix « par pièce et par aspect » : des pastilles de pièce au-dessus des vignettes, la pièce de l'écran 1 d'abord ;
+   un exemple d'une autre pièce essayé change la pièce du parcours (sinon les zones ne correspondraient pas).
+2. Le plan citait `LegendeMatieres`, retiré au lot C4 : les cartels (`revue/Cartel`) liés aux fiches le remplacent,
+   comme sur `/inspirations`.
+3. `<nom>` de l'exemple = l'avant sans « -avant » (`cuisine-bordeaux-brillante`), lisible par Lucas dans le CRM.
+4. Les après sont pré-résolus côté serveur (8 Ko compressés de plus sur `/simulateur`) plutôt que de charger le
+   manifeste ou le catalogue dans le navigateur.
+5. « Simulation » s'affiche désormais sur le rendu d'une photo de visiteur (il n'y avait aucune pastille) : la règle
+   d'honnêteté vaut dans les deux sens.
+
+**Tests** : 499 → 513, tous réussis. Nouveau `src/app/simulateur/_components/exemples.test.ts` (11) : 18 avants × 2
+après et la répartition 11/3/3/1/0, aspects et formes, filtre par pièces publiées, pleine taille prise au manifeste
+(et un manifeste factice à 2 000 px), fichiers présents sur le disque, liens des cartels vers les fiches ; grille
+(11 « Ambiance », 4 pastilles, aucun principal, rien de « Simulation ») ; exemple choisi (versions `aria-pressed`,
+curseur, avant et après, liens, bouton secondaire) ; sources sans `fetch(`, `sendBeacon`, `etat.photo`, analyse ni
+événement, un seul `fetch` dans `useExemple` vers l'image du site ; écran Photo (lien, ordre, un principal) ;
+`Simulateur.tsx` (chemin d'une photo, PHOTO_CHARGEE `exemple`, Turnstile, un seul `lancerGeneration`) ; étiquette du
+résultat ; message de la demande. Ajoutés : `entonnoir.test.ts` (méta `exemple`, une fois par parcours),
+`reprise.test.ts` (un état d'avant le lot se relit sans `exemple`, exemple illisible ou sans photo écarté),
+`photo.test.ts` (`fichierExemple`). `npx eslint .` et `npm run build` passent (546 pages).
+
+**Vérification visuelle** : build local comme la CI, `next start -p 3100` arrêté ensuite ; Playwright + Edge, toute
+requête hors GET/HEAD, `/api/simulate*`, `/api/simulation/*` et le CRM hors images coupés (et **tout** le CRM dans le
+contexte à 390 px où l'on essaie l'exemple). À 360, 390 et 1 440 px : aucun débordement ; 11 vignettes chargées ;
+« Bordeaux brillant » choisi → **0 requête** hors ses images, focus sur son titre, Version 1 puis 2, curseur au
+clavier, cartels NF13 / AG13 vers leurs fiches. À 390 px, « Essayer d'autres matières sur cette pièce » → écran des
+matières avec la photo de 1 536 × 1 024, mémoire `exemple: cuisine-bordeaux-brillante` ; la seule requête vers le CRM,
+`POST /api/simulate/analyse`, a été coupée (le chemin est bien celui d'une photo de visiteur). Aucun bouton de
+génération touché. Captures : `docs/captures/site-3-0/simulateur-exemples-390.jpg` et `-1440.jpg`.
+
+**Problèmes**
+- Une capture pleine page d'Edge laissait la première vignette vide à 1 440 px alors qu'elle était chargée (artefact
+  de capture, l'image s'affiche) : captures refaites à la hauteur de la fenêtre.
+- Coût en production : chaque essai d'exemple lance une vraie analyse puis, si la personne génère, une vraie
+  génération (comptées comme celles d'un visiteur) ; la note du devis permet de les reconnaître.

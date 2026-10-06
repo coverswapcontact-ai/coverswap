@@ -13,13 +13,14 @@ import { corpsDemandeSimulation, type ExtraDemande } from "@/lib/simulateur/dema
 import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/lib/simulateur/ecrans";
 import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
 import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
-import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
+import { messageErreurPhoto, preparerPhoto, type ExempleCharge } from "@/lib/simulateur/photo";
 import { lireElementDemande, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
 import { zoneDeLElement } from "@/lib/simulateur/elements";
 import { getProject } from "@/lib/simulateur/projets";
 import { ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
 import { pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
+import type { ExempleSimulateur } from "@/lib/exemples-simulateur";
 import type { TarifsSite } from "@/lib/tarifs-site";
 import { acquisitionPourEnvoi, lireOrigine, sourceCourte } from "@/lib/utm";
 import { DemandeApresRendu, type DemandeEnvoyee } from "./DemandeApresRendu";
@@ -45,8 +46,8 @@ import { useSondage } from "./useSondage";
 ───────────────────────────────────────────────────────────────── */
 type Echec = { message: string; raison: string };
 
-/** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. */
-export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null }) {
+/** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. `exemples` : les pièces d'exemple de l'écran Photo (lot E3). */
+export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[] }) {
   const [charge, setCharge] = useState(false);
   const [ecran, setEcran] = useState<Ecran>(1);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
@@ -160,7 +161,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     onPret: (travailId: string, reponse: ReponseSuiviComplete) => {
       setEtat((e) => {
         if (!e.parcoursId) return { ...e, travailEnCours: null };
-        const rendu: RenduSimulateur = { travailId, simulationSiteId: reponse.simulationSiteId ?? null, urlApres: urlImageTravail(travailId, e.parcoursId, "apres"), urlAvant: reponse.imageAvant ? urlImageTravail(travailId, e.parcoursId, "avant") : null, references: reponse.references ?? [], le: Date.now() };
+        // Lot E3 : un rendu fait sur une pièce d'exemple le garde (« Ambiance · avant / après », note du devis).
+        const rendu: RenduSimulateur = { travailId, simulationSiteId: reponse.simulationSiteId ?? null, urlApres: urlImageTravail(travailId, e.parcoursId, "apres"), urlAvant: reponse.imageAvant ? urlImageTravail(travailId, e.parcoursId, "avant") : null, references: reponse.references ?? [], le: Date.now(), ...(e.exemple ? { exemple: e.exemple } : {}) };
         return { ...e, travailEnCours: null, rendus: [...e.rendus.filter((r) => r.travailId !== travailId), rendu] };
       });
       setRenduAffiche(travailId);
@@ -197,8 +199,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     setMessageRefus(null);
   };
 
-  /* ── Écran 2 : la photo ── */
-  const choisirPhoto = async (file: File) => {
+  /* ── Écran 2 : la photo (ou une pièce d'exemple, lot E3 : même chemin, sa pièce choisie avec elle) ── */
+  const choisirPhoto = async (file: File, exemple?: ExempleCharge) => {
     setErreur(null);
     setOccupe("photo");
     try {
@@ -221,11 +223,12 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         hauteur = prete.hauteur;
       }
       // Les dimensions sont gardées avec la photo : les écrans réservent son rapport avant de la décoder.
-      mettreAJour({ photo: dataUrl, photoLargeur: largeur > 0 ? largeur : null, photoHauteur: hauteur > 0 ? hauteur : null, analyse: null });
+      const autrePiece = !!exemple && exemple.piece !== etat.projet;
+      mettreAJour({ photo: dataUrl, photoLargeur: largeur > 0 ? largeur : null, photoHauteur: hauteur > 0 ? hauteur : null, analyse: null, exemple: exemple?.id ?? null, ...(autrePiece ? { projet: exemple.piece, selections: {} } : {}) });
       setBandeau(null);
       setConseilIgnore(false);
       effacerEchec();
-      emetteur.current.marquer("PHOTO_CHARGEE", { projet: etat.projet, poids_ko: poidsKo, largeur });
+      emetteur.current.marquer("PHOTO_CHARGEE", { projet: exemple?.piece ?? etat.projet, poids_ko: poidsKo, largeur, ...(exemple ? { exemple: exemple.id } : {}) });
       setEcran(reduireEcran(ecran, { type: "photo-chargee" }, etat).ecran);
     } catch (e) {
       const code = e instanceof Error ? e.message : "illisible";
@@ -307,6 +310,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         simulationIds: etat.rendus.map((r) => r.simulationSiteId).filter((id): id is string => !!id),
         references: refs,
         echec: depuisEchec && etat.photo ? { photo: etat.photo, raison: echecGeneration?.raison ?? "inconnue" } : null,
+        exemple: depuisEchec ? etat.exemple : rendu?.exemple,
         jetonCaptcha,
         acquisition: acquisitionPourEnvoi(),
         consentement: consentementPourEnvoi(formulaire.consentement, "simulateur"),
@@ -427,7 +431,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
             photo={etat.photo}
             rapport={rapportPhoto(etat)}
             occupe={occupe === "photo"}
-            onFichier={(f) => void choisirPhoto(f)}
+            onFichier={(f, exemple) => void choisirPhoto(f, exemple)}
+            exemples={exemples}
             onGarder={() => {
               effacerEchec();
               setEcran(3);

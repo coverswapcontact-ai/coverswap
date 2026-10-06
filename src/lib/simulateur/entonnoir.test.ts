@@ -50,3 +50,20 @@ describe("entonnoir du simulateur", () => {
     assert.equal(simulateur.split("depuisLien.current").length - 1, 3, "lu une fois, écrit dans PIECE_CHOISIE seulement");
   });
 });
+
+describe("site 3.0, lot E3 : une pièce d'exemple chargée", () => {
+  test("PHOTO_CHARGEE porte `exemple: <nom>` (une fois par parcours, comme toute photo) ; une génération relancée ne la recompte pas", () => {
+    const partis: { type: EtapeEntonnoir; meta: Record<string, unknown> }[] = [];
+    const envoi = (type: EtapeEntonnoir, meta: Record<string, unknown>) => partis.push({ type, meta });
+    const e = creerEmetteur(envoi);
+    e.marquer("PIECE_CHOISIE", { projet: "cuisine" });
+    assert.equal(e.marquer("PHOTO_CHARGEE", { projet: "cuisine", poids_ko: 310, largeur: 1536, exemple: "cuisine-bordeaux-brillante" }), true);
+    assert.deepEqual(partis[1], { type: "PHOTO_CHARGEE", meta: { projet: "cuisine", poids_ko: 310, largeur: 1536, exemple: "cuisine-bordeaux-brillante" } });
+    assert.equal(e.marquer("PHOTO_CHARGEE", { projet: "cuisine", exemple: "cuisine-merisier" }), false, "une fois par parcours");
+    const relance = rouvrirGeneration(e, envoi);
+    assert.equal(relance.marquer("PHOTO_CHARGEE", { exemple: "cuisine-merisier" }), false);
+    // Une photo de visiteur n'a pas de méta `exemple`.
+    const simulateur = readFileSync(path.join(process.cwd(), "src/app/simulateur/_components/Simulateur.tsx"), "utf8");
+    assert.match(simulateur, /\.\.\.\(exemple \? \{ exemple: exemple\.id \} : \{\}\)/);
+  });
+});

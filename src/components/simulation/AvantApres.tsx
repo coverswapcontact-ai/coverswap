@@ -135,8 +135,9 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           Avant
         </Etiquette>
         <Etiquette className="pointer-events-none absolute top-3 right-3">Après</Etiquette>
-        {pastille}
         <div className="pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_4px_rgba(0,0,0,0.35)]" style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }} />
+        {/* L'étiquette passe au-dessus du trait du curseur (lot E3 : à 390 px, le trait la coupait). */}
+        {pastille}
         <div
           role="slider"
           tabIndex={0}

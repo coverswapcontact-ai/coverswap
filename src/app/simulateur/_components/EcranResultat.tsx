@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AvantApres } from "@/components/simulation/AvantApres";
 import { Bouton } from "@/components/simulation/Bouton";
+import { Etiquette } from "@/components/simulation/Etiquette";
 import { fichierDuRendu, telechargerFichier } from "@/components/simulation/fichiers";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { urlVignette } from "@/lib/simulateur/generation-client";
@@ -18,9 +19,18 @@ import type { RenduSimulateur } from "@/lib/simulateur/reprise";
  * et « Partager » AVANT le formulaire de contact (`children`), en fin d'écran.
  * Les images sont préchargées avant d'être montrées et leur rapport réserve la
  * place : rien ne saute.
+ *
+ * Site 3.0, lot E3 : l'image porte son étiquette d'honnêteté (`etiquetteDuRendu`) — « Simulation » sur la photo du
+ * visiteur, « Ambiance · avant / après » sur une pièce d'exemple (l'avant est une image générée, la pièce n'est pas
+ * la sienne), jamais « Simulation » pour celle-ci ; le texte de l'image, le fichier et le partage le disent aussi.
  */
 const DUREE_FONDU_MS = 1_000;
 const RATIO_PAR_DEFAUT = "4 / 3";
+
+/** L'étiquette d'honnêteté d'un rendu : une pièce d'exemple n'est jamais une « Simulation » de la pièce du visiteur. */
+export function etiquetteDuRendu(rendu: Pick<RenduSimulateur, "exemple">): "Simulation" | "Ambiance · avant / après" {
+  return rendu.exemple ? "Ambiance · avant / après" : "Simulation";
+}
 
 type Dimensions = { largeur: number; hauteur: number };
 type Chargee = { travailId: string; ratio: string | null; phase: "fondu" | "curseur"; visible: boolean };
@@ -50,7 +60,10 @@ type Props = {
 export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFonduFini, onChoisirRendu, onAutresMatieres, onPartage, children }: Props) {
   const avant = rendu.urlAvant ?? photo;
   // Invariable : « Vos meubles », « Votre espace pro »… ne s'accordent pas avec un participe.
-  const alt = `Simulation : ${titre}`;
+  const exemple = !!rendu.exemple;
+  const etiquette = etiquetteDuRendu(rendu);
+  const alt = exemple ? `Ambiance sur une pièce d'exemple : ${titre}` : `Simulation : ${titre}`;
+  const altAvant = exemple ? "La pièce d'exemple avant les matières" : "Votre pièce aujourd'hui";
   // L'état ne vaut que pour le rendu qui l'a produit : un autre rendu affiché repart en « chargement » sans setState dans l'effet.
   const [chargee, setChargee] = useState<Chargee | null>(null);
   const [comparaison, setComparaison] = useState<string | null>(null);
@@ -94,7 +107,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
   const reserve = courante?.ratio ?? RATIO_PAR_DEFAUT;
   const avecImage = rendus.filter((r) => r.urlApres);
   const autre = comparaison ? avecImage.find((r) => r.travailId === comparaison) ?? null : null;
-  const nomFichier = `coverswap-simulation-${rendu.travailId.slice(-6)}.jpg`;
+  const nomFichier = `coverswap-${exemple ? "ambiance" : "simulation"}-${rendu.travailId.slice(-6)}.jpg`;
 
   const telecharger = async () => {
     setPartage("envoi");
@@ -108,7 +121,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
     setPartage("envoi");
     const fichier = await fichierDuRendu(rendu.urlApres, nomFichier);
     if (!fichier) return setPartage("erreur");
-    const donnees = { files: [fichier], title: "Ma simulation CoverSwap", text: `${titre} après simulation, avec CoverSwap.` };
+    const donnees = exemple ? { files: [fichier], title: "Une ambiance CoverSwap", text: "Une pièce d'exemple habillée de films Cover Styl', avec CoverSwap." } : { files: [fichier], title: "Ma simulation CoverSwap", text: `${titre} après simulation, avec CoverSwap.` };
     if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare(donnees))) {
       try {
         await navigator.share(donnees);
@@ -130,17 +143,18 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
       </h2>
 
       {phase === "curseur" ? (
-        <AvantApres apres={rendu.urlApres} avant={avant} alt={alt} ratio={reserve} />
+        <AvantApres apres={rendu.urlApres} avant={avant} alt={alt} altAvant={altAvant} ratio={reserve} etiquette={etiquette} />
       ) : (
         <div className="relative w-full overflow-hidden rounded-[var(--rayon-md)] bg-fond-2" style={{ aspectRatio: reserve }} aria-busy={phase === "chargement"}>
           {avant && phase === "fondu" ? (
             // eslint-disable-next-line @next/next/no-img-element -- photo du visiteur (mémoire locale ou servie par le CRM)
-            <img src={avant} alt="Votre pièce aujourd'hui" className="absolute inset-0 h-full w-full object-cover" draggable={false} referrerPolicy="no-referrer" />
+            <img src={avant} alt={altAvant} className="absolute inset-0 h-full w-full object-cover" draggable={false} referrerPolicy="no-referrer" />
           ) : null}
           {phase === "fondu" ? (
             // eslint-disable-next-line @next/next/no-img-element -- rendu servi par le CRM, non optimisé
             <img src={rendu.urlApres} alt={alt} draggable={false} referrerPolicy="no-referrer" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-out ${courante?.visible ? "opacity-100" : "opacity-0"}`} />
           ) : null}
+          <Etiquette className="pointer-events-none absolute bottom-3 left-3">{etiquette}</Etiquette>
           <span className="sr-only" role="status">
             {phase === "chargement" ? "Chargement du rendu" : "Votre simulation apparaît"}
           </span>
@@ -156,7 +170,10 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
           ))}
         </ul>
       ) : null}
-      <p className="text-[13px] leading-relaxed text-encre-2">Rendu indicatif produit par une intelligence artificielle. Les teintes exactes se valident sur échantillons avant la pose.</p>
+      <p className="text-[13px] leading-relaxed text-encre-2">
+        {exemple ? "Image d'ambiance : une pièce d'exemple, générée, habillée par une intelligence artificielle avec vos matières. " : "Rendu indicatif produit par une intelligence artificielle. "}
+        Les teintes exactes se valident sur échantillons avant la pose.
+      </p>
 
       <div className="flex flex-wrap gap-2">
         <Bouton variante="secondaire" onClick={onAutresMatieres}>

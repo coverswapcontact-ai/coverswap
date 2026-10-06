@@ -7,6 +7,8 @@ import type { CreneauRappel } from "@/lib/rappel";
  * connus du parcours (le formulaire ne les redemande pas). Partent aussi la fourchette vue et sa taille, le créneau
  * de rappel choisi, l'origine de la visite (`acquisitionPourEnvoi`) et le consentement (`consentementPourEnvoi`), et,
  * après un rendu seulement, `afficherLienEspace` (le lien de l'espace sera affiché : le CRM peut l'ouvrir).
+ * Site 3.0 (lot E3) : une simulation faite sur une pièce d'exemple le dit dans le message de la demande (« Simulation
+ * sur une pièce d'exemple : cuisine-bordeaux-brillante ») ; la route le transmet au CRM tel quel (`message`).
  */
 
 export type ExtraDemande = { estimation: Estimation | null; rappelCreneau: CreneauRappel | null };
@@ -20,6 +22,8 @@ export type EntreeDemande = {
   references: readonly { libelle: string; ref: string; nom: string }[];
   /** Après un échec de génération : la photo part, pour une simulation faite à la main. */
   echec: { photo: string; raison: string } | null;
+  /** Lot E3 : la pièce d'exemple de la simulation (absente sur la photo du visiteur). */
+  exemple?: string | null;
   jetonCaptcha: string | null;
   acquisition: Record<string, string | undefined>;
   consentement: Record<string, unknown>;
@@ -27,8 +31,14 @@ export type EntreeDemande = {
   extra?: ExtraDemande;
 };
 
+/** Les lignes du message joint à la demande (lot E3) ; vide pour une demande ordinaire. */
+export function messageDemande(e: Pick<EntreeDemande, "exemple">): string {
+  return [e.exemple ? `Simulation sur une pièce d'exemple : ${e.exemple}` : null].filter(Boolean).join("\n");
+}
+
 export function corpsDemandeSimulation(e: EntreeDemande): Record<string, unknown> {
   const { formulaire: f, extra } = e;
+  const message = messageDemande(e);
   return {
     name: f.name.trim(),
     phone: f.phone.trim(),
@@ -50,5 +60,6 @@ export function corpsDemandeSimulation(e: EntreeDemande): Record<string, unknown
     ...e.consentement,
     ...estimationPourEnvoi(extra?.estimation ?? null),
     ...(extra?.rappelCreneau ? { rappelCreneau: extra.rappelCreneau } : {}),
+    ...(message ? { message } : {}),
   };
 }
