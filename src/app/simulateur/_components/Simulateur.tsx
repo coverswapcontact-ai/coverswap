@@ -1,37 +1,38 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bouton } from "@/components/simulation/Bouton";
-import EcranAttente, { type FilmChoisi } from "@/components/simulation/EcranAttente";
-import { FeuilleCatalogue, type Teinte } from "@/components/simulation/FeuilleCatalogue";
 import { FilEtapes } from "@/components/simulation/FilEtapes";
 import Turnstile, { TURNSTILE_SITE_KEY, reinitialiserTurnstile } from "@/components/Turnstile";
 import { consentementPourEnvoi } from "@/lib/consentement";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { envoyerEvenement } from "@/lib/evenements-site";
-import { DELAI_REPONSE } from "@/lib/offre-legere";
 import { adopterParcoursId, obtenirParcoursId } from "@/lib/parcours";
 import { phraseRappel, rappelDuCreneau } from "@/lib/rappel";
 import { corpsDemandeSimulation, type ExtraDemande } from "@/lib/simulateur/demande";
 import { ecranAtteignable, ecranDepuisEtape, reduireEcran, type Ecran } from "@/lib/simulateur/ecrans";
-import { creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
-import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, urlEchantillon, urlVignette, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
-import { messageErreurPhoto, preparerPhoto } from "@/lib/simulateur/photo";
-import { lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
+import { changerDeSource, creerEmetteur, lireDepuis, rouvrirGeneration, type Emetteur } from "@/lib/simulateur/entonnoir";
+import { PANNES, convertirPhotoParLeCrm, demanderAEtrePrevenu, lancerGeneration, urlImageTravail, type ReponseSuiviComplete } from "@/lib/simulateur/generation-client";
+import { messageErreurPhoto, preparerPhoto, type ExempleCharge } from "@/lib/simulateur/photo";
+import { lireElementDemande, lireRefDemandee } from "@/lib/simulateur/matiere-demandee";
+import { zoneDeLElement } from "@/lib/simulateur/elements";
 import { getProject } from "@/lib/simulateur/projets";
-import { ATTENTE_PAR_DEFAUT_S, ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
+import { ETAT_VIDE, MESSAGE_SANS_PHOTO, decisionAuMontage, naissanceDuParcours, rapportPhoto, type EtatAnalyse, type RenduSimulateur } from "@/lib/simulateur/reprise";
 import { effacerEtat, lireEtat, sauvegarderEtat, type EtatSimulateur } from "@/lib/simulateur/stockage";
-import { composantesDe, pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
+import { pieceDe, titrePiece, type ZonesSimulateur } from "@/lib/simulateur/zones";
+import type { ExempleSimulateur } from "@/lib/exemples-simulateur";
+import type { PieceId } from "@/lib/images-pieces";
+import type { PhotoCarte } from "@/lib/photos-cartes";
 import type { TarifsSite } from "@/lib/tarifs-site";
 import { acquisitionPourEnvoi, lireOrigine, sourceCourte } from "@/lib/utm";
-import { DemandeApresRendu, type DemandeEnvoyee } from "./DemandeApresRendu";
+import { attendreLeMoment } from "@/lib/prechargement-liens";
+import type { DemandeEnvoyee } from "./DemandeApresRendu";
+import { DemandeApresRendu, EcranGeneration, EcranResultat, EcranSansPhoto, FeuilleCatalogue, prechargerLesEcrans } from "./ecrans-differes";
 import { EcranMatieres } from "./EcranMatieres";
 import { EcranPhoto } from "./EcranPhoto";
 import { EcranPiece } from "./EcranPiece";
-import EcranResultat from "./EcranResultat";
-import { ChampsContact, FORMULAIRE_VIDE, type Formulaire } from "./Formulaires";
+import { FORMULAIRE_VIDE, type Formulaire } from "./Formulaires";
 import { useAnalyse } from "./useAnalyse";
-import { useFavoris } from "./useFavoris";
+import { useFeuilleCatalogue } from "./useFeuilleCatalogue";
 import { useMatiereDemandee } from "./useMatiereDemandee";
 import { useSondage } from "./useSondage";
 
@@ -44,19 +45,21 @@ import { useSondage } from "./useSondage";
    après fermeture, historique des rendus. Le seul défilement programmé : le
    haut de l'étape quand elle change.
 ───────────────────────────────────────────────────────────────── */
-type Selections = EtatSimulateur["selections"];
 type Echec = { message: string; raison: string };
 
-/** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. */
-export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null }) {
+/** `tarifs` : les tarifs publics du CRM pour l'estimation après le rendu (mission 16, partie 4) ; null → fourchettes d'`offre.ts`. `exemples` : les pièces d'exemple de l'écran Photo (lot E3). */
+export default function Simulateur({ zones, tarifs = null, exemples = [], photosPieces }: { zones: ZonesSimulateur; tarifs?: TarifsSite | null; exemples?: readonly ExempleSimulateur[]; /** Lot F7 : les photos des cartes de l'écran Pièce, résolues par la page (`photosDesCartes`). */ photosPieces?: Partial<Record<PieceId, PhotoCarte>> }) {
   const [charge, setCharge] = useState(false);
   const [ecran, setEcran] = useState<Ecran>(1);
+  // Lot F7 : les écrans chargés à part, préchargés au premier geste, trois secondes après `load`, ou dès l'écran Photo.
+  useEffect(() => attendreLeMoment(window, document, prechargerLesEcrans), []);
+  useEffect(() => {
+    if (ecran >= 2) prechargerLesEcrans();
+  }, [ecran]);
   const [etat, setEtat] = useState<EtatSimulateur>(ETAT_VIDE);
   // L'état vide vaut `projet: "cuisine"` (repli) : la carte n'est montrée choisie que si la pièce l'a vraiment été (clic, `?projet=`, accueil, photo en mémoire).
   const [pieceChoisie, setPieceChoisie] = useState(false);
   const [bandeau, setBandeau] = useState<2 | 3 | null>(null);
-  const [zoneOuverte, setZoneOuverte] = useState<string | null>(null);
-  const [focusZone, setFocusZone] = useState<string | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const [echecGeneration, setEchecGeneration] = useState<Echec | null>(null);
   const [zonesRefusees, setZonesRefusees] = useState<string[]>([]);
@@ -68,13 +71,13 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   const [envoye, setEnvoye] = useState<(DemandeEnvoyee & { leadId: string | null }) | null>(null);
   const [renduAffiche, setRenduAffiche] = useState<string | null>(null);
   const [fondu, setFondu] = useState(false);
-  const { favoris, charger: chargerFavoris, basculer: basculerFavori } = useFavoris();
   const haut = useRef<HTMLDivElement>(null);
   const premierEcran = useRef(true);
   const lanceLe = useRef<number>(0);
   const emetteur = useRef<Emetteur>(creerEmetteur((type, meta) => envoyerEvenement(type, meta)));
   /** Mission 16 (partie 3) : le bouton qui a amené ici (`?depuis=accueil-ouverture`…), repris dans le meta de PIECE_CHOISIE. */
   const depuisLien = useRef<string | null>(null);
+  const zoneDemandee = useRef<string | null>(null); // lot B6 : la zone de `?element=`, ouverte d'abord à l'écran 3
   /** Mission 16 (partie 4) : ESTIMATION_VUE part une fois par simulation — « Nouvelle simulation » la réarme, comme les étapes de l'entonnoir (`emetteur.reinitialiser`). */
   const estimationVue = useRef(false);
 
@@ -83,6 +86,9 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   const captchaActif = !!TURNSTILE_SITE_KEY;
   const enAttente = !!etat.travailEnCours;
   const mettreAJour = useCallback((maj: Partial<EtatSimulateur>) => setEtat((e) => ({ ...e, ...maj })), []);
+  // Lot E1 : la feuille des matières (zone ouverte, focus, favoris, choix d'une teinte) vit dans `useFeuilleCatalogue`.
+  const { setZoneOuverte, focusZone, retirer, chargerFavoris, feuille } = useFeuilleCatalogue(piece, etat.selections, mettreAJour, (choisies) => setZonesRefusees((z) => z.filter((id) => !choisies.includes(id))));
+  const marquerPiece = (id: string) => emetteur.current.marquer("PIECE_CHOISIE", { projet: id, ...(depuisLien.current ? { depuis: depuisLien.current } : {}) });
 
   /* ── Reprise de l'état local + pièce demandée dans l'adresse ── */
   useEffect(() => {
@@ -94,14 +100,14 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       const demande = parametres.get("projet");
       const reprise = parametres.get("reprise");
       const parcoursDuLien = parametres.get("p");
-      const depuisAccueil = parametres.get("suite") === "1";
       depuisLien.current = lireDepuis(parametres.get("depuis"));
       if (annule) return;
       const base = memoire ?? ETAT_VIDE;
       // Une génération en cours fige la pièce : l'adresse ne la change pas (les choix serviraient encore à « Réessayer »).
       const projetInitial = !base.travailEnCours && demande && zones.pieces.some((p) => p.id === demande) ? demande : base.projet;
       const memeProjet = projetInitial === base.projet;
-      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, depuisAccueil });
+      const decision = decisionAuMontage(base, { reprise, p: parcoursDuLien, choix: parametres.get("choix") === "1" && projetInitial === demande });
+      zoneDemandee.current = zoneDeLElement(lireElementDemande(parametres.get("element")), projetInitial);
       const parcoursId = (decision.ecran === "attente" && decision.parcoursId) || base.parcoursId || obtenirParcoursId() || crypto.randomUUID();
       adopterParcoursId(parcoursId);
       // Mission 17 (partie B) : la naissance du parcours ne bouge pas tant que c'est le même (7 jours au plus, `lireEtat`).
@@ -115,18 +121,16 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         setBandeau(decision.etape);
         setEcran(1);
       } else {
-        setEcran(ecranDepuisEtape(decision.etape, repris));
+        setEcran(decision.pieceChoisie ? 2 : ecranDepuisEtape(decision.etape, repris));
       }
-      if (depuisAccueil) {
-        // Le module d'accueil vient d'émettre PIECE_CHOISIE et PHOTO_CHARGEE : ici, elles comptent comme déjà émises (jamais deux fois par parcours).
-        emetteur.current = creerEmetteur((type, meta) => envoyerEvenement(type, meta), ["PIECE_CHOISIE", ...(repris.photo ? (["PHOTO_CHARGEE"] as const) : [])]);
-      }
-      setPieceChoisie(depuisAccueil || !!repris.photo || (!!demande && projetInitial === demande));
+      // Le retour `?suite=1` du module photo de l'accueil (mission 15, retiré au lot B6) n'est plus lu (relecture des lots B et C).
+      setPieceChoisie(!!repris.photo || (!!demande && projetInitial === demande));
       setRenduAffiche(repris.rendus[repris.rendus.length - 1]?.travailId ?? null);
       setEtat(repris);
       chargerFavoris();
       setCharge(true);
       envoyerEvenement("PAGE_VUE", { projet: projetInitial, reprise: !!memoire?.photo, travail_en_cours: !!repris.travailEnCours });
+      if (decision.ecran === "direct" && decision.pieceChoisie) marquerPiece(projetInitial);
     })();
     return () => {
       annule = true;
@@ -163,7 +167,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     onPret: (travailId: string, reponse: ReponseSuiviComplete) => {
       setEtat((e) => {
         if (!e.parcoursId) return { ...e, travailEnCours: null };
-        const rendu: RenduSimulateur = { travailId, simulationSiteId: reponse.simulationSiteId ?? null, urlApres: urlImageTravail(travailId, e.parcoursId, "apres"), urlAvant: reponse.imageAvant ? urlImageTravail(travailId, e.parcoursId, "avant") : null, references: reponse.references ?? [], le: Date.now() };
+        // Lot E3 : un rendu fait sur une pièce d'exemple le garde (« Ambiance · avant / après », note du devis).
+        const rendu: RenduSimulateur = { travailId, simulationSiteId: reponse.simulationSiteId ?? null, urlApres: urlImageTravail(travailId, e.parcoursId, "apres"), urlAvant: reponse.imageAvant ? urlImageTravail(travailId, e.parcoursId, "avant") : null, references: reponse.references ?? [], le: Date.now(), ...(e.exemple ? { exemple: e.exemple } : {}) };
         return { ...e, travailEnCours: null, rendus: [...e.rendus.filter((r) => r.travailId !== travailId), rendu] };
       });
       setRenduAffiche(travailId);
@@ -179,15 +184,17 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     },
   });
 
-  /* ── Écran 1 : la pièce ── */
-  const choisirPiece = (id: string) => {
+  /* ── Écran 1 : la pièce ou un élément précis (PIECE_CHOISIE par `marquerPiece`, au clic ou au montage pour un picto de l'accueil) ── */
+  const choisirPiece = (id: string, element: string | null = null) => {
     const transition = reduireEcran(ecran, { type: "piece-choisie", projet: id, projetPrecedent: etat.projet }, etat);
     // Autre pièce : ses matières ne valent plus, et l'analyse non plus (elle a été faite pour l'autre pièce ; `useAnalyse` la redemande, le CRM répond aussitôt s'il la connaît).
     mettreAJour({ projet: id, ...(transition.viderSelections ? { selections: {}, analyse: null } : {}) });
     setPieceChoisie(true);
     setBandeau(null);
     effacerEchec();
-    emetteur.current.marquer("PIECE_CHOISIE", { projet: id, ...(depuisLien.current ? { depuis: depuisLien.current } : {}) });
+    // Lot E2 : un élément précis (« Plan de travail »…) ouvre d'abord sa zone à l'écran des matières, comme `?element=`.
+    zoneDemandee.current = zoneDeLElement(element, id);
+    marquerPiece(id);
     setEcran(transition.ecran);
   };
 
@@ -198,8 +205,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     setMessageRefus(null);
   };
 
-  /* ── Écran 2 : la photo ── */
-  const choisirPhoto = async (file: File) => {
+  /* ── Écran 2 : la photo (ou une pièce d'exemple, lot E3 : même chemin, sa pièce choisie avec elle) ── */
+  const choisirPhoto = async (file: File, exemple?: ExempleCharge) => {
     setErreur(null);
     setOccupe("photo");
     try {
@@ -222,11 +229,13 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         hauteur = prete.hauteur;
       }
       // Les dimensions sont gardées avec la photo : les écrans réservent son rapport avant de la décoder.
-      mettreAJour({ photo: dataUrl, photoLargeur: largeur > 0 ? largeur : null, photoHauteur: hauteur > 0 ? hauteur : null, analyse: null });
+      const autrePiece = !!exemple && exemple.piece !== etat.projet;
+      mettreAJour({ photo: dataUrl, photoLargeur: largeur > 0 ? largeur : null, photoHauteur: hauteur > 0 ? hauteur : null, analyse: null, exemple: exemple?.id ?? null, ...(autrePiece ? { projet: exemple.piece, selections: {} } : {}) });
       setBandeau(null);
       setConseilIgnore(false);
       effacerEchec();
-      emetteur.current.marquer("PHOTO_CHARGEE", { projet: etat.projet, poids_ko: poidsKo, largeur });
+      changerDeSource(emetteur.current, { exemple: etat.exemple ?? null, projet: etat.projet }, { exemple: exemple?.id ?? null, projet: exemple?.piece ?? etat.projet });
+      emetteur.current.marquer("PHOTO_CHARGEE", { projet: exemple?.piece ?? etat.projet, poids_ko: poidsKo, largeur, ...(exemple ? { exemple: exemple.id } : {}) });
       setEcran(reduireEcran(ecran, { type: "photo-chargee" }, etat).ecran);
     } catch (e) {
       const code = e instanceof Error ? e.message : "illisible";
@@ -238,28 +247,12 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
   };
 
   /* ── Écran 3 : les matières ── */
-  useMatiereDemandee(ecran === 3 && !!etat.photo && !enAttente && !echecGeneration, etat, piece, mettreAJour);
+  useMatiereDemandee(ecran === 3 && !!etat.photo && !enAttente && !echecGeneration, etat, piece, mettreAJour, zoneDemandee, setZoneOuverte);
   const selectionsActives = piece.zones.map((z) => ({ zone: z, sel: etat.selections[z.id] ?? null })).filter((x) => x.sel);
-  const films: FilmChoisi[] = selectionsActives.map(({ zone, sel }) => ({ zone: zone.id, libelle: zone.libelle, nom: sel!.nom, image: urlVignette(sel!.ref) }));
   const raisonBloque = selectionsActives.length === 0 ? "Choisissez au moins une matière" : captchaActif && !jetonCaptcha ? "Vérification anti-robot en cours…" : null;
   const peutGenerer = !raisonBloque && !!etat.photo && occupe === null && !enAttente;
   const attenteReessai = captchaActif && !jetonCaptcha ? "Vérification anti-robot en cours…" : null;
 
-  const choisirTeinte = (zoneId: string, teinte: Teinte, aussi: string[]) => {
-    const suivantes: Selections = { ...etat.selections };
-    for (const id of [zoneId, ...aussi]) {
-      suivantes[id] = { ref: teinte.id, nom: teinte.nom, famille: teinte.famille, finition: teinte.finition, categorie: teinte.categorie, tags: teinte.tags, image: teinte.image };
-      // « Façades (toutes) » et « Meubles hauts / bas » couvrent les mêmes meubles : le dernier choix l'emporte.
-      for (const autre of piece.zones.find((z) => z.id === id)?.exclut ?? []) suivantes[autre] = null;
-    }
-    mettreAJour({ selections: suivantes });
-    setZonesRefusees((z) => z.filter((id) => id !== zoneId && !aussi.includes(id)));
-    setZoneOuverte(null);
-    setFocusZone(null);
-    // Le focus revient sur « Modifier » de la zone, sans défilement (posé après la fermeture de la feuille).
-    window.setTimeout(() => setFocusZone(zoneId), 0);
-  };
-  const retirer = (zoneId: string) => mettreAJour({ selections: { ...etat.selections, [zoneId]: null } });
 
   const generer = async () => {
     if (!etat.photo || !etat.parcoursId || !peutGenerer) return;
@@ -280,6 +273,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         page: window.location.pathname,
         source: sourceCourte(origine) ?? null,
         campagne: origine.campagne,
+        exemple: etat.exemple,
       });
       if (lancement.ok) {
         mettreAJour({ travailEnCours: { travailId: lancement.travailId, lanceLe: Date.now(), attenteEstimeeS: lancement.attenteEstimeeS } });
@@ -324,6 +318,8 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
         simulationIds: etat.rendus.map((r) => r.simulationSiteId).filter((id): id is string => !!id),
         references: refs,
         echec: depuisEchec && etat.photo ? { photo: etat.photo, raison: echecGeneration?.raison ?? "inconnue" } : null,
+        exemple: depuisEchec ? etat.exemple : rendu?.exemple,
+        echantillons: !depuisEchec && !!formulaire.echantillons,
         jetonCaptcha,
         acquisition: acquisitionPourEnvoi(),
         consentement: consentementPourEnvoi(formulaire.consentement, "simulateur"),
@@ -393,22 +389,6 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     setEcran(transition.ecran);
   };
 
-  const formulaireSecours = (
-    <form onSubmit={(e) => void envoyer(e, true)} className="space-y-4 border-t border-trait pt-5">
-      <div>
-        <h3 className="font-display text-[18px] font-semibold text-encre">Recevoir ma simulation et un devis par e-mail</h3>
-        <p className="text-[14.5px] leading-relaxed text-encre-2">Nous faisons la simulation pour vous à partir de cette photo et de vos choix. Devis gratuit {DELAI_REPONSE}, sans engagement.</p>
-      </div>
-      <ChampsContact prefixe="echec" formulaire={formulaire} onChange={setFormulaire} avecVille={!(etat.ville && etat.codePostal)} emailRequis />
-      <Bouton type="submit" plein occupe={occupe === "envoi"} libelleOccupe="Envoi…">
-        Envoyer ma photo et recevoir ma simulation
-      </Bouton>
-    </form>
-  );
-
-  const lecturePhoto = etat.analyse?.statut === "PRETE" && etat.analyse.zonesVisibles.length > 0 ? `Vu sur votre photo : ${etat.analyse.zonesVisibles.map((id) => piece.zones.find((z) => z.id === id)?.libelle ?? id).join(", ")}.` : null;
-  const zoneCatalogue = zoneOuverte ? piece.zones.find((z) => z.id === zoneOuverte) ?? null : null;
-
   return (
     <div ref={haut} className="scroll-mt-4">
       <FilEtapes courant={ecran} atteignable={(e) => ecranAtteignable({ ...etat, generationEnCours: occupe === "lancement" }, e, ecran)} onAller={allerA} verrou={enAttente ? "Choix figés pendant la génération" : null} />
@@ -416,7 +396,7 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       {/* Une seule région d'annonce : le `role="alert"` (assertif) — pas de `aria-live` autour, sinon le message est lu deux fois. */}
       <div className="min-h-[8px]">
         {erreur ? (
-          <div role="alert" className="mt-4 rounded-[var(--rayon-sm)] border border-accent/40 bg-accent-fond px-4 py-3 text-[14.5px] leading-relaxed text-accent-texte">
+          <div role="alert" className="mt-4 rounded-[var(--rayon-sm)] border border-alerte-texte/40 bg-alerte-fond px-4 py-3 text-[14.5px] leading-relaxed text-alerte-texte">
             {erreur}
           </div>
         ) : null}
@@ -452,141 +432,113 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
       ) : null}
 
       <div className="mt-5">
-        {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} /> : null}
+        <Suspense fallback={null}>
+          {ecran === 1 ? <EcranPiece zones={zones} projet={charge && pieceChoisie ? etat.projet : null} onChoisir={choisirPiece} photos={photosPieces} /> : null}
 
-        {ecran === 2 ? (
-          <EcranPhoto
-            projet={projet}
-            photo={etat.photo}
-            rapport={rapportPhoto(etat)}
-            occupe={occupe === "photo"}
-            onFichier={(f) => void choisirPhoto(f)}
-            onGarder={() => {
-              effacerEchec();
-              setEcran(3);
-            }}
-          />
-        ) : null}
-
-        {ecran === 3 && (enAttente || echecGeneration) ? (
-          <EcranAttente
-            photo={etat.photo}
-            films={films}
-            statut={echecGeneration ? "ECHEC" : (sondage?.statut ?? "EN_ATTENTE")}
-            etape={sondage?.etape ?? null}
-            attenteEstimeeS={sondage?.attenteEstimeeS ?? etat.travailEnCours?.attenteEstimeeS ?? ATTENTE_PAR_DEFAUT_S}
-            horsLigne={sondage?.horsLigne ?? false}
-            echec={echecGeneration}
-            peutReessayer={!!echecGeneration && !PANNES.includes(echecGeneration.raison) && !!etat.photo && selectionsActives.length > 0}
-            attenteReessai={attenteReessai}
-            onReessayer={() => {
-              rouvrir();
-              void generer();
-            }}
-            onPrevenir={enAttente ? prevenir : undefined}
-            lecturePhoto={lecturePhoto}
-          >
-            {envoye ? (
-              <div role="status" className="rounded-[var(--rayon-sm)] bg-ok-fond p-4 text-ok-texte">
-                <p className="text-[17px] font-semibold">Demande bien reçue</p>
-                <p className="mt-1 text-[14.5px] leading-relaxed">Votre photo et vos choix de matières nous sont parvenus. Nous réalisons la simulation et vous l&apos;envoyons par e-mail avec votre devis, {DELAI_REPONSE}. Besoin de nous joindre avant ? {ENTREPRISE.telephone}.</p>
-              </div>
-            ) : etat.photo ? (
-              <>
-                {echecGeneration ? (
-                  <Bouton variante="secondaire" onClick={revenirAuxMatieres}>
-                    Revenir à mes matières
-                  </Bouton>
-                ) : null}
-                {formulaireSecours}
-                <Turnstile action="simulateur-secours" theme="light" onToken={setJetonCaptcha} />
-              </>
-            ) : (
-              <Bouton
-                variante="secondaire"
-                onClick={() => {
-                  effacerEchec();
-                  setEcran(2);
-                }}
-              >
-                Nouvelle simulation
-              </Bouton>
-            )}
-          </EcranAttente>
-        ) : null}
-
-        {ecran === 3 && !enAttente && !echecGeneration ? (
-          etat.photo ? (
-            <EcranMatieres
-              piece={piece}
+          {ecran === 2 ? (
+            <EcranPhoto
+              projet={projet}
               photo={etat.photo}
               rapport={rapportPhoto(etat)}
+              occupe={occupe === "photo"}
+              onFichier={(f, exemple) => void choisirPhoto(f, exemple)}
+              exemples={exemples}
+              onGarder={() => {
+                effacerEchec();
+                setEcran(3);
+              }}
+            />
+          ) : null}
+
+          {ecran === 3 && (enAttente || echecGeneration) ? (
+            <EcranGeneration
+              piece={piece}
+              photo={etat.photo}
               selections={etat.selections}
               analyse={etat.analyse}
-              conseilIgnore={conseilIgnore}
-              onIgnorerConseil={() => setConseilIgnore(true)}
-              onReprendrePhoto={() => setEcran(2)}
-              onOuvrir={setZoneOuverte}
-              onRetirer={retirer}
-              focusZone={focusZone}
-              zonesRefusees={zonesRefusees}
-              messageRefus={messageRefus}
-              peutGenerer={peutGenerer}
-              raisonBloque={raisonBloque}
-              occupe={occupe === "lancement"}
-              onGenerer={() => void generer()}
-              zonesMax={zones.zonesMax}
-              captcha={<Turnstile action="simulateur" theme="light" onToken={setJetonCaptcha} />}
-            />
-          ) : (
-            // Sans photo sur cet appareil (rendu retrouvé par un lien, mémoire vide) : on le dit, plutôt qu'un écran vide.
-            <section aria-labelledby="etape-sans-photo" className="space-y-4">
-              <h2 id="etape-sans-photo" className="font-display text-[26px] leading-tight font-semibold">
-                Commencez par une photo
-              </h2>
-              <p className="text-[15px] text-encre-2">Aucune photo n&apos;est en mémoire sur cet appareil : choisissez-en une pour lancer une simulation.</p>
-              <Bouton onClick={() => setEcran(2)}>Choisir une photo</Bouton>
-            </section>
-          )
-        ) : null}
-
-        {ecran === 4 && rendu ? (
-          <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres}>
-            <DemandeApresRendu
-              projet={projet.id}
-              rendu={rendu}
-              tarifs={tarifs}
+              sondage={sondage}
+              travail={etat.travailEnCours}
+              echec={echecGeneration}
+              peutReessayer={!!echecGeneration && !PANNES.includes(echecGeneration.raison) && !!etat.photo && selectionsActives.length > 0}
+              attenteReessai={attenteReessai}
+              onReessayer={() => {
+                rouvrir();
+                void generer();
+              }}
+              onPrevenir={enAttente ? prevenir : undefined}
+              envoye={!!envoye}
               formulaire={formulaire}
               onFormulaire={setFormulaire}
               avecVille={!(etat.ville && etat.codePostal)}
-              occupe={occupe === "envoi"}
-              envoye={envoye}
-              onEnvoyer={(extra) => void envoyer(null, false, extra)}
-              onEstimationVue={(meta) => {
-                if (estimationVue.current) return;
-                estimationVue.current = true;
-                envoyerEvenement("ESTIMATION_VUE", { ...meta, projet: projet.id });
+              envoiEnCours={occupe === "envoi"}
+              onEnvoyer={(e) => void envoyer(e, true)}
+              onRevenir={revenirAuxMatieres}
+              onNouvelle={() => {
+                effacerEchec();
+                setEcran(2);
               }}
-              captcha={<Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />}
-              onRecommencer={() => void recommencer()}
+              onJeton={setJetonCaptcha}
+              exemple={etat.exemple}
             />
-          </EcranResultat>
-        ) : null}
+          ) : null}
+
+          {ecran === 3 && !enAttente && !echecGeneration ? (
+            etat.photo ? (
+              <EcranMatieres
+                piece={piece}
+                photo={etat.photo}
+                rapport={rapportPhoto(etat)}
+                selections={etat.selections}
+                analyse={etat.analyse}
+                conseilIgnore={conseilIgnore}
+                onIgnorerConseil={() => setConseilIgnore(true)}
+                onReprendrePhoto={() => setEcran(2)}
+                onOuvrir={setZoneOuverte}
+                onRetirer={retirer}
+                focusZone={focusZone}
+                zonesRefusees={zonesRefusees}
+                messageRefus={messageRefus}
+                peutGenerer={peutGenerer}
+                raisonBloque={raisonBloque}
+                occupe={occupe === "lancement"}
+                onGenerer={() => void generer()}
+                zonesMax={zones.zonesMax}
+                captcha={<Turnstile action="simulateur" theme="light" onToken={setJetonCaptcha} />}
+              />
+            ) : (
+              <EcranSansPhoto onPhoto={() => setEcran(2)} />
+            )
+          ) : null}
+
+          {ecran === 4 && rendu ? (
+            <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres} selections={etat.selections} onEchantillons={envoye ? undefined : () => setFormulaire((f) => ({ ...f, echantillons: true }))}>
+              <DemandeApresRendu
+                projet={projet.id}
+                rendu={rendu}
+                tarifs={tarifs}
+                formulaire={formulaire}
+                onFormulaire={setFormulaire}
+                avecVille={!(etat.ville && etat.codePostal)}
+                occupe={occupe === "envoi"}
+                envoye={envoye}
+                onEnvoyer={(extra) => void envoyer(null, false, extra)}
+                onEstimationVue={(meta) => {
+                  if (estimationVue.current) return;
+                  estimationVue.current = true;
+                  envoyerEvenement("ESTIMATION_VUE", { ...meta, projet: projet.id });
+                }}
+                captcha={<Turnstile action="simulateur-devis" theme="light" onToken={setJetonCaptcha} />}
+                onRecommencer={() => void recommencer()}
+              />
+            </EcranResultat>
+          ) : null}
+        </Suspense>
       </div>
 
-      {zoneCatalogue ? (
-        <FeuilleCatalogue
-          ouverte={!!zoneOuverte}
-          onFermer={() => setZoneOuverte(null)}
-          zone={{ id: zoneCatalogue.id, libelle: zoneCatalogue.libelle }}
-          autresZones={piece.zones.filter((z) => z.id !== zoneCatalogue.id && !zoneCatalogue.exclut.includes(z.id) && !z.exclut.includes(zoneCatalogue.id) && !composantesDe(piece, zoneCatalogue.id).includes(z.id)).map((z) => ({ id: z.id, libelle: z.libelle }))}
-          choisie={etat.selections[zoneCatalogue.id]?.ref ?? null}
-          favoris={favoris}
-          onFavori={basculerFavori}
-          onChoisir={(teinte, aussi) => choisirTeinte(zoneCatalogue.id, teinte, aussi)}
-          urlVignette={urlVignette}
-          urlEchantillon={urlEchantillon}
-        />
+      {feuille ? (
+        <Suspense fallback={null}>
+          <FeuilleCatalogue {...feuille} />
+        </Suspense>
       ) : null}
     </div>
   );

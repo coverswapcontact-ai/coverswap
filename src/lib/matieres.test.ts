@@ -8,10 +8,12 @@ import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared
 import revetements from "@/data/revetements.json";
 import { classesBouton } from "@/components/simulation/Bouton";
 import { garderLeFocus } from "@/components/simulation/PleinEcran";
-import { GRILLE_TUILES_GRANDES, SqueletteTuiles } from "@/components/simulation/Squelette";
+import { GRILLE_ECHANTILLONS, SqueletteTuiles } from "@/components/simulation/Squelette";
 import { FAMILLES, libelleFamille } from "./familles-matieres";
-import { MATIERES_PAR_PAGE, catalogueEnMemoireSiCharge, chargerCatalogue, choixFamilles, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, messageAucuneMatiere, type Matiere } from "./matieres";
+import { vueDans } from "./indexation-matieres";
+import { MATIERES_PAR_PAGE, catalogueEnMemoireSiCharge, chargerCatalogue, choixFamilles, choixFinitions, estAffine, etatListeMatieres, filtrerMatieres, lienEssayer, lireAdresseMatieres, messageAucuneMatiere, premieresDuPresentoir, tiroirs, type Matiere } from "./matieres";
 import { NB_REFERENCES } from "./offre";
+import { teinteDe, trierParTeinte } from "./teintes";
 
 /**
  * Mission 16 (partie 5) — la page Matières : ce que l'adresse demande (`?famille=`, `?ref=`), le filtre (famille,
@@ -21,7 +23,8 @@ import { NB_REFERENCES } from "./offre";
 
 const CATALOGUE = revetements as Matiere[];
 const SRC = join(process.cwd(), "src");
-const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8");
+/** Fins de ligne ramenées à LF : sous Windows (`core.autocrlf`), un fichier repris par git revient en CRLF. */
+const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8").replace(/\r\n/g, "\n");
 const compter = (texte: string, motif: string) => texte.split(motif).length - 1;
 /** Un routeur factice : la page (liens posés dans le plein écran) lit le routeur de Next ; rien ne navigue ici. */
 const ROUTEUR = { back() {}, forward() {}, refresh() {}, hmrRefresh() {}, push() {}, replace() {}, prefetch() {} };
@@ -48,9 +51,10 @@ describe("l'adresse de la page Matières", () => {
     assert.deepEqual(lireAdresseMatieres("?famille=pierre&ref=K1", null), { famille: "pierre", ouverte: null });
   });
 
-  test("« Essayer sur ma photo » → le simulateur, la matière présélectionnée (encodée)", () => {
+  test("« Essayer sur ma photo » → le simulateur, la matière présélectionnée (encodée) ; `depuis` seulement s'il est donné", () => {
     assert.equal(lienEssayer("K1"), "/simulateur?ref=K1");
     assert.equal(lienEssayer("A B&C"), "/simulateur?ref=A%20B%26C");
+    assert.equal(lienEssayer("NF13", "matieres"), "/simulateur?ref=NF13&depuis=matieres");
   });
 });
 
@@ -74,6 +78,59 @@ describe("filtre et familles", () => {
     assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "bois", recherche: "   " }), filtrerMatieres(CATALOGUE, { filtre: "bois" }));
     const ids = filtrerMatieres(CATALOGUE, { filtre: "tout" }).map((m) => m.id);
     assert.deepEqual(ids, CATALOGUE.map((m) => m.id));
+  });
+
+  test("site 3.0, lot D2 — l'affinage : teinte, finition, vue dans une ambiance, combinables ; l'ordre du catalogue est gardé", () => {
+    const vues = Object.keys(vueDans());
+    const verts = filtrerMatieres(CATALOGUE, { filtre: "tout", teinte: "Vert" });
+    assert.ok(verts.length > 0 && verts.every((m) => teinteDe(m.famille, m.hex) === "Vert"));
+    assert.ok(verts.some((m) => m.id === "NF13"), "le vert profond");
+    assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "tout", finition: "Structured" }).map((m) => m.id), ["AA01", "AA02", "AA04", "AA05", "AA12", "AA17"]);
+    assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "tout", finition: "Rustic" }).map((m) => m.id), ["AA15"]);
+    assert.equal(filtrerMatieres(CATALOGUE, { filtre: "tout", finition: "Glitter" }).length, 16);
+    // « Vue dans une ambiance » garde les 49 références vues (séries 1 et 2), et elles seules.
+    const enAmbiance = filtrerMatieres(CATALOGUE, { filtre: "tout", ambiance: vues });
+    assert.equal(enAmbiance.length, 49);
+    assert.deepEqual(enAmbiance.map((m) => m.id).sort(), [...vues].sort());
+    assert.ok(!enAmbiance.some((m) => m.id === "AF02" || m.id === "NF27"));
+    // Combinés : famille, teinte, ambiance, recherche.
+    const boisClairsVus = filtrerMatieres(CATALOGUE, { filtre: "bois", teinte: "Bois clair", ambiance: vues });
+    assert.ok(boisClairsVus.length > 0 && boisClairsVus.every((m) => m.famille === "bois" && teinteDe("bois", m.hex) === "Bois clair" && vues.includes(m.id)));
+    assert.ok(boisClairsVus.some((m) => m.id === "AG13"), "le chêne pâle de la bordeaux");
+    assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "couleur", teinte: "Vert", ambiance: vues, recherche: "deep" }).map((m) => m.id), ["NF13"]);
+    assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "paillettes", finition: "Structured" }), []);
+    const ids = enAmbiance.map((m) => m.id);
+    assert.deepEqual(ids, CATALOGUE.map((m) => m.id).filter((id) => ids.includes(id)), "le filtre garde l'ordre du catalogue ; le présentoir range ensuite par teinte");
+    // Sans affinage, rien ne change ; un affinage vide n'en est pas un.
+    assert.deepEqual(filtrerMatieres(CATALOGUE, { filtre: "bois", teinte: null, finition: null, ambiance: null }), filtrerMatieres(CATALOGUE, { filtre: "bois" }));
+    assert.deepEqual([estAffine({}), estAffine({ teinte: "Vert" }), estAffine({ finition: "Rustic" }), estAffine({ ambiance: vues }), estAffine({ ambiance: null })], [false, true, true, true, false]);
+  });
+
+  test("site 3.0, lot D2 — les sept tiroirs : comptés dans les données, du plus fourni au moins fourni, quatre teintes de leur nuancier", () => {
+    const t = tiroirs(CATALOGUE);
+    assert.deepEqual(t.map((f) => [f.id, f.libelle, f.nombre]), [
+      ["tout", "Tout", 497],
+      ["bois", "Bois", 267],
+      ["couleur", "Couleurs", 89],
+      ["textile", "Textiles", 41],
+      ["pierre", "Pierres", 36],
+      ["metal", "Métaux", 31],
+      ["beton", "Bétons et stucs", 17],
+      ["paillettes", "Paillettes", 16],
+    ]);
+    for (const f of t) {
+      assert.equal(f.teintes.length, 4, f.id);
+      for (const hex of f.teintes) assert.match(hex, /^#[0-9A-F]{6}$/, f.id);
+      if (f.id !== "tout") for (const hex of f.teintes) assert.ok(CATALOGUE.some((m) => m.famille === f.id && m.hex.toUpperCase() === hex), `${f.id} : ${hex} est une de ses matières`);
+    }
+    assert.equal(new Set(t[1].teintes).size, 4, "quatre teintes différentes du bois");
+    // La finition : les trois qui ne sont pas « Standard » (474 matières sur 497), glosées.
+    assert.deepEqual(choixFinitions(CATALOGUE), [
+      { id: "Structured", libelle: "Structurée", nombre: 6 },
+      { id: "Rustic", libelle: "Rustique", nombre: 1 },
+      { id: "Glitter", libelle: "Pailletée", nombre: 16 },
+    ]);
+    assert.equal(CATALOGUE.filter((m) => m.finition === "Soft").length, 474);
   });
 
   test("le catalogue est chargé une fois, partagé avec la feuille du simulateur", async () => {
@@ -110,6 +167,16 @@ describe("la liste : premier lot, attente, échec, comptes", () => {
     assert.equal(bois.message, "Le catalogue ne s'est pas chargé. Vérifiez votre réseau, puis rechargez la page.");
   });
 
+  test("un affinage avant le catalogue attend (squelette) ; sans résultat, il dit d'enlever un filtre", () => {
+    const vert = etatListeMatieres({ ...base, filtrees: null, affine: true });
+    assert.deepEqual([vert.visibles.length, vert.attend], [0, true]);
+    assert.equal(etatListeMatieres({ ...base, filtrees: [], affine: true }).message, "Aucune matière pour ce choix : enlevez un filtre ou ouvrez un autre tiroir.");
+    assert.equal(messageAucuneMatiere("favoris", "", "matière", true), messageAucuneMatiere("tout", "zzz", "matière", true), "l'affinage passe avant le reste");
+    assert.equal(etatListeMatieres({ ...base, filtrees: null }).visibles.length, MATIERES_PAR_PAGE, "sans affinage : le premier lot du serveur");
+    const boisClairs = filtrerMatieres(CATALOGUE, { filtre: "bois", teinte: "Bois clair", ambiance: Object.keys(vueDans()) });
+    assert.equal(etatListeMatieres({ ...base, filtre: "bois", filtrees: boisClairs, affine: true, precisions: ["Bois clair", "vues dans une ambiance"] }).message, `${boisClairs.length} matières dans Bois (Bois clair, vues dans une ambiance)`, "le compte dit l'affinage");
+  });
+
   test("catalogue arrivé : compte filtré, « Voir plus », listes vides (mêmes règles que la feuille du simulateur)", () => {
     const bois = filtrerMatieres(CATALOGUE, { filtre: "bois" });
     const etat = etatListeMatieres({ ...base, filtre: "bois", filtrees: bois });
@@ -131,7 +198,7 @@ describe("la liste : premier lot, attente, échec, comptes", () => {
 });
 
 describe("la page rendue", () => {
-  test("le serveur rend le titre, l'intro et le premier lot de 30 tuiles (vignettes du CRM), sans bouton principal", async () => {
+  test("le serveur rend le titre, l'intro et le premier lot de 30 échantillons du nuancier (vignettes du CRM), sans bouton principal", async () => {
     const { default: PageMatieres, metadata } = await import("@/app/matieres/page");
     const html = renderToStaticMarkup(avecRouteur(createElement(PageMatieres))).replace(/&#x27;/g, "'");
     assert.match(html, /<p class="surtitre">Catalogue Cover Styl'<\/p><h1 class="titre-1 mt-2 text-encre">Choisissez votre matière<\/h1>/);
@@ -139,22 +206,65 @@ describe("la page rendue", () => {
     // L'intro tient en deux lignes à 390 px (environ 42 caractères par ligne en 17 px sur 358 px).
     const intro = html.match(/<p class="texte mt-4 max-w-2xl text-encre-2">([^<]*)<\/p>/);
     assert.ok(intro && intro[1].length <= 84, intro?.[1]);
-    assert.equal(compter(html, "/api/site/echantillons/"), MATIERES_PAR_PAGE);
-    for (const m of CATALOGUE.slice(0, MATIERES_PAR_PAGE)) assert.ok(html.includes(`/api/site/echantillons/${m.id}?l=320`), m.id);
-    assert.ok(!html.includes(`/api/site/echantillons/${CATALOGUE[MATIERES_PAR_PAGE].id}?`), "le 31e attend « Voir plus »");
+    // La grille seule (la bande de matière qui ferme la page lit aussi le CRM).
+    const debut = html.indexOf(`<ul class="mt-4 ${GRILLE_ECHANTILLONS}">`);
+    assert.ok(debut > 0, "la grille des échantillons");
+    const grille = html.slice(debut, html.indexOf("</ul>", debut));
+    assert.equal(compter(grille, "/api/site/echantillons/"), MATIERES_PAR_PAGE);
+    const nuancier = trierParTeinte(CATALOGUE);
+    assert.deepEqual(premieresDuPresentoir(CATALOGUE), nuancier.slice(0, MATIERES_PAR_PAGE));
+    let precedent = -1;
+    for (const m of nuancier.slice(0, MATIERES_PAR_PAGE)) {
+      const ici = grille.indexOf(`/api/site/echantillons/${m.id}?l=320`);
+      assert.ok(ici > precedent, `${m.id} à sa place dans le nuancier`);
+      precedent = ici;
+    }
+    assert.ok(!grille.includes(`/api/site/echantillons/${nuancier[MATIERES_PAR_PAGE].id}?`), "le 31e attend « Voir plus »");
     assert.ok(html.includes(`Voir plus (${NB_REFERENCES - MATIERES_PAR_PAGE})`));
+    // Chaque échantillon : coin arrondi, ombre légère, la couleur de la matière dessous, son cartel ; la première rangée part tout de suite, le reste à la demande.
+    assert.equal(compter(grille, 'loading="eager"'), 5);
+    assert.equal(compter(grille, 'loading="lazy"'), MATIERES_PAR_PAGE - 5);
+    assert.equal(compter(grille, "rounded-[var(--rayon-sm)] bg-fond-2 shadow-[0_10px_22px_rgba(40,25,15,0.18)]"), MATIERES_PAR_PAGE);
+    const premiere = nuancier[0];
+    assert.ok(grille.includes(`background-color:${premiere.hex}`), "la couleur de la matière tant que la vignette charge");
+    // Lot F6 : le bouton est nommé par son propre texte (le cartel, puis « voir en grand » pour les lecteurs d'écran), plus par un aria-label qui le doublait.
+    const premierBouton = grille.slice(grille.indexOf("<button"), grille.indexOf("</button>"));
+    assert.ok(!premierBouton.includes("aria-label"), "pas d'aria-label qui double le texte");
+    assert.ok(premierBouton.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().startsWith(`${premiere.nom} · ${premiere.id} · `), "l'échantillon est nommé par son cartel");
+    assert.ok(premierBouton.includes('<span class="sr-only"> : voir en grand</span>'));
+    assert.equal(compter(grille, '<span class="relative block pl-[15px] mt-3"'), MATIERES_PAR_PAGE, "un cartel par échantillon, dans le bouton");
+    assert.ok(!grille.includes("<p "), "pas de paragraphe dans un bouton");
     assert.equal(compter(html, `class="${classesBouton("principal")}`), 0, "le bouton principal est dans la matière en grand");
-    assert.match(html, /grid-cols-3[^"]*md:grid-cols-5/);
-    for (const f of choixFamilles(CATALOGUE)) assert.ok(html.includes(`>${f.libelle}</span>`), f.libelle);
-    assert.match(String(metadata.title && typeof metadata.title === "object" && "absolute" in metadata.title ? metadata.title.absolute : ""), new RegExp(`^Matières Cover Styl' : bois, marbre, béton, couleurs — ${NB_REFERENCES} références`));
+    assert.match(html, /grid-cols-2[^"]*sm:grid-cols-3[^"]*lg:grid-cols-5/);
+    // Les tiroirs, leurs nombres et leurs pastilles ; les filtres.
+    for (const f of tiroirs(CATALOGUE)) assert.ok(html.includes(`<span>${f.libelle}</span><span class="text-[13px] ${f.id === "tout" ? "text-blanc/70" : "text-encre-2"}">${f.nombre}</span>`), f.libelle);
+    assert.equal(choixFamilles(CATALOGUE).length, tiroirs(CATALOGUE).length, "« Tout » et les sept familles");
+    assert.ok(html.includes(">Favoris</span>"));
+    const barre = html.slice(html.indexOf('aria-label="Familles de matières"'), html.indexOf('<select id="filtre-teinte"'));
+    assert.equal(compter(barre, "h-4 w-4 rounded-full ring-2"), 32, "quatre pastilles par tiroir, « Tout » compris");
+    // Lot D3 : les sept familles mènent à leur page, chacune avec les quatre teintes de son tiroir.
+    const familles = html.slice(html.indexOf('<section id="familles"'), html.indexOf("</section>", html.indexOf('<section id="familles"')));
+    assert.equal(compter(familles, "h-4 w-4 rounded-full ring-2"), 28, "quatre pastilles par famille");
+    for (const f of tiroirs(CATALOGUE).filter((t) => t.id !== "tout")) assert.ok(familles.includes(`href="/matieres/${f.id}"`) && familles.includes(`${f.nombre} références`), f.id);
+    assert.match(html, /<select id="filtre-teinte"/);
+    assert.match(html, /<select id="filtre-finition"[^>]*>.*Structurée \(6\).*Rustique \(1\).*Pailletée \(16\)<\/option><\/select>/);
+    assert.ok(!/<option value="Soft"/.test(html), "« Standard » ne filtrerait presque rien");
+    assert.ok(html.includes('<span>Vue dans une ambiance</span><span class="text-[13px] text-encre-2">49</span>'));
+    // La bande de matière ferme le présentoir, après la grille.
+    assert.ok(html.indexOf('aria-label="Matière Original Oak · AA14') > debut);
+    assert.equal(String(metadata.title && typeof metadata.title === "object" && "absolute" in metadata.title ? metadata.title.absolute : ""), `Films adhésifs Cover Styl' : ${NB_REFERENCES} matières | CoverSwap`, "site 3.0 (lot F2) : 60 caractères au plus (docs/SEO.md)");
   });
 
   test("la matière en grand : PleinEcran + ZoomImage (l'échantillon entier), nom, référence, famille, « Essayer sur ma photo »", () => {
     const source = lire("app/matieres/_components/Matieres.tsx");
     assert.match(source, /<PleinEcran/);
     assert.match(source, /apres=\{agrandie \? urlEchantillon\(agrandie\.id\) : ""\}/);
-    assert.match(source, /<Lien href=\{lienEssayer\(agrandie\.id\)\} onClick=\{aller\(lienEssayer\(agrandie\.id\)\)\} plein>\s*Essayer sur ma photo/);
-    assert.match(source, /Réf\. \{agrandie\.id\} · \{libelleFamille\(agrandie\.famille\)\}/);
+    assert.match(source, /<Lien href=\{lienEssayer\(agrandie\.id, "matieres"\)\} onClick=\{aller\(lienEssayer\(agrandie\.id, "matieres"\)\)\} plein>\s*Essayer sur ma photo/);
+    // Le cartel de la matière : nom, référence, famille, finition.
+    assert.match(source, /<Cartel matiere=\{agrandie\} \/>/);
+    // « Vue dans » : un lien de PAGE (pas le routeur) — l'ancre ouvre l'ambiance même dans la suite masquée de /inspirations.
+    assert.match(source, /<a href=\{`\/inspirations#\$\{a\.id\}`\} className="[^"]*">/);
+    assert.doesNotMatch(source, /aller\(`\/inspirations/);
     assert.match(source, /useFavoris\(\)/);
     assert.match(source, /useLiensDeFeuille\(agrandie !== null, fermer\)/, "le lien part une fois le plein écran fermé");
     assert.doesNotMatch(source, /useSearchParams\(/,"l'adresse est lue sans rendre toute la page côté client");
@@ -205,20 +315,22 @@ describe("la page rendue", () => {
 
   test("focus visible : les tuiles s'arrêtent sous l'en-tête et la barre collée ; les pastilles du bout ne sont pas rognées", () => {
     const page = lire("app/matieres/_components/Matieres.tsx");
-    assert.match(page, /const SOUS_LES_BARRES = "scroll-mt-\[140px\]";/);
+    assert.match(page, /const SOUS_LES_BARRES = "scroll-mt-\[140px\] lg:scroll-mt-\[200px\]";/, "dès 1 024 px, les tiroirs tiennent sur deux rangées");
     assert.equal(compter(page, "SOUS_LES_BARRES)"), 2, "la tuile et la recherche");
     assert.ok(page.includes("<BoutonFavori nom={m.nom} favori={favori} onBasculer={() => basculerFavori(m.id)} className={SOUS_LES_BARRES} />"), "le cœur aussi");
     assert.match(page, /role="group" aria-label="Familles de matières" className="[^"]*overflow-x-auto px-4 [^"]*md:px-6/);
   });
 
-  test("le squelette de la page a la grille et la hauteur des vraies tuiles (rien ne saute à l'arrivée du catalogue)", () => {
+  test("le squelette de la page a la grille et la hauteur des vrais échantillons (rien ne saute à l'arrivée du catalogue)", () => {
     const page = lire("app/matieres/_components/Matieres.tsx");
-    assert.match(page, /<ul className=\{cx\("mt-4", GRILLE_TUILES_GRANDES\)\}>/);
-    assert.match(page, /<SqueletteTuiles nombre=\{15\} grand \/>/);
-    const squelette = renderToStaticMarkup(createElement(SqueletteTuiles, { nombre: 15, grand: true }));
-    assert.ok(squelette.startsWith(`<ul class="${GRILLE_TUILES_GRANDES}"`), squelette.slice(0, 120));
-    assert.equal(compter(squelette, "<li>"), 15);
-    assert.equal(compter(squelette, "h-[19.5px]") + compter(squelette, "h-[22.5px]"), 30, "le libellé de 13 px puis le nom de 15 px");
+    assert.match(page, /<ul className=\{cx\("mt-4", GRILLE_ECHANTILLONS\)\}>/);
+    assert.match(page, /<SqueletteTuiles nombre=\{10\} grand \/>/);
+    const squelette = renderToStaticMarkup(createElement(SqueletteTuiles, { nombre: 10, grand: true }));
+    assert.ok(squelette.startsWith(`<ul class="${GRILLE_ECHANTILLONS}"`), squelette.slice(0, 120));
+    assert.equal(compter(squelette, "<li>"), 10);
+    // Le cartel : le nom de 19 px (interligne 1,25 : 24 px), puis « RÉF · famille · finition » en 12 px, souvent sur deux lignes (34 px).
+    assert.equal(compter(squelette, "mt-3 flex h-[24px]") + compter(squelette, "mt-1 flex h-[34px]"), 20, "le nom puis la ligne du cartel");
+    assert.equal(compter(squelette, "pl-[15px]"), 20, "décalés comme le texte du cartel, à droite de son filet");
     // Le squelette du simulateur ne change pas.
     assert.ok(renderToStaticMarkup(createElement(SqueletteTuiles)).startsWith('<ul class="grid grid-cols-3 gap-x-2.5 gap-y-3"'));
   });

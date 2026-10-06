@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import Breadcrumb from "@/components/Breadcrumb";
-import { BreadcrumbSchema } from "@/components/JsonLd";
 import { Lien } from "@/components/simulation/Lien";
 import { Section } from "@/components/simulation/Section";
 import { ZONES, getZoneSlug } from "@/data/zones";
-import { ENTREPRISE } from "@/lib/entreprise";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { TITRE_ZONES, descriptionZones } from "./textes-seo";
 
 /**
  * Zones d'intervention (mission 16, partie 5) : l'index des 8 pages locales, conservé (lien du pied de page et de la
@@ -15,8 +14,8 @@ import { metadonneesPage } from "@/lib/metadonnees";
  */
 export const metadata: Metadata = {
   ...metadonneesPage({
-    titre: "Zones d'intervention CoverSwap — Covering Adhésif Hérault & Occitanie",
-    description: "CoverSwap intervient à Montpellier, Pérols, Lattes, Mauguio, Castelnau-le-Lez, Béziers, Nîmes, Sète et dans toute la France. Découvrez nos prestations de covering adhésif Cover Styl' par ville.",
+    titre: TITRE_ZONES,
+    description: descriptionZones(ZONES.map((z) => z.ville)),
     chemin: "/zones",
   }),
   keywords: "covering Montpellier, covering Pérols, covering Hérault, covering Occitanie, rénovation cuisine Montpellier, covering adhésif France, zone intervention covering",
@@ -27,17 +26,10 @@ export default function ZonesIndexPage() {
 
   return (
     <div className="bg-fond">
-      <BreadcrumbSchema
-        items={[
-          { name: "Accueil", url: ENTREPRISE.site },
-          { name: "Zones d'intervention", url: `${ENTREPRISE.site}/zones` },
-        ]}
-      />
-
       {/* OUVERTURE */}
       <section className="bg-fond-2 px-4 pt-10 pb-[var(--espace-5)] md:px-6 md:pt-14">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention" }]} />
+          <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Zones d'intervention", href: "/zones" }]} />
           <p className="surtitre">Hérault · Occitanie · France entière</p>
           <h1 className="titre-1 mt-2 max-w-3xl text-encre">Zones d&apos;intervention CoverSwap</h1>
           <p className="texte mt-4 max-w-3xl text-encre-2">

@@ -167,7 +167,7 @@ export function FormulairePro() {
       <Turnstile action="pro" theme="light" onToken={setJeton} actif={touche} />
 
       {erreur ? (
-        <p role="alert" className="rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
+        <p role="alert" className="rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[14.5px] text-alerte-texte">
           {erreur}
         </p>
       ) : null}

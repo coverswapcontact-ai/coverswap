@@ -1,7 +1,5 @@
-import type { ReactNode } from "react";
 import { sourcesPhoto } from "@/lib/images-preparees";
-import { Etiquette } from "./Etiquette";
-import { ImagePreparee } from "./ImagePreparee";
+import { CadrePhoto, type ProprietesCommunes } from "./CadrePhoto";
 
 /**
  * Une photo du site (mission 16) : `<picture>` AVIF + WebP + JPEG d'après le
@@ -17,25 +15,8 @@ import { ImagePreparee } from "./ImagePreparee";
  * `etiquette` : « Ambiance » (illustration) ou « Simulation » (rendu du
  * moteur) — jamais une image présentée comme un chantier. Sans état : rendu
  * serveur, ou dans un composant client (les cartes de pièces, partie 2).
+ * Lot F7 : le rendu est dans `CadrePhoto` (sources déjà résolues) ; ce composant-ci lit le manifeste.
  */
-type ProprietesCommunes = {
-  alt: string;
-  /** Rapport réservé (« 4 / 3 ») ; par défaut celui de l'image. */
-  ratio?: string;
-  /** L'image de l'ouverture, une seule par page : `loading="eager"` + `fetchpriority="high"`. */
-  priorite?: boolean;
-  /** Une image du premier écran qui n'est pas l'ouverture : `loading="eager"`, sans `fetchpriority`. Sinon `lazy`. */
-  immediat?: boolean;
-  /** L'attribut `sizes`. */
-  tailles?: string;
-  className?: string;
-  etiquette?: "Ambiance" | "Simulation";
-  /** Mission 19 : un calque posé sur l'image, dans son cadre (les étiquettes matière, `ambiances/CalqueMatieres`). */
-  calque?: ReactNode;
-  /** Cadre en `span` (bloc) au lieu d'un `div` : pour une photo posée dans un bouton ou un lien, qui n'admettent pas de `div`. */
-  enLigne?: boolean;
-};
-
 export type ProprietesPhoto = ProprietesCommunes &
   (
     | { /** Nom de l'image dans le manifeste. */ nom: string; src?: never; largeur?: never; hauteur?: never }
@@ -43,38 +24,10 @@ export type ProprietesPhoto = ProprietesCommunes &
     | { src: string; ratio: string; largeur?: number; hauteur?: number; nom?: never }
   );
 
-/** Un nom absent du manifeste (image pas encore préparée) : le cadre garde une place visible. */
-const RATIO_DE_REPLI = "4 / 3";
-
-const TAILLES_PAR_DEFAUT = "(min-width: 1024px) 50vw, 100vw";
-
-export function Photo({ nom, src, largeur, hauteur, alt, ratio, priorite = false, immediat = false, tailles = TAILLES_PAR_DEFAUT, className, etiquette, enLigne = false, calque }: ProprietesPhoto) {
-  const sources = nom ? sourcesPhoto(nom) : null;
-  const l = sources?.largeur ?? largeur;
-  const h = sources?.hauteur ?? hauteur;
-  const rapport = ratio ?? (l && h ? `${l} / ${h}` : sources || src ? undefined : RATIO_DE_REPLI);
-  const chargement = { loading: priorite || immediat ? ("eager" as const) : ("lazy" as const), fetchPriority: priorite ? ("high" as const) : undefined, decoding: "async" as const };
-  // Sans rapport connu (ne devrait pas arriver : le type l'exige), l'image reste dans le flux et donne sa hauteur.
-  const classesImage = rapport ? "absolute inset-0 h-full w-full object-cover" : "block h-auto w-full";
-  const Cadre = enLigne ? "span" : "div";
-
-  return (
-    <Cadre className={`relative ${enLigne ? "block " : ""}overflow-hidden bg-fond-2${className ? ` ${className}` : ""}`} style={rapport ? { aspectRatio: rapport } : undefined}>
-      {sources ? (
-        <ImagePreparee sources={sources} tailles={tailles} alt={alt} className={classesImage} {...chargement} />
-      ) : src ? (
-        // eslint-disable-next-line @next/next/no-img-element -- image pas encore préparée, servie telle quelle
-        <img src={src} width={largeur} height={hauteur} alt={alt} className={classesImage} {...chargement} />
-      ) : (
-        <span {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })} className="absolute inset-0" />
-      )}
-      {calque}
-      {/* Image décorative (`alt=""`) : son étiquette non plus n'est pas lue, sinon il resterait un mot isolé (« Ambiance »). */}
-      {etiquette ? (
-        <Etiquette className="absolute top-3 left-3" muette={!alt}>
-          {etiquette}
-        </Etiquette>
-      ) : null}
-    </Cadre>
-  );
+export function Photo(props: ProprietesPhoto) {
+  if (props.nom !== undefined) {
+    const { nom, ...reste } = props;
+    return <CadrePhoto {...reste} sources={sourcesPhoto(nom)} />;
+  }
+  return <CadrePhoto {...props} />;
 }

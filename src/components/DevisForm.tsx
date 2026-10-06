@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/LienSite";
 import { Bouton } from "@/components/simulation/Bouton";
 import { CHAMP } from "@/app/simulateur/_components/Formulaires";
 import { consentementPourEnvoi } from "@/lib/consentement";
@@ -29,12 +29,15 @@ export default function DevisForm({
   reference,
   submitLabel = "Envoyer ma demande",
   familles = FAMILLES_REPLI,
+  messageInitial,
 }: {
   source: string;
   reference?: string;
   submitLabel?: string;
   /** Les prestations de CoverSwap (fichier unique du CRM) ; un repli sinon. */
   familles?: Pick<FamillePrestation, "id" | "libelle" | "aide">[];
+  /** Site 3.0 (lot D4) : le message prérempli (une demande de visite avec échantillons, `lib/visite`). */
+  messageInitial?: string;
 }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -228,6 +231,7 @@ export default function DevisForm({
           <textarea
             id="devis-message"
             name="message"
+            defaultValue={messageInitial}
             required
             rows={4}
             placeholder="Décrivez votre projet, vos contraintes, vos envies..."
@@ -239,16 +243,17 @@ export default function DevisForm({
 
         <CaseConsentement id="consentement-devis" checked={consentement} onChange={setConsentement} />
 
-        {/* Honeypot - hidden from humans */}
+        {/* Honeypot - hidden from humans. Lot F6 : le champ sort aussi de l'ordre du clavier (`tabIndex={-1}`, comme ceux de
+            /pro et de l'accueil) — un champ atteignable sous aria-hidden coûtait 4 points d'accessibilité à /contact. */}
         <div className="absolute overflow-hidden" style={{ width: 0, height: 0, opacity: 0, position: "absolute", top: "-9999px", left: "-9999px" }} aria-hidden="true" tabIndex={-1}>
           <label htmlFor="website">Website</label>
-          <input type="text" id="website" name="website" autoComplete="off" />
+          <input type="text" id="website" name="website" autoComplete="off" tabIndex={-1} />
         </div>
 
         <Turnstile action="devis" theme="light" onToken={setJetonCaptcha} actif={touche} />
 
         {error && (
-          <p role="alert" className="rounded-[var(--rayon-sm)] bg-accent-fond px-4 py-3 text-[14.5px] text-accent-texte">
+          <p role="alert" className="rounded-[var(--rayon-sm)] bg-alerte-fond px-4 py-3 text-[14.5px] text-alerte-texte">
             {error}
           </p>
         )}

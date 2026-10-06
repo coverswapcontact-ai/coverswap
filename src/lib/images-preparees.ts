@@ -28,9 +28,13 @@ export type ManifesteImages = Record<string, EntreeImage>;
 /** Dossier public des images préparées. */
 export const DOSSIER_IMAGES = "/images/prep";
 
+/**
+ * Site 3.0, lot F6 : le WebP préparé reste produit sur le disque, mais n'est plus annoncé — l'AVIF (lu par tout
+ * navigateur actuel) et le JPEG de repli suffisent ; chaque série en moins allège le HTML et la charge RSC des pages à
+ * nombreuses images (/inspirations : ~100 images). `ImagePreparee` n'écrit pas non plus de WebP à côté d'un AVIF.
+ */
 export type SourcesPhoto = {
   avif: string;
-  webp: string;
   /** `srcset` des JPEG (repli universel). */
   jpg: string;
   /** Le JPEG du `src` : la plus grande largeur ≤ 960 (ou la plus petite). */
@@ -39,24 +43,11 @@ export type SourcesPhoto = {
   hauteur: number;
 };
 
-/**
- * Ce que `ImagePreparee` (`components/simulation`) sait rendre : une image du dépôt (`SourcesPhoto`, tout est connu) ou
- * une photo publiée par le CRM (`sourcesPhotoCrm` de `lib/publications` : WebP réduits en `srcset`, la photo telle
- * quelle en `src`, dimensions inconnues). Une source absente n'est pas écrite.
- */
-export type SourcesImage = {
-  avif?: string;
-  webp?: string;
-  /** `srcset` des JPEG. */
-  jpg?: string;
-  /** L'image du `src` (le repli). */
-  src: string;
-  largeur?: number;
-  hauteur?: number;
-};
+export type { SourcesImage } from "./sources-image";
+export { LARGEUR_MAX_TELEPHONE, MEDIA_ECRAN_LARGE, MEDIA_TELEPHONE, plafonnerSrcset } from "./sources-image";
 
 /**
- * Les `srcset` AVIF / WebP / JPEG et les dimensions d'une image du manifeste ; `null` si le nom est inconnu.
+ * Les `srcset` AVIF / JPEG et les dimensions d'une image du manifeste ; `null` si le nom est inconnu.
  *
  * Mission 16 (partie 6) : `/images/prep/*` est servi en cache immuable d'un an (`next.config.ts › headers`), et un
  * original remplacé garde son nom de fichier : chaque adresse porte donc l'empreinte de son original (`?v=<empreinte>`,
@@ -72,29 +63,10 @@ export function sourcesPhoto(nom: string, manifeste: ManifesteImages = MANIFESTE
   const srcset = (ext: string) => largeurs.map((l) => `${fichier(l, ext)} ${l}w`).join(", ");
   const moyennes = largeurs.filter((l) => l <= 960);
   const largeurSrc = moyennes.length > 0 ? moyennes[moyennes.length - 1] : largeurs[0];
-  return { avif: srcset("avif"), webp: srcset("webp"), jpg: srcset("jpg"), src: fichier(largeurSrc, "jpg"), largeur: entree.largeur, hauteur: entree.hauteur };
+  return { avif: srcset("avif"), jpg: srcset("jpg"), src: fichier(largeurSrc, "jpg"), largeur: entree.largeur, hauteur: entree.hauteur };
 }
 
 /** Vrai si l'image est préparée (présente au manifeste avec au moins une largeur). */
 export function imagePreparee(nom: string, manifeste: ManifesteImages = MANIFESTE_IMAGES): boolean {
   return sourcesPhoto(nom, manifeste) !== null;
-}
-
-/**
- * Mission 16 (partie 6, mesure Lighthouse) : sur un téléphone à forte densité (390 px × 3), le navigateur choisit
- * l'image de 1536 px alors que 960 px suffisent à l'œil ; le `<picture>` et le préchargement de l'ouverture
- * proposent donc au téléphone un `srcset` plafonné à 960 px (`MEDIA_TELEPHONE`), la pleine série ailleurs.
- */
-export const MEDIA_TELEPHONE = "(max-width: 767px)";
-export const MEDIA_ECRAN_LARGE = "(min-width: 768px)";
-export const LARGEUR_MAX_TELEPHONE = 960;
-
-/** Garde les candidats d'un `srcset` jusqu'à `max` px de large (au moins le plus petit, pour ne jamais rendre vide). */
-export function plafonnerSrcset(srcset: string, max: number = LARGEUR_MAX_TELEPHONE): string {
-  const entrees = srcset.split(",").map((e) => e.trim()).filter(Boolean);
-  const gardees = entrees.filter((e) => {
-    const m = /\s(\d+)w$/.exec(e);
-    return !m || Number(m[1]) <= max;
-  });
-  return (gardees.length > 0 ? gardees : entrees.slice(0, 1)).join(", ");
 }

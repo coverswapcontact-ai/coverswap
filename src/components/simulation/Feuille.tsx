@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "re
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { apresHistorique, entrerFeuille } from "./historique-feuilles";
+import { ATTRIBUT_FEUILLE_OUVERTE, retenirLeFocus } from "./saisie";
 
 /**
  * Feuille plein écran pour le pouce (mission 15, partie 4 : extraite de
@@ -15,7 +16,9 @@ import { apresHistorique, entrerFeuille } from "./historique-feuilles";
  *    dernière fermée libère ;
  *  - z-index au-dessus de tout ce que le site pose (en-tête 50, bouton collé 40) ;
  *  - Échap ferme la feuille du dessus, glisser vers le bas depuis le haut du
- *    contenu aussi, et le geste retour du téléphone (historique).
+ *    contenu aussi, et le geste retour du téléphone (historique) ;
+ *  - fermée, elle rend le focus à l'élément qui l'avait à l'ouverture
+ *    (`retenirLeFocus`, relecture des lots B et C).
  */
 
 export const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(" ");
@@ -65,11 +68,16 @@ export function useLiensDeFeuille(ouverte: boolean, fermer: () => void) {
 let verrous = 0;
 let restaurer: (() => void) | null = null;
 
-/** Verrouille la page derrière un panneau (feuille, plein écran modal) ; chaque appel est rendu par `liberer()`. */
+/**
+ * Verrouille la page derrière un panneau (feuille, plein écran modal) ; chaque appel est rendu par `liberer()`.
+ * Tant qu'un panneau est ouvert, `<html>` porte `data-feuille-ouverte` (site 3.0, lot B5) : le bouton collé de
+ * l'accueil (`BoutonColle masquerSurSaisie`) s'efface pendant ce temps.
+ */
 export function verrouillerLaPage() {
   verrous++;
   if (verrous > 1) return;
   const html = document.documentElement;
+  html.setAttribute(ATTRIBUT_FEUILLE_OUVERTE, "");
   const body = document.body;
   const scrollY = window.scrollY;
   const barre = window.innerWidth - html.clientWidth;
@@ -82,6 +90,7 @@ export function verrouillerLaPage() {
   body.style.overflow = "hidden";
   if (barre > 0) body.style.paddingRight = `${barre}px`;
   restaurer = () => {
+    html.removeAttribute(ATTRIBUT_FEUILLE_OUVERTE);
     body.style.position = avant.position;
     body.style.top = avant.top;
     body.style.left = avant.left;
@@ -139,10 +148,12 @@ export function Feuille({ ouverte, onFermer, titre, sousTitre, children, pied, l
       if (e.key === "Escape" && feuilles[feuilles.length - 1] === boite.current) fermeture.current();
     };
     window.addEventListener("keydown", surTouche);
+    const rendreLeFocus = retenirLeFocus(document.activeElement as HTMLElement | null);
     boite.current?.focus({ preventScroll: true });
     return () => {
       window.removeEventListener("keydown", surTouche);
       liberer();
+      rendreLeFocus();
     };
   }, [ouverte]);
 

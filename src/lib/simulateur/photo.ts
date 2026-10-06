@@ -63,6 +63,17 @@ async function decoder(file: File): Promise<ImageBitmap | HTMLImageElement> {
   });
 }
 
+/**
+ * Site 3.0 (lot E3) : la pièce d'exemple (« Essayer d'autres matières sur cette pièce ») devient un fichier JPEG comme
+ * celui d'un visiteur, qui suit ensuite le même chemin (`preparerPhoto`, analyse, limites, Turnstile, quotas).
+ */
+export function fichierExemple(contenu: Blob, id: string): File {
+  return new File([contenu], `exemple-${id}.jpg`, { type: "image/jpeg" });
+}
+
+/** L'exemple chargé comme photo : son identifiant (méta `exemple` de PHOTO_CHARGEE) et sa pièce. */
+export type ExempleCharge = { id: string; piece: string };
+
 export type PhotoPreparee = { dataUrl: string; largeur: number; hauteur: number; poidsKo: number };
 /** Le navigateur ne sait pas décoder ce fichier (HEIC) : à envoyer tel quel au CRM. */
 export type PhotoAConvertir = { aConvertir: true; file: File };

@@ -7,7 +7,9 @@
         "http://localhost:3100/matieres",
         "http://localhost:3100/realisations",
         "http://localhost:3100/comment-ca-marche",
-        "http://localhost:3100/pro"
+        "http://localhost:3100/pro",
+        "http://localhost:3100/prestations/cuisine",
+        "http://localhost:3100/matieres/couleur/NF13"
       ],
       "numberOfRuns": 2,
       "settings": {

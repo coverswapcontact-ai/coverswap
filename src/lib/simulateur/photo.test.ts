@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { COTE_MAX, POIDS_MAX_OCTETS, dimensionsReduites, estHeic, messageErreurPhoto, poidsKoDe, verifierFichier } from "./photo";
+import { COTE_MAX, POIDS_MAX_OCTETS, dimensionsReduites, estHeic, fichierExemple, messageErreurPhoto, poidsKoDe, verifierFichier } from "./photo";
 
 /** Mission 15 (partie 4) — préparation de la photo : fonctions pures (aucun DOM, aucun réseau). */
 
@@ -40,5 +40,16 @@ describe("réduction", () => {
   test("poids d'une data URL en Ko", () => {
     assert.equal(poidsKoDe(`data:image/jpeg;base64,${"A".repeat(4096)}`), 3);
     assert.equal(poidsKoDe("data:image/jpeg;base64,"), 0);
+  });
+});
+
+describe("site 3.0, lot E3 : la pièce d'exemple en fichier", () => {
+  test("un JPEG nommé d'après l'exemple, accepté comme une photo de visiteur", async () => {
+    const fichier = fichierExemple(new Blob([new Uint8Array(2048)], { type: "image/jpeg" }), "cuisine-merisier");
+    assert.equal(fichier.name, "exemple-cuisine-merisier.jpg");
+    assert.equal(fichier.type, "image/jpeg");
+    assert.equal(fichier.size, 2048);
+    assert.equal(verifierFichier(fichier), null);
+    assert.equal(estHeic(fichier), false);
   });
 });

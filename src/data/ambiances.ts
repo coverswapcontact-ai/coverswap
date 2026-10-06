@@ -15,7 +15,14 @@
  *  - `etiquette` : où poser l'étiquette, dans un vide (mur, plafond, sol), jamais sur une façade ; `vers` : le côté
  *    vers lequel elle s'étend depuis ce point.
  * Trois étiquettes au plus par image.
+ *
+ * Deux séries (site 3.0, lot B4) : la série 1 (mission 19), écrite ici à la main, et la série 2, GÉNÉRÉE par
+ * `npm run bibliotheque` dans `ambiances-serie-2.ts` depuis `scripts/bibliotheque/` (ses avants en paires avec leurs
+ * deux après, ses photos utiles). `AMBIANCES` les réunit : c'est la seule liste que lit le site. Toutes ces images
+ * sont générées : elles portent « Ambiance » (« Ambiance · avant / après » en paire), jamais « Réalisation ».
  */
+import { AMBIANCES_SERIE_2, PAIRES_SERIE_2, PHOTOS_UTILES } from "./ambiances-serie-2";
+
 export type PieceAmbiance = "cuisine" | "salle-de-bain" | "meubles" | "mur-plafond" | "professionnel";
 
 export type SurfaceAmbiance = {
@@ -49,7 +56,31 @@ export type Ambiance = {
   surfaces: SurfaceAmbiance[];
 };
 
-export const AMBIANCES: readonly Ambiance[] = [
+/** Un avant de la série 2 et ses deux après (même cadrage) : curseurs avant / après, exemples du simulateur. */
+export type PaireAmbiance = {
+  /** L'image « avant » (nom du manifeste). */
+  avant: string;
+  piece: PieceAmbiance;
+  /** Le rapport de l'image (`aspect-ratio`), « 1536 / 1024 » ou « 1024 / 1536 ». */
+  ratio: string;
+  /** Ce que montre l'avant (son texte alternatif). */
+  scene: string;
+  etiquette: "Ambiance · avant / après";
+  /** Les deux ambiances « après » (leurs `id`). */
+  apres: readonly string[];
+};
+
+/** Une photo utile au site (pose, mesure, échantillons…) : générée, donc « Ambiance ». */
+export type PhotoUtile = {
+  image: string;
+  alt: string;
+  etiquette: "Ambiance";
+  /** L'ambiance qui en décrit les matières, quand la photo en montre une du catalogue. */
+  ambiance?: string;
+};
+
+/** La série 1 (mission 19), relevée le 01/10/2026. */
+const AMBIANCES_SERIE_1: readonly Ambiance[] = [
   {
     id: "cuisine-sauge-bois-clair",
     image: "ouverture-cuisine-apres",
@@ -446,3 +477,8 @@ export const AMBIANCES: readonly Ambiance[] = [
     ],
   },
 ];
+
+/** Toutes les ambiances du site : la série 1, puis la série 2. */
+export const AMBIANCES: readonly Ambiance[] = [...AMBIANCES_SERIE_1, ...AMBIANCES_SERIE_2];
+
+export { PAIRES_SERIE_2, PHOTOS_UTILES };

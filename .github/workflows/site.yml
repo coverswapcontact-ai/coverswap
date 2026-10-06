@@ -1,6 +1,6 @@
 # Mission 16 (partie 6) : à chaque push sur main (chaque déploiement Vercel) et à chaque pull request.
-# Lint, tests, build, puis le site construit est démarré (port 3100) et mesuré : Lighthouse CI sur les six pages
-# (mobile, seuils de lighthouserc.json : un seuil manqué fait ÉCHOUER le job), captures 375 / 768 / 1440 comparées à
+# Lint, tests, build, puis le site construit est démarré (port 3100) et mesuré : Lighthouse CI sur les huit pages
+# (mobile, seuils de lighthouserc.json : un seuil manqué fait ÉCHOUER le job), captures 390 / 768 / 1440 comparées à
 # la dernière exécution réussie sur main (information seulement, jamais un échec). Aucun secret : le site lit les
 # routes publiques du CRM de production et n'y écrit rien (NEXT_PUBLIC_SANS_EVENEMENTS). Lire : docs/SUIVI.md § 11.
 name: Site — lint, tests, Lighthouse, captures
@@ -45,7 +45,7 @@ jobs:
           exit 1
 
       # Lighthouse CI : collecte (2 passages par page), rapports dans lhci/ (publiés même en cas d'échec), puis les seuils.
-      - name: Lighthouse — mesure des six pages (mobile)
+      - name: Lighthouse — mesure des huit pages (mobile)
         run: npx lhci collect --config=lighthouserc.json
       - name: Lighthouse — rapports
         if: ${{ !cancelled() && steps.serveur.outcome == 'success' }}
@@ -60,16 +60,17 @@ jobs:
           path: lhci/
           if-no-files-found: ignore
 
-      # Captures : même si Lighthouse a échoué (elles aident à comprendre pourquoi).
+      # Captures : même si Lighthouse a échoué (elles aident à comprendre pourquoi) ; publiées et comparées même si le
+      # contrôle à 360 px a fait échouer l'étape (un débordement se comprend en les regardant).
       - name: Chromium pour les captures
         if: ${{ !cancelled() && steps.serveur.outcome == 'success' }}
         run: npx playwright install --with-deps chromium
-      - name: Captures 375 / 768 / 1440
+      - name: Captures 390 / 768 / 1440, contrôle à 360 px
         id: captures
         if: ${{ !cancelled() && steps.serveur.outcome == 'success' }}
         run: npm run captures
       - name: Captures de référence (dernière exécution réussie sur main)
-        if: ${{ !cancelled() && steps.captures.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.captures.outcome != 'skipped' }}
         continue-on-error: true
         uses: dawidd6/action-download-artifact@v6
         with:
@@ -81,11 +82,11 @@ jobs:
           path: captures-precedentes
           if_no_artifact_found: warn
       - name: Comparaison (information, jamais un échec)
-        if: ${{ !cancelled() && steps.captures.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.captures.outcome != 'skipped' }}
         continue-on-error: true
         run: node scripts/comparer-captures.mjs captures-precedentes captures
       - name: Publier les captures
-        if: ${{ !cancelled() && steps.captures.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.captures.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4
         with:
           name: captures

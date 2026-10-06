@@ -1,0 +1,88 @@
+{
+ "pictos": {
+  "picto-plan-parallele": "plan-parallele"
+ },
+ "images": {
+  "cuisine-bordeaux-brillante-avant": { "scene": "Cuisine en L d'appartement des années 2000, façades bordeaux brillantes, plan de travail gris moucheté" },
+  "cuisine-bordeaux-brillante-apres-neutre": { "titre": "Cuisine en L, gris clair et chêne", "scene": "Cuisine en L d'appartement, façades gris clair mates, plan de travail en chêne, crédence en carreaux blancs" },
+  "cuisine-bordeaux-brillante-apres-couleur": { "titre": "Cuisine en L, vert profond et chêne pâle", "scene": "Cuisine en L d'appartement, façades vert profond mates, plan de travail en chêne pâle, crédence en carreaux blancs" },
+
+  "cuisine-blanche-jaunie-avant": { "scene": "Cuisine des années 1980 sur un mur, façades blanches jaunies par le temps, plan de travail effet bois brun, carrelage à frise" },
+  "cuisine-blanche-jaunie-apres-bois": { "titre": "Cuisine sur un mur, chêne pâle et marbre noir", "scene": "Cuisine des années 1980 sur un mur, façades en chêne pâle, plan de travail effet marbre noir veiné de blanc, carrelage à frise gardé" },
+  "cuisine-blanche-jaunie-apres-couleur": { "titre": "Cuisine sur un mur, bleu nuit et chêne", "scene": "Cuisine des années 1980 sur un mur, façades bleu nuit mates, plan de travail en chêne, carrelage à frise gardé" },
+
+  "cuisine-kitchenette-studio-avant": { "scene": "Kitchenette de studio, façades blanches brillantes, plan de travail effet hêtre, petit réfrigérateur sous le plan" },
+  "cuisine-kitchenette-studio-apres-bois": { "titre": "Kitchenette de studio, chêne pâle et marbre blanc", "scene": "Kitchenette de studio, façades en chêne pâle, plan de travail effet marbre blanc, petit réfrigérateur sous le plan" },
+  "cuisine-kitchenette-studio-apres-couleur": { "titre": "Kitchenette de studio, vert tendre et chêne", "scene": "Kitchenette de studio, façades vert tendre, plan de travail en chêne, petit réfrigérateur sous le plan" },
+
+  "cuisine-l-hetre-avant": { "scene": "Cuisine en L des années 2000, façades effet hêtre, plan de travail effet granit gris" },
+  "cuisine-l-hetre-apres-bois": { "titre": "Cuisine en L, bleu roi, chêne pâle et marbre", "scene": "Cuisine en L des années 2000, meubles bas bleu roi, meubles hauts en chêne pâle, plan de travail effet marbre blanc" },
+  "cuisine-l-hetre-apres-couleur": { "titre": "Cuisine en L, vert jade et pierre grise", "scene": "Cuisine en L des années 2000, meubles bas et hauts vert jade, plan de travail effet pierre grise" },
+
+  "cuisine-u-pavillon-avant": { "scene": "Cuisine en U de pavillon des années 1990, façades effet chêne doré, plan de travail effet granit vert, sol en terre cuite" },
+  "cuisine-u-pavillon-apres-neutre": { "titre": "Cuisine en U, grège et pierre claire", "scene": "Cuisine en U de pavillon ouverte sur le jardin, façades grège, plan de travail effet pierre claire, sol en terre cuite" },
+  "cuisine-u-pavillon-apres-bois": { "titre": "Cuisine en U, frêne bronze et noir", "scene": "Cuisine en U de pavillon ouverte sur le jardin, façades effet frêne bronze, plan de travail anthracite, sol en terre cuite" },
+
+  "cuisine-couloir-avant": { "scene": "Cuisine couloir d'un appartement ancien sous haut plafond, façades blanches usées, plans de travail gris foncé, carreaux de ciment" },
+  "cuisine-couloir-apres-neutre": { "titre": "Cuisine couloir, gris perle et chêne", "scene": "Cuisine couloir d'un appartement ancien sous haut plafond, façades gris perle, plans de travail en chêne, carreaux de ciment", "libelles": { "plan": "plans de travail" } },
+  "cuisine-couloir-apres-couleur": { "titre": "Cuisine couloir, bleu acier et chêne pâle", "scene": "Cuisine couloir d'un appartement ancien sous haut plafond, façades bleu acier, plans de travail en chêne pâle, carreaux de ciment", "libelles": { "plan": "plans de travail" } },
+
+  "cuisine-ouverte-bar-avant": { "scene": "Cuisine ouverte avec bar d'un appartement récent, façades taupe et blanches brillantes, plan de travail noir" },
+  "cuisine-ouverte-bar-apres-bois": { "titre": "Cuisine ouverte, chêne et marbre noir", "scene": "Cuisine ouverte sur le séjour avec un bar, façades et bar en chêne, plan de travail effet marbre noir, baie vitrée sur le balcon", "libelles": { "facades": "façades et bar" } },
+  "cuisine-ouverte-bar-apres-couleur": { "titre": "Cuisine ouverte, vert olive et travertin", "scene": "Cuisine ouverte sur le séjour avec un bar, façades et bar vert olive, plan de travail effet travertin, baie vitrée sur le balcon", "libelles": { "facades": "façades et bar" } },
+
+  "cuisine-merisier-avant": { "scene": "Cuisine des années 1990 sur un mur, façades effet merisier, plan de travail beige marbré, table et chaises au premier plan" },
+  "cuisine-merisier-apres-neutre": { "titre": "Cuisine sur un mur, blanc lin et chêne clair", "scene": "Cuisine des années 1990 sur un mur, façades blanc lin, plan de travail en chêne clair, table et chaises au premier plan" },
+  "cuisine-merisier-apres-couleur": { "titre": "Cuisine sur un mur, vieux rose et chêne", "scene": "Cuisine des années 1990 sur un mur, façades vieux rose, plan de travail en chêne, table et chaises au premier plan" },
+
+  "cuisine-grise-brillante-avant": { "scene": "Cuisine en L de maison récente, façades anthracite brillantes, plan de travail blanc, crédence en verre" },
+  "cuisine-grise-brillante-apres-bois": { "titre": "Cuisine en L, chêne blond et pierre grise", "scene": "Cuisine en L de maison récente, façades en chêne blond, plan de travail effet pierre grise, crédence en verre" },
+  "cuisine-grise-brillante-apres-couleur": { "titre": "Cuisine en L, bleu profond et chêne clair", "scene": "Cuisine en L de maison récente, façades bleu profond mates, plan de travail en chêne clair, crédence en verre" },
+
+  "cuisine-maison-de-village-avant": { "scene": "Cuisine d'une maison de village en pierre, façades orange, plan de travail effet bois, tomettes et poutres apparentes" },
+  "cuisine-maison-de-village-apres-neutre": { "titre": "Maison de village, crème et béton gris", "scene": "Cuisine d'une maison de village en pierre, façades crème, plan de travail effet béton gris, tomettes et poutres apparentes", "etiquettes": { "plan": { "x": 64, "y": 38, "vers": "droite" } } },
+  "cuisine-maison-de-village-apres-couleur": { "titre": "Maison de village, vert kaki et chêne", "scene": "Cuisine d'une maison de village en pierre, façades vert kaki, plan de travail en chêne, tomettes et poutres apparentes", "etiquettes": { "plan": { "x": 64, "y": 38, "vers": "droite" } } },
+
+  "cuisine-ilot-maison-avant": { "scene": "Cuisine familiale de maison avec îlot, façades beiges brillantes, plan de travail effet granit brun, porte-fenêtre sur le jardin" },
+  "cuisine-ilot-maison-apres-neutre": { "titre": "Cuisine à îlot, blanc et noir mat", "scene": "Cuisine familiale de maison, meubles blanc cassé le long des murs, îlot noir mat, plan de travail en chêne, porte-fenêtre sur le jardin", "zones": { "facades": "meubles-hauts", "ilot": "meubles-bas" }, "libelles": { "facades": "meubles le long des murs" }, "ancres": { "facades": { "x": 13.5, "y": 16 } } },
+  "cuisine-ilot-maison-apres-couleur": { "titre": "Cuisine à îlot, grège et vert profond", "scene": "Cuisine familiale de maison, meubles grège le long des murs, îlot vert profond, plan de travail en chêne pâle, porte-fenêtre sur le jardin", "zones": { "facades": "meubles-hauts", "ilot": "meubles-bas" }, "libelles": { "facades": "meubles le long des murs" }, "ancres": { "facades": { "x": 13.5, "y": 16 } } },
+
+  "sdb-petit-meuble-vasque-avant": { "scene": "Petite salle de bain d'appartement, meuble vasque blanc à deux portes, baignoire, carrelage beige" },
+  "sdb-petit-meuble-vasque-apres-bois": { "titre": "Petit meuble vasque en chêne", "scene": "Petite salle de bain d'appartement, meuble vasque à deux portes en chêne, baignoire, carrelage beige" },
+  "sdb-petit-meuble-vasque-apres-couleur": { "titre": "Petit meuble vasque vert jade", "scene": "Petite salle de bain d'appartement, meuble vasque à deux portes vert jade, baignoire, carrelage beige" },
+
+  "sdb-double-vasque-wenge-avant": { "scene": "Salle de bain familiale, meuble double vasque wengé à quatre tiroirs, douche à l'italienne" },
+  "sdb-double-vasque-wenge-apres-neutre": { "titre": "Double vasque blanc crème", "scene": "Salle de bain familiale, meuble double vasque blanc crème à quatre tiroirs, douche à l'italienne", "libelles": { "meuble": "tiroirs" } },
+  "sdb-double-vasque-wenge-apres-bois": { "titre": "Double vasque en chêne pâle", "scene": "Salle de bain familiale, meuble double vasque en chêne pâle à quatre tiroirs, douche à l'italienne", "libelles": { "meuble": "tiroirs" } },
+
+  "sdb-baignoire-tablier-avant": { "scene": "Salle de bain avec baignoire, tablier blanc, meuble vasque effet érable, faïence bleu-gris" },
+  "sdb-baignoire-tablier-apres-neutre": { "titre": "Baignoire et meuble vasque gris chaud", "scene": "Salle de bain avec baignoire, tablier et meuble vasque gris chaud, faïence bleu-gris" },
+  "sdb-baignoire-tablier-apres-couleur": { "titre": "Baignoire et meuble vasque vert profond", "scene": "Salle de bain avec baignoire, tablier et meuble vasque vert profond, faïence bleu-gris" },
+
+  "placard-coulissant-chambre-avant": { "scene": "Chambre d'appartement, placard à trois portes coulissantes blanches, parquet stratifié" },
+  "placard-coulissant-chambre-apres-bois": { "titre": "Placard coulissant en chêne", "scene": "Chambre d'appartement, placard à trois portes coulissantes en chêne, parquet stratifié", "libelles": { "portes": "portes coulissantes" } },
+  "placard-coulissant-chambre-apres-couleur": { "titre": "Placard coulissant gris beige", "scene": "Chambre d'appartement, placard à trois portes coulissantes gris beige, parquet stratifié", "libelles": { "portes": "portes coulissantes" } },
+
+  "portes-couloir-avant": { "scene": "Couloir d'appartement, portes intérieures blanches jaunies, parquet stratifié, petite console" },
+  "portes-couloir-apres-bois": { "titre": "Portes de couloir en noyer", "scene": "Couloir d'appartement, portes intérieures en noyer, parquet stratifié, petite console", "etiquettes": { "portes": { "x": 28, "y": 82, "vers": "droite" } } },
+  "portes-couloir-apres-couleur": { "titre": "Portes de couloir rouge bordeaux", "scene": "Couloir d'appartement, portes intérieures rouge bordeaux, parquet stratifié, petite console", "etiquettes": { "portes": { "x": 28, "y": 82, "vers": "droite" } } },
+
+  "buffet-salle-a-manger-avant": { "scene": "Salle à manger, long buffet bas des années 1970 effet teck orangé, table et chaises au premier plan" },
+  "buffet-salle-a-manger-apres-neutre": { "titre": "Buffet taupe, dessus chêne", "scene": "Salle à manger, long buffet bas aux portes et tiroirs taupe, dessus en chêne, table et chaises au premier plan", "libelles": { "facades": "portes et tiroirs" } },
+  "buffet-salle-a-manger-apres-couleur": { "titre": "Buffet jaune moutarde, dessus chêne pâle", "scene": "Salle à manger, long buffet bas aux portes et tiroirs jaune moutarde, dessus en chêne pâle, table et chaises au premier plan", "libelles": { "facades": "portes et tiroirs" } },
+
+  "pro-comptoir-accueil-avant": { "scene": "Accueil d'un cabinet, comptoir effet hêtre au dessus gris, chaises d'attente" },
+  "pro-comptoir-accueil-apres-bois": { "titre": "Comptoir d'accueil noyer, dessus noir", "scene": "Accueil d'un cabinet, comptoir en noyer au dessus noir mat, chaises d'attente", "libelles": { "dessus": "dessus du comptoir" } },
+  "pro-comptoir-accueil-apres-couleur": { "titre": "Comptoir d'accueil vert sauge, dessus marbre", "scene": "Accueil d'un cabinet, comptoir vert sauge au dessus effet marbre blanc, chaises d'attente", "libelles": { "dessus": "dessus du comptoir" } },
+
+  "detail-chant": { "alt": "Gros plan d'un tiroir de cuisine habillé d'un film vert sauge, le chant replié net, sans bulle. Image d'ambiance.", "piece": "cuisine", "titre": "Le chant, en gros plan", "scene": "Gros plan d'un tiroir de cuisine habillé d'un film vert sauge, le chant replié net, à côté d'un caisson en chêne", "libelles": { "facades": "tiroir" } },
+  "pose-mains": { "alt": "Mains d'un poseur qui applique à la raclette un film effet pin clair sur une porte de cuisine blanche, le papier de protection à moitié retiré. Image d'ambiance.", "piece": "cuisine", "titre": "La pose, film à moitié posé", "scene": "Mains d'un poseur qui applique à la raclette un film effet pin clair sur une porte de cuisine blanche", "libelles": { "facades": "film posé" } },
+  "echantillons-table": { "alt": "Éventail d'échantillons de matières (chêne, noyer, marbre blanc, vert sauge, terre cuite, noir mat) sur une table de cuisine, à côté d'un mètre ruban et d'un crayon. Image d'ambiance." },
+  "mesure-visite": { "alt": "Mains d'un artisan qui mesure la largeur d'une porte de cuisine effet merisier avec un mètre ruban. Image d'ambiance." },
+  "usure-detail": { "alt": "Gros plan d'une porte de cuisine blanche jaunie par les années, le chant qui se décolle, de petits éclats et une poignée en plastique. Image d'ambiance." },
+  "outils-pose": { "alt": "Outils de pose sur un établi : raclette feutrée, cutter, décapeur thermique, rouleaux, un rouleau de film effet chêne et des chutes vert sauge et marbre blanc. Image d'ambiance." },
+
+  "amb-cuisine-familiale": { "titre": "Cuisine en L, bleu nuit et frêne beige", "scene": "Cuisine familiale en L d'appartement, meubles bas bleu nuit mats, meubles hauts en frêne beige, plan de travail effet marbre blanc", "etiquettes": { "plan": { "x": 40, "y": 43, "vers": "gauche" } } },
+  "amb-couloir-portes": { "titre": "Couloir aux portes vert profond", "scene": "Couloir d'appartement lumineux, portes intérieures vert profond aux poignées laiton, parquet en chêne" }
+ }
+}

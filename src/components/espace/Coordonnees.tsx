@@ -42,18 +42,18 @@ export function PastilleCoordonnees({ etat, onOuvrir, actif }: { etat: Etat; onO
       title="Mes coordonnées"
       className={cx(
         "ml-auto flex min-h-[40px] shrink-0 items-center gap-1.5 rounded-full border px-2.5 text-[13.5px] font-semibold whitespace-nowrap",
-        complet ? "border-[#BFDCCB] bg-[#E7F3EC] text-[#17563A]" : "border-[#F0C98A] bg-[#FFF4E0] text-[#8A4B00]",
+        complet ? "border-succes/30 bg-succes-fond text-succes" : "border-alerte-texte/40 bg-alerte-fond text-alerte-texte",
         FOCUS
       )}
     >
       <IconePersonne taille={16} />
       {complet ? (
-        <span aria-hidden className="flex h-4 w-4 items-center justify-center rounded-full bg-[#1F7A4D] text-white">
+        <span aria-hidden className="flex h-4 w-4 items-center justify-center rounded-full bg-succes text-blanc">
           <IconeCoche taille={10} />
         </span>
       ) : (
         <>
-          <span aria-hidden className="h-2 w-2 rounded-full bg-[#E08A00]" />
+          <span aria-hidden className="h-2 w-2 rounded-full bg-alerte-texte" />
           À compléter
         </>
       )}
@@ -78,14 +78,14 @@ export function RappelCoordonnees({ etat, onOuvrir, moment }: { etat: Etat; onOu
   if (etat.coordonnees.completes || ecarte) return null;
   const manque = manqueCoordonnees(etat.coordonnees);
   return (
-    <div role="note" className="flex items-start gap-3 rounded-2xl border border-[#F0C98A] bg-[#FFF8EC] px-4 py-3">
-      <span aria-hidden className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#E08A00]" />
+    <div role="note" className="flex items-start gap-3 rounded-2xl border border-alerte-texte/40 bg-alerte-fond px-4 py-3">
+      <span aria-hidden className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-alerte-texte" />
       <div className="min-w-0 flex-1">
-        <p className="text-[15.5px] leading-snug text-[#3F3B36]">
+        <p className="text-[15.5px] leading-snug text-encre">
           {moment === "devis" ? "Pour que votre devis soit à votre nom et à la bonne adresse" : "Pour préparer votre devis à votre nom et à la bonne adresse"}, vérifiez vos coordonnées
           {manque.length ? ` (il manque ${manque.join(", ")})` : ""}.
         </p>
-        <button type="button" onClick={onOuvrir} className={cx("mt-1.5 min-h-[40px] text-[15.5px] font-semibold text-[#1A1A1A] underline decoration-[#BDB8B0] underline-offset-4", FOCUS)}>
+        <button type="button" onClick={onOuvrir} className={cx("mt-1.5 min-h-[40px] text-[15.5px] font-semibold text-encre underline decoration-trait underline-offset-4", FOCUS)}>
           Vérifier mes coordonnées
         </button>
       </div>
@@ -100,7 +100,7 @@ export function RappelCoordonnees({ etat, onOuvrir, moment }: { etat: Etat; onOu
             // navigation privée : le rappel reviendra, sans gêner
           }
         }}
-        className={cx("-mt-1 -mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[20px] text-[#8A857E] active:bg-[#F2EADB]", FOCUS)}
+        className={cx("-mt-1 -mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[20px] text-encre-2 active:bg-alerte-fond", FOCUS)}
       >
         ×
       </button>
@@ -173,8 +173,8 @@ export function MesCoordonnees({ etat, client, onEtat, onRetour }: { etat: Etat;
   }
 
   const champ = (erreur: string | null) =>
-    cx("min-h-[54px] w-full rounded-2xl border bg-white px-4 text-[17px] text-[#1A1A1A] placeholder:text-[#8A857E] focus:outline-none", erreur ? "border-[#C0392B] focus:border-[#C0392B]" : "border-[#D3CFC8] focus:border-[#1A1A1A]");
-  const etiquette = "mb-1.5 block text-[15px] font-semibold text-[#1A1A1A]";
+    cx("min-h-[54px] w-full rounded-2xl border bg-blanc px-4 text-[17px] text-encre placeholder:text-encre-2 focus:outline-none", erreur ? "border-alerte-texte focus:border-alerte-texte" : "border-trait focus:border-encre");
+  const etiquette = "mb-1.5 block text-[15px] font-semibold text-encre";
   const manque = manqueCoordonnees(c);
 
   return (
@@ -185,7 +185,7 @@ export function MesCoordonnees({ etat, client, onEtat, onRetour }: { etat: Etat;
       />
 
       <Carte className="space-y-4">
-        <p className="text-[14.5px] font-semibold tracking-[0.02em] text-[#6B665F] uppercase">Vous</p>
+        <p className="text-[14.5px] font-semibold tracking-[0.02em] text-encre-2 uppercase">Vous</p>
         <div className="grid grid-cols-2 gap-2.5">
           <label className="block min-w-0">
             <span className={etiquette}>Prénom</span>
@@ -199,24 +199,24 @@ export function MesCoordonnees({ etat, client, onEtat, onRetour }: { etat: Etat;
         <label className="block">
           <span className={etiquette}>E-mail</span>
           <input className={champ(vu.email ? erreurs.email : null)} type="email" inputMode="email" autoComplete="email" autoCapitalize="none" spellCheck={false} placeholder="prenom.nom@gmail.com" value={saisie.email} onChange={(e) => setSaisie({ ...saisie, email: e.target.value })} onBlur={() => setVu({ ...vu, email: true })} aria-invalid={Boolean(vu.email && erreurs.email)} />
-          {vu.email && erreurs.email ? <span className="mt-1 block px-1 text-[14px] text-[#A5281B]">{erreurs.email}</span> : null}
+          {vu.email && erreurs.email ? <span className="mt-1 block px-1 text-[14px] text-alerte-texte">{erreurs.email}</span> : null}
         </label>
         <label className="block">
           <span className={etiquette}>Téléphone</span>
           <input className={champ(vu.telephone ? erreurs.telephone : null)} type="tel" inputMode="tel" autoComplete="tel" placeholder="06 12 34 56 78" value={saisie.telephone} onChange={(e) => setSaisie({ ...saisie, telephone: e.target.value })} onBlur={() => setVu({ ...vu, telephone: true })} aria-invalid={Boolean(vu.telephone && erreurs.telephone)} />
-          {vu.telephone && erreurs.telephone ? <span className="mt-1 block px-1 text-[14px] text-[#A5281B]">{erreurs.telephone}</span> : <span className="mt-1 block px-1 text-[14px] leading-snug text-[#5F5A53]">C&apos;est lui qui protège votre espace.</span>}
+          {vu.telephone && erreurs.telephone ? <span className="mt-1 block px-1 text-[14px] text-alerte-texte">{erreurs.telephone}</span> : <span className="mt-1 block px-1 text-[14px] leading-snug text-encre-2">C&apos;est lui qui protège votre espace.</span>}
         </label>
       </Carte>
 
       <Carte className="space-y-4">
-        <p className="text-[14.5px] font-semibold tracking-[0.02em] text-[#6B665F] uppercase">L&apos;adresse de ce projet</p>
+        <p className="text-[14.5px] font-semibold tracking-[0.02em] text-encre-2 uppercase">L&apos;adresse de ce projet</p>
         <div className="relative">
           <label className="block">
             <span className={etiquette}>Numéro et rue</span>
             <input className={champ(null)} autoComplete="street-address" placeholder="12 rue des Lilas" value={saisie.adresse} onChange={(e) => chercherAdresse(e.target.value)} aria-autocomplete="list" />
           </label>
           {suggestions.length > 0 ? (
-            <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-[#D3CFC8] bg-white shadow-lg" role="listbox" aria-label="Adresses proposées">
+            <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-trait bg-blanc shadow-lg" role="listbox" aria-label="Adresses proposées">
               {suggestions.map((s) => (
                 <li key={s.libelle}>
                   <button
@@ -227,7 +227,7 @@ export function MesCoordonnees({ etat, client, onEtat, onRetour }: { etat: Etat;
                       setSaisie((x) => ({ ...x, adresse: s.adresse, codePostal: s.codePostal, ville: s.ville }));
                       setSuggestions([]);
                     }}
-                    className="block min-h-[52px] w-full px-4 py-2 text-left text-[16px] text-[#1A1A1A] active:bg-[#F2F0EC]"
+                    className="block min-h-[52px] w-full px-4 py-2 text-left text-[16px] text-encre active:bg-fond-2"
                   >
                     {s.libelle}
                   </button>
@@ -246,14 +246,14 @@ export function MesCoordonnees({ etat, client, onEtat, onRetour }: { etat: Etat;
             <input className={champ(null)} autoComplete="address-level2" value={saisie.ville} onChange={(e) => setSaisie({ ...saisie, ville: e.target.value })} />
           </label>
         </div>
-        {vu.codePostal && erreurs.codePostal ? <p className="-mt-2 px-1 text-[14px] text-[#A5281B]">Code postal : {erreurs.codePostal.toLowerCase()}</p> : null}
+        {vu.codePostal && erreurs.codePostal ? <p className="-mt-2 px-1 text-[14px] text-alerte-texte">Code postal : {erreurs.codePostal.toLowerCase()}</p> : null}
       </Carte>
 
       {message ? <Annonce ton={message.ton}>{message.texte}</Annonce> : null}
       <BoutonPrincipal onClick={() => void enregistrer()} disabled={occupe || !changement}>
         {occupe ? "Enregistrement…" : "Enregistrer"}
       </BoutonPrincipal>
-      <button type="button" onClick={onRetour} className={cx("mx-auto block min-h-[44px] px-2 text-[15.5px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4", FOCUS)}>
+      <button type="button" onClick={onRetour} className={cx("mx-auto block min-h-[44px] px-2 text-[15.5px] font-medium text-encre-2 underline decoration-trait underline-offset-4", FOCUS)}>
         Revenir à mon projet
       </button>
     </div>

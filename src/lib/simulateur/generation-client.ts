@@ -22,22 +22,10 @@ export const PANNES = ["service-indisponible", "global-quota", "ip-quota", "quot
 
 export const MESSAGE_NON_CONFIGURE = "Le simulateur n'est pas disponible pour l'instant. Votre photo et vos choix sont conservés : laissez-nous vos coordonnées, nous ferons la simulation pour vous.";
 
-export function baseCrm(): string {
-  return SIMULATE_URL.replace(/\/api\/simulate\/?$/, "");
-}
+export { baseCrm, urlEchantillon, urlVignette } from "./adresses-crm";
 
 export function urlImageTravail(travailId: string, parcoursId: string, quoi: "apres" | "avant"): string {
   return `${SIMULATE_URL}/image?id=${encodeURIComponent(travailId)}&p=${encodeURIComponent(parcoursId)}&quoi=${quoi}`;
-}
-
-/** Vignette de 320 px d'un échantillon (grille du catalogue), servie et mise en cache par le CRM. */
-export function urlVignette(ref: string): string {
-  return `${baseCrm()}/api/site/echantillons/${encodeURIComponent(ref)}?l=320`;
-}
-
-/** L'échantillon entier (« voir en grand »). */
-export function urlEchantillon(ref: string): string {
-  return `${baseCrm()}/api/site/echantillons/${encodeURIComponent(ref)}`;
 }
 
 export type Lancement = { ok: true; travailId: string; attenteEstimeeS: number } | { ok: false; raison: string; message: string; zones?: string[] };
@@ -51,6 +39,8 @@ export type EntreeLancement = {
   page: string;
   source: string | null;
   campagne: string | null;
+  /** Relecture D, E, F : la pièce d'exemple chargée à la place d'une photo (lot E3) ; le CRM ne la prend pas pour la photo du visiteur. */
+  exemple?: string | null;
 };
 
 async function lireJson(reponse: Response | null): Promise<Record<string, unknown>> {
@@ -69,7 +59,7 @@ export async function lancerGeneration(entree: EntreeLancement): Promise<Lanceme
   const prep = await fetch("/api/simulation/prepare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ project_type: entree.projetId, parcoursId: entree.parcoursId, turnstileToken: entree.turnstileToken, selections: entree.selections }),
+    body: JSON.stringify({ project_type: entree.projetId, parcoursId: entree.parcoursId, turnstileToken: entree.turnstileToken, selections: entree.selections, ...(entree.exemple ? { exemple: entree.exemple } : {}) }),
   }).catch(() => null);
   const prepData = await lireJson(prep);
   if (!prep) return { ok: false, raison: "reseau", message: MESSAGE_INJOIGNABLE };
@@ -92,6 +82,8 @@ export async function lancerGeneration(entree: EntreeLancement): Promise<Lanceme
       page: entree.page,
       source: entree.source,
       campagne: entree.campagne,
+      // Relu par prepare (exemple connu du site) ; facultatif et hors signature : un CRM d'avant l'ignore.
+      ...(texte(prepData.exemple) ? { exemple: texte(prepData.exemple) } : {}),
       photo_base64: entree.photo,
     }),
   }).catch(() => null);

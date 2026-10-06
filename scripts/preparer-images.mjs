@@ -30,6 +30,7 @@ import { createHash } from "node:crypto";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { lireJetons, versRgb } from "./jetons.mjs";
 
 const RACINE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const DOSSIER_SOURCES = path.join(RACINE, "public", "images", "sources");
@@ -45,8 +46,8 @@ export const QUALITES = { avif: 50, webp: 78, jpg: 80 };
 export const EXTENSIONS_SOURCES = [".jpg", ".jpeg", ".png"];
 /** Un nom d'image : minuscules, chiffres et tirets (il devient une adresse). */
 export const MOTIF_NOM = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-/** Fond posé sous une éventuelle transparence (le JPEG n'en a pas) : le jeton `--color-fond`. */
-const FOND = { r: 245, g: 244, b: 241 };
+/** Fond posé sous une éventuelle transparence (le JPEG n'en a pas) : le jeton `--color-fond`, lu dans globals.css. */
+const FOND = versRgb(lireJetons().fond);
 /** Longueur de l'empreinte d'un original au manifeste (sha1 tronqué) : assez pour voir qu'il a été remplacé. */
 export const LONGUEUR_EMPREINTE = 12;
 

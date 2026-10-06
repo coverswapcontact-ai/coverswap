@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { MESSAGE_ECHEC_TOTAL, sendLeadToCRM, splitName, mapTypeProjet, resolveSource } from "@/lib/crm";
 import { MESSAGE_CAPTCHA, verifierTurnstile } from "@/lib/turnstile";
 import { parcoursIdValide } from "@/lib/parcours";
+import { estCreneauRappel } from "@/lib/rappel";
 
 // L'envoi au CRM est attendu (photos comprises) : au-delà des 10 s par défaut de Vercel.
 export const maxDuration = 30;
@@ -166,6 +167,8 @@ export async function POST(req: NextRequest) {
       pageEntree: texte(body.pageEntree, 200),
       ...(surface ? (body.surfaceUnite === "ml" ? { surfaceMl: surface } : { surfaceM2: surface }) : {}),
       notes,
+      // Site 3.0 (lot B6) : « Être rappelé » de l'accueil — le code du créneau, validé comme dans /api/simulation/contact ; le CRM date le rappel.
+      ...(estCreneauRappel(body.rappelCreneau) ? { rappelCreneau: body.rappelCreneau } : {}),
       ...consentementDepuis(body),
     },
     { ipVisiteur: ip }

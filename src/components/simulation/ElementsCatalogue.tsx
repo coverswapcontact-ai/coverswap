@@ -13,7 +13,7 @@ export const CHAMP_RECHERCHE = "min-h-[48px] w-full rounded-[var(--rayon-sm)] bo
 /** Le cœur d'une tuile (cible de 44 px, pastille blanche de 32 px), posé en haut à droite de la vignette. */
 export function BoutonFavori({ nom, favori, onBasculer, className }: { nom: string; favori: boolean; onBasculer: () => void; className?: string }) {
   return (
-    <button type="button" aria-pressed={favori} aria-label={favori ? `Retirer ${nom} de mes favoris` : `Ajouter ${nom} à mes favoris`} onClick={onBasculer} className={cx("absolute top-0 right-0 flex h-11 w-11 items-center justify-center rounded-full", favori ? "text-accent" : "text-encre-2", className)}>
+    <button type="button" aria-pressed={favori} aria-label={favori ? `Retirer ${nom} de mes favoris` : `Ajouter ${nom} à mes favoris`} onClick={onBasculer} className={cx("absolute top-0 right-0 flex h-11 w-11 items-center justify-center rounded-full", favori ? "text-encre" : "text-encre-2", className)}>
       <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90">
         <IconeCoeur taille={18} plein={favori} />
       </span>

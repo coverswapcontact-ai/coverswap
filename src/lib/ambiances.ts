@@ -1,5 +1,6 @@
 import { AMBIANCES, type Ambiance, type PieceAmbiance, type SurfaceAmbiance } from "@/data/ambiances";
 import revetements from "@/data/revetements.json";
+import { labDeHex, teinteDe, type Teinte } from "./teintes";
 
 /**
  * Ce qu'on tire des ambiances (mission 19, `data/ambiances.ts`) : les matières de chaque photo résolues dans le
@@ -25,43 +26,13 @@ export type AmbianceResolue = Omit<Ambiance, "surfaces"> & {
 
 /* ── Teintes ─────────────────────────────────────────────────────── */
 
-export const TEINTES = ["Bois clair", "Bois foncé", "Vert", "Bleu", "Blanc", "Noir", "Beige et taupe", "Terre cuite", "Pierre et marbre"] as const;
-export type Teinte = (typeof TEINTES)[number];
-
-const lineaire = (c: number) => {
-  const v = c / 255;
-  return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-};
-
-/** sRGB → Lab (D65). */
-export function lab(hex: string): [number, number, number] {
-  const n = Number.parseInt(hex.replace("#", ""), 16);
-  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(lineaire);
-  const f = (t: number) => (t > 216 / 24389 ? Math.cbrt(t) : ((24389 / 27) * t + 16) / 116);
-  const fx = f((0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047);
-  const fy = f(0.2126729 * r + 0.7151522 * g + 0.072175 * b);
-  const fz = f((0.0193339 * r + 0.119192 * g + 0.9503041 * b) / 1.08883);
-  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
-}
-
 /**
- * La teinte d'une matière, pour le filtre de /inspirations : la famille d'abord (bois clair ou foncé, sauf un bois
- * teinté de vert ; pierre et marbre), puis la couleur (clarté, saturation, angle de teinte en Lab).
+ * Les teintes du filtre (/inspirations, et /matieres depuis le lot D2) et la conversion Lab vivent dans `lib/teintes`
+ * (sans dépendance : le présentoir les lit dans le navigateur sans tirer les ambiances) ; réexportées ici.
  */
-export function teinteDe(famille: string, hex: string): Teinte {
-  const [L, a, b] = lab(hex);
-  const C = Math.hypot(a, b);
-  const h = ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
-  // Un bois teinté de vert (Smokey Green) se cherche avec les verts.
-  if (famille === "bois") return C >= 5 && h >= 95 && h < 200 ? "Vert" : L >= 55 ? "Bois clair" : "Bois foncé";
-  if (famille === "pierre") return L >= 85 && C < 6 ? "Blanc" : "Pierre et marbre";
-  if (L >= 85 && C < 8) return "Blanc";
-  if (L < 22 && C < 12) return "Noir";
-  if (C >= 5 && h >= 95 && h < 200) return "Vert";
-  if (C >= 8 && h >= 200 && h < 300) return "Bleu";
-  if (C >= 14 && (h < 70 || h >= 330)) return "Terre cuite";
-  return "Beige et taupe";
-}
+export { TEINTES, teinteDe, type Teinte } from "./teintes";
+/** sRGB → Lab (D65) : la conversion de `lib/teintes`, la seule du site. */
+export const lab = labDeHex;
 
 /* ── Résolution ─────────────────────────────────────────────────── */
 
@@ -129,18 +100,8 @@ export const PIECES_INSPIRATION: readonly {
   { id: "professionnel", libelle: "Pro" },
 ];
 
-/** « Vue dans » de /matieres : pour chaque référence, les ambiances (d'inspiration) où elle apparaît. */
-export function vueDans(liste: readonly Ambiance[] = AMBIANCES): Record<string, { id: string; titre: string }[]> {
-  const parRef: Record<string, { id: string; titre: string }[]> = {};
-  for (const a of liste) {
-    if (!a.inspiration) continue;
-    for (const s of a.surfaces) {
-      const deja = (parRef[s.ref] ??= []);
-      if (!deja.some((x) => x.id === a.id)) deja.push({ id: a.id, titre: a.titre });
-    }
-  }
-  return parRef;
-}
+/** « Vue dans » de /matieres et des fiches : `lib/indexation-matieres` (site 3.0, lot D1), réexporté ici. */
+export { vueDans } from "./indexation-matieres";
 
 /** L'ancre d'une ambiance sur /inspirations. */
 export const lienInspiration = (id: string) => `/inspirations#${id}`;

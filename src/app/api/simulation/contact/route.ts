@@ -20,6 +20,7 @@ import { validerContactSimulation } from "./validation";
  * le site n'envoie rien — et `rappelLe`, le rappel daté par le CRM. Le CRM n'ouvre
  * l'espace que si la demande porte `afficherLienEspace` (formulaire après un rendu ;
  * jamais la demande après un échec, dont l'écran ne montre pas de lien).
+ * Relecture des phases D, E, F : `exemple` (pièce d'exemple du site) part au CRM ; sa photo jamais comme celle du visiteur.
  */
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -60,12 +61,14 @@ export async function POST(req: NextRequest) {
       parcoursId: c.parcoursId,
       simulationIds: c.simulationIds,
       notes: c.echec
-        ? `SIMULATION À RÉALISER À LA MAIN — la génération n'a pas abouti sur le site (${c.echec}). Projet ${projet.id}${c.references ? ` : ${c.references}` : ""}. ${c.photoAvant ? "Photo du visiteur jointe." : "Photo non transmise."}`
+        ? `SIMULATION À RÉALISER À LA MAIN — la génération n'a pas abouti sur le site (${c.echec}). Projet ${projet.id}${c.references ? ` : ${c.references}` : ""}. ${c.exemple ? `Essai sur la pièce d'exemple ${c.exemple} : aucune photo du visiteur, la lui demander.` : c.photoAvant ? "Photo du visiteur jointe." : "Photo non transmise."}`
         : c.references
           ? `Simulation ${projet.id} : ${c.references}`
           : `Simulation ${projet.id}`,
       // Génération non aboutie (crédit épuisé, panne, photo refusée) : la photo du visiteur part avec sa demande. ~6 Mo au plus.
-      photos: c.photoAvant && c.echec ? [c.photoAvant] : undefined,
+      photos: c.photoAvant && c.echec && !c.exemple ? [c.photoAvant] : undefined,
+      // Relecture D, E, F : le CRM marque la simulation « pièce d'exemple » (un CRM d'avant ignore le champ).
+      exemple: c.exemple,
       campagne: c.campagne,
       publicite: c.publicite,
       formulaire: c.formulaire,

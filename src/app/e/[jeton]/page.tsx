@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: { title: "Votre espace CoverSwap", description: "Vos projets de rénovation, étape par étape." },
 };
 
-export const viewport: Viewport = { themeColor: "#F5F4F1", width: "device-width", initialScale: 1, viewportFit: "cover" };
+export const viewport: Viewport = { themeColor: "#F4EDE2", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const dynamic = "force-dynamic";
 

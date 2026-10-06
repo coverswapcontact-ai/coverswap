@@ -41,6 +41,8 @@ type Props = {
   phraseQuitter?: string;
   /** Contenu montré sous l'échec : la demande « simulation à la main ». */
   children?: ReactNode;
+  /** Le titre de l'attente : « Votre simulation se prépare » à défaut ; « L'ambiance se prépare » sur une pièce d'exemple (site 3.0). */
+  titre?: string;
 };
 
 const CHAMP = "w-full rounded-[var(--rayon-sm)] border border-trait bg-white px-3.5 py-3 text-[16px] text-encre placeholder:text-encre-2/70 focus:border-encre focus:outline-none";
@@ -91,7 +93,7 @@ function FormulairePrevenir({ onPrevenir }: { onPrevenir: NonNullable<Props["onP
         <span>{TEXTE_CONSENTEMENT_PREVENIR}</span>
       </label>
       {etat.type === "erreur" ? (
-        <p role="alert" className="text-[13.5px] text-accent-texte">
+        <p role="alert" className="text-[13.5px] text-alerte-texte">
           {etat.message}
         </p>
       ) : null}
@@ -109,7 +111,7 @@ function FormulairePrevenir({ onPrevenir }: { onPrevenir: NonNullable<Props["onP
 
 export const PHRASE_QUITTER_SITE = "Vous pouvez quitter cette page : votre simulation continue. Revenez sur le simulateur pour la retrouver.";
 
-export default function EcranAttente({ photo, films, statut, etape, attenteEstimeeS, horsLigne, echec, peutReessayer, attenteReessai, onReessayer, onPrevenir, lecturePhoto, phraseQuitter = PHRASE_QUITTER_SITE, children }: Props) {
+export default function EcranAttente({ photo, films, statut, etape, attenteEstimeeS, horsLigne, echec, peutReessayer, attenteReessai, onReessayer, onPrevenir, lecturePhoto, phraseQuitter = PHRASE_QUITTER_SITE, children, titre = "Votre simulation se prépare" }: Props) {
   const cochees = etapesCochees(etape, statut);
   const enEchec = statut === "ECHEC" && echec;
   return (
@@ -162,7 +164,7 @@ export default function EcranAttente({ photo, films, statut, etape, attenteEstim
           <>
             <div>
               <h2 id="attente-titre" className="font-display text-[22px] leading-tight font-semibold">
-                Votre simulation se prépare
+                {titre}
               </h2>
               <p className="mt-1 text-[15px] font-medium text-encre">{texteAttente(attenteEstimeeS)}</p>
               <p role="status" aria-live="polite" className="mt-1 min-h-[20px] text-[14px] text-encre-2">

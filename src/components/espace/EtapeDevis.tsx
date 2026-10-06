@@ -4,6 +4,7 @@ import { RappelCoordonnees } from "./Coordonnees";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { dateCourte, dateLongue, euros, type Client, type Etat } from "./api";
 import { AvantApres } from "@/components/simulation/AvantApres";
+import { LIBELLE_AMBIANCE } from "./simulations-outils";
 import { Signature, type SignatureRef } from "./Signature";
 import { Annonce, BoutonAConfirmer, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
 import { devisDeLOnglet, enteteDesDevis, precisionAccord } from "@/lib/espace/devis";
@@ -95,7 +96,7 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
     }
   }
 
-  const champ = "min-h-[54px] w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 text-[17px] text-[#1A1A1A] placeholder:text-[#8A857E] focus:border-[#1A1A1A] focus:outline-none";
+  const champ = "min-h-[54px] w-full rounded-2xl border border-trait bg-blanc px-4 text-[17px] text-encre placeholder:text-encre-2 focus:border-encre focus:outline-none";
   // L'e-mail est demandé, jamais exigé : sans lui, le devis signé reste ici. S'il est écrit, il doit être lisible.
   const emailOk = !coord.email.trim() || /.+@.+\..+/.test(coord.email.trim());
   const coordonneesOk = !aCompleter || (coord.adresse.trim().length >= 3 && /^\d{5}$/.test(coord.codePostal) && coord.ville.trim() && emailOk);
@@ -115,27 +116,27 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
   const choix = plusieurs ? (
     <Carte className="space-y-3">
       <div>
-        <Surtitre ton={selection.aSigner.length ? "rouge" : "vert"}>{entete.surtitre}</Surtitre>
-        <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">{entete.phrase}</p>
+        <Surtitre ton={selection.aSigner.length ? "fort" : "vert"}>{entete.surtitre}</Surtitre>
+        <p className="mt-1 text-[15.5px] leading-relaxed text-encre">{entete.phrase}</p>
       </div>
       <ul className="grid grid-cols-2 gap-2.5">
         {proposes.map((d) => {
           const actif = d.id === devis?.id;
           return (
             <li key={d.id}>
-              <button type="button" aria-pressed={actif} onClick={() => setChoisiId(d.id)} className={cx("flex min-h-[124px] w-full flex-col justify-between rounded-2xl border-2 p-3 text-left", actif ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9] bg-white active:bg-[#F2F0EC]")}>
-                <span className="block text-[13px] text-[#6B665F]">
+              <button type="button" aria-pressed={actif} onClick={() => setChoisiId(d.id)} className={cx("flex min-h-[124px] w-full flex-col justify-between rounded-2xl border-2 p-3 text-left", actif ? "border-encre bg-fond" : "border-trait bg-blanc active:bg-fond-2")}>
+                <span className="block text-[13px] text-encre-2">
                   Devis n° {d.numero}
-                  {d.accepte ? <span className="ml-1.5 font-semibold text-[#1F7A4D]">· Signé</span> : null}
+                  {d.accepte ? <span className="ml-1.5 font-semibold text-succes">· Signé</span> : null}
                 </span>
-                <span className="mt-1 block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{d.libelle || d.objet}</span>
-                <span className="mt-2 block font-display text-[22px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{euros(d.total)}</span>
+                <span className="mt-1 block text-[16px] leading-snug font-semibold text-encre">{d.libelle || d.objet}</span>
+                <span className="mt-2 block font-sans text-[22px] leading-none font-semibold text-encre tabular-nums">{euros(d.total)}</span>
               </button>
             </li>
           );
         })}
       </ul>
-      {!devis ? <p className="text-center text-[14px] text-[#6B665F]">Touchez un devis pour voir son détail.</p> : null}
+      {!devis ? <p className="text-center text-[14px] text-encre-2">Touchez un devis pour voir son détail.</p> : null}
     </Carte>
   ) : null;
 
@@ -158,71 +159,71 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
       <Carte className="space-y-4">
         <div>
           <Surtitre>Devis n° {devis.numero}{devis.libelle ? ` · ${devis.libelle}` : ""}</Surtitre>
-          <h2 className="mt-1 font-display text-[22px] leading-tight font-semibold text-[#1A1A1A]">{devis.objet}</h2>
-          <p className="mt-1 text-[14.5px] text-[#5F5A53]">
+          <h2 className="mt-1 font-display text-[22px] leading-tight font-semibold text-encre">{devis.objet}</h2>
+          <p className="mt-1 text-[14.5px] text-encre-2">
             Émis le {dateCourte(devis.emisLe)} · valable jusqu&apos;au {dateCourte(devis.valableJusquau)}
           </p>
         </div>
-        {devis.lignes.length === 0 ? <p className="border-y border-[#EEEBE6] py-3 text-[15.5px] leading-relaxed text-[#3F3B36]">Le détail des prestations figure sur votre devis{devis.pdf ? ", à ouvrir en PDF ci-dessous" : " papier"}.</p> : null}
-        <ul className={cx("divide-y divide-[#EEEBE6] border-y border-[#EEEBE6]", devis.lignes.length === 0 && "hidden")}>
+        {devis.lignes.length === 0 ? <p className="border-y border-trait py-3 text-[15.5px] leading-relaxed text-encre">Le détail des prestations figure sur votre devis{devis.pdf ? ", à ouvrir en PDF ci-dessous" : " papier"}.</p> : null}
+        <ul className={cx("divide-y divide-trait border-y border-trait", devis.lignes.length === 0 && "hidden")}>
           {devis.lignes.map((ligne, i) =>
             ligne.type === "SECTION" ? (
-              <li key={i} className="pt-3 pb-1.5 text-[13px] font-semibold tracking-[0.06em] text-[#6B665F] uppercase">
+              <li key={i} className="pt-3 pb-1.5 text-[13px] font-semibold tracking-[0.06em] text-encre-2 uppercase">
                 {ligne.libelle}
               </li>
             ) : (
               <li key={i} className="flex items-start justify-between gap-4 py-3">
                 <span className="min-w-0">
-                  <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{ligne.designation}</span>
-                  {ligne.detail ? <span className="mt-0.5 block text-[14.5px] leading-snug text-[#5F5A53]">{ligne.detail}</span> : null}
-                  <span className="mt-1 block text-[14px] text-[#6B665F] tabular-nums">
+                  <span className="block text-[16px] leading-snug font-semibold text-encre">{ligne.designation}</span>
+                  {ligne.detail ? <span className="mt-0.5 block text-[14.5px] leading-snug text-encre-2">{ligne.detail}</span> : null}
+                  <span className="mt-1 block text-[14px] text-encre-2 tabular-nums">
                     {quantite(ligne.quantite, ligne.unite)}
                     {ligne.unite !== "forfait" ? ` × ${euros(ligne.prixUnitaire)}` : ""}
                   </span>
                 </span>
-                <span className="shrink-0 font-display text-[17px] font-semibold text-[#1A1A1A] tabular-nums">{euros(ligne.total)}</span>
+                <span className="shrink-0 font-sans text-[17px] font-semibold text-encre tabular-nums">{euros(ligne.total)}</span>
               </li>
             )
           )}
         </ul>
         <div className="flex items-end justify-between gap-3">
-          <span className="text-[16px] font-semibold text-[#1A1A1A]">Total, fourni et posé</span>
-          <span className="font-display text-[34px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{euros(devis.total)}</span>
+          <span className="text-[16px] font-semibold text-encre">Total, fourni et posé</span>
+          <span className="font-sans text-[34px] leading-none font-semibold text-encre tabular-nums">{euros(devis.total)}</span>
         </div>
-        <p className="text-right text-[13px] text-[#6B665F]">{devis.mentionTva}</p>
+        <p className="text-right text-[13px] text-encre-2">{devis.mentionTva}</p>
         {devis.acompte > 0 ? (
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="rounded-2xl bg-[#F6F5F2] p-3">
-              <span className="block text-[13.5px] text-[#5F5A53]">À la commande</span>
-              <span className="block font-display text-[20px] font-semibold text-[#1A1A1A] tabular-nums">{euros(devis.acompte)}</span>
-              <span className="block text-[13px] text-[#5F5A53]">acompte {devis.acomptePct ? `de ${devis.acomptePct}\u00a0%` : ""}</span>
+            <div className="rounded-2xl bg-fond p-3">
+              <span className="block text-[13.5px] text-encre-2">À la commande</span>
+              <span className="block font-sans text-[20px] font-semibold text-encre tabular-nums">{euros(devis.acompte)}</span>
+              <span className="block text-[13px] text-encre-2">acompte {devis.acomptePct ? `de ${devis.acomptePct}\u00a0%` : ""}</span>
             </div>
-            <div className="rounded-2xl bg-[#F6F5F2] p-3">
-              <span className="block text-[13.5px] text-[#5F5A53]">À la fin du chantier</span>
-              <span className="block font-display text-[20px] font-semibold text-[#1A1A1A] tabular-nums">{euros(devis.solde)}</span>
-              <span className="block text-[13px] text-[#5F5A53]">le solde</span>
+            <div className="rounded-2xl bg-fond p-3">
+              <span className="block text-[13.5px] text-encre-2">À la fin du chantier</span>
+              <span className="block font-sans text-[20px] font-semibold text-encre tabular-nums">{euros(devis.solde)}</span>
+              <span className="block text-[13px] text-encre-2">le solde</span>
             </div>
           </div>
         ) : null}
-        <ul className="space-y-1.5 text-[14.5px] leading-snug text-[#3F3B36]">
+        <ul className="space-y-1.5 text-[14.5px] leading-snug text-encre">
           {devis.conditions.map((c) => (
             <li key={c} className="flex gap-2">
-              <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rotate-45 bg-[#CC0000]" />
+              <span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rotate-45 bg-encre" />
               {c}
             </li>
           ))}
         </ul>
         {devis.pdf ? (
-          <a href={client.url(`/${devis.pdf}`)} target="_blank" rel="noopener noreferrer" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-[#D3CFC8] text-[16px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]">
+          <a href={client.url(`/${devis.pdf}`)} target="_blank" rel="noopener noreferrer" className="flex min-h-[52px] items-center justify-center rounded-2xl border border-trait text-[16px] font-medium text-encre active:bg-fond-2">
             Voir le devis en PDF
           </a>
         ) : null}
       </Carte>
 
       {devis.accepte ? (
-        <Carte className="border-[#1F7A4D] bg-[#F3FAF6]">
+        <Carte className="border-succes bg-succes-fond">
           <Surtitre ton="vert">{devis.accepte.source === "CRM" ? "Devis signé" : "Bon pour accord donné"}</Surtitre>
-          <p className="mt-1.5 text-[16px] leading-relaxed text-[#17563A]">
+          <p className="mt-1.5 text-[16px] leading-relaxed text-succes">
             {devis.accepte.source === "CRM" ? `Signé le ${dateLongue(devis.accepte.le)}.` : `Par ${devis.accepte.nom}, le ${dateLongue(devis.accepte.le)}.`} {etat.acompte && !etat.acompte.complet ? "Dernière étape\u00a0: l'acompte, dans l'onglet Paiement." : ""}
           </p>
           <BoutonPrincipal className="mt-3" onClick={onSuite}>
@@ -232,24 +233,24 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
           {devis.accepte.retirable ? (
             <BoutonAConfirmer className="mt-2" libelle="Revenir sur mon accord" question="Retirer votre bon pour accord ? CoverSwap en sera prévenu." confirmer="Oui, retirer" occupe={occupe} onConfirme={() => void retirerAccord()} />
           ) : devis.accepte.source !== "CRM" ? (
-            <p className="mt-3 text-[14px] leading-relaxed text-[#3F5F4E]">Votre projet est engagé. Pour revenir sur votre accord, appelez CoverSwap.</p>
+            <p className="mt-3 text-[14px] leading-relaxed text-succes">Votre projet est engagé. Pour revenir sur votre accord, appelez CoverSwap.</p>
           ) : null}
         </Carte>
       ) : (
         <Carte className="space-y-4">
           <div>
-            <Surtitre ton="rouge">Donner mon accord</Surtitre>
-            <p className="mt-1 text-[15.5px] leading-relaxed text-[#3F3B36]">Aucun paiement maintenant. L&apos;acompte se règle ensuite, dans l&apos;onglet Paiement.</p>
+            <Surtitre ton="fort">Donner mon accord</Surtitre>
+            <p className="mt-1 text-[15.5px] leading-relaxed text-encre">Aucun paiement maintenant. L&apos;acompte se règle ensuite, dans l&apos;onglet Paiement.</p>
           </div>
 
           {aCompleter ? (
             <fieldset className="space-y-2.5">
-              <legend className="text-[16px] font-semibold text-[#1A1A1A]">L&apos;adresse du chantier</legend>
+              <legend className="text-[16px] font-semibold text-encre">L&apos;adresse du chantier</legend>
               <input className={champ} placeholder="Nom et prénom" autoComplete="name" value={nom} onChange={(e) => setNom(e.target.value)} aria-label="Nom et prénom" />
               <div className="relative">
                 <input className={champ} placeholder="Numéro et rue" autoComplete="street-address" value={coord.adresse} onChange={(e) => chercherAdresse(e.target.value)} aria-label="Adresse" aria-autocomplete="list" />
                 {suggestions.length > 0 ? (
-                  <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-[#D3CFC8] bg-white shadow-lg" role="listbox">
+                  <ul className="absolute inset-x-0 top-full z-10 mt-1 overflow-hidden rounded-2xl border border-trait bg-blanc shadow-lg" role="listbox">
                     {suggestions.map((s) => (
                       <li key={s.libelle}>
                         <button
@@ -260,7 +261,7 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
                             setCoord((c) => ({ ...c, adresse: s.adresse, codePostal: s.codePostal, ville: s.ville }));
                             setSuggestions([]);
                           }}
-                          className="block min-h-[52px] w-full px-4 py-2 text-left text-[16px] text-[#1A1A1A] active:bg-[#F2F0EC]"
+                          className="block min-h-[52px] w-full px-4 py-2 text-left text-[16px] text-encre active:bg-fond-2"
                         >
                           {s.libelle}
                         </button>
@@ -274,27 +275,27 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
                 <input className={champ} placeholder="Ville" autoComplete="address-level2" value={coord.ville} onChange={(e) => setCoord({ ...coord, ville: e.target.value })} aria-label="Ville" />
               </div>
               <input className={champ} type="email" inputMode="email" placeholder="E-mail (facultatif)" autoComplete="email" value={coord.email} onChange={(e) => setCoord({ ...coord, email: e.target.value })} aria-label="E-mail, facultatif&nbsp;: pour recevoir une copie du devis signé" />
-              <p className="-mt-1 px-1 text-[14px] leading-snug text-[#5F5A53]">Pour recevoir une copie du devis signé. Sans e-mail, il reste ici, dans votre espace.</p>
+              <p className="-mt-1 px-1 text-[14px] leading-snug text-encre-2">Pour recevoir une copie du devis signé. Sans e-mail, il reste ici, dans votre espace.</p>
             </fieldset>
           ) : (
             <label className="block">
-              <span className="mb-1.5 block text-[16px] font-semibold text-[#1A1A1A]">Votre nom</span>
+              <span className="mb-1.5 block text-[16px] font-semibold text-encre">Votre nom</span>
               <input className={champ} autoComplete="name" value={nom} onChange={(e) => setNom(e.target.value)} />
             </label>
           )}
 
-          <button type="button" role="checkbox" aria-checked={accepte} aria-label={`J'accepte le devis n° ${devis.numero}${devis.libelle ? ` « ${devis.libelle} »` : ""} d'un montant de ${euros(devis.total)}. Mon accord vaut signature.`} onClick={() => setAccepte(!accepte)} className={cx("flex w-full items-start gap-3 rounded-2xl border-2 p-4 text-left", accepte ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9]")}>
-            <span aria-hidden className={cx("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 text-[16px] font-bold", accepte ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#8A857E] bg-white")}>
+          <button type="button" role="checkbox" aria-checked={accepte} aria-label={`J'accepte le devis n° ${devis.numero}${devis.libelle ? ` « ${devis.libelle} »` : ""} d'un montant de ${euros(devis.total)}. Mon accord vaut signature.`} onClick={() => setAccepte(!accepte)} className={cx("flex w-full items-start gap-3 rounded-2xl border-2 p-4 text-left", accepte ? "border-encre bg-fond" : "border-trait")}>
+            <span aria-hidden className={cx("mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 text-[16px] font-bold", accepte ? "border-encre bg-encre text-blanc" : "border-encre-2 bg-blanc")}>
               {accepte ? "✓" : ""}
             </span>
-            <span className="text-[16px] leading-snug text-[#1A1A1A]">
-              J&apos;accepte le devis n° {devis.numero}{devis.libelle ? ` «\u00a0${devis.libelle}\u00a0»` : ""} d&apos;un montant de <strong className="font-semibold">{euros(devis.total)}</strong>. Mon accord vaut signature.
+            <span className="text-[16px] leading-snug text-encre">
+              J&apos;accepte le devis n° {devis.numero}{devis.libelle ? ` «\u00a0${devis.libelle}\u00a0»` : ""} d&apos;un montant de <strong className="font-semibold tabular-nums">{euros(devis.total)}</strong>. Mon accord vaut signature.
               {precisionAccord(selection)}
             </span>
           </button>
 
           <div>
-            <p className="mb-2 text-[15px] text-[#3F3B36]">Votre signature (facultative)</p>
+            <p className="mb-2 text-[15px] text-encre">Votre signature (facultative)</p>
             <Signature ref={signature} />
           </div>
 
@@ -303,11 +304,11 @@ export function EtapeDevis({ etat, client, onEtat, onSuite, onCoordonnees }: { e
             {occupe ? "Enregistrement…" : "Bon pour accord"}
           </BoutonPrincipal>
           {!apercu && resteAFaire ? (
-            <p className="text-center text-[15px] leading-snug font-medium text-[#8A2A00]" aria-live="polite">
+            <p className="text-center text-[15px] leading-snug font-medium text-alerte-texte" aria-live="polite">
               Pour valider, il reste à {resteAFaire}.
             </p>
           ) : null}
-          <p className="text-center text-[13.5px] leading-relaxed text-[#6B665F]">La date, l&apos;heure et votre accord sont enregistrés comme preuve. Votre devis reste ici, à relire quand vous voulez.</p>
+          <p className="text-center text-[13.5px] leading-relaxed text-encre-2">La date, l&apos;heure et votre accord sont enregistrés comme preuve. Votre devis reste ici, à relire quand vous voulez.</p>
         </Carte>
       )}
     </div>
@@ -323,15 +324,15 @@ export function DevisEnPreparation({ etat, client, onSimulations }: { etat: Etat
       <EnteteEtape titre="Votre devis" phrase="CoverSwap prépare votre devis sur la base de la simulation que vous avez validée. Il arrive ici même, très vite." />
       {simulation ? (
         <Carte className="space-y-3 p-3">
-          <AvantApres apres={client.url(`/simulations/${simulation.id}`)} avant={simulation.avant ? client.url(`/simulations/${simulation.id}/avant`) : null} alt="Votre simulation validée" sansOutils />
+          <AvantApres apres={client.url(`/simulations/${simulation.id}`)} avant={simulation.avant ? client.url(`/simulations/${simulation.id}/avant`) : null} alt={simulation.exemple ? `${LIBELLE_AMBIANCE} validée` : "Votre simulation validée"} etiquette={simulation.exemple ? LIBELLE_AMBIANCE : undefined} sansOutils />
           <ul className="space-y-1.5 px-1 pb-1">
             {simulation.zones.map((z) => (
               <li key={`${z.zone}-${z.ref}`} className="flex items-center gap-2.5 text-[15px]">
                 {/* eslint-disable-next-line @next/next/no-img-element -- échantillon servi par le CRM */}
-                <img src={client.url(`/echantillons/${encodeURIComponent(z.ref)}?l=320`)} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-black/10" loading="lazy" referrerPolicy="no-referrer" />
+                <img src={client.url(`/echantillons/${encodeURIComponent(z.ref)}?l=320`)} alt="" className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-encre/10" loading="lazy" referrerPolicy="no-referrer" />
                 <span>
-                  <span className="text-[#5F5A53]">{z.libelle}&nbsp;: </span>
-                  <span className="font-semibold text-[#1A1A1A]">{z.nom || z.ref}</span>
+                  <span className="text-encre-2">{z.libelle}&nbsp;: </span>
+                  <span className="font-semibold text-encre">{z.nom || z.ref}</span>
                 </span>
               </li>
             ))}
@@ -343,7 +344,7 @@ export function DevisEnPreparation({ etat, client, onSimulations }: { etat: Etat
           <ul className="mt-2 space-y-1.5 text-[15.5px]">
             {choix.zones.map((z) => (
               <li key={`${z.zone}-${z.ref}`}>
-                <span className="text-[#5F5A53]">{z.libelle || z.zone}&nbsp;: </span>
+                <span className="text-encre-2">{z.libelle || z.zone}&nbsp;: </span>
                 <span className="font-semibold">{z.nom || z.ref}</span>
               </li>
             ))}
@@ -352,7 +353,7 @@ export function DevisEnPreparation({ etat, client, onSimulations }: { etat: Etat
       ) : null}
       {etat.choixModifiable !== false ? (
         <>
-          <p className="px-1 text-[15px] leading-relaxed text-[#5F5A53]">Vous pouvez encore changer de simulation tant que le devis n&apos;est pas établi.</p>
+          <p className="px-1 text-[15px] leading-relaxed text-encre-2">Vous pouvez encore changer de simulation tant que le devis n&apos;est pas établi.</p>
           <BoutonSecondaire onClick={onSimulations}>Revoir mes simulations</BoutonSecondaire>
         </>
       ) : null}

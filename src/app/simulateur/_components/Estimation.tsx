@@ -4,13 +4,18 @@ import { DessinFamille, PlanCuisine } from "@/components/espace/Illustrations";
 import { PRECISION_ESTIMATION, texteEstimation, type Estimation as ValeurEstimation } from "@/lib/estimation";
 import type { FormatPiece, IdFamilleTarifs } from "@/lib/tarifs-site";
 
-const FORMES_CUISINE = ["une-rangee", "en-l", "en-u", "ilot"] as const;
+/**
+ * Les formes de cuisine qui ont leur plan (picto vu de dessus). Site 3.0, lot E2 : `parallele` (cuisine en couloir,
+ * `plan-parallele`) ne s'affiche que si le CRM publie un format de ce nom ; aujourd'hui il publie `une-rangee`, `en-l`
+ * et `ilot` (`modifier_tarifs` pour l'ajouter). Un format sans plan prend le picto de la famille.
+ */
+const FORMES_CUISINE = ["une-rangee", "en-l", "en-u", "ilot", "parallele"] as const;
 type FormeCuisine = (typeof FORMES_CUISINE)[number];
 const estForme = (id: string): id is FormeCuisine => (FORMES_CUISINE as readonly string[]).includes(id);
 
 /**
  * L'estimation après le rendu (mission 16, partie 4) : « Quelle taille ? » en un geste — les formats du CRM (deux ou
- * trois, une colonne chacun) en boutons de 44 px au moins, le plan vu de dessus pour la cuisine (`PlanCuisine`), le dessin de la pièce sinon — puis
+ * trois, une colonne chacun) en boutons de 44 px au moins, le plan vu de dessus pour la cuisine (`PlanCuisine`), le picto de la pièce sinon — puis
  * « Estimation : 1 500 à 1 900 € » et la phrase fixe. Sans format (mobilier, pro, murs, CRM injoignable) : la
  * fourchette de la pièce ou « Prix sur devis », tout de suite. Le calcul est ailleurs (`lib/estimation`).
  */

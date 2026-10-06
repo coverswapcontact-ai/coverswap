@@ -1,11 +1,19 @@
 "use client";
 
-import { useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
-import type { SourcesImage } from "@/lib/images-preparees";
+import { lazy, Suspense, useCallback, useRef, useState, type ImgHTMLAttributes, type ReactNode } from "react";
+import type { SourcesImage } from "@/lib/sources-image";
 import { CalqueMatieres, type MatiereCalque } from "@/components/ambiances/CalqueMatieres";
+import { positionAuClavier } from "./curseur-clavier";
 import { Etiquette } from "./Etiquette";
 import { ImagePreparee } from "./ImagePreparee";
-import { PleinEcran } from "./PleinEcran";
+
+/**
+ * Lot F7 : le plein écran (et son zoom à pincer) n'est chargé qu'à la demande — au survol ou au focus de « Plein
+ * écran », au plus tard au clic. Il n'a rien à montrer tant qu'il est fermé (`PleinEcran` rend `null`), et son code
+ * partait avec chaque curseur de chaque page.
+ */
+const chargerPleinEcran = () => import("./PleinEcran");
+const PleinEcran = lazy(() => chargerPleinEcran().then((m) => ({ default: m.PleinEcran })));
 
 /**
  * Avant / après sur la photo du visiteur (mission 15, partie 4 ; déplacé
@@ -13,7 +21,8 @@ import { PleinEcran } from "./PleinEcran";
  * cadre au rapport de l'image, la photo d'origine par-dessus, découpée par
  * un curseur. Le curseur se glisse depuis sa POIGNÉE (`touch-action: none`
  * dessus seulement : ailleurs, la page défile normalement au doigt), à la
- * souris, au clavier (flèches, Début, Fin). « Comparer » alterne entre tout
+ * souris, au clavier (site 3.0, lot B3 : les quatre flèches, Page ↑ / ↓ par
+ * 25 %, Début, Fin, sans faire défiler la page — `curseur-clavier.ts`). « Comparer » alterne entre tout
  * avant et tout après ; « Plein écran » ouvre l'image à pincer.
  * `altAvant` (mission 16) : le texte de la photo « avant » quand ce n'est pas
  * celle du visiteur (une réalisation publiée).
@@ -22,7 +31,9 @@ import { PleinEcran } from "./PleinEcran";
  * rapport réel de la photo (rien n'est coupé), une carte de réalisation un
  * rapport fixe (une photo d'un autre format est recadrée pareil avant et
  * après, jamais coupée en bas d'un seul côté). Sans `ratio`, l'image « après »
- * donne sa hauteur naturelle.
+ * donne sa hauteur naturelle : réservé à l'espace client (images du CRM de
+ * format inconnu) ; partout ailleurs `ratio` est obligatoire, la place est
+ * réservée avant le chargement (composants.test.ts).
  * Les pastilles « Avant » / « Après » sont l'`Etiquette` commune.
  *
  * Mission 16 (partie 3), pour l'ouverture de l'accueil (rien ne change sans
@@ -35,7 +46,9 @@ import { PleinEcran } from "./PleinEcran";
  *  - `priorite` : l'image du premier écran (LCP) — « avant » en `eager` +
  *    `fetchpriority="high"`, « après » en `eager` ;
  *  - `outilsMobile="comparer"` : sous 768 px, seul « Comparer » reste (l'image
- *    occupe déjà l'écran) ;
+ *    occupe déjà l'écran) ; `"aucun"` (site 3.0, lot B6 : l'ouverture) : sous
+ *    768 px, plus d'outils du tout — la poignée suffit, et le titre et le
+ *    bouton remontent dans le premier écran ;
  *  - `etiquette` : la pastille « Simulation » ou « Réalisation, <ville> » en bas
  *    à gauche de l'image (les pastilles « Avant » / « Après » sont en haut).
  *
@@ -55,7 +68,7 @@ function ImageCadre({ src, sources, tailles, alt, ...props }: ProprietesImage) {
   return <ImagePreparee sources={sources} tailles={tailles} alt={alt} {...props} />;
 }
 
-export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
+export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd'hui", className, ratio, sansOutils = false, preparees, priorite = false, outilsMobile = "tous", etiquette, matieres }: { apres: string; avant: string | null; alt: string; altAvant?: string; className?: string; ratio?: string; sansOutils?: boolean; preparees?: ImagesPreparees; priorite?: boolean; outilsMobile?: "tous" | "comparer" | "aucun"; etiquette?: ReactNode; matieres?: readonly MatiereCalque[] }) {
   const [position, setPosition] = useState(50);
   const [glisse, setGlisse] = useState(false);
   const [pleinEcran, setPleinEcran] = useState(false);
@@ -75,16 +88,20 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
   }, []);
 
   const outils = sansOutils ? null : (
-    <div className="mt-2 flex flex-wrap items-center gap-2">
+    <div className={`mt-2 flex flex-wrap items-center gap-2${outilsMobile === "aucun" ? " max-md:hidden" : ""}`}>
       {avant ? (
         <button type="button" onClick={() => setPosition((p) => (p > 50 ? 0 : 100))} className="min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2">
           Comparer
         </button>
       ) : null}
-      <button type="button" onClick={() => setPleinEcran(true)} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile === "comparer" ? " max-md:hidden" : ""}`}>
+      <button type="button" onClick={() => setPleinEcran(true)} onPointerEnter={chargerPleinEcran} onFocus={chargerPleinEcran} className={`min-h-[44px] rounded-[var(--rayon-sm)] border border-trait bg-white px-4 text-[15px] font-medium text-encre transition-colors duration-[var(--duree-courte)] active:bg-fond-2${outilsMobile !== "tous" ? " max-md:hidden" : ""}`}>
         Plein écran
       </button>
-      <PleinEcran ouvert={pleinEcran} onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
+      {pleinEcran ? (
+        <Suspense fallback={null}>
+          <PleinEcran ouvert onFermer={() => setPleinEcran(false)} apres={apres} avant={avant} alt={alt} />
+        </Suspense>
+      ) : null}
     </div>
   );
 
@@ -129,8 +146,9 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           Avant
         </Etiquette>
         <Etiquette className="pointer-events-none absolute top-3 right-3">Après</Etiquette>
-        {pastille}
         <div className="pointer-events-none absolute inset-y-0 w-[2px] -translate-x-1/2 bg-white shadow-[0_0_4px_rgba(0,0,0,0.35)]" style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }} />
+        {/* L'étiquette passe au-dessus du trait du curseur (lot E3 : à 390 px, le trait la coupait). */}
+        {pastille}
         <div
           role="slider"
           tabIndex={0}
@@ -151,10 +169,10 @@ export function AvantApres({ apres, avant, alt, altAvant = "Votre pièce aujourd
           onPointerUp={() => setGlisse(false)}
           onPointerCancel={() => setGlisse(false)}
           onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") setPosition((p) => Math.max(0, p - 5));
-            if (e.key === "ArrowRight") setPosition((p) => Math.min(100, p + 5));
-            if (e.key === "Home") setPosition(0);
-            if (e.key === "End") setPosition(100);
+            const suivante = positionAuClavier(e.key, position);
+            if (suivante === null) return;
+            e.preventDefault();
+            setPosition(suivante);
           }}
           className="absolute top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 touch-none items-center justify-center rounded-full bg-white text-encre shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
           style={{ left: `${position}%`, transition: glisse ? "none" : "left var(--duree-moyenne) var(--ease)" }}

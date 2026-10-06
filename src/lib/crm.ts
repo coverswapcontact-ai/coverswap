@@ -65,6 +65,8 @@ export interface CrmLeadPayload {
   surfaceMl?: number;
   /** Le navigateur affichera le lien de l'espace (formulaire après un rendu) : sans lui, le CRM n'ouvre pas l'espace. */
   afficherLienEspace?: boolean;
+  /** Relecture D, E, F : la simulation a été faite sur une pièce d'exemple du site (son nom) ; facultatif, ignoré d'un CRM d'avant. */
+  exemple?: string;
   // Consentement aux e-mails commerciaux : case distincte, texte figé horodaté (lib/consentement)
   consentementMail?: boolean;
   consentementTexte?: string;

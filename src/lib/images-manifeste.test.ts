@@ -26,11 +26,11 @@ describe("sourcesPhoto", () => {
     assert.equal(imagePreparee("toString"), false);
   });
 
-  test("une entrée du manifeste rend le triplet avif / webp / jpg et ses dimensions", () => {
+  test("une entrée du manifeste rend ses séries avif et jpg (lot F6 : le WebP n'est plus annoncé) et ses dimensions", () => {
     const s = sourcesPhoto("ouverture-essai", ESSAI);
     assert.ok(s);
     assert.equal(s.avif, `${DOSSIER_IMAGES}/ouverture-essai-480.avif 480w, ${DOSSIER_IMAGES}/ouverture-essai-960.avif 960w, ${DOSSIER_IMAGES}/ouverture-essai-1600.avif 1600w`);
-    assert.equal(s.webp, `${DOSSIER_IMAGES}/ouverture-essai-480.webp 480w, ${DOSSIER_IMAGES}/ouverture-essai-960.webp 960w, ${DOSSIER_IMAGES}/ouverture-essai-1600.webp 1600w`);
+    assert.equal("webp" in s, false, "l'AVIF et le JPEG de repli suffisent");
     assert.equal(s.jpg, `${DOSSIER_IMAGES}/ouverture-essai-480.jpg 480w, ${DOSSIER_IMAGES}/ouverture-essai-960.jpg 960w, ${DOSSIER_IMAGES}/ouverture-essai-1600.jpg 1600w`);
     assert.equal(s.src, `${DOSSIER_IMAGES}/ouverture-essai-960.jpg`);
     assert.equal(s.largeur, 2400);
@@ -107,6 +107,16 @@ describe("le manifeste généré", () => {
     assert.equal(texteManifeste(MANIFESTE_IMAGES), fichier);
     const noms = Object.keys(MANIFESTE_IMAGES);
     assert.deepEqual(noms, [...noms].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0)));
+  });
+
+  test("série 2 (lot B4) : 1536 × 1024 ou 1024 × 1536, plafonnées à l'origine (jamais de 1600), chacune avec sa source servie", () => {
+    const serie2 = (JSON.parse(readFileSync(path.join(process.cwd(), "scripts", "bibliotheque", "serie-2.json"), "utf8")) as { nom: string; serie: string }[]).filter((e) => e.serie !== "pictos");
+    for (const { nom } of serie2) {
+      const e = MANIFESTE_IMAGES[nom];
+      assert.ok(e, nom);
+      assert.deepEqual(e.largeurs, e.largeur > e.hauteur ? [480, 960, 1536] : [480, 960, 1024], nom);
+      assert.ok(sourcesPhoto(nom)?.src.includes(`?v=${e.empreinte}`), nom);
+    }
   });
 
   test("l'empreinte de l'original : écrite après les largeurs, relue telle quelle ; une entrée sans empreinte n'en a pas", () => {

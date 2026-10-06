@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { BreadcrumbSchema, FAQSchema, HowToSchema } from "@/components/JsonLd";
+import Breadcrumb from "@/components/Breadcrumb";
+import { FAQSchema, HowToSchema } from "@/components/JsonLd";
 import { FAQ_SIMULATEUR } from "@/data/faq";
-import { ENTREPRISE } from "@/lib/entreprise";
+import { exemplesSimulateur } from "@/lib/exemples-simulateur";
+import { PHOTOS_PIECES } from "@/lib/images-pieces";
 import { metadonneesPage } from "@/lib/metadonnees";
+import { photosDesCartes } from "@/lib/photos-cartes";
 import { DELAI_RENDU, DELAI_REPONSE, NB_REFERENCES } from "@/lib/offre";
 import { chargerZonesSimulateur, zonesMaxEnLettres } from "@/lib/simulateur/zones";
 import { chargerTarifs } from "@/lib/tarifs-site";
@@ -19,7 +22,7 @@ import Simulateur from "./_components/Simulateur";
 const DESCRIPTION_SIMULATEUR = `Votre pièce avec une matière Cover Styl', sur votre photo, en ${DELAI_RENDU}. Puis un devis covering en ligne, gratuit et sans engagement, ${DELAI_REPONSE}.`;
 
 export const metadata: Metadata = {
-  ...metadonneesPage({ titre: "Simulateur de covering sur votre photo — gratuit, sans inscription | CoverSwap", description: DESCRIPTION_SIMULATEUR, chemin: "/simulateur" }),
+  ...metadonneesPage({ titre: "Simulateur de covering sur votre photo, gratuit | CoverSwap", description: DESCRIPTION_SIMULATEUR, chemin: "/simulateur" }),
   keywords: `simulateur covering, simulation covering cuisine, ${MOTS_CLES_DEVIS_EN_LIGNE}`,
 };
 
@@ -38,16 +41,19 @@ export default async function PageSimulateur() {
   // Mission 16 (partie 4) : les tarifs publics du CRM pour l'estimation après le rendu (une heure en cache ; null → fourchettes).
   const [zones, tarifs] = await Promise.all([chargerZonesSimulateur(), chargerTarifs()]);
   const ETAPES = etapesDe(zones.zonesMax);
+  // Lot E3 : les pièces d'exemple de l'écran Photo, seulement pour les pièces que le simulateur publie.
+  const exemples = exemplesSimulateur({ pieces: zones.pieces.map((p) => p.id) });
   return (
     <div data-theme="simulation" data-page="simulateur" className="min-h-[100dvh] bg-fond text-encre">
       <HowToSchema name="Simuler un covering sur sa propre photo" description="Quatre étapes, sans inscription." etapes={ETAPES} dureeTotale="PT3M" />
       <FAQSchema faqs={FAQ_SIMULATEUR} />
-      <BreadcrumbSchema items={[{ name: "Accueil", url: ENTREPRISE.site }, { name: "Simulateur", url: `${ENTREPRISE.site}/simulateur` }]} />
       <EnteteSimulateur />
       <div className="mx-auto w-full max-w-3xl px-4 pt-5 pb-16">
         <h1 className="sr-only">Simulateur de covering sur votre photo</h1>
-        <Simulateur zones={zones} tarifs={tarifs} />
-        <section className="mt-16 max-w-2xl border-t border-trait pt-10">
+        <Simulateur zones={zones} tarifs={tarifs} exemples={exemples} photosPieces={photosDesCartes(PHOTOS_PIECES)} />
+        {/* Site 3.0 (lot F4) : le fil d'Ariane, visible et balisé, sous l'outil — le premier écran reste au simulateur. */}
+        <Breadcrumb items={[{ label: "Accueil", href: "/" }, { label: "Simulateur", href: "/simulateur" }]} className="mt-16 mb-0" />
+        <section className="mt-4 max-w-2xl border-t border-trait pt-10">
           <h2 className="font-display text-[22px] font-semibold">Comment ça marche</h2>
           <ol className="mt-5 space-y-4">
             {ETAPES.map((e, i) => (
@@ -66,7 +72,7 @@ export default async function PageSimulateur() {
           <div className="mt-5 space-y-2.5">
             {FAQ_SIMULATEUR.map((f) => (
               <details key={f.q} className="group rounded-[var(--rayon-md)] border border-trait bg-white p-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
+                <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-4 text-[16px] font-semibold text-encre">
                   {f.q}
                   <span aria-hidden className="text-2xl leading-none text-encre-2 transition-transform duration-[var(--duree-courte)] group-open:rotate-45">
                     +

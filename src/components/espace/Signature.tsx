@@ -26,7 +26,8 @@ export function Signature({ ref, onChange }: { ref?: Ref<SignatureRef>; onChange
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.lineWidth = 2.6;
-    ctx.strokeStyle = "#1A1A1A";
+    // Le trait prend l'encre du thème : la couleur calculée de la toile (`text-encre`), pas une valeur écrite ici.
+    ctx.strokeStyle = getComputedStyle(c).color;
   }, []);
 
   useEffect(() => {
@@ -49,10 +50,10 @@ export function Signature({ ref, onChange }: { ref?: Ref<SignatureRef>; onChange
 
   return (
     <div>
-      <div className="relative rounded-2xl border-2 border-dashed border-[#BDB8B0] bg-white">
+      <div className="relative rounded-2xl border-2 border-dashed border-trait bg-blanc">
         <canvas
           ref={toile}
-          className="block h-40 w-full touch-none rounded-2xl"
+          className="block h-40 w-full touch-none rounded-2xl text-encre"
           aria-label="Zone de signature&nbsp;: signez avec le doigt"
           onPointerDown={(e) => {
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -79,11 +80,11 @@ export function Signature({ ref, onChange }: { ref?: Ref<SignatureRef>; onChange
           onPointerUp={() => (dessin.current.actif = false)}
           onPointerCancel={() => (dessin.current.actif = false)}
         />
-        {!signe ? <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[16px] text-[#8A857E]">Signez ici avec le doigt</span> : null}
-        <span className="pointer-events-none absolute right-6 bottom-9 left-6 border-b border-[#D3CFC8]" aria-hidden />
+        {!signe ? <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[16px] text-encre-2">Signez ici avec le doigt</span> : null}
+        <span className="pointer-events-none absolute right-6 bottom-9 left-6 border-b border-trait" aria-hidden />
       </div>
       {signe ? (
-        <button type="button" onClick={effacer} className="mt-1.5 min-h-[40px] px-1 text-[15px] font-medium text-[#4F4A44] underline underline-offset-4">
+        <button type="button" onClick={effacer} className="mt-1.5 min-h-[40px] px-1 text-[15px] font-medium text-encre-2 underline underline-offset-4">
           Effacer et recommencer
         </button>
       ) : null}

@@ -1,15 +1,21 @@
 import { ENTREPRISE } from "@/lib/entreprise";
 import { ZONES } from "@/data/zones";
 import { GARANTIE_ANS, PRIX_ML_MIN, PRIX_ML_MAX } from "@/lib/offre";
+import { Script } from "./ScriptJsonLd";
+import { IMAGE_PARTAGE } from "@/lib/partage";
 
 /**
  * Balisage schema.org, écrit à la main depuis la source unique (lib/entreprise,
  * lib/offre, data/zones) : LocalBusiness, Organization, Service, FAQPage,
- * HowTo, Article, BreadcrumbList. Aucune valeur en dur ici.
+ * HowTo, Article, BreadcrumbList, ImageObject. Aucune valeur en dur ici.
+ *
+ * Site 3.0 (lot F4) : UNE entreprise locale (`LOCAL_BUSINESS`, posée par le gabarit, jamais par une page) ; un
+ * `Service` par prestation avec son `@id` et son image ; le `BreadcrumbList` posé par le fil d'Ariane visible lui-même
+ * (`Breadcrumb.tsx`, une seule liste pour les deux) ; un `ImageObject` par avant / après rendu (`imageObjet`), légendé,
+ * avec un `creditText` honnête sur les images d'ambiance.
  */
-function Script({ data }: { data: Record<string, unknown> }) {
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
-}
+export { DonneesStructurees } from "./ScriptJsonLd";
+export { CREDIT_AMBIANCE, adresseImage, imageObjet, legendeAmbiance, refImage } from "@/lib/donnees-images";
 
 const ADRESSE = {
   "@type": "PostalAddress",
@@ -37,7 +43,7 @@ export const LOCAL_BUSINESS = {
   currenciesAccepted: "EUR",
   paymentAccepted: "Virement, chèque, espèces",
   slogan: "Rénover sans casser",
-  image: [`${ENTREPRISE.site}/og-image.jpg`],
+  image: [IMAGE_PARTAGE.url],
   logo: `${ENTREPRISE.site}/logo.png`,
   address: ADRESSE,
   geo: { "@type": "GeoCoordinates", latitude: ENTREPRISE.geo.lat, longitude: ENTREPRISE.geo.lng },
@@ -81,12 +87,21 @@ export function OrganizationSchema() {
  * `zone` (mission 16, partie 5) : la zone desservie quand le service est local (une page de ville : la ville) ; le
  * prestataire reste l'entreprise (`@id`), jamais une seconde fiche `LocalBusiness`.
  */
-export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/simulateur`, zone }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string; zone?: Record<string, unknown> }) {
+/** L'`@id` d'un service : l'adresse de sa page, suivie de `#service` (`https://coverswap.fr/#service` pour l'accueil). */
+export const idService = (url: string) => `${url === ENTREPRISE.site ? `${url}/` : url}#service`;
+
+/**
+ * Site 3.0 (lot F4) : `@id` (`idService`) et `image` (une référence `{ "@id" }` à l'`ImageObject` de l'avant / après
+ * de la page, `imageObjet`) sont posés juste après `@type`.
+ */
+export function ServiceSchema({ name, description, url, typeProjet, urlOffre = `${ENTREPRISE.site}/simulateur`, zone, image }: { name: string; description: string; url: string; typeProjet?: string; urlOffre?: string; zone?: Record<string, unknown>; image?: Record<string, unknown> | null }) {
   return (
     <Script
       data={{
         "@context": "https://schema.org",
         "@type": "Service",
+        "@id": idService(url),
+        ...(image ? { image } : {}),
         name,
         description,
         url,

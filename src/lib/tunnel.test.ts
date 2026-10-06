@@ -9,9 +9,10 @@ import { EspacePret } from "@/app/simulateur/_components/EspacePret";
 import { Estimation } from "@/app/simulateur/_components/Estimation";
 import { ChampsContact, FORMULAIRE_VIDE } from "@/app/simulateur/_components/Formulaires";
 import { Rappel } from "@/app/simulateur/_components/Rappel";
-import { ARGUMENTS_PRO, LIGNE_PRO, REFERENCES_PRO, SOURCE_FORMULAIRE_PRO, TITRE_PRO } from "@/app/pro/contenu";
+import { ARGUMENTS_PRO, LIGNE_PRO, PAIRE_COMPTOIR_PRO, REFERENCES_PRO, SOURCE_FORMULAIRE_PRO, TITRE_PRO } from "@/app/pro/contenu";
 import { AVANTAGES_DEVIS_EN_LIGNE, ETAPES_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, LIEN_DEVIS_EN_LIGNE, TITRE_DEVIS_EN_LIGNE } from "@/app/comment-ca-marche/devis-en-ligne";
 import ContenuPrestation from "@/components/ContenuPrestation";
+import { classesBouton, TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { getPrestation } from "@/data/prestations";
 import { resolveSource } from "./crm";
 import { estimer } from "./estimation";
@@ -27,12 +28,13 @@ import { messageWhatsAppSimulation } from "./whatsapp";
  * Mission 16 (partie 4) — le tunnel côté site, hors estimation et rappel (leurs fichiers) : sources des
  * formulaires, message WhatsApp qui cite la simulation, corps de la demande, matière présélectionnée, tarifs du CRM
  * (lecture et repli), mémoire du parcours, écrans rendus (un seul bouton principal, champs réduits, espace affiché
- * sans rien envoyer), /pro (références « Ambiance », textes de l'ancienne page repris) et /contact.
+ * sans rien envoyer), /pro (comptoir et lieux « Ambiance », réalisations PRO d'abord, textes de l'ancienne page repris) et /contact.
  */
 
 const SRC = join(process.cwd(), "src");
 const lire = (chemin: string) => readFileSync(join(SRC, chemin), "utf8");
-const principaux = (html: string) => (html.match(/class="[^"]*bg-encre text-blanc hover:bg-encre-survol/g) ?? []).length;
+/** Les boutons principaux d'un écran rendu : les éléments qui portent les teintes de `classesBouton("principal")` (le rouge depuis le lot B2). */
+const principaux = (html: string) => [...html.matchAll(/class="([^"]*)"/g)].filter(([, classes]) => classes.includes(TEINTE_PRINCIPALE)).length;
 
 const TARIFS: TarifsSite = {
   version: 1,
@@ -209,6 +211,7 @@ describe("écrans du tunnel (rendus)", () => {
     // Façades seules : la taille change le chiffre, on la demande.
     const html = rendre({ ...RENDU, references: [RENDU.references[0]] });
     assert.equal(principaux(html), 1);
+    assert.ok(html.includes(`class="${classesBouton("principal")}`), "le principal est le bouton du site (classesBouton)");
     assert.match(html, />Recevoir mon devis<\/button>/);
     assert.match(html, /wa\.me\/33670352869\?text=Bonjour%2C%20je%20viens%20de%20simuler%20ma%20cuisine/);
     assert.match(html, /Quelle taille \?/);
@@ -229,6 +232,7 @@ describe("écrans du tunnel (rendus)", () => {
     assert.match(html, /Copier le lien/);
     assert.match(html, /Lucas vous appelle demain à 10 h\./);
     assert.equal(principaux(html), 1);
+    assert.ok(html.includes(`class="${classesBouton("principal")}`), "le principal est le bouton du site (classesBouton)");
     const sansLien = renderToStaticMarkup(createElement(EspacePret, { lienEspace: null, phraseRappel: null, messageWhatsApp: "Bonjour", onRecommencer: () => undefined }));
     assert.match(sansLien, /Demande bien reçue/);
     assert.match(sansLien, /Nous vous rappelons pour finaliser\./);
@@ -237,26 +241,90 @@ describe("écrans du tunnel (rendus)", () => {
 });
 
 describe("/pro et /contact", () => {
-  test("/pro : titre, trois références « Ambiance », trois arguments, un bouton vers le formulaire, textes de l'ancienne page repris", async () => {
-    const { default: PagePro } = await import("@/app/pro/page");
-    const html = renderToStaticMarkup(createElement(PagePro));
+  /** /pro rendue, le CRM simulé (`fetch` remplacé : aucune requête réseau) avec ces publications. */
+  async function rendrePro(publications: unknown[] = []): Promise<string> {
+    const fetchOrigine = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL) => (String(url).endsWith("/api/site/publications") ? new Response(JSON.stringify({ publications }), { status: 200 }) : new Response("{}", { status: 404 }))) as typeof fetch;
+    try {
+      const { default: PagePro } = await import("@/app/pro/page");
+      return renderToStaticMarkup((await PagePro()) as Parameters<typeof renderToStaticMarkup>[0]);
+    } finally {
+      globalThis.fetch = fetchOrigine;
+    }
+  }
+
+  test("/pro : titre, le comptoir puis les lieux de la série 1 étiquetés « Ambiance », trois arguments, un bouton vers le formulaire, textes de l'ancienne page repris", async () => {
+    const html = await rendrePro();
     assert.match(html, new RegExp(`<h1[^>]*>${TITRE_PRO}</h1>`));
     // L'ouverture : une ligne courte (l'accroche entière est plus bas, sous « en détail »).
     assert.ok(LIGNE_PRO.length <= 80);
     const ouverture = html.slice(html.indexOf("<h1"), html.indexOf(">Demander un devis pro</a>"));
     assert.ok(ouverture.includes(LIGNE_PRO.replace(/'/g, "&#x27;")));
     assert.ok(!ouverture.includes("sous-traitance"), "l'accroche longue n'est pas dans l'ouverture");
+    // Site 3.0 (lot C2) : l'hôtel, la boutique, les bureaux en photo seule (« Ambiance ») ; le comptoir et le bar en paire (« Ambiance · avant / après ») ; jamais « Simulation » ni « Réalisation ».
+    // Lot F5 (trois avant / après par prestation) : le même comptoir dans son autre direction, en paire lui aussi.
     assert.equal((html.match(/>Ambiance</g) ?? []).length, 3);
+    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 3);
+    assert.ok(!html.includes(">Simulation<") && !/>Réalisation/.test(html));
     for (const r of REFERENCES_PRO) assert.ok(html.includes(`/images/prep/${r.nom}-`), r.nom);
     const echappe = (t: string) => t.replace(/&/g, "&amp;").replace(/'/g, "&#x27;").replace(/"/g, "&quot;");
     for (const a of ARGUMENTS_PRO) assert.ok(html.includes(a.titre) && html.includes(echappe(a.texte)), a.titre);
     assert.match(html, /<a[^>]*href="#devis-pro"[^>]*>Demander un devis pro<\/a>/);
     assert.match(html, /id="devis-pro"/);
+    // Une seule action principale, le formulaire : le lien de l'ouverture, « Envoyer ma demande » dans le formulaire, le
+    // lien du dernier appel (encre) ; « Être rappelé » en secondaire.
+    assert.equal(principaux(html), 3);
+    assert.equal(principaux(html.slice(0, html.indexOf('id="devis-pro"'))), 1, "un seul principal avant le formulaire");
+    assert.equal((html.match(/<a[^>]*href="#devis-pro"[^>]*>Demander un devis pro<\/a>/g) ?? []).length, 2);
+    const dernier = html.slice(html.indexOf('id="dernier-appel"'));
+    assert.match(dernier, /^id="dernier-appel"[^>]*class="ton-encre bg-encre/);
+    assert.match(dernier, />Être rappelé</);
     const pro = getPrestation("professionnel")!;
     for (const t of [...pro.intro, ...pro.surfaces.map((s) => s.texte), ...pro.atouts.map((a) => a.texte), ...pro.deroulement.map((d) => d.texte), pro.prix.texte, ...pro.faq.map((f) => f.q), pro.accroche]) assert.ok(html.includes(echappe(t)), `texte repris : ${t.slice(0, 40)}`);
     assert.match(html, /"@type":"FAQPage"/);
     assert.doesNotMatch(html, /simulateur/, "pas de simulateur sur /pro");
     assert.doesNotMatch(html, /href="\/devis|href="\/prestations\/professionnel/);
+  });
+
+  test("/pro, lot C2 : l'avant / après du comptoir en ouverture (seul couple prioritaire, sa légende, ses cartels), puis le bar, l'hôtel, la boutique, les bureaux ; teinte K1 + D1 ; formulaire inchangé", async () => {
+    const html = await rendrePro();
+    const ouverture = html.slice(0, html.indexOf('id="lieux"'));
+    assert.ok(ouverture.includes("/images/prep/pro-comptoir-accueil-avant-") && ouverture.includes("/images/prep/pro-comptoir-accueil-apres-bois-"));
+    assert.ok(ouverture.includes(">Ambiance · avant / après</span>"));
+    assert.ok(ouverture.includes(PAIRE_COMPTOIR_PRO.legende.replace(/'/g, "&#x27;")));
+    // Lot F6 : les liens de préchargement (`Prechargements`, dans le <head> sur le site) portent aussi fetchPriority ; on compte les images.
+    assert.equal((html.match(/<img [^>]*fetchPriority="high"/g) ?? []).length, 2, "le couple de l'ouverture, rien d'autre");
+    assert.ok(ouverture.includes("Classic Walnut") && ouverture.includes("D1 · ") && ouverture.includes("K1 · "), "les cartels du comptoir");
+    // Les lieux, dans l'ordre : le bar (paire), puis l'hôtel, la boutique, les bureaux ; aucun lien vers le simulateur.
+    const lieux = html.slice(html.indexOf('id="lieux"'), html.indexOf('id="devis-pro"'));
+    const positions = ["pro-restaurant-avant-", ...REFERENCES_PRO.map((r) => `/images/prep/${r.nom}-`)].map((m) => lieux.indexOf(m));
+    assert.ok(positions.every((p, i) => p > 0 && (i === 0 || p > positions[i - 1])), JSON.stringify(positions));
+    // L'image de l'ouverture n'est pas répétée ; le lot F5 ajoute l'AUTRE après du comptoir, juste après le bar.
+    assert.ok(!lieux.includes("pro-comptoir-accueil-apres-bois"), "le comptoir de l'ouverture n'est pas répété");
+    assert.ok(lieux.indexOf("pro-comptoir-accueil-apres-couleur-") > lieux.indexOf("pro-restaurant-avant-") && lieux.indexOf("pro-comptoir-accueil-apres-couleur-") < lieux.indexOf("/images/prep/pro-hotel-"), "l'autre direction du comptoir suit le bar");
+    assert.ok(!lieux.includes("Essayer cette composition"));
+    // La teinte du professionnel : Black Mat K1 (filets), Classic Walnut D1 (cartels, bande de matière).
+    // Lot F6 : les liens de préchargement (hissés dans le <head> sur le site) précèdent la page dans ce rendu isolé.
+    assert.match(html.replace(/^(?:<link [^>]*\/>)+/, ""), /^<div style="--teinte:#232220;--teinte-2:#654835">/);
+    assert.ok(lieux.includes('aria-label="Matière Classic Walnut · D1'), "la bande Classic Walnut ferme les lieux");
+    // Le formulaire, inchangé : le même composant, posé tel quel dans sa section.
+    assert.match(lire("app/pro/page.tsx"), /<FormulairePro \/>/);
+  });
+
+  test("/pro, lot C2 : une réalisation PRO publiée passe devant (ouverture, puis « Nos chantiers »), le comptoir descend en tête des lieux ; les autres pièces restent ailleurs", async () => {
+    const pub = (id: string, typeProjet: string, avecAvant = true) => ({ id, type: "REALISATION", titre: `Chantier ${id}`, texte: "Comptoir refait en noyer.", ville: "Lattes", typeProjet, note: null, auteur: null, photoAvant: avecAvant ? `/api/site/photos/${id}/avant` : null, photoApres: `/api/site/photos/${id}/apres`, publieLe: "2026-09-01T00:00:00.000Z" });
+    const html = await rendrePro([pub("c1", "CUISINE"), pub("p1", "PRO"), pub("p2", "PRO", false)]);
+    const ouverture = html.slice(0, html.indexOf('id="lieux"'));
+    assert.ok(ouverture.includes("/api/site/photos/p1/apres") && ouverture.includes(">Réalisation, Lattes</span>"), "la réalisation PRO ouvre la page");
+    assert.ok(!html.includes("/api/site/photos/c1/"), "une cuisine publiée n'est pas une référence pro");
+    const lieux = html.slice(html.indexOf('id="lieux"'));
+    const chantier = lieux.indexOf("/api/site/photos/p2/apres");
+    assert.ok(chantier > 0 && chantier < lieux.indexOf("pro-comptoir-accueil-avant-"), "les vraies d'abord, puis le comptoir en ambiance");
+    assert.ok(lieux.indexOf("Nos chantiers") < chantier);
+    assert.ok(lieux.indexOf("pro-comptoir-accueil-avant-") < lieux.indexOf("pro-restaurant-avant-"));
+    assert.equal((html.match(/>Ambiance · avant \/ après</g) ?? []).length, 3, "le comptoir (ses deux directions) et le bar, toujours étiquetés");
+    const { vueDuPro } = await import("@/app/pro/vue");
+    assert.deepEqual(vueDuPro([]).lieux.map((l) => l.cas.ambiance.image), ["pro-restaurant", "pro-comptoir-accueil-apres-couleur", "pro-hotel", "pro-commerce", "pro-bureaux"]);
   });
 
   test("/contact : une colonne, « Écrivez-nous », téléphone et e-mail, ancre #espace avec la phrase de l'espace client", () => {
@@ -269,7 +337,7 @@ describe("/pro et /contact", () => {
     assert.doesNotMatch(page, /lg:grid-cols/, "une seule colonne");
     // La confirmation du formulaire : titre et texte, sans pastille colorée ; une réponse neutre (la page sert aussi à redemander son lien).
     const formulaire = lire("components/DevisForm.tsx");
-    assert.doesNotMatch(formulaire, /bg-ok-fond|<svg/);
+    assert.doesNotMatch(formulaire, /bg-(ok|succes)-fond|<svg/);
     assert.match(formulaire, /Nous vous répondons \{DELAI_REPONSE\}\./);
   });
 
@@ -301,7 +369,7 @@ describe("/pro et /contact", () => {
   test("balisage Service : l'offre suit le bouton de la page (simulateur de la pièce, sinon /contact pour les vitrages)", () => {
     const offre = (slug: string) => {
       const p = getPrestation(slug)!;
-      const html = renderToStaticMarkup(createElement(ContenuPrestation, { p, url: `https://coverswap.fr/prestations/${slug}`, fil: [], filSchema: [] }));
+      const html = renderToStaticMarkup(createElement(ContenuPrestation, { p, url: `https://coverswap.fr/prestations/${slug}`, fil: [] }));
       const service = JSON.parse(html.match(/<script[^>]*>(\{"@context":"https:\/\/schema\.org","@type":"Service"[\s\S]*?)<\/script>/)![1]) as { offers?: { url?: string } };
       return service.offers?.url;
     };
@@ -311,7 +379,15 @@ describe("/pro et /contact", () => {
 
   test("les textes de l'ancienne /devis et l'ancien titre de /contact sont repris (/comment-ca-marche, métadonnées du simulateur)", async () => {
     const { default: PageCommentCaMarche, metadata } = await import("@/app/comment-ca-marche/page");
-    const html = renderToStaticMarkup(createElement(PageCommentCaMarche)).replace(/&#x27;/g, "'");
+    // La page lit les tarifs du CRM (relecture des lots B et C) : rien ne part, le repli suffit ici.
+    const fetchOrigine = globalThis.fetch;
+    globalThis.fetch = (async () => new Response("{}", { status: 404 })) as typeof fetch;
+    let html: string;
+    try {
+      html = renderToStaticMarkup(await PageCommentCaMarche()).replace(/&#x27;/g, "'");
+    } finally {
+      globalThis.fetch = fetchOrigine;
+    }
     for (const t of [TITRE_DEVIS_EN_LIGNE, INTRO_DEVIS_EN_LIGNE, LIEN_DEVIS_EN_LIGNE, ...ETAPES_DEVIS_EN_LIGNE.flatMap((e) => [e.titre, e.texte]), ...AVANTAGES_DEVIS_EN_LIGNE.flatMap((a) => [a.titre, a.texte])]) assert.ok(html.includes(t.replace(/&/g, "&amp;")), `repris : ${t.slice(0, 40)}`);
     assert.match(html, /href="\/contact"/);
     assert.match(String(metadata.keywords), /devis covering en ligne/);

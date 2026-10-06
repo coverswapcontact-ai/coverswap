@@ -26,7 +26,7 @@ function abonner(rappel: () => void): () => void {
   };
 }
 
-const BOUTON = "inline-flex min-h-[44px] items-center text-accent-texte underline underline-offset-4 hover:text-encre";
+const BOUTON = "inline-flex min-h-[44px] items-center text-encre underline underline-offset-4 hover:text-encre-2";
 
 export default function OppositionMesure() {
   const etat = useSyncExternalStore<Etat>(abonner, lireEtat, () => "inconnu");

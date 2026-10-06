@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Libre_Franklin, Playfair_Display } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import EnteteSite from "@/components/EnteteSite";
@@ -8,31 +8,62 @@ import ScrollToTop from "@/components/ScrollToTop";
 import SuiviParcours from "@/components/SuiviParcours";
 import HorsEspaceClient from "@/components/HorsEspaceClient";
 import HorsSimulateur from "@/components/HorsSimulateur";
+import PrechargementDiffere from "@/components/PrechargementDiffere";
 import { LocalBusinessSchema, OrganizationSchema } from "@/components/JsonLd";
 
 import { DELAI_REPONSE, PRIX_PLAGE } from "@/lib/offre";
-const inter = Inter({
+import { ENTREPRISE } from "@/lib/entreprise";
+import { IMAGE_PARTAGE } from "@/lib/partage";
+/**
+ * Site 3.0 (lot B1) : Playfair Display pour les titres (400 à 900) et Libre Franklin pour le texte, en polices
+ * variables téléchargées au build et servies par le site (next/font) : aucun appel à Google Fonts depuis le
+ * navigateur. `display: swap`, préchargées, et une police de repli ajustée (adjustFontFallback, par défaut) contre le
+ * décalage au chargement. Les jetons --font-display et --font-sans de globals.css pointent sur ces variables.
+ *
+ * Lot F6 : l'italique de Playfair (38 Ko) n'est plus préchargée avec le droit. Elle ne sert qu'au nom des matières
+ * des cartels (`font-display-italique`), le plus souvent sous le premier écran : préchargée, elle prenait la bande
+ * passante du LCP sur chaque page. Une famille à part, demandée par le navigateur quand un cartel s'affiche, avec
+ * sa propre police de repli ajustée. Lot F7 : en graisse 400 seulement (la seule employée), fichier fixe plus léger.
+ */
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-playfair",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const playfairItalique = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  // Lot F7 : la seule graisse de l'italique (le nom des cartels est en `font-normal`, Cartel.tsx) — un fichier fixe de
+  // 400 au lieu de la police variable 400 à 900 (38 Ko).
+  weight: "400",
+  style: ["italic"],
+  variable: "--font-playfair-italique",
+  display: "swap",
+  preload: false,
+});
+
+const franklin = Libre_Franklin({
+  subsets: ["latin"],
+  variable: "--font-franklin",
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://coverswap.fr";
+/**
+ * Site 3.0 (lot F3) : une seule adresse du site, `ENTREPRISE.site` (https://coverswap.fr, l'hôte gardé : le www et
+ * l'adresse vercel.app de production y redirigent en 301, vercel.json). Aucune adresse canonique par défaut ici :
+ * chaque page pose la sienne (`metadonneesPage`) ; la 404 et les pages privées n'en ont pas (avant, elles héritaient
+ * de celle de l'accueil).
+ */
+const SITE_URL = ENTREPRISE.site;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
+    default: "CoverSwap — Covering adhésif, rénovation en une journée",
     template: "%s | CoverSwap",
   },
-  description:
-    `Rénovez cuisine, salle de bain et meubles en 1 journée grâce au covering adhésif premium. Simulation IA gratuite. Devis gratuit ${DELAI_REPONSE}. Prix au mètre linéaire, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose.`,
+  // Relecture des phases D, E, F : 155 signes au plus, comme toutes les descriptions (elle n'était lue que sur la 404).
+  description: `Cuisine, salle de bain, meubles rénovés en une journée par covering adhésif, posé sur place. Simulation et devis gratuits ${DELAI_REPONSE}, ${PRIX_PLAGE} posé.`,
   keywords:
     "covering adhésif, rénovation cuisine, covering salle de bain, covering meubles, revêtement adhésif, simulation IA, rénovation rapide",
   applicationName: "CoverSwap",
@@ -40,33 +71,33 @@ export const metadata: Metadata = {
   creator: "CoverSwap",
   publisher: "CoverSwap",
   openGraph: {
-    title: "CoverSwap — Covering adhésif premium, rénovation en 1 jour",
+    title: "CoverSwap — Covering adhésif, rénovation en une journée",
     description:
-      `Rénovez cuisine, salle de bain et meubles en 1 journée. Simulation IA gratuite. Prix au mètre linéaire, ${PRIX_PLAGE} fourni et posé selon la complexité de la pose.`,
+      `Cuisine, salle de bain et meubles rénovés en une journée. Simulation gratuite sur votre photo. Au mètre linéaire, ${PRIX_PLAGE} fourni et posé selon la pose.`,
     url: SITE_URL,
     siteName: "CoverSwap",
     locale: "fr_FR",
     type: "website",
+    // Site 3.0 (lot F2) : l'image du site, une seule source (`lib/partage`) ; chaque page pose la sienne (`metadonneesPage`).
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
-        width: 1200,
-        height: 630,
-        alt: "CoverSwap — Covering adhésif premium",
+        url: IMAGE_PARTAGE.url,
+        width: IMAGE_PARTAGE.largeur,
+        height: IMAGE_PARTAGE.hauteur,
+        alt: "CoverSwap — Covering adhésif, rénovation en une journée",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CoverSwap — Covering adhésif premium",
-    description: "Rénovez votre intérieur en 1 journée. Simulation IA gratuite.",
-    images: [`${SITE_URL}/og-image.jpg`],
+    title: "CoverSwap — Covering adhésif, rénovation en une journée",
+    description: "Cuisine, salle de bain et meubles rénovés en une journée. Simulation gratuite sur votre photo.",
+    images: [IMAGE_PARTAGE.url],
   },
-  alternates: {
-    canonical: SITE_URL,
-  },
+  // Lot F7 : l'icône de l'onglet en 64 px (2 Ko, `scripts/generate-assets.mjs`) — le navigateur la demande pendant le
+  // chargement de chaque page ; le logo de 512 px (12 Ko) reste celui de l'écran d'accueil.
   icons: {
-    icon: "/logo.png",
+    icon: { url: "/icone-64.png", type: "image/png", sizes: "64x64" },
     apple: "/logo.png",
   },
   robots: {
@@ -75,9 +106,9 @@ export const metadata: Metadata = {
   },
 };
 
-/** Mission 16 : la couleur de la barre du navigateur = le fond du thème clair (jeton --color-fond), une seule fois pour tout le site. */
+/** La couleur de la barre du navigateur = le papier (jeton --color-fond, vérifié par theme.test.ts) ; l'espace client (/e/…) a la même. */
 export const viewport: Viewport = {
-  themeColor: "#F5F4F1",
+  themeColor: "#F4EDE2",
   width: "device-width",
   initialScale: 1,
 };
@@ -88,7 +119,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="fr" className={`${playfair.variable} ${playfairItalique.variable} ${franklin.variable}`}>
       <body className="bg-fond font-sans text-encre antialiased">
         {/* Tout ce qui suit disparaît sur l'espace client (/e/…) : page privée, sans suivi de parcours ni habillage commercial. */}
         {/* Mission 16 (partie 6) : aucun script tiers ni cookie de mesure (GTM, GA4, pixel Meta, Clarity et Vercel Analytics retirés,
@@ -108,6 +139,8 @@ export default function RootLayout({
           </HorsSimulateur>
         </HorsEspaceClient>
         <main id="main-content">{children}</main>
+        {/* Lot F7 : le préchargement des liens, au geste puis après le chargement (les liens ne préchargent plus seuls). */}
+        <PrechargementDiffere />
         <HorsEspaceClient>
           <PiedDePage />
         </HorsEspaceClient>

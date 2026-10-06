@@ -1,5 +1,19 @@
 {
   "framework": "nextjs",
+  "redirects": [
+    {
+      "source": "/((?!api/).*)",
+      "has": [{ "type": "host", "value": "www.coverswap.fr" }],
+      "destination": "https://coverswap.fr/$1",
+      "statusCode": 301
+    },
+    {
+      "source": "/((?!api/).*)",
+      "has": [{ "type": "host", "value": "coverswap.vercel.app" }],
+      "destination": "https://coverswap.fr/$1",
+      "statusCode": 301
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron/webhook-health",

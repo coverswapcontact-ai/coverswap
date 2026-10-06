@@ -1,28 +1,32 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  /* ── Les jetons du site 3.0, direction « La Revue » : la SEULE source (docs/DESIGN.md).
+     Les composants passent par les classes ou var(--color-*) ; les scripts d'images lisent ce bloc
+     (scripts/jetons.mjs › lireJetons). Jamais une valeur hexadécimale dans un composant. ── */
+  --font-sans: var(--font-franklin), system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  /* L'italique de Playfair (le nom des matières dans les cartels, seul usage) : une famille à part, chargée à la demande. */
+  --font-display-italique: var(--font-playfair-italique), Georgia, serif;
   /* La mention « Google Maps » des avis (mission 16, partie 3) : Roboto, sinon la sans-serif du système (règle de Google). */
   --font-google: Roboto, sans-serif;
 
-  /* ── Le thème du site (mission 15, généralisé par la mission 16) : clair « éditorial ».
-     Blanc cassé, noir doux, UNE couleur d'accent ; coins peu arrondis ; deux durées, une courbe.
-     Toute couleur d'un composant passe par ces jetons (jamais une valeur hexadécimale). ── */
-  --color-fond: #f5f4f1;
-  --color-fond-2: #eceae5;
-  --color-encre: #1a1a1a;
-  --color-encre-2: #5f5a53;
-  --color-trait: #d3cfc8;
-  --color-accent: #cc0000;
-  --color-accent-fond: #fbe9e7;
-  --color-accent-texte: #8f1d12; /* le rouge en texte sur le fond clair (7:1) */
-  --color-encre-survol: #3f3b36; /* l'encre au survol / à l'appui des boutons principaux */
-  --color-sombre: #111110; /* fond des feuilles sombres et du plein écran */
-  --color-blanc: #ffffff; /* le texte posé sur l'encre ou sur le sombre, les cartes */
-  --color-ok-fond: #e7f3ec;
-  --color-ok-texte: #17563a;
-  --color-google: #5e5e5e; /* la mention « Google Maps » des avis : un des gris imposés par Google (6:1 sur le fond) */
+  --color-fond: #F4EDE2; /* le papier */
+  --color-fond-2: #EBE2D4; /* le papier foncé : cadres des photos, bandeaux ; jamais de grain */
+  --color-encre: #1B1613; /* 15,4:1 sur le papier */
+  --color-encre-2: #6E5F52; /* le gris chaud : 5,28:1 sur le papier, 4,78:1 sur fond-2 ; jamais sur l'encre (2,92) */
+  --color-trait: #D9CDBD; /* filets et bordures, jamais du texte */
+  --color-accent: #B3261E; /* le rouge CoverSwap : les actions seulement (5,62:1 sur le papier, 6,54:1 sous du blanc) */
+  --color-accent-survol: #8F1E18; /* le rouge au survol / à l'appui (8,87:1 sous du blanc) */
+  --color-alerte-fond: #F3E1CC; /* erreurs et avertissements : brun, pas rouge */
+  --color-alerte-texte: #7A3A14; /* 6,74:1 sur alerte-fond, 7,39:1 sur le papier */
+  --color-succes: #2E6741; /* 5,41:1 sur succes-fond, 5,76:1 sur le papier */
+  --color-succes-fond: #E1EAD8;
+  --color-encre-survol: #3B322B; /* l'encre au survol / à l'appui des boutons encre */
+  --color-sur-encre-2: #A99C8E; /* le texte secondaire posé sur l'encre (6,69:1) */
+  --color-sombre: #120E0C; /* fond des feuilles sombres et du plein écran */
+  --color-blanc: #FFFFFF; /* le texte posé sur le rouge, l'encre ou le sombre ; les cartes */
+  --color-google: #5e5e5e; /* la mention « Google Maps » des avis : un des gris imposés par Google (5,6:1 sur le papier) */
   --rayon-sm: 6px;
   --rayon-md: 10px;
   --duree-courte: 150ms;
@@ -35,39 +39,31 @@
   --espace-5: 4rem; /* l'espace vertical d'une section : 64 px sur mobile, 96 px à partir de 768 px (plus bas) */
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+/* Tailwind 4 borde en `currentcolor` par défaut : ici, le trait du thème. */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+  *, ::after, ::before, ::backdrop, ::file-selector-button { border-color: var(--color-trait); }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TYPOGRAPHIE — deux tailles de titre par page, figées ici (mission 16).
-   --titre-1 : l'ouverture (h1) ; --titre-2 : les h2 de section ; --texte : le corps ;
-   --texte-2 : le texte secondaire ; --surtitre : les seules capitales du site (13 px).
+   TYPOGRAPHIE — Playfair Display (titres) et Libre Franklin (texte), next/font dans layout.tsx.
+   --titre-0 : le grand titre posé sur une photo d'ouverture ; --titre-1 : l'ouverture (h1) ;
+   --titre-2 : les h2 de section ; --texte : le corps ; --texte-2 : le secondaire ; --surtitre : les capitales.
 ═══════════════════════════════════════════════════════════ */
 @layer base {
   :root {
+    --titre-0: 44px;
     --titre-1: 34px;
     --titre-2: 26px;
     --texte: 17px;
     --texte-2: 15px;
     --surtitre: 13px;
+    /* Le grain du papier : bruit fractal (0,7 ; 3 octaves) en gris, opacité 0,16, en tuile de 160 px, multiplié
+       au papier. Posé sur `body` et `.papier` SEULEMENT : jamais sur fond-2 (cadres des photos), l'encre, une photo. */
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
   }
   @media (min-width: 48rem) {
     :root {
+      --titre-0: 96px;
       --titre-1: 48px;
       --titre-2: 32px;
       --espace-5: 6rem;
@@ -84,7 +80,8 @@
   }
 
   body {
-    background: var(--color-fond);
+    background: var(--color-fond) var(--grain) 0 0 / 160px 160px;
+    background-blend-mode: multiply;
     color: var(--color-encre);
     font-family: var(--font-sans);
   }
@@ -96,6 +93,19 @@
 }
 
 @layer components {
+  /* Un bloc papier posé sur autre chose que le corps de page : le même papier, le même grain. */
+  .papier {
+    background: var(--color-fond) var(--grain) 0 0 / 160px 160px;
+    background-blend-mode: multiply;
+  }
+  .titre-0 {
+    font-family: var(--font-display);
+    font-size: var(--titre-0);
+    line-height: 0.95;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
   .titre-1 {
     font-family: var(--font-display);
     font-size: var(--titre-1);
@@ -112,10 +122,7 @@
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
-  .texte {
-    font-size: var(--texte);
-    line-height: 1.6;
-  }
+  .texte { font-size: var(--texte); line-height: 1.6; }
   .texte-2 {
     font-size: var(--texte-2);
     line-height: 1.6;
@@ -129,6 +136,24 @@
     letter-spacing: 0.06em;
     color: var(--color-encre-2);
   }
+  /* Le grand numéro des étapes : encre ou teinte de la prestation, jamais le rouge. */
+  .grand-numero {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 0.85;
+    font-weight: 900;
+    font-variant-numeric: lining-nums;
+  }
+  /* Le filet fin : la teinte de la prestation (--teinte) si la page en a une, l'encre sinon. */
+  .filet { border: 0; border-top: 1px solid var(--teinte, var(--color-encre)); }
+  /* Le cartel d'une matière (« Couleur · RM20 ») : petites capitales espacées, comme en boutique. */
+  .cartel {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
 }
 
 /* Mission 16 (partie 6) : une section sous la ligne de flottaison n'est mise en page et peinte qu'à l'approche
@@ -139,56 +164,32 @@
   contain-intrinsic-size: auto 640px;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FOCUS ET BARRE DE DÉFILEMENT — l'encre, partout.
-   L'attribut data-theme="simulation" (simulateur, feuilles, espace) reste accepté : il ne change plus rien.
-═══════════════════════════════════════════════════════════ */
+/* FOCUS — l'encre partout ; le papier sur un bloc encre (`.ton-encre`), où l'encre serait invisible.
+   L'attribut data-theme="simulation" (simulateur, feuilles, espace) reste accepté : il ne change plus rien. */
 @layer utilities {
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible,
-  summary:focus-visible,
-  [tabindex]:focus-visible {
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+  textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
     outline: 3px solid var(--color-encre);
     outline-offset: 2px;
   }
+  .ton-encre :focus-visible { outline-color: var(--color-fond); }
+  /* Sur l'encre, le gris chaud tomberait à 2,92:1 : le secondaire passe en sur-encre-2 (6,69), les liens nus au papier. */
+  .ton-encre .surtitre, .ton-encre .texte-2 { color: var(--color-sur-encre-2); }
+  :where(.ton-encre) a:not([class]) { color: var(--color-fond); }
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-fond-2);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-trait);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-encre-2);
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-fond-2); }
+::-webkit-scrollbar-thumb { background: var(--color-trait); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-encre-2); }
 
 /* Aucune animation quand la personne préfère moins de mouvement. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   SIMULATEUR — écran d'attente (mission 15) : la lueur lente qui parcourt la
-   photo ; coupée par prefers-reduced-motion (motion-reduce:hidden côté composant).
-═══════════════════════════════════════════════════════════ */
-@keyframes lueur-attente {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(300%); }
-}
+/* Simulateur, écran d'attente (mission 15) : la lueur lente qui parcourt la photo ; coupée par prefers-reduced-motion. */
+@keyframes lueur-attente { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
 
 /* Étiquettes matière (mission 19, `ambiances/CalqueMatieres`) : apparition en fondu, coupée si moins de mouvement. */
 @keyframes apparition-etiquettes { from { opacity: 0; } to { opacity: 1; } }

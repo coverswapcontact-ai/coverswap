@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { describe, test } from "node:test";
 import { debuterSondage, decisionAuMontage, etapesCochees, migrerEtat, rapportPhoto, reduireAnalyse, reduireSondage, texteAttente, zoneNonVisible, ATTENTE_PAR_DEFAUT_S, MESSAGE_ANALYSE_SAUTEE, MESSAGE_DELAI, MESSAGE_ECHEC_GENERIQUE, MESSAGE_INJOIGNABLE, MESSAGE_INTROUVABLE, MESSAGE_SANS_PHOTO, REPRISE_MAX_MS, type EtatSimulateur } from "./reprise";
 import { DELAI_RENDU } from "@/lib/offre";
@@ -85,15 +87,59 @@ describe("décision au montage", () => {
     assert.deepEqual(decisionAuMontage(null, { reprise: "../etc" }), { ecran: "direct", etape: 1 }, "un identifiant mal formé est ignoré");
   });
 
-  test("parcours récent → bandeau (étape 3 si un rendu existe, sinon 2) ; depuis l'accueil → direct ; trop vieux → étape 1", () => {
+  test("parcours récent → bandeau (étape 3 si un rendu existe, sinon 2) ; trop vieux → étape 1", () => {
     const maintenant = Date.now();
     assert.deepEqual(decisionAuMontage(etatV2(), { maintenant }), { ecran: "bandeau", etape: 2 });
     const avecRendu = etatV2({ rendus: [{ travailId: "cmun000000000002", simulationSiteId: "s", urlApres: "https://crm/image", urlAvant: null, references: [], le: maintenant }] });
     assert.deepEqual(decisionAuMontage(avecRendu, { maintenant }), { ecran: "bandeau", etape: 3 });
-    assert.deepEqual(decisionAuMontage(etatV2(), { maintenant, depuisAccueil: true }), { ecran: "direct", etape: 2 });
     assert.deepEqual(decisionAuMontage(etatV2({ majLe: maintenant - REPRISE_MAX_MS - 1 }), { maintenant }), { ecran: "direct", etape: 1 });
     assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { maintenant }), { ecran: "direct", etape: 1 });
     assert.deepEqual(decisionAuMontage(null), { ecran: "direct", etape: 1 });
+  });
+});
+
+describe("décision au montage : un picto de l'accueil (site 3.0, lot B6)", () => {
+  test("?choix=1 sans photo en mémoire → pièce choisie, écran Photo ; sans choix, rien ne change", () => {
+    const maintenant = Date.now();
+    assert.deepEqual(decisionAuMontage(null, { choix: true, maintenant }), { ecran: "direct", etape: 1, pieceChoisie: true });
+    assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { choix: true, maintenant }), { ecran: "direct", etape: 1, pieceChoisie: true });
+    // Sans `choix` (prestations, villes, anciens liens `?projet=`) : la carte est seulement présélectionnée, comme avant.
+    assert.deepEqual(decisionAuMontage(null, { maintenant }), { ecran: "direct", etape: 1 });
+    assert.deepEqual(decisionAuMontage(etatV2({ photo: null }), { maintenant }), { ecran: "direct", etape: 1 });
+    assert.deepEqual(decisionAuMontage(null, { choix: false, maintenant }), { ecran: "direct", etape: 1 });
+  });
+
+  test("une photo en mémoire ou un travail en cours passent avant le choix", () => {
+    const maintenant = Date.now();
+    assert.deepEqual(decisionAuMontage(etatV2(), { choix: true, maintenant }), { ecran: "bandeau", etape: 2 }, "photo récente : le bandeau de reprise, rien n'est écrasé");
+    // Relecture des lots B et C : décision gardée (la plus simple) — une photo trop vieille pour le bandeau : l'écran 1,
+    // la pièce de l'adresse présélectionnée, sans PIECE_CHOISIE au montage (elle part au clic).
+    assert.deepEqual(decisionAuMontage(etatV2({ majLe: maintenant - REPRISE_MAX_MS - 1 }), { choix: true, maintenant }), { ecran: "direct", etape: 1 });
+    const travail = { travailId: "cmun000000000003", lanceLe: 1, attenteEstimeeS: 75 };
+    assert.deepEqual(decisionAuMontage(etatV2({ travailEnCours: travail, photo: null }), { choix: true, maintenant }), { ecran: "attente", travail });
+    assert.equal(decisionAuMontage(null, { choix: true, reprise: "cmun000000000009", maintenant }).ecran, "attente", "le lien du mail d'abord");
+  });
+
+  test("relecture des lots B et C : le retour « suite=1 » du module photo de l'accueil (retiré au lot B6) n'est plus lu ; la pièce de l'adresse reste présélectionnée", () => {
+    const simulateur = readFileSync(path.join(process.cwd(), "src/app/simulateur/_components/Simulateur.tsx"), "utf8");
+    assert.doesNotMatch(simulateur, /parametres\.get\("suite"\)|depuisAccueil/);
+    assert.doesNotMatch(readFileSync(path.join(process.cwd(), "src/lib/simulateur/reprise.ts"), "utf8"), /depuisAccueil|suite=1/);
+    // Aucun événement compté d'avance au montage : l'émetteur part vide (PIECE_CHOISIE et PHOTO_CHARGEE partent du simulateur).
+    assert.equal((simulateur.match(/creerEmetteur\(/g) ?? []).length, 1);
+    assert.match(simulateur, /const projetInitial = !base\.travailEnCours && demande && zones\.pieces\.some\(\(p\) => p\.id === demande\) \? demande : base\.projet;/);
+    assert.match(simulateur, /setPieceChoisie\(!!repris\.photo \|\| \(!!demande && projetInitial === demande\)\);/);
+  });
+
+  test("le simulateur : `choix` seulement pour la pièce de l'adresse, PIECE_CHOISIE émise par marquerPiece au montage et au clic, écran Photo ensuite", () => {
+    const simulateur = readFileSync(path.join(process.cwd(), "src/app/simulateur/_components/Simulateur.tsx"), "utf8");
+    assert.match(simulateur, /choix: parametres\.get\("choix"\) === "1" && projetInitial === demande/);
+    assert.match(simulateur, /setEcran\(decision\.pieceChoisie \? 2 : ecranDepuisEtape\(decision\.etape, repris\)\)/);
+    assert.match(simulateur, /if \(decision\.ecran === "direct" && decision\.pieceChoisie\) marquerPiece\(projetInitial\);/);
+    assert.equal(simulateur.split("const marquerPiece = (id: string) =>").length - 1, 1, "définie une fois");
+    assert.equal(simulateur.split("marquerPiece(").length - 1, 2, "appelée au montage et au clic");
+    // L'élément (`?element=`) : sa zone, si elle est dans la pièce, s'ouvre d'abord à l'écran des matières.
+    assert.match(simulateur, /zoneDemandee\.current = zoneDeLElement\(lireElementDemande\(parametres\.get\("element"\)\), projetInitial\);/);
+    assert.match(simulateur, /useMatiereDemandee\([^)]*, zoneDemandee, setZoneOuverte\);/);
   });
 });
 
@@ -159,5 +205,21 @@ describe("écran d'attente", () => {
     assert.equal(texteAttente(120), "environ 2 min");
     assert.equal(texteAttente(40), "environ 45 s");
     assert.equal(texteAttente(0), "environ 15 s");
+  });
+});
+
+describe("site 3.0, lot E3 : la pièce d'exemple dans la mémoire", () => {
+  test("un état d'avant le lot (sans `exemple`) se relit tel quel ; un exemple lisible est gardé, avec la photo seulement ; celui d'un rendu aussi", () => {
+    const ancien = { version: 2, projet: "cuisine", photo: PHOTO, selections: {}, parcoursId: "p", rendus: [{ travailId: "cmun000000000002", simulationSiteId: null, urlApres: "https://crm/x", urlAvant: null, references: [], le: 7 }], majLe: 9 };
+    const relu = migrerEtat(ancien);
+    assert.ok(relu);
+    assert.ok(!("exemple" in relu), "pas de champ ajouté à un état ancien");
+    assert.ok(!("exemple" in relu.rendus[0]));
+    assert.equal(decisionAuMontage(relu, { maintenant: 10 }).ecran, "bandeau", "la reprise ne change pas");
+    const avecExemple = migrerEtat({ ...ancien, exemple: "cuisine-merisier", rendus: [{ ...ancien.rendus[0], exemple: "cuisine-merisier" }] });
+    assert.equal(avecExemple?.exemple, "cuisine-merisier");
+    assert.equal(avecExemple?.rendus[0].exemple, "cuisine-merisier");
+    assert.ok(!("exemple" in (migrerEtat({ ...ancien, photo: null, exemple: "cuisine-merisier" }) ?? {})), "sans photo, pas d'exemple");
+    for (const illisible of ["<script>", "A B", 42, "x".repeat(61)]) assert.ok(!("exemple" in (migrerEtat({ ...ancien, exemple: illisible }) ?? {})), String(illisible));
   });
 });

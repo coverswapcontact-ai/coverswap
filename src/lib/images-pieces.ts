@@ -1,7 +1,7 @@
 /**
  * Les photos des cinq cartes de pièces (mission 16, partie 2) : UN seul
- * endroit, lu par le simulateur (`EcranPiece`), le module d'accueil
- * (`SimulationSection`) et, depuis la partie 5, les cartes de pièces de
+ * endroit, lu par le simulateur (`EcranPiece`) (le module d'accueil
+ * `SimulationSection` est parti au lot B6 du site 3.0) et, depuis la partie 5, les cartes de pièces de
  * `/realisations` et l'ouverture des pages par pièce (`ContenuPrestation`). Chaque valeur est un nom du manifeste
  * (`src/lib/images-manifeste.ts`) ; tant que l'image n'est pas préparée, la
  * carte garde son dessin au trait.

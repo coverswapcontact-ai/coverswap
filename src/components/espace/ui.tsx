@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { IconeCadenas } from "./Illustrations";
 
 /**
@@ -11,7 +12,7 @@ import { IconeCadenas } from "./Illustrations";
 
 export const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(" ");
 
-export const FOCUS = "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]";
+export const FOCUS = "focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-encre";
 
 export function BoutonPrincipal({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
@@ -19,7 +20,7 @@ export function BoutonPrincipal({ children, className, ...props }: React.ButtonH
       type="button"
       {...props}
       className={cx(
-        "flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#CC0000] px-5 text-[17px] font-semibold text-white transition-colors active:bg-[#A80000] disabled:bg-[#D9D6D0] disabled:text-[#6B665F]",
+        `flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl px-5 text-[17px] font-semibold transition-colors ${TEINTE_PRINCIPALE} disabled:bg-trait disabled:text-encre-2`,
         FOCUS,
         className
       )}
@@ -34,7 +35,7 @@ export function BoutonSecondaire({ children, className, ...props }: React.Button
     <button
       type="button"
       {...props}
-      className={cx("flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-[#D3CFC8] bg-white px-5 text-[16px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC] disabled:opacity-50", FOCUS, className)}
+      className={cx("flex min-h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-trait bg-blanc px-5 text-[16px] font-medium text-encre active:bg-fond-2 disabled:opacity-50", FOCUS, className)}
     >
       {children}
     </button>
@@ -43,18 +44,18 @@ export function BoutonSecondaire({ children, className, ...props }: React.Button
 
 export function LienPrincipal({ children, className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
-    <a {...props} className={cx("flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#CC0000] px-5 text-[17px] font-semibold text-white active:bg-[#A80000]", FOCUS, className)}>
+    <a {...props} className={cx("flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-2xl px-5 text-[17px] font-semibold", TEINTE_PRINCIPALE, FOCUS, className)}>
       {children}
     </a>
   );
 }
 
 export function Carte({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cx("rounded-[22px] border border-[#E6E3DD] bg-white p-5 shadow-[0_1px_2px_rgba(26,26,26,0.04)]", className)}>{children}</section>;
+  return <section className={cx("rounded-[22px] border border-trait bg-blanc p-5 shadow-[0_1px_2px_rgba(26,26,26,0.04)]", className)}>{children}</section>;
 }
 
-export function Surtitre({ children, ton = "gris" }: { children: ReactNode; ton?: "gris" | "rouge" | "vert" }) {
-  return <p className={cx("text-[13px] font-semibold tracking-[0.08em] uppercase", ton === "rouge" ? "text-[#B00000]" : ton === "vert" ? "text-[#1F6B45]" : "text-[#6B665F]")}>{children}</p>;
+export function Surtitre({ children, ton = "gris" }: { children: ReactNode; ton?: "gris" | "fort" | "vert" }) {
+  return <p className={cx("text-[13px] font-semibold tracking-[0.08em] uppercase", ton === "fort" ? "text-encre" : ton === "vert" ? "text-succes" : "text-encre-2")}>{children}</p>;
 }
 
 /**
@@ -66,10 +67,10 @@ export function EnteteEtape({ titre, phrase, avant, apres }: { titre: string; ph
     <div className="pt-2">
       {avant ? <div className="mb-3">{avant}</div> : null}
       <div className="flex items-start justify-between gap-3">
-        <h1 className="font-display text-[29px] leading-[1.12] font-semibold tracking-tight text-balance text-[#1A1A1A]">{titre}</h1>
+        <h1 className="font-display text-[29px] leading-[1.12] font-semibold tracking-tight text-balance text-encre">{titre}</h1>
         {apres}
       </div>
-      {phrase ? <p className="mt-2.5 text-[17px] leading-relaxed text-[#4F4A44]">{phrase}</p> : null}
+      {phrase ? <p className="mt-2.5 text-[17px] leading-relaxed text-encre-2">{phrase}</p> : null}
     </div>
   );
 }
@@ -84,20 +85,20 @@ export function CaseCarte({ coche, onBasculer, titre, aide, illustration, classN
       aria-label={aide ? `${titre} — ${aide}` : titre}
       onClick={onBasculer}
       className={cx(
-        "relative flex w-full flex-col items-start gap-2 rounded-2xl border-2 bg-white p-3 text-left transition-colors",
-        coche ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9] active:bg-[#F6F5F2]",
+        "relative flex w-full flex-col items-start gap-2 rounded-2xl border-2 bg-blanc p-3 text-left transition-colors",
+        coche ? "border-encre bg-fond" : "border-trait active:bg-fond",
         FOCUS,
         className
       )}
     >
       {illustration}
       <span className="pr-7">
-        <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{titre}</span>
-        {aide ? <span className="mt-0.5 block text-[14px] leading-snug text-[#5F5A53]">{aide}</span> : null}
+        <span className="block text-[16px] leading-snug font-semibold text-encre">{titre}</span>
+        {aide ? <span className="mt-0.5 block text-[14px] leading-snug text-encre-2">{aide}</span> : null}
       </span>
       <span
         aria-hidden
-        className={cx("absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full border-2 text-[13px] font-bold", coche ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#BDB8B0] bg-white")}
+        className={cx("absolute top-3 right-3 flex h-6 w-6 items-center justify-center rounded-full border-2 text-[13px] font-bold", coche ? "border-encre bg-encre text-blanc" : "border-trait bg-blanc")}
       >
         {coche ? "✓" : ""}
       </span>
@@ -112,7 +113,7 @@ export function Annonce({ children, ton = "info" }: { children: ReactNode; ton?:
       role={ton === "erreur" ? "alert" : "status"}
       className={cx(
         "rounded-2xl px-4 py-3 text-[15.5px] leading-snug",
-        ton === "succes" ? "bg-[#E7F3EC] text-[#17563A]" : ton === "erreur" ? "bg-[#FBE9E7] text-[#8F1D12]" : "bg-[#F1EFEA] text-[#3F3B36]"
+        ton === "succes" ? "bg-succes-fond text-succes" : ton === "erreur" ? "bg-alerte-fond text-alerte-texte" : "bg-fond-2 text-encre"
       )}
     >
       {children}
@@ -140,7 +141,7 @@ export function Enregistrement({ etat, className }: { etat: EtatEnregistrement; 
         <span
           className={cx(
             "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium",
-            etat.etat === "ok" ? "bg-[#E7F3EC] text-[#17563A]" : etat.etat === "erreur" ? "bg-[#FBE9E7] text-[#8F1D12]" : etat.etat === "attente" || etat.etat === "apercu" ? "bg-[#FFF1C7] text-[#5C4200]" : "bg-[#F1EFEA] text-[#5F5A53]"
+            etat.etat === "ok" ? "bg-succes-fond text-succes" : etat.etat === "erreur" ? "bg-alerte-fond text-alerte-texte" : etat.etat === "attente" || etat.etat === "apercu" ? "bg-alerte-fond text-alerte-texte" : "bg-fond-2 text-encre-2"
           )}
         >
           {etat.etat === "ok" ? <span aria-hidden>✓</span> : null}
@@ -166,15 +167,15 @@ export function BoutonAConfirmer({ libelle, question, confirmer = "Oui", onConfi
   }, [demande]);
   if (!demande)
     return (
-      <button type="button" disabled={occupe} onClick={() => setDemande(true)} className={cx("flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl px-4 text-[15.5px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4 active:bg-[#F2F0EC] disabled:opacity-50", FOCUS, className)}>
+      <button type="button" disabled={occupe} onClick={() => setDemande(true)} className={cx("flex min-h-[48px] w-full items-center justify-center gap-2 rounded-2xl px-4 text-[15.5px] font-medium text-encre-2 underline decoration-trait underline-offset-4 active:bg-fond-2 disabled:opacity-50", FOCUS, className)}>
         {libelle}
       </button>
     );
   return (
-    <div role="group" aria-label={question} className={cx("rounded-2xl border border-[#D3CFC8] bg-white p-3", className)}>
-      <p className="px-1 text-[15.5px] leading-snug font-semibold text-[#1A1A1A]">{question}</p>
+    <div role="group" aria-label={question} className={cx("rounded-2xl border border-trait bg-blanc p-3", className)}>
+      <p className="px-1 text-[15.5px] leading-snug font-semibold text-encre">{question}</p>
       <div className="mt-2.5 grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => setDemande(false)} className={cx("min-h-[48px] rounded-xl border border-[#D3CFC8] bg-white text-[15.5px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]", FOCUS)}>
+        <button type="button" onClick={() => setDemande(false)} className={cx("min-h-[48px] rounded-xl border border-trait bg-blanc text-[15.5px] font-medium text-encre active:bg-fond-2", FOCUS)}>
           Non
         </button>
         <button
@@ -184,7 +185,7 @@ export function BoutonAConfirmer({ libelle, question, confirmer = "Oui", onConfi
             setDemande(false);
             onConfirme();
           }}
-          className={cx("min-h-[48px] rounded-xl bg-[#1A1A1A] text-[15.5px] font-semibold text-white active:bg-[#333] disabled:opacity-50", FOCUS)}
+          className={cx("min-h-[48px] rounded-xl bg-encre text-[15.5px] font-semibold text-blanc active:bg-encre-survol disabled:opacity-50", FOCUS)}
         >
           {occupe ? "Un instant…" : confirmer}
         </button>
@@ -199,10 +200,10 @@ export function Verrou({ titre, raison, action }: { titre: string; raison: strin
     <div className="space-y-5">
       <EnteteEtape titre={titre} />
       <Carte className="flex flex-col items-center gap-4 px-6 py-9 text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F1EFEA] text-[#1A1A1A]" aria-hidden>
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-fond-2 text-encre" aria-hidden>
           <IconeCadenas taille={28} />
         </span>
-        <p className="max-w-[20rem] text-[18.5px] leading-snug font-semibold text-balance text-[#1A1A1A]">{raison}</p>
+        <p className="max-w-[20rem] text-[18.5px] leading-snug font-semibold text-balance text-encre">{raison}</p>
         {action ? <BoutonPrincipal onClick={action.onClick}>{action.libelle}</BoutonPrincipal> : null}
       </Carte>
     </div>

@@ -276,9 +276,9 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
             <dt>
               <Surtitre>{f.libelle}</Surtitre>
             </dt>
-            <dd className="mt-1 font-semibold text-[#1A1A1A]">
+            <dd className="mt-1 font-semibold text-encre">
               {parties.join(", ") || "À préciser"}
-              {taille ? <span className="block text-[15px] font-normal text-[#5F5A53]">{taille}</span> : null}
+              {taille ? <span className="block text-[15px] font-normal text-encre-2">{taille}</span> : null}
             </dd>
           </div>
         );
@@ -288,7 +288,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
           <dt>
             <Surtitre>Votre mot</Surtitre>
           </dt>
-          <dd className="mt-1 whitespace-pre-wrap text-[#1A1A1A]">« {saisie.precisions.trim()} »</dd>
+          <dd className="mt-1 whitespace-pre-wrap text-encre">« {saisie.precisions.trim()} »</dd>
         </div>
       ) : null}
     </dl>
@@ -299,7 +299,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
     return (
       <div className="space-y-5">
         <EnteteEtape titre="Votre projet" phrase={etat.projetModifiable?.raison ?? "Votre projet est arrêté."} />
-        <Carte className="space-y-4">{cochees.length ? resume : <p className="text-[16px] text-[#3F3B36]">Votre projet a été précisé avec CoverSwap, au téléphone.</p>}</Carte>
+        <Carte className="space-y-4">{cochees.length ? resume : <p className="text-[16px] text-encre">Votre projet a été précisé avec CoverSwap, au téléphone.</p>}</Carte>
         {etat.devis && onDevis ? (
           <BoutonPrincipal onClick={onDevis}>
             Voir mon devis <span aria-hidden>→</span>
@@ -318,9 +318,9 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
     return (
       <div className="space-y-5">
         <EnteteEtape titre="Votre projet" phrase="Votre projet est validé. CoverSwap l'a bien reçu." />
-        <Carte className="space-y-4 border-2 border-[#1F7A4D]">
-          <p className="inline-flex items-center gap-2 rounded-full bg-[#E7F3EC] px-3 py-1.5 text-[14.5px] font-semibold text-[#17563A]">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1F7A4D] text-white" aria-hidden>
+        <Carte className="space-y-4 border-2 border-succes">
+          <p className="inline-flex items-center gap-2 rounded-full bg-succes-fond px-3 py-1.5 text-[14.5px] font-semibold text-succes">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-succes text-blanc" aria-hidden>
               <IconeCoche taille={11} />
             </span>
             Projet validé
@@ -334,7 +334,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
         <BoutonSecondaire onClick={() => void rouvrir()} disabled={validation.occupe}>
           {validation.occupe ? "Un instant…" : "Modifier mon projet"}
         </BoutonSecondaire>
-        <p className="px-1 text-center text-[14px] leading-relaxed text-[#6B665F]">Modifier rouvre votre projet&nbsp;: vous le validerez à nouveau ensuite.</p>
+        <p className="px-1 text-center text-[14px] leading-relaxed text-encre-2">Modifier rouvre votre projet&nbsp;: vous le validerez à nouveau ensuite.</p>
       </div>
     );
   }
@@ -346,7 +346,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
       {initial.depuis && !modifie ? <Annonce>Prérempli d&apos;après {initial.depuis}. Modifiez si besoin.</Annonce> : null}
 
       <section aria-labelledby="titre-familles" className="space-y-3">
-        <h2 id="titre-familles" className="px-1 text-[18px] font-semibold text-[#1A1A1A]">
+        <h2 id="titre-familles" className="px-1 text-[18px] font-semibold text-encre">
           Ce que vous voulez rénover
         </h2>
         <ul className="space-y-2.5">
@@ -354,22 +354,25 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
             const coche = f.id in saisie.familles;
             return (
               <li key={f.id} id={`famille-${f.id}`} className={cx(i === nbSiennes && nbSiennes > 0 && "!mt-6")}>
-                {i === nbSiennes && nbSiennes > 0 ? <p className="mb-2 px-1 text-[15.5px] font-medium text-[#5F5A53]">Autre chose à rénover&nbsp;?</p> : null}
-                <div className={cx("overflow-hidden rounded-2xl border-2 bg-white", coche ? "border-[#1A1A1A]" : "border-[#E2DFD9]")}>
-                <button type="button" role="checkbox" aria-checked={coche} onClick={() => basculerFamille(f.id)} className={cx("flex w-full items-center gap-3 p-3 text-left active:bg-[#F6F5F2]", FOCUS)}>
-                  <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[18px] leading-snug font-semibold text-[#1A1A1A]">{f.libelle}</span>
-                    <span className="mt-0.5 block text-[14.5px] leading-snug text-[#5F5A53]">{f.aide}</span>
+                {i === nbSiennes && nbSiennes > 0 ? <p className="mb-2 px-1 text-[15.5px] font-medium text-encre-2">Autre chose à rénover&nbsp;?</p> : null}
+                <div className={cx("overflow-hidden rounded-2xl border-2 bg-blanc", coche ? "border-encre" : "border-trait")}>
+                <button type="button" role="checkbox" aria-checked={coche} onClick={() => basculerFamille(f.id)} className={cx("flex w-full items-center gap-3 p-3 text-left active:bg-fond", FOCUS)}>
+                  {/* Relecture D, E, F : la marge est sur le cadre, le picto garde ses 64 px utiles. */}
+                  <span className="flex h-[72px] w-20 shrink-0 items-center justify-center rounded-xl bg-fond p-1">
+                    <DessinFamille famille={f.id} className="h-16 w-16" />
                   </span>
-                  <span aria-hidden className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold", coche ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#BDB8B0] bg-white")}>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[18px] leading-snug font-semibold text-encre">{f.libelle}</span>
+                    <span className="mt-0.5 block text-[14.5px] leading-snug text-encre-2">{f.aide}</span>
+                  </span>
+                  <span aria-hidden className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-[14px] font-bold", coche ? "border-encre bg-encre text-blanc" : "border-trait bg-blanc")}>
                     {coche ? "✓" : ""}
                   </span>
                 </button>
                 {coche ? (
                   // Ses sous-parties se déplient juste dessous : ce qu'il veut traiter dans cette famille.
-                  <div className="border-t border-[#ECE9E3] bg-[#FAF9F7] p-3">
-                    <p className="mb-2 px-0.5 text-[15px] font-medium text-[#3F3B36]">Qu&apos;est-ce qu&apos;on recouvre&nbsp;?</p>
+                  <div className="border-t border-trait bg-fond p-3">
+                    <p className="mb-2 px-0.5 text-[15px] font-medium text-encre">Qu&apos;est-ce qu&apos;on recouvre&nbsp;?</p>
                     <div className="grid grid-cols-2 gap-2">
                       {f.sousParties.map((sp) => (
                         <CaseCarte key={sp.id} coche={(saisie.familles[f.id] ?? []).includes(sp.id)} onBasculer={() => basculerPartie(f.id, sp.id)} titre={sp.libelle} aide={sp.aide} />
@@ -392,10 +395,10 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
         return (
           <section key={id} id={`taille-${id}`} aria-labelledby={`titre-taille-${id}`} className="space-y-3">
             <div className="px-1">
-              <h2 id={`titre-taille-${id}`} className="text-[18px] font-semibold text-[#1A1A1A]">
+              <h2 id={`titre-taille-${id}`} className="text-[18px] font-semibold text-encre">
                 {q.titre}
               </h2>
-              <p className="mt-0.5 text-[15px] text-[#5F5A53]">{q.aide}</p>
+              <p className="mt-0.5 text-[15px] text-encre-2">{q.aide}</p>
             </div>
             {q.reperes.length ? (
               <div className="grid grid-cols-2 gap-2.5">
@@ -411,15 +414,15 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
                 ))}
               </div>
             ) : null}
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6E3DD] bg-white p-2">
-              <button type="button" aria-label="Moins" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.max(q.min, Math.round(((t.valeur ?? q.depart + q.pas) - q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-trait bg-blanc p-2">
+              <button type="button" aria-label="Moins" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.max(q.min, Math.round(((t.valeur ?? q.depart + q.pas) - q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-fond text-[24px] font-semibold text-encre active:bg-fond-2">
                 −
               </button>
               <span className="text-center" aria-live="polite">
-                <span className="block font-display text-[26px] leading-none font-semibold text-[#1A1A1A] tabular-nums">{t.valeur ? (unite === "portes" ? `${t.valeur}` : `≈ ${String(t.valeur).replace(".", ",")} m`) : "—"}</span>
-                <span className="text-[13px] text-[#5F5A53]">{unite === "portes" ? "portes, à peu près" : id === "CUISINE" ? "de meubles, mis bout à bout" : "à peu près"}</span>
+                <span className="block font-display text-[26px] leading-none font-semibold text-encre tabular-nums">{t.valeur ? (unite === "portes" ? `${t.valeur}` : `≈ ${String(t.valeur).replace(".", ",")} m`) : "—"}</span>
+                <span className="text-[13px] text-encre-2">{unite === "portes" ? "portes, à peu près" : id === "CUISINE" ? "de meubles, mis bout à bout" : "à peu près"}</span>
               </span>
-              <button type="button" aria-label="Plus" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.min(q.max, Math.round(((t.valeur ?? q.depart - q.pas) + q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F5F2] text-[24px] font-semibold text-[#1A1A1A] active:bg-[#ECEAE5]">
+              <button type="button" aria-label="Plus" onClick={() => poserTaille(id, { repere: t.repere, valeur: Math.min(q.max, Math.round(((t.valeur ?? q.depart - q.pas) + q.pas) * 10) / 10) })} className="flex h-12 w-12 items-center justify-center rounded-xl bg-fond text-[24px] font-semibold text-encre active:bg-fond-2">
                 +
               </button>
             </div>
@@ -430,8 +433,8 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
       {cochees.length ? (
         <section aria-labelledby="titre-note" className="space-y-2">
           <label id="titre-note" htmlFor="precisions" className="block px-1">
-            <span className="block text-[18px] font-semibold text-[#1A1A1A]">Un mot pour CoverSwap</span>
-            <span className="block text-[15px] text-[#5F5A53]">Facultatif. Vous pouvez aussi dicter avec le micro du clavier.</span>
+            <span className="block text-[18px] font-semibold text-encre">Un mot pour CoverSwap</span>
+            <span className="block text-[15px] text-encre-2">Facultatif. Vous pouvez aussi dicter avec le micro du clavier.</span>
           </label>
           <textarea
             id="precisions"
@@ -441,7 +444,7 @@ export function EtapeProjet({ etat, client, prestations, onEtat, onSuite, onDevi
             onChange={(e) => changer((s) => ({ ...s, precisions: e.target.value }), 1200)}
             onBlur={() => vider()}
             placeholder={cochees.includes("CUISINE") ? "Garder les poignées, un plan de travail qui résiste à la chaleur…" : cochees.includes("SDB") ? "Garder la vasque, une teinte claire qui ne marque pas…" : `Ce qui compte pour ${mots.votre}…`}
-            className="w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 py-3 text-[17px] leading-relaxed text-[#1A1A1A] placeholder:text-[#8A857E] focus:border-[#1A1A1A] focus:outline-none"
+            className="w-full rounded-2xl border border-trait bg-blanc px-4 py-3 text-[17px] leading-relaxed text-encre placeholder:text-encre-2 focus:border-encre focus:outline-none"
           />
         </section>
       ) : null}

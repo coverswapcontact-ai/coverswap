@@ -21,6 +21,8 @@ export type RenduSimulateur = {
   references: ReferenceRendu[];
   /** Horodatage (ms) de l'arrivée du rendu. */
   le: number;
+  /** Site 3.0 (lot E3) : la pièce d'exemple du rendu (« cuisine-bordeaux-brillante ») ; absent sur la photo du visiteur. */
+  exemple?: string | null;
 };
 
 export type TravailEnCours = { travailId: string; lanceLe: number; attenteEstimeeS: number };
@@ -75,6 +77,11 @@ export type EtatSimulateur = {
   codePostal: string | null;
   /** Mission 16 (partie 4) : la matière demandée par l'adresse (`?ref=`, depuis /matieres), posée à l'écran des matières. */
   refDemandee: string | null;
+  /**
+   * Site 3.0 (lot E3) : la photo est une pièce d'exemple de la bibliothèque (« Pas de photo sous la main ? »), pas
+   * celle du visiteur. Facultatif : un état d'avant le lot se relit sans.
+   */
+  exemple?: string | null;
   majLe: number;
 };
 
@@ -127,6 +134,14 @@ function lireReferences(v: unknown): ReferenceRendu[] {
   return Array.isArray(v) ? v.filter(estObjet).map((r) => ({ zone: String(r.zone ?? ""), libelle: String(r.libelle ?? ""), ref: String(r.ref ?? ""), nom: String(r.nom ?? "") })) : [];
 }
 
+/** L'identifiant d'une pièce d'exemple (minuscules, chiffres, tirets), ou null. */
+const lireExemple = (v: unknown): string | null => (typeof v === "string" && /^[a-z0-9-]{1,60}$/.test(v) ? v : null);
+/** `{ exemple }` seulement s'il est lisible : un état (ou un rendu) sans exemple se relit tel qu'avant le lot E3. */
+const avecExemple = (v: unknown): { exemple?: string } => {
+  const exemple = lireExemple(v);
+  return exemple ? { exemple } : {};
+};
+
 const listeDeTextes = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : []);
 
 function lireAnalyse(v: unknown): EtatAnalyse | null {
@@ -157,14 +172,14 @@ export function migrerEtat(brut: unknown): EtatSimulateur | null {
   const projet = typeof brut.projet === "string" && brut.projet ? brut.projet : "cuisine";
   const majLe = typeof brut.majLe === "number" ? brut.majLe : 0;
   const photo = texteOuNull(brut.photo);
-  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), parcoursNeLe: typeof brut.parcoursNeLe === "number" && brut.parcoursNeLe > 0 ? brut.parcoursNeLe : majLe, travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), majLe };
+  const base: EtatSimulateur = { projet, photo, photoLargeur: photo ? entierPositifOuNull(brut.photoLargeur) : null, photoHauteur: photo ? entierPositifOuNull(brut.photoHauteur) : null, selections: lireSelections(brut.selections), parcoursId: texteOuNull(brut.parcoursId), parcoursNeLe: typeof brut.parcoursNeLe === "number" && brut.parcoursNeLe > 0 ? brut.parcoursNeLe : majLe, travailEnCours: null, rendus: [], analyse: lireAnalyse(brut.analyse), ville: texteOuNull(brut.ville), codePostal: typeof brut.codePostal === "string" && /^\d{5}$/.test(brut.codePostal) ? brut.codePostal : null, refDemandee: texteOuNull(brut.refDemandee), ...avecExemple(photo ? brut.exemple : null), majLe };
   if (brut.version === 2) {
     const t = brut.travailEnCours;
     return {
       ...base,
       travailEnCours: estObjet(t) && typeof t.travailId === "string" ? { travailId: t.travailId, lanceLe: typeof t.lanceLe === "number" ? t.lanceLe : majLe, attenteEstimeeS: typeof t.attenteEstimeeS === "number" ? t.attenteEstimeeS : ATTENTE_PAR_DEFAUT_S } : null,
       rendus: Array.isArray(brut.rendus)
-        ? brut.rendus.filter(estObjet).filter((r) => typeof r.travailId === "string").map((r) => ({ travailId: String(r.travailId), simulationSiteId: texteOuNull(r.simulationSiteId), urlApres: String(r.urlApres ?? ""), urlAvant: texteOuNull(r.urlAvant), references: lireReferences(r.references), le: typeof r.le === "number" ? r.le : majLe }))
+        ? brut.rendus.filter(estObjet).filter((r) => typeof r.travailId === "string").map((r) => ({ travailId: String(r.travailId), simulationSiteId: texteOuNull(r.simulationSiteId), urlApres: String(r.urlApres ?? ""), urlAvant: texteOuNull(r.urlAvant), references: lireReferences(r.references), le: typeof r.le === "number" ? r.le : majLe, ...avecExemple(r.exemple) }))
         : [],
     };
   }
@@ -184,8 +199,12 @@ export type DecisionMontage =
   | { ecran: "attente"; travail: TravailEnCours; parcoursId?: string }
   /** Un parcours récent existe : proposer de le reprendre, sans écraser. */
   | { ecran: "bandeau"; etape: 2 | 3 }
-  /** Repartir directement à l'étape voulue (arrivée depuis l'accueil, ou rien à reprendre). */
-  | { ecran: "direct"; etape: 1 | 2 | 3 };
+  /**
+   * Repartir directement à l'étape voulue (rien à reprendre). `pieceChoisie` (site 3.0,
+   * lot B6) : la pièce de l'adresse a été CHOISIE par un picto de l'accueil (`?choix=1`) — le simulateur émet
+   * `PIECE_CHOISIE` et ouvre l'écran Photo.
+   */
+  | { ecran: "direct"; etape: 1 | 2 | 3; pieceChoisie?: true };
 
 const TRAVAIL_ID = /^[a-z0-9]{10,40}$/i;
 const PARCOURS_ID = /^[0-9a-fA-F-]{16,64}$/;
@@ -196,19 +215,22 @@ const PARCOURS_ID = /^[0-9a-fA-F-]{16,64}$/;
  * Ouvert sur un autre appareil, sans mémoire locale, le site adopte ce parcours
  * avant de sonder — sinon il sonderait avec un parcours neuf et lirait 404.
  */
-export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; depuisAccueil?: boolean; maintenant?: number } = {}): DecisionMontage {
+export function decisionAuMontage(etat: EtatSimulateur | null, options: { reprise?: string | null; p?: string | null; choix?: boolean; maintenant?: number } = {}): DecisionMontage {
   const maintenant = options.maintenant ?? Date.now();
   if (options.reprise && TRAVAIL_ID.test(options.reprise)) {
     const rendu = etat?.rendus.find((r) => r.travailId === options.reprise);
     const parcoursId = options.p && PARCOURS_ID.test(options.p) ? options.p : undefined;
     return { ecran: "attente", travail: { travailId: options.reprise, lanceLe: rendu?.le ?? maintenant, attenteEstimeeS: 0 }, ...(parcoursId ? { parcoursId } : {}) };
   }
+  if (etat?.travailEnCours) return { ecran: "attente", travail: etat.travailEnCours };
+  // `choix` : une pièce valide choisie sur l'accueil (le simulateur vérifie la pièce), sans photo en mémoire. Avec une
+  // photo, le bandeau de reprise passe d'abord (la pièce de l'adresse reste présélectionnée) : rien n'est écrasé.
+  if (options.choix && !etat?.photo) return { ecran: "direct", etape: 1, pieceChoisie: true };
   if (!etat) return { ecran: "direct", etape: 1 };
-  if (etat.travailEnCours) return { ecran: "attente", travail: etat.travailEnCours };
   const dernier = etat.rendus[etat.rendus.length - 1];
   const etape: 2 | 3 | 1 = dernier?.urlApres ? 3 : etat.photo ? 2 : 1;
   if (etape === 1) return { ecran: "direct", etape: 1 };
-  if (options.depuisAccueil || maintenant - etat.majLe < 0) return { ecran: "direct", etape: etat.photo ? 2 : 1 };
+  if (maintenant - etat.majLe < 0) return { ecran: "direct", etape: etat.photo ? 2 : 1 };
   if (maintenant - etat.majLe > REPRISE_MAX_MS) return { ecran: "direct", etape: 1 };
   return { ecran: "bandeau", etape };
 }

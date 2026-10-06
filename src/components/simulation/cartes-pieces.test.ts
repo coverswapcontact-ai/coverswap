@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, test } from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MANIFESTE_IMAGES } from "@/lib/images-manifeste";
 import { PHOTOS_PIECES, photoDePiece } from "@/lib/images-pieces";
+import { photosDesCartes } from "@/lib/photos-cartes";
 import { PROJECT_TYPES } from "@/lib/simulateur/projets";
 import { CartesPieces, type PieceCarte } from "./CartesPieces";
 import { Photo } from "./Photo";
@@ -21,7 +22,8 @@ import { Photo } from "./Photo";
  */
 
 const PIECES: PieceCarte[] = PROJECT_TYPES.map((p) => ({ id: p.id, libelle: p.label, description: p.description }));
-const rendre = (photos?: Record<string, string>) => renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos }));
+// Lot F7 : les cartes reçoivent leurs photos résolues par la page (`photosDesCartes`), comme le simulateur et /realisations.
+const rendre = (photos?: Record<string, string>) => renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: photos ? photosDesCartes(photos) : undefined }));
 const boutons = (html: string) => html.split("<button").slice(1);
 /** Un nom réellement préparé (le manifeste du dépôt n'est pas vide : ouverture provisoire, illustrations). */
 const PREPAREE = Object.keys(MANIFESTE_IMAGES)[0];
@@ -32,6 +34,13 @@ describe("CartesPieces avec photos", () => {
     assert.equal(boutons(html).length, 5);
     assert.equal((html.match(/<svg/g) ?? []).length, 5);
     assert.ok(!html.includes("<picture") && !html.includes("<img") && !html.includes("Ambiance"));
+  });
+
+  test("site 3.0, lot C6 : sans photo, le dessin est le pictogramme de la famille de la pièce", () => {
+    const pictos = [...rendre().matchAll(/<image href="\/images\/pictos\/([a-z-]+)-256\.webp"/g)].map((m) => m[1]);
+    const ATTENDUS: Record<string, string> = { cuisine: "picto-cuisine", "salle-de-bain": "picto-salle-de-bain", meubles: "picto-mobilier", "mur-plafond": "picto-murs", professionnel: "picto-pro" };
+    assert.deepEqual(pictos, PIECES.map((p) => ATTENDUS[p.id]));
+    for (const nom of pictos) assert.ok(existsSync(path.join(process.cwd(), "public", "images", "pictos", `${nom}-256.webp`)), nom);
   });
 
   test("une photo préparée remplace le dessin de SA carte (carré, « Ambiance »), les autres gardent le leur", { skip: PREPAREE ? false : "manifeste vide" }, () => {
@@ -58,7 +67,7 @@ describe("CartesPieces avec photos", () => {
 
   test("chargement : les N premières photos tout de suite (eager, sans fetchpriority), les autres en lazy ; lazy par défaut", { skip: PREPAREE ? false : "manifeste vide" }, () => {
     const toutes = Object.fromEntries(PIECES.map((p) => [p.id, PREPAREE]));
-    const images = (photosImmediates?: number) => boutons(renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: toutes, photosImmediates }))).map((b) => b.match(/<img [^>]*>/)?.[0] ?? "");
+    const images = (photosImmediates?: number) => boutons(renderToStaticMarkup(createElement(CartesPieces, { pieces: PIECES, valeur: null, onChoisir: () => undefined, photos: photosDesCartes(toutes), photosImmediates }))).map((b) => b.match(/<img [^>]*>/)?.[0] ?? "");
     const parDefaut = images();
     assert.equal(parDefaut.length, 5);
     for (const img of parDefaut) assert.match(img, /loading="lazy"/);
@@ -85,18 +94,23 @@ describe("les photos des pièces : un seul endroit", () => {
     assert.deepEqual(Object.values(PHOTOS_PIECES).sort(), ["piece-cuisine", "piece-meubles", "piece-murs", "piece-pro", "piece-salle-de-bain"]);
   });
 
-  test("le simulateur et l'accueil passent PHOTOS_PIECES ; l'espace client, non (ses cartes restent des dessins)", () => {
+  test("le simulateur passe PHOTOS_PIECES ; l'espace client, non (ses cartes restent des dessins) ; l'accueil n'a plus de cartes (site 3.0 : des pictos)", () => {
     const lire = (f: string) => readFileSync(path.join(process.cwd(), f), "utf8");
-    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/HomeClient.tsx"]) {
-      assert.match(lire(f), /<CartesPieces [^\n]*photos=\{PHOTOS_PIECES\}[^\n]*\/>/, f);
-      assert.match(lire(f), /from "@\/lib\/images-pieces"/, f);
-    }
-    // Premier écran du simulateur : les photos du premier rang en chargement immédiat ; l'accueil (module sous l'ouverture) en lazy.
+    // Lot F7 : la page du simulateur résout les photos (`photosDesCartes(PHOTOS_PIECES)`) et les passe jusqu'aux cartes ;
+    // l'écran Pièce (rendu dans le navigateur) n'importe ni les noms, ni le manifeste, ni les ambiances.
+    assert.match(lire("src/app/simulateur/page.tsx"), /<Simulateur [^\n]*photosPieces=\{photosDesCartes\(PHOTOS_PIECES\)\} \/>/);
+    assert.match(lire("src/app/simulateur/_components/Simulateur.tsx"), /<EcranPiece [^\n]*photos=\{photosPieces\} \/>/);
+    assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /<CartesPieces [^\n]*photos=\{photos\} \/>/);
+    assert.match(lire("src/app/realisations/page.tsx"), /<CartesPieces [^\n]*photos=\{photosDesCartes\(PHOTOS_PIECES\)\}/);
+    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.doesNotMatch(lire(f), /import \{[^}]*\b(PHOTOS_PIECES|sourcesPhoto|imagePreparee|PastillesMatieres|Photo)\b[^}]*\} from/, f);
+    // Premier écran du simulateur : les photos du premier rang en chargement immédiat.
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /<CartesPieces [^\n]*photosImmediates=\{PHOTOS_IMMEDIATES\}/);
     assert.match(lire("src/app/simulateur/_components/EcranPiece.tsx"), /const PHOTOS_IMMEDIATES = 3;/);
-    assert.ok(!lire("src/components/HomeClient.tsx").includes("photosImmediates"));
+    // Site 3.0 (lot B6) : le module photo de l'accueil (HomeClient) est remplacé par les pictos de « Par où commencer ? ».
+    assert.ok(!existsSync(path.join(process.cwd(), "src/components/HomeClient.tsx")));
+    assert.doesNotMatch(lire("src/components/accueil/ParOuCommencer.tsx"), /CartesPieces/);
     assert.ok(!lire("src/components/espace/CreationEcrans.tsx").includes("photos="));
     // Aucune liste de noms piece-* ailleurs que dans lib/images-pieces.
-    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/HomeClient.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.ok(!/"piece-(cuisine|murs|pro|meubles|salle-de-bain)"/.test(lire(f)), f);
+    for (const f of ["src/app/simulateur/_components/EcranPiece.tsx", "src/components/accueil/ParOuCommencer.tsx", "src/components/simulation/CartesPieces.tsx"]) assert.ok(!/"piece-(cuisine|murs|pro|meubles|salle-de-bain)"/.test(lire(f)), f);
   });
 });

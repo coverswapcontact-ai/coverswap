@@ -1,17 +1,18 @@
-import Link from "next/link";
-import { CuisineDeFace, MobilierDeFace, MursDeFace, ProfessionnelDeFace, SalleDeBainDeFace } from "@/components/espace/Illustrations";
-import { photoDePiece, type PieceId } from "@/lib/images-pieces";
-import { imagePreparee } from "@/lib/images-preparees";
-import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
+import Link from "@/components/LienSite";
+import { Picto } from "@/components/espace/Illustrations";
+import type { PieceId } from "@/lib/images-pieces";
+import type { PhotoCarte } from "@/lib/photos-cartes";
+import { pictoDeLaPiece } from "@/lib/simulateur/projets";
+import { Pastilles } from "@/components/ambiances/Pastilles";
 import { Etiquette } from "./Etiquette";
-import { Photo } from "./Photo";
+import { CadrePhoto } from "./CadrePhoto";
 
 /**
  * Les cinq cartes « Quelle pièce transformons-nous ? » (mission 15, partie 4),
  * partagées par le simulateur, le module d'accueil et l'espace client. Une
  * carte = le dessin au trait fin de la pièce (`espace/Illustrations`), le
  * libellé et la description venus du CRM. Le dessin est en gris léger, et
- * passe en couleur avec le trait d'accent quand la carte est choisie. Jamais
+ * passe en couleur avec le trait d'encre quand la carte est choisie. Jamais
  * un emoji. Hauteur fixe : les cartes ne font pas bouger la page. Des boutons
  * `aria-pressed` dans un groupe (pas un `radiogroup` : choisir une carte fait
  * avancer le parcours, les flèches n'auraient pas leur sens de radio).
@@ -27,8 +28,16 @@ import { Photo } from "./Photo";
  * second sur téléphone) ; les autres, et l'accueil (module sous l'ouverture),
  * en `lazy`.
  *
+ * Site 3.0, lot C6 : sans photo, le pictogramme de la famille (`DessinFamille enSvg`, celui de l'espace client) au lieu
+ * de l'ancien dessin au trait ; toujours un `<svg>` par carte, gris tant que la carte n'est pas choisie. Lot E2 : le picto
+ * vient de la pièce (`pictoDeLaPiece`, `lib/simulateur/projets`), une seule table pour le simulateur et l'espace.
+ *
  * Mission 19 : sur une photo, les pastilles des vraies matières de l'ambiance (`ambiances/PastillesMatieres`), en bas à
  * droite ; leurs noms au survol ou à l'appui.
+ *
+ * Lot F7 : `photos` arrive RÉSOLU (`photosDesCartes` de `lib/photos-cartes`, appelé par la page serveur : sources du
+ * manifeste et matières des pastilles) ; ce composant, rendu dans le navigateur par le simulateur, n'importe plus ni le
+ * manifeste des images ni les données des ambiances (`CadrePhoto`, `Pastilles`). Même rendu.
  *
  * Mission 16 (partie 6) : sans état, donc sans « use client » — rendu serveur quand la page est serveur (les cartes
  * en liens de `/realisations` n'envoient aucun JavaScript), rendu dans le paquet client quand un composant client
@@ -37,14 +46,6 @@ import { Photo } from "./Photo";
  */
 export type PieceCarte = { id: string; libelle: string; description: string };
 
-const DESSINS: Record<string, (p: { className?: string }) => React.ReactElement> = {
-  cuisine: CuisineDeFace,
-  "salle-de-bain": SalleDeBainDeFace,
-  meubles: MobilierDeFace,
-  "mur-plafond": MursDeFace,
-  professionnel: ProfessionnelDeFace,
-};
-
 /** L'attribut `sizes` d'une carte : deux colonnes sur téléphone, trois (≈ 240 px) à partir de 640 px. */
 const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
 
@@ -52,35 +53,34 @@ const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
  * Mission 16 (partie 5) : `liens` (pièce → adresse) fait de chaque carte un LIEN (`/realisations` mène aux pages par
  * pièce) au lieu d'un bouton de choix ; même dessin, même photo. Une pièce sans adresse garde son bouton.
  */
-type ProprietesCartesPieces = { pieces: PieceCarte[]; nom?: string; photos?: Partial<Record<PieceId, string>>; photosImmediates?: number } & ({ valeur: string | null; onChoisir: (id: string) => void; liens?: undefined } | { liens: Partial<Record<string, string>>; valeur?: undefined; onChoisir?: undefined });
+type ProprietesCartesPieces = { pieces: PieceCarte[]; nom?: string; photos?: Partial<Record<PieceId, PhotoCarte>>; photosImmediates?: number } & ({ valeur: string | null; onChoisir: (id: string) => void; liens?: undefined } | { liens: Partial<Record<string, string>>; valeur?: undefined; onChoisir?: undefined });
 
 export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce", photos, photosImmediates = 0, liens }: ProprietesCartesPieces) {
   return (
     <div role="group" aria-label={nom} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {pieces.map((p, rang) => {
-        const Dessin = DESSINS[p.id] ?? CuisineDeFace;
         const choisie = valeur === p.id;
-        const photo = photoDePiece(photos, p.id);
-        const avecPhoto = photo !== null && imagePreparee(photo);
-        const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-accent ring-1 ring-accent" : "border-trait hover:border-encre-2"}`;
+        const photo = photos && Object.prototype.hasOwnProperty.call(photos, p.id) ? (photos[p.id as PieceId] ?? null) : null;
+        const classes = `group flex min-h-[172px] flex-col items-stretch rounded-[var(--rayon-md)] border bg-white p-3 text-left transition-colors duration-[var(--duree-courte)] ease-[var(--ease)] ${choisie ? "border-encre ring-1 ring-encre" : "border-trait hover:border-encre-2"}`;
         const lien = liens && Object.prototype.hasOwnProperty.call(liens, p.id) ? liens[p.id] : undefined;
         const contenu = (
           <>
-            {avecPhoto ? (
+            {photo ? (
               <span className="relative block w-full overflow-hidden rounded-[var(--rayon-sm)]">
-                <Photo nom={photo} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
+                <CadrePhoto sources={photo.sources} alt="" ratio="1 / 1" tailles={TAILLES_CARTE} immediat={rang < photosImmediates} enLigne />
                 <span aria-hidden="true">
                   <Etiquette className="absolute bottom-2 left-2">Ambiance</Etiquette>
                 </span>
-                <PastillesMatieres image={photo} />
+                <Pastilles matieres={photo.matieres} />
               </span>
             ) : (
               <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>
-                <Dessin className="h-full w-full" />
+                <Picto nom={pictoDeLaPiece(p.id)} enSvg className="h-full w-full" />
               </span>
             )}
             <span className="mt-2 block text-[15.5px] leading-snug font-semibold text-encre">{p.libelle}</span>
-            <span className="mt-0.5 line-clamp-2 block text-[13px] leading-snug text-encre-2">{p.description}</span>
+            {/* Lot F6 : deux lignes réservées (2 × 1,375 em) : la carte garde sa hauteur quand Libre Franklin remplace la police de repli. */}
+            <span className="mt-0.5 line-clamp-2 block min-h-[2.75em] text-[13px] leading-snug text-encre-2">{p.description}</span>
           </>
         );
         return lien ? (

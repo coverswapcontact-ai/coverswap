@@ -1,3 +1,4 @@
+import { exempleConnu } from "@/lib/exemples-simulateur";
 import { parcoursIdValide } from "@/lib/parcours";
 import { estCreneauRappel, type CreneauRappel } from "@/lib/rappel";
 
@@ -34,6 +35,8 @@ export type ContactSimulation = {
   afficherLienEspace?: true;
   consentementMail?: boolean;
   consentementTexte?: string;
+  /** Relecture D, E, F : la pièce d'exemple de la simulation (connue du site) ; sa photo n'est jamais celle du visiteur. */
+  exemple?: string;
 };
 
 export type ResultatValidation = { ok: true; contact: ContactSimulation } | { ok: false; erreur: string };
@@ -56,7 +59,9 @@ export function validerContactSimulation(brut: unknown): ResultatValidation {
   const min = entier(body.estimationMin);
   const max = entier(body.estimationMax);
   const fourchette = min && max && min <= max ? { estimationMin: min, estimationMax: max, formatPiece: texte(body.formatPiece, 40) } : {};
-  const photoAvant = typeof body.photoAvant === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(body.photoAvant) && body.photoAvant.length < 8_000_000 ? body.photoAvant : undefined;
+  const exemple = exempleConnu(body.exemple) ?? undefined;
+  // Sur une pièce d'exemple, l'avant n'est pas une photo du visiteur : il ne part jamais comme tel.
+  const photoAvant = !exemple && typeof body.photoAvant === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(body.photoAvant) && body.photoAvant.length < 8_000_000 ? body.photoAvant : undefined;
   return {
     ok: true,
     contact: {
@@ -82,6 +87,7 @@ export function validerContactSimulation(brut: unknown): ResultatValidation {
       rappelCreneau: estCreneauRappel(creneau) ? creneau : undefined,
       afficherLienEspace: body.afficherLienEspace === true && !texte(body.simulationEchouee, 60) ? true : undefined,
       ...(typeof body.consentementMail === "boolean" ? { consentementMail: body.consentementMail, consentementTexte: texte(body.consentementTexte, 1000) } : {}),
+      ...(exemple ? { exemple } : {}),
     },
   };
 }

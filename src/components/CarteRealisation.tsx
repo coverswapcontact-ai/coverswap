@@ -1,5 +1,7 @@
-import Link from "next/link";
+import Link from "@/components/LienSite";
+import { DonneesStructurees } from "@/components/ScriptJsonLd";
 import { AvantApres } from "@/components/simulation/AvantApres";
+import { imageObjet } from "@/lib/donnees-images";
 import { lignePrixDuree, type EtudeReelle } from "@/lib/etude-de-cas";
 import { lienMatiere } from "@/lib/matieres-vedettes";
 import { sourcesPhotoCrm } from "@/lib/publications";
@@ -10,26 +12,36 @@ import { sourcesPhotoCrm } from "@/lib/publications";
  * avant / après sans outils (la photo après seule s'il n'y a pas d'avant), en
  * WebP réduit par le CRM (`sourcesPhotoCrm`) ; titre, légende (type · ville),
  * texte (`avecTexte`), matières posées vers la page Matières, prix et durée
- * (`lignePrixDuree` : publiés, sinon habituels libellés comme tels).
+ * (`lignePrixDuree` : publiés ; sans prix publié, aucun, la durée habituelle libellée comme telle).
+ * Lot F6 (honnêteté) : la photo porte l'étiquette « Réalisation », comme toute image du site porte la sienne
+ * (`honnetete.test.ts`) — un vrai chantier se reconnaît sur l'image, pas seulement au titre de la section.
  * Composant serveur.
  */
 export const CLASSE_CARTE_REALISATION = "overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white";
 export const RATIO_CARTE_REALISATION = "4 / 3";
 const TAILLES_PAR_DEFAUT = "(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw";
 
+/** Le texte de la photo « après » : le titre du chantier, puis les matières posées quand le CRM les publie (lot F4). */
+export function altApres(etude: Pick<EtudeReelle, "titre" | "matieres">): string {
+  return `Après la pose — ${etude.titre}${etude.matieres.length ? `, ${etude.matieres.map((m) => `${m.nom} ${m.ref}`).join(", ")}` : ""}`;
+}
+
 export function CarteRealisation({ etude, avecTexte = false, tailles = TAILLES_PAR_DEFAUT }: { etude: EtudeReelle; avecTexte?: boolean; tailles?: string }) {
   const ligne = lignePrixDuree(etude);
   return (
     <article className={CLASSE_CARTE_REALISATION}>
+      {/* Site 3.0 (lot F4) : l'ImageObject d'un avant / après de chantier (une vraie photo : pas de creditText d'ambiance). */}
+      {etude.apres && etude.avant ? <DonneesStructurees data={imageObjet({ src: etude.apres, legende: etude.legende ? `${etude.titre} (${etude.legende}).` : `${etude.titre}.`, description: `Réalisation. ${altApres(etude)}`, ambiance: false })} /> : null}
       {etude.apres ? (
         <AvantApres
           apres={etude.apres}
           avant={etude.avant}
-          alt={`Après — ${etude.titre}`}
-          altAvant={`Avant — ${etude.titre}`}
+          alt={altApres(etude)}
+          altAvant={`Avant la pose — ${etude.titre}`}
           ratio={RATIO_CARTE_REALISATION}
           preparees={{ apres: sourcesPhotoCrm(etude.apres), avant: etude.avant ? sourcesPhotoCrm(etude.avant) : null, tailles }}
           sansOutils
+          etiquette="Réalisation"
         />
       ) : null}
       <div className="p-5">
