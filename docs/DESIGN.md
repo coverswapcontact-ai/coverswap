@@ -767,6 +767,22 @@ lien souligné vers lui dans le cadre des boutons (« Pas de photo sous la main 
 - L'étiquette d'honnêteté du curseur passe au-dessus de son trait blanc (`AvantApres`) : à 390 px le trait la
   coupait quand le curseur était près de la moitié.
 
+## Après le rendu
+
+Lot E4 (énoncé, phase E point 3), sous l'image du résultat, dans cet ordre :
+
+- **La composition** (`CartelComposition.tsx`) : un cadre blanc par film posé, la vignette du CRM, la zone, le nom et
+  la référence réels du rendu (`TuileFilm`), puis en petites capitales la famille et la finition (`.cartel`) quand la
+  sélection de la zone est bien ce film, et « Voir la fiche » : le cadre entier mène à la fiche
+  (`/matieres/<famille>/<REF>`, le présentoir ouvert sur la référence si la famille n'est pas connue). 1 colonne au
+  téléphone, 2 dès 640 px.
+- **« Recevoir ces échantillons chez moi »** : un lien souligné (jamais un bouton, encore moins le principal) vers
+  `#demande`, qui coche la case « Recevoir les échantillons de ces matières chez moi » de la demande (les zones et
+  références écrites dessous). La demande l'écrit dans son message : « Souhaite recevoir les échantillons : NF13
+  (Façades), AG13 (Plan de travail) ». Le lien disparaît une fois la demande envoyée.
+- Puis, sans changement : la note sur le rendu, « Essayer d'autres matières », « Télécharger », « Partager »,
+  l'estimation, la demande et son **seul** bouton principal, « Recevoir mon devis ».
+
 ## Ce qu'on a jeté de la maquette
 
 Tout ce qui fait « faux magazine » (énoncé, phase B) :

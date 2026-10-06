@@ -5,9 +5,8 @@ import { AvantApres } from "@/components/simulation/AvantApres";
 import { Bouton } from "@/components/simulation/Bouton";
 import { Etiquette } from "@/components/simulation/Etiquette";
 import { fichierDuRendu, telechargerFichier } from "@/components/simulation/fichiers";
-import { TuileFilm } from "@/components/simulation/TuileFilm";
-import { urlVignette } from "@/lib/simulateur/generation-client";
-import type { RenduSimulateur } from "@/lib/simulateur/reprise";
+import type { RenduSimulateur, Selection } from "@/lib/simulateur/reprise";
+import { CartelComposition } from "./CartelComposition";
 
 /**
  * Écran 4 — le résultat (mission 15, partie 4) : le rendu plein cadre au
@@ -23,6 +22,8 @@ import type { RenduSimulateur } from "@/lib/simulateur/reprise";
  * Site 3.0, lot E3 : l'image porte son étiquette d'honnêteté (`etiquetteDuRendu`) — « Simulation » sur la photo du
  * visiteur, « Ambiance · avant / après » sur une pièce d'exemple (l'avant est une image générée, la pièce n'est pas
  * la sienne), jamais « Simulation » pour celle-ci ; le texte de l'image, le fichier et le partage le disent aussi.
+ * Lot E4 : sous l'image, le cartel de la composition (`CartelComposition` : références réelles, liens vers les fiches,
+ * « Recevoir ces échantillons chez moi ») ; l'estimation et la demande (`children`) ne changent pas.
  */
 const DUREE_FONDU_MS = 1_000;
 const RATIO_PAR_DEFAUT = "4 / 3";
@@ -54,10 +55,14 @@ type Props = {
   onChoisirRendu: (travailId: string) => void;
   onAutresMatieres: () => void;
   onPartage?: (moyen: "partage" | "telechargement") => void;
+  /** Les choix courants : la famille et la finition des films du cartel (lot E4). */
+  selections?: Readonly<Record<string, Selection | null>>;
+  /** « Recevoir ces échantillons chez moi » coche la case de la demande ; absent après l'envoi. */
+  onEchantillons?: () => void;
   children?: ReactNode;
 };
 
-export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFonduFini, onChoisirRendu, onAutresMatieres, onPartage, children }: Props) {
+export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFonduFini, onChoisirRendu, onAutresMatieres, onPartage, selections = {}, onEchantillons, children }: Props) {
   const avant = rendu.urlAvant ?? photo;
   // Invariable : « Vos meubles », « Votre espace pro »… ne s'accordent pas avec un participe.
   const exemple = !!rendu.exemple;
@@ -161,15 +166,7 @@ export default function EcranResultat({ rendu, rendus, photo, titre, fondu, onFo
         </div>
       )}
 
-      {rendu.references.length > 0 ? (
-        <ul className="grid gap-2 sm:grid-cols-2" aria-label="Films utilisés">
-          {rendu.references.map((r) => (
-            <li key={r.zone} className="rounded-[var(--rayon-sm)] border border-trait bg-white p-2">
-              <TuileFilm ref={r.ref} nom={r.nom} libelle={r.libelle} vignette={urlVignette(r.ref)} />
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <CartelComposition references={rendu.references} selections={selections} onEchantillons={onEchantillons} />
       <p className="text-[13px] leading-relaxed text-encre-2">
         {exemple ? "Image d'ambiance : une pièce d'exemple, générée, habillée par une intelligence artificielle avec vos matières. " : "Rendu indicatif produit par une intelligence artificielle. "}
         Les teintes exactes se valident sur échantillons avant la pose.

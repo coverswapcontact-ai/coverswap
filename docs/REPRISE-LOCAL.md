@@ -1421,3 +1421,49 @@ génération touché. Captures : `docs/captures/site-3-0/simulateur-exemples-390
   de capture, l'image s'affiche) : captures refaites à la hauteur de la fenêtre.
 - Coût en production : chaque essai d'exemple lance une vraie analyse puis, si la personne génère, une vraie
   génération (comptées comme celles d'un visiteur) ; la note du devis permet de les reconnaître.
+
+## E4 — après le rendu (06/10/2026)
+
+**Fait** (aucune génération, aucun envoi)
+- `src/app/simulateur/_components/CartelComposition.tsx` : sous l'image du résultat, « La composition » — pour chaque
+  film du rendu, la zone, la vignette, le nom et la référence réels (`TuileFilm`, gardé), la famille et la finition
+  (`familleDuCartel`, `libelleFinition`) quand la sélection de la zone est bien ce film, et le lien de sa fiche
+  (`cheminMatiere` : `/matieres/<famille>/<REF>`, sinon `/matieres?ref=`), sans préchargement. Remplace la liste
+  « Films utilisés » (même `aria-label`).
+- « Recevoir ces échantillons chez moi » (l'équivalent, après le rendu, d'« Essayer cette composition chez moi ») :
+  lien secondaire vers `#demande` qui coche la case des échantillons (`formulaire.echantillons`, `onEchantillons`) ;
+  absent après l'envoi.
+- `DemandeApresRendu` : `id="demande"` à sa racine (avant et après l'envoi) ; la case « Recevoir les échantillons de
+  ces matières chez moi » avec les zones et références dessous. Estimation inchangée, toujours un seul principal.
+- `demande.ts` : `messageDemande` ajoute « Souhaite recevoir les échantillons : NF13 (Façades), AG13 (Plan de
+  travail) » au `message` de la demande (jamais après un échec ; la route le transmet déjà au CRM).
+- `docs/DESIGN.md` : « Après le rendu ».
+
+**Décisions prises seul**
+1. Les échantillons passent par une **case** de la demande plutôt que par un envoi à part : un seul formulaire, un seul
+   principal ; le lien ne fait que la cocher et y mener. Rien n'est promis sur le mode d'envoi (Lucas rappelle).
+2. Famille et finition lues dans les choix courants, et seulement si la zone porte encore ce film (un rendu plus
+   ancien du parcours peut en porter un autre) : rien n'est deviné, le lien retombe sur le présentoir.
+3. `TuileFilm` gardé dans un cadre-lien plutôt que le `Cartel` de la revue : la vignette réelle du film compte plus
+   ici que le filet de teinte, et le nom n'est pas répété.
+
+**Tests** : 513 → 517, tous réussis. Nouveau `src/app/simulateur/_components/composition.test.ts` (4) : références
+réelles, zones, vignettes, famille et finition, lien de fiche (et le repli `?ref=` quand la zone porte un autre
+film), aucun principal ; le lien `#demande` seulement avant l'envoi, pas d'« Essayer cette composition chez moi » ;
+`id="demande"` avant et après l'envoi, case décochée puis cochée, un principal, estimation présente ; message
+(échantillons, exemple et échantillons sur deux lignes, rien sans case ou sans film, aucun champ à part), et les
+lignes de `Simulateur.tsx` (jamais après un échec, lien absent après l'envoi). `npx eslint .` et `npm run build`
+passent (546 pages). `Simulateur.tsx` : 530 lignes.
+
+**Vérification visuelle** : build local comme la CI, `next start -p 3100` arrêté ensuite ; Playwright + Edge, toute
+requête hors GET/HEAD, `/api/simulate*`, `/api/simulation/*` et le CRM hors images coupés. **Écran de résultat sans
+aucune génération** : un état injecté dans la mémoire locale (IndexedDB) — photo = l'avant « bordeaux » de la
+bibliothèque, rendu = son après « couleur » de la bibliothèque, références NF13 et AG13, `exemple` posé —, puis
+« Reprendre ». À 360, 390 et 1 440 px : aucun débordement ; pastille « Ambiance · avant / après » ; liens
+`/matieres/couleur/NF13` et `/matieres/bois/AG13` ; un seul principal (« Recevoir mon devis ») ; « Recevoir ces
+échantillons chez moi » → `#demande` en haut de l'écran, case cochée. Formulaire jamais envoyé. Seule requête coupée :
+l'analyse que la mémoire injectée (photo sans analyse) redemandait au CRM. Captures :
+`docs/captures/site-3-0/simulateur-resultat-390.jpg` et `-1440.jpg`.
+
+**Problèmes** : aucun. À vérifier par Lucas : la note « Souhaite recevoir les échantillons » arrive dans le message
+du lead (champ `message` du CRM, déjà transmis par la route).

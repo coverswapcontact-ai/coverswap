@@ -9,6 +9,8 @@ import type { CreneauRappel } from "@/lib/rappel";
  * après un rendu seulement, `afficherLienEspace` (le lien de l'espace sera affiché : le CRM peut l'ouvrir).
  * Site 3.0 (lot E3) : une simulation faite sur une pièce d'exemple le dit dans le message de la demande (« Simulation
  * sur une pièce d'exemple : cuisine-bordeaux-brillante ») ; la route le transmet au CRM tel quel (`message`).
+ * Lot E4 : la case des échantillons de la demande après un rendu y ajoute « Souhaite recevoir les échantillons :
+ * NF13 (Façades), AG13 (Plan de travail) ».
  */
 
 export type ExtraDemande = { estimation: Estimation | null; rappelCreneau: CreneauRappel | null };
@@ -24,6 +26,8 @@ export type EntreeDemande = {
   echec: { photo: string; raison: string } | null;
   /** Lot E3 : la pièce d'exemple de la simulation (absente sur la photo du visiteur). */
   exemple?: string | null;
+  /** Lot E4 : la personne veut les échantillons des matières du rendu (« Recevoir ces échantillons chez moi »). */
+  echantillons?: boolean;
   jetonCaptcha: string | null;
   acquisition: Record<string, string | undefined>;
   consentement: Record<string, unknown>;
@@ -31,9 +35,10 @@ export type EntreeDemande = {
   extra?: ExtraDemande;
 };
 
-/** Les lignes du message joint à la demande (lot E3) ; vide pour une demande ordinaire. */
-export function messageDemande(e: Pick<EntreeDemande, "exemple">): string {
-  return [e.exemple ? `Simulation sur une pièce d'exemple : ${e.exemple}` : null].filter(Boolean).join("\n");
+/** Les lignes du message joint à la demande (lots E3 et E4) ; vide pour une demande ordinaire. */
+export function messageDemande(e: Pick<EntreeDemande, "exemple" | "echantillons"> & { references?: EntreeDemande["references"] }): string {
+  const echantillons = e.echantillons && e.references?.length ? `Souhaite recevoir les échantillons : ${e.references.map((r) => `${r.ref} (${r.libelle})`).join(", ")}` : null;
+  return [e.exemple ? `Simulation sur une pièce d'exemple : ${e.exemple}` : null, echantillons].filter(Boolean).join("\n");
 }
 
 export function corpsDemandeSimulation(e: EntreeDemande): Record<string, unknown> {

@@ -9,7 +9,8 @@ import CaseConsentement from "@/components/CaseConsentement";
  * consentement. Plus de message libre : Lucas rappelle.
  */
 
-export type Formulaire = { name: string; phone: string; email: string; ville: string; codePostal: string; consentement: boolean };
+/** `echantillons` (site 3.0, lot E4) : la case « Recevoir les échantillons de ces matières » de la demande après un rendu. */
+export type Formulaire = { name: string; phone: string; email: string; ville: string; codePostal: string; consentement: boolean; echantillons?: boolean };
 
 export const CHAMP = "min-h-[48px] w-full rounded-[var(--rayon-sm)] border border-trait bg-white px-3.5 py-2.5 text-[16px] text-encre placeholder:text-encre-2/60 focus:border-encre focus:outline-none";
 export const FORMULAIRE_VIDE: Formulaire = { name: "", phone: "", email: "", ville: "", codePostal: "", consentement: false };

@@ -311,6 +311,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
         references: refs,
         echec: depuisEchec && etat.photo ? { photo: etat.photo, raison: echecGeneration?.raison ?? "inconnue" } : null,
         exemple: depuisEchec ? etat.exemple : rendu?.exemple,
+        echantillons: !depuisEchec && !!formulaire.echantillons,
         jetonCaptcha,
         acquisition: acquisitionPourEnvoi(),
         consentement: consentementPourEnvoi(formulaire.consentement, "simulateur"),
@@ -500,7 +501,7 @@ export default function Simulateur({ zones, tarifs = null, exemples = [] }: { zo
         ) : null}
 
         {ecran === 4 && rendu ? (
-          <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres}>
+          <EcranResultat rendu={rendu} rendus={etat.rendus} photo={etat.photo} titre={titrePiece(zones, etat.projet)} fondu={fondu} onFonduFini={() => setFondu(false)} onChoisirRendu={(id) => { setFondu(false); setRenduAffiche(id); }} onAutresMatieres={autresMatieres} selections={etat.selections} onEchantillons={envoye ? undefined : () => setFormulaire((f) => ({ ...f, echantillons: true }))}>
             <DemandeApresRendu
               projet={projet.id}
               rendu={rendu}

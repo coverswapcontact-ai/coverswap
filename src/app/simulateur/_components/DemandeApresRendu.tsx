@@ -24,6 +24,10 @@ export type DemandeEnvoyee = { lienEspace: string | null; phraseRappel: string |
  * consentement), « Être rappelé » (facultatif), UN bouton principal « Recevoir mon devis », WhatsApp en secondaire
  * avec un message qui cite la simulation. Après l'envoi : « Votre espace est prêt » (`EspacePret`). Le simulateur
  * garde l'envoi (`onEnvoyer`) : cette partie ne parle pas au réseau.
+ *
+ * Site 3.0, lot E4 : la racine porte `id="demande"` (cible de « Recevoir ces échantillons chez moi », sous le cartel
+ * de la composition), et la demande, une case « Recevoir les échantillons de ces matières chez moi » (cochée par ce
+ * lien, `formulaire.echantillons`) qui ajoute les références et leurs zones au message de la demande.
  */
 export function DemandeApresRendu(props: {
   projet: string;
@@ -60,11 +64,15 @@ export function DemandeApresRendu(props: {
   }, [cle]);
 
   if (envoye) {
-    return <EspacePret lienEspace={envoye.lienEspace} phraseRappel={envoye.phraseRappel} messageWhatsApp={messageWhatsAppSimulation(projet, rendu.references)} onRecommencer={props.onRecommencer} />;
+    return (
+      <div id="demande" className="scroll-mt-4">
+        <EspacePret lienEspace={envoye.lienEspace} phraseRappel={envoye.phraseRappel} messageWhatsApp={messageWhatsAppSimulation(projet, rendu.references)} onRecommencer={props.onRecommencer} />
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
+    <div id="demande" className="scroll-mt-4 space-y-6">
       <Estimation famille={famille} formats={formats} format={format} onFormat={setFormat} estimation={estimation} />
       <form
         onSubmit={(e) => {
@@ -78,6 +86,15 @@ export function DemandeApresRendu(props: {
           <p className="text-[14.5px] leading-relaxed text-encre-2">Gratuit, {DELAI_REPONSE}, sans engagement. Votre espace s&apos;ouvre avec ce rendu.</p>
         </div>
         <ChampsContact prefixe="sim" formulaire={props.formulaire} onChange={props.onFormulaire} avecVille={props.avecVille} />
+        {rendu.references.length > 0 ? (
+          <label className="flex min-h-[44px] cursor-pointer items-start gap-3 text-[15px] leading-snug text-encre">
+            <input type="checkbox" name="echantillons" checked={!!props.formulaire.echantillons} onChange={(e) => props.onFormulaire({ ...props.formulaire, echantillons: e.target.checked })} className="mt-0.5 h-5 w-5 shrink-0 rounded border-trait accent-[var(--color-encre)]" />
+            <span>
+              Recevoir les échantillons de ces matières chez moi
+              <span className="mt-0.5 block text-[13.5px] text-encre-2">{rendu.references.map((r) => `${r.libelle} : ${r.ref}`).join(" · ")}</span>
+            </span>
+          </label>
+        ) : null}
         <Rappel choisi={creneau} onChoisir={setCreneau} />
         {props.captcha}
         <Bouton type="submit" plein occupe={props.occupe} libelleOccupe="Envoi…">
