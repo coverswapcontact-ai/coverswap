@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { Picto } from "@/components/espace/Illustrations";
 import { Bouton } from "@/components/simulation/Bouton";
 import { BoutonColle } from "@/components/simulation/BoutonColle";
 import { RESERVE_BOUTON_COLLE } from "@/components/simulation/reserve-bouton-colle";
 import { TuileFilm } from "@/components/simulation/TuileFilm";
 import { urlVignette } from "@/lib/simulateur/generation-client";
 import { MESSAGE_ANALYSE_SAUTEE, TITRES_VERDICT, zoneNonVisible, type EtatAnalyse, type EtatSimulateur } from "@/lib/simulateur/reprise";
-import { composantesDe, type PieceSimulateur } from "@/lib/simulateur/zones";
+import { composantesDe, pictoDeZone, type PieceSimulateur } from "@/lib/simulateur/zones";
 
 /**
  * Écran 3 — les matières : la photo en haut (rapport réel, jamais rognée) avec
@@ -19,6 +20,9 @@ import { composantesDe, type PieceSimulateur } from "@/lib/simulateur/zones";
  * bas, au-dessus de la zone de sécurité de l'iPhone. Aucun défilement
  * programmé : après un choix, le focus revient sur « Modifier » sans bouger la
  * page.
+ *
+ * Site 3.0, lot E2 : chaque zone sans matière montre son picto (`pictoDeZone`, celui de la pièce à défaut), 64 px ; une
+ * fois la matière choisie, la vignette du film prend sa place. Les rangées font 64 px au moins dans les deux états.
  */
 export type Selections = EtatSimulateur["selections"];
 
@@ -109,7 +113,12 @@ export function EcranMatieres({ piece, photo, rapport, selections, analyse, cons
           const raison = nonVisible ? "Non visible sur la photo" : bloque ? `${zonesMax} zones au plus par rendu` : null;
           return (
             <li key={zone.id} className={`rounded-[var(--rayon-md)] border bg-white p-3 transition-colors duration-[var(--duree-courte)] ${refusee ? "border-alerte-texte" : sel ? "border-encre" : "border-trait"} ${nonVisible ? "opacity-60" : ""}`}>
-              <div className="flex min-h-[56px] items-center justify-between gap-3">
+              <div className="flex min-h-[64px] items-center justify-between gap-3">
+                {sel ? null : (
+                  <span className="shrink-0">
+                    <Picto nom={pictoDeZone(zone.id, piece.id)} className="h-16 w-16" />
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   {sel ? (
                     <TuileFilm ref={sel.ref} nom={sel.nom} libelle={zone.libelle} vignette={urlVignette(sel.ref)} />

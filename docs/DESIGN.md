@@ -718,9 +718,31 @@ des effets, pas des couleurs d'interface. La signature trace à la couleur calcu
 - Les cartes de pièce sans photo (`CartesPieces`, l'espace) montrent le pictogramme de la famille (`DessinFamille
   enSvg`) au lieu du dessin au trait ; « Quelles photos prendre » (cuisine) montre le pictogramme de la cuisine, celui du
   plan de travail pour la prise du plan, à 96 px dans le cadre d'avant.
-- Les dessins de la salle de bain, du mobilier, du local professionnel et des murs sont supprimés ; reste
-  `CuisineDeFace`, aux jetons (`var(--color-*)`, la zone allumée en voile d'encre), pour l'écran Photo du simulateur
-  (lot E2).
+- Les dessins de la salle de bain, du mobilier, du local professionnel et des murs sont supprimés ; `CuisineDeFace`
+  aussi depuis le lot E2 (voir « Les pictos du simulateur »).
+
+## Les pictos du simulateur
+
+Lot E2 (énoncé, phase E point 1) : les pictos de la série 1 (5 familles, 4 plans) et de la série 2 (7 éléments, la
+cuisine en couloir) remplacent tout dessin au trait dans le choix de la pièce, de l'élément et de la forme. Images
+détourées, AVIF puis WebP en 128 et 256 px (`Picto`, `espace/Illustrations`), décoratives (`alt=""`), **64 px au
+moins** partout, jamais d'étiquette d'honnêteté.
+
+| Écran | Ce qui porte le picto | Taille |
+|---|---|---|
+| 1. Pièce | une carte sans photo prête : le picto de la pièce (`pictoDeLaPiece`, `lib/simulateur/projets`) | la largeur de la carte |
+| 1. Pièce | « Un élément précis ? » : sept boutons (portes, placards, plan de travail, meuble vasque, commode, porte d'entrée, réfrigérateur), 4 colonnes au téléphone, 7 dès 640 px | 64 px |
+| 2. Photo | le conseil « Toute la zone visible » : le picto de la pièce choisie | 64 px, 128 dès 640 px |
+| 3. Matières | chaque zone sans matière (`pictoDeZone` : la table `PICTO_DE_ZONE`, sinon le picto de la pièce) ; la vignette du film prend sa place une fois choisie, rangées de 64 px dans les deux états | 64 px |
+| 4. Estimation | le plan vu de dessus de chaque format de cuisine publié par le CRM (`plan-parallele` seulement si le CRM publie `parallele`), le picto de la famille sinon | 64 px |
+
+- Un élément est un raccourci : il choisit sa pièce et ouvre d'abord sa zone à l'écran des matières, sans état
+  « choisi » à lui. La porte d'entrée (portes du dressing) et le réfrigérateur (façades de cuisine) sont rattachés côté
+  site ; le moteur et les consignes du CRM ne changent pas.
+- Les libellés des éléments passent à la ligne avec une coupure de mot (`hyphens-auto`, la page est en `lang="fr"`) ;
+  « Réfrigérateur » tient sur une ligne à 360 px.
+- « De face » et « Lumière du jour » restent deux schémas d'interface (pas des pièces), à la couleur du texte
+  (`currentColor`) et aux jetons : plus aucune couleur écrite dans `EcranPhoto.tsx`.
 
 ## Ce qu'on a jeté de la maquette
 

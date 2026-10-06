@@ -176,14 +176,16 @@ export default function Simulateur({ zones, tarifs = null }: { zones: ZonesSimul
     },
   });
 
-  /* ── Écran 1 : la pièce (PIECE_CHOISIE par `marquerPiece`, au clic ou au montage pour un picto de l'accueil) ── */
-  const choisirPiece = (id: string) => {
+  /* ── Écran 1 : la pièce ou un élément précis (PIECE_CHOISIE par `marquerPiece`, au clic ou au montage pour un picto de l'accueil) ── */
+  const choisirPiece = (id: string, element: string | null = null) => {
     const transition = reduireEcran(ecran, { type: "piece-choisie", projet: id, projetPrecedent: etat.projet }, etat);
     // Autre pièce : ses matières ne valent plus, et l'analyse non plus (elle a été faite pour l'autre pièce ; `useAnalyse` la redemande, le CRM répond aussitôt s'il la connaît).
     mettreAJour({ projet: id, ...(transition.viderSelections ? { selections: {}, analyse: null } : {}) });
     setPieceChoisie(true);
     setBandeau(null);
     effacerEchec();
+    // Lot E2 : un élément précis (« Plan de travail »…) ouvre d'abord sa zone à l'écran des matières, comme `?element=`.
+    zoneDemandee.current = zoneDeLElement(element, id);
     marquerPiece(id);
     setEcran(transition.ecran);
   };

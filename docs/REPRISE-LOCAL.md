@@ -40,7 +40,8 @@ débordement à 360 px ; rouge #B3261E réservé aux actions.
 ## Phase E : le simulateur
 
 - E1, alléger `Simulateur.tsx` : fait (594 → 522 lignes ; `EcranGeneration.tsx`, `useFeuilleCatalogue.ts`).
-- E2 à E5 : à venir.
+- E2, les pictos partout : fait (écrans Pièce, Photo, Matières, Estimation ; `CuisineDeFace` supprimé ; `docs/DESIGN.md` « Les pictos du simulateur »).
+- E3 à E5 : à venir.
 
 ## Phase F : SEO et performance
 
@@ -1286,3 +1287,69 @@ zones) ; rendu pendant la génération (films dans l'ordre des zones, lecture de
 
 **Problèmes** : aucun. Vérification visuelle des écrans 1 à 3 faite avec E2 (l'écran d'attente et le secours ne
 s'atteignent pas en local sans lancer de génération : couverts par les rendus des tests).
+
+## E2 — les pictos partout (06/10/2026)
+
+**Fait** (aucune image générée ni régénérée : les 17 pictos préparés en B4 et à la mission 19 ; aucun envoi)
+- `lib/simulateur/projets.ts` : `picto` par pièce (série 1) et `pictoDeLaPiece` (cuisine à défaut, comme
+  `getProject`). `lib/simulateur/zones.ts` : `PICTO_DE_ZONE` (8 zones : plan de travail, meuble vasque, murs carrelés,
+  portes du dressing, commode/buffet, mobilier et rangements pro, habillage mural) et `pictoDeZone` (repli sur le
+  picto de la pièce pour toute autre zone ou une zone nouvelle du CRM).
+- **Écran 1** : `CartesPieces` prend `pictoDeLaPiece` (plus de table de familles à part) ; sous les cartes,
+  « Un élément précis ? » : les sept éléments de `lib/simulateur/elements` (ceux de l'accueil), boutons de 64 px de
+  picto + libellé, 4 colonnes au téléphone, 7 dès 640 px. Toucher un élément = `choisirPiece(piece, element)` :
+  PIECE_CHOISIE inchangé (aucune méta nouvelle), et `zoneDemandee` reçoit sa zone, ouverte d'abord à l'écran 3 comme
+  `?element=` (vérifié : « Placards » → la feuille « Portes du dressing » s'ouvre). Un élément dont la pièce n'est
+  plus publiée par le CRM n'est pas proposé.
+- **Écran 2** : le conseil « Toute la zone visible » montre le picto de la pièce choisie (64 px, 128 dès 640 px) au
+  lieu de la cuisine au trait, et son texte vaut pour toutes les pièces (« Tout ce qui recevra le film doit être dans
+  le cadre, en entier. » ; il citait « Meubles, plan, crédence » même pour une salle de bain). « De face » et
+  « Lumière du jour » restent des schémas d'interface, en `currentColor` et jetons (plus aucun hexadécimal).
+- **Écran 3** : chaque zone sans matière montre son picto (64 px) ; une matière choisie prend sa place (vignette du
+  film) ; rangées de 64 px dans les deux états.
+- **Estimation** : `FORMES_CUISINE` gagne `parallele` (picto `plan-parallele`), affiché seulement si le CRM publie un
+  format `parallele` — aujourd'hui il publie `une-rangee`, `en-l`, `ilot` (`tarifs-publics.ts`).
+- `CuisineDeFace` (et `ZoneCuisine`) supprimés d'`espace/Illustrations.tsx` : plus aucun dessin de pièce au trait.
+- `docs/DESIGN.md` : « Les pictos du simulateur » ; la note de l'espace client mise à jour.
+
+**Décisions prises seul**
+1. Les éléments de l'écran 1 sont des **raccourcis** sans état « choisi » (ils font avancer, comme les pictos de
+   l'accueil) ; la carte de la pièce reste marquée choisie au retour.
+2. Choisir une carte de pièce **sans** élément efface la zone demandée (avant : une zone venue de `?element=`
+   survivait à un nouveau clic sur la carte) : le dernier choix l'emporte.
+3. Picto d'une zone **remplacé** par la vignette du film une fois la matière choisie (les deux côte à côte ne
+   tenaient pas à 390 px avec « Retirer » et « Modifier »).
+4. Libellés en `text-[12px]` au téléphone avec `hyphens-auto` : « Réfrigérateur » coupait en « Réfrigérateu / r ».
+5. Les schémas « De face » et « Lumière du jour » gardés (le plan : « schémas en currentColor ») : ce ne sont pas des
+   choix de pièce, d'élément ni de forme, et aucun picto ne les montre.
+
+**Pour Lucas** : pour montrer la cuisine en couloir dans l'estimation, publier un format `parallele` côté CRM
+(`modifier_tarifs` / `tarifs-publics.ts`). Risque signalé (plan) : l'analyse du CRM peut griser une zone rattachée
+(réfrigérateur sur « Façades » qui exclut l'électroménager inox ou verre ; porte d'entrée sur « Portes du dressing ») ;
+le message « non visible sur la photo » existe déjà, consignes inchangées.
+
+**Tests** : 491 → 499, tous réussis. Nouveau `src/lib/simulateur/pictos.test.ts` (8) : picto de chaque pièce et
+repli, mêmes pictos que les familles de l'espace, 17 pictos utilisés et leurs 4 fichiers (AVIF/WebP, 128/256) ;
+chaque élément → pièce et zone de `ZONES_REPLI`, porte d'entrée et réfrigérateur rattachés ; `PICTO_DE_ZONE` sur des
+zones connues, repli pour une zone ou une pièce nouvelles, fichiers de toutes les zones ; écran 1 (sept boutons,
+picto 64 px `alt=""`, libellé, 44 px, élément masqué sans sa pièce, `choisirPiece(piece, element)` →
+`zoneDeLElement`) ; écran 3 (picto des zones sans matière, rangées de 64 px) ; écran 2 (picto de la pièce, texte
+général, deux schémas `currentColor`, aucun hexadécimal) ; estimation (3 `<svg>` pour les formats publiés
+aujourd'hui, `plan-parallele` seulement avec `parallele`, famille sinon) ; 64 px à chacun des 6 appels ; plus aucun
+`CuisineDeFace` dans les sources. Adapté en gardant son intention : `theme.test.ts` (cartes → `pictoDeLaPiece` ;
+`CuisineDeFace` rejoint la liste des dessins retirés). `npx eslint .` et `npm run build` passent (546 pages).
+`Simulateur.tsx` : 522 → 524 lignes.
+
+**Vérification visuelle** : build local, `next start -p 3100` arrêté ensuite ; Playwright + Edge (toute requête
+hors GET/HEAD, `/api/simulate*`, `/api/simulation/*` et le CRM hors images coupés : **0 requête coupée**, aucune
+erreur de page). À 390 et 1 440 px : écran 1 (cartes + éléments), « Placards » → écran 2 (« Votre photo du
+meuble », picto du mobilier), une image de la bibliothèque (`prep/meubles-dressing-avant-1024.jpg`, un avant généré
+de la série 2, jamais une photo de client) chargée par « Choisir dans mes photos » → écran 3 : la feuille « Portes du
+dressing » ouverte d'abord, puis les trois zones et leurs pictos (placard coulissant, mobilier, commode) à 64 px.
+Aucun bouton de génération touché. Aucun débordement à 360, 390 ni 1 440 px ; les sept libellés tiennent à 360 px.
+Captures dans le dossier de travail (pas dans le dépôt).
+
+**Problèmes**
+- En local, la feuille des matières affiche « Visuel indisponible » (vignettes du CRM non servies à ce build local) :
+  sans rapport avec le lot, à revoir sur la prévisualisation.
+- L'écran 4 (estimation) ne s'atteint pas sans génération : couvert par les rendus des tests.

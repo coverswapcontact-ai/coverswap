@@ -325,10 +325,10 @@ describe("site 3.0, lot C6 : l'espace client aux jetons", () => {
     assert.doesNotMatch(ESPACE.map(lire).join("\n"), /ton="rouge"/);
   });
 
-  test("les dessins des pièces ont laissé la place aux pictogrammes ; la cuisine de face (écran Photo du simulateur) aux jetons", () => {
+  test("les dessins des pièces ont laissé la place aux pictogrammes, la cuisine de face comprise (lot E2)", () => {
     const illustrations = lire(join(DOSSIER_ESPACE, "Illustrations.tsx"));
     const toutes = [...fichiers(SRC, ".tsx"), ...fichiers(SRC, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f));
-    for (const retire of ["SalleDeBainDeFace", "MobilierDeFace", "ProfessionnelDeFace", "MursDeFace"]) {
+    for (const retire of ["SalleDeBainDeFace", "MobilierDeFace", "ProfessionnelDeFace", "MursDeFace", "CuisineDeFace"]) {
       for (const f of toutes) assert.ok(!lire(f).includes(retire), `${retire} dans ${nom(f)}`);
     }
     assert.doesNotMatch(illustrations, /rgba|#[0-9a-f]{3,8}\b/i);
@@ -336,7 +336,10 @@ describe("site 3.0, lot C6 : l'espace client aux jetons", () => {
     assert.doesNotMatch(photos, /CuisineDeFace/);
     assert.match(photos, /<Picto nom=\{pictoDeLaPrise\(prise\.cadre\)\} className="h-24 w-24" \/>/);
     assert.match(photos, /cadre === "plan" \? PICTOS_ELEMENTS\["plan-de-travail"\] : PICTOS_FAMILLES\.CUISINE/);
-    assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /<DessinFamille famille=\{FAMILLES\[p\.id\] \?\? "CUISINE"\} enSvg className="h-full w-full" \/>/);
+    // Lot E2 : le picto de la pièce vient de `pictoDeLaPiece` (les mêmes pictos que les familles de l'espace).
+    assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /<Picto nom=\{pictoDeLaPiece\(p\.id\)\} enSvg className="h-full w-full" \/>/);
+    // Lot E2 : la cuisine de face, dernier dessin de pièce, est supprimée (l'écran Photo montre le picto de la pièce).
+    assert.ok(!illustrations.includes("CuisineDeFace"), "CuisineDeFace dans Illustrations.tsx");
   });
 
   test("les montants : chiffres alignés, dans la police du texte", () => {

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { DessinFamille } from "@/components/espace/Illustrations";
+import { Picto } from "@/components/espace/Illustrations";
 import { photoDePiece, type PieceId } from "@/lib/images-pieces";
 import { imagePreparee } from "@/lib/images-preparees";
+import { pictoDeLaPiece } from "@/lib/simulateur/projets";
 import { PastillesMatieres } from "@/components/ambiances/PastillesMatieres";
 import { Etiquette } from "./Etiquette";
 import { Photo } from "./Photo";
@@ -28,7 +29,8 @@ import { Photo } from "./Photo";
  * en `lazy`.
  *
  * Site 3.0, lot C6 : sans photo, le pictogramme de la famille (`DessinFamille enSvg`, celui de l'espace client) au lieu
- * de l'ancien dessin au trait ; toujours un `<svg>` par carte, gris tant que la carte n'est pas choisie.
+ * de l'ancien dessin au trait ; toujours un `<svg>` par carte, gris tant que la carte n'est pas choisie. Lot E2 : le picto
+ * vient de la pièce (`pictoDeLaPiece`, `lib/simulateur/projets`), une seule table pour le simulateur et l'espace.
  *
  * Mission 19 : sur une photo, les pastilles des vraies matières de l'ambiance (`ambiances/PastillesMatieres`), en bas à
  * droite ; leurs noms au survol ou à l'appui.
@@ -39,9 +41,6 @@ import { Photo } from "./Photo";
  * (une fonction ne passe pas du serveur au navigateur).
  */
 export type PieceCarte = { id: string; libelle: string; description: string };
-
-/** La famille de pictogramme de chaque pièce du simulateur (`PICTOS_FAMILLES` d'`espace/Illustrations`). */
-const FAMILLES: Record<string, string> = { cuisine: "CUISINE", "salle-de-bain": "SDB", meubles: "MEUBLES", "mur-plafond": "MURS", professionnel: "PRO" };
 
 /** L'attribut `sizes` d'une carte : deux colonnes sur téléphone, trois (≈ 240 px) à partir de 640 px. */
 const TAILLES_CARTE = "(min-width: 640px) 240px, 45vw";
@@ -73,7 +72,7 @@ export function CartesPieces({ pieces, valeur = null, onChoisir, nom = "Pièce",
               </span>
             ) : (
               <span className={`block aspect-[120/92] w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond transition-[filter,opacity] duration-[var(--duree-moyenne)] ease-[var(--ease)] ${choisie ? "" : "opacity-80 grayscale group-hover:opacity-100"}`}>
-                <DessinFamille famille={FAMILLES[p.id] ?? "CUISINE"} enSvg className="h-full w-full" />
+                <Picto nom={pictoDeLaPiece(p.id)} enSvg className="h-full w-full" />
               </span>
             )}
             <span className="mt-2 block text-[15.5px] leading-snug font-semibold text-encre">{p.libelle}</span>

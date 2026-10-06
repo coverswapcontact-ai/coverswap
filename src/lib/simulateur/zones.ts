@@ -7,6 +7,8 @@
  * page debout. Fonctions pures pour l'écran et pour `prepare`.
  */
 
+import { pictoDeLaPiece } from "./projets";
+
 export type ZoneSimulateur = { id: string; libelle: string; description: string; exclut: string[]; compose: string[] };
 export type PieceSimulateur = { id: string; libelle: string; titre: string; code: string; zones: ZoneSimulateur[] };
 export type ZonesSimulateur = { version: number; zonesMax: number; pieces: PieceSimulateur[] };
@@ -112,6 +114,26 @@ export function zonesMaxEnLettres(n: number): string {
 }
 
 /* ── Fonctions pures ──────────────────────────────────────────────── */
+
+/**
+ * Site 3.0, lot E2 : le picto d'une zone, à l'écran des matières. Seules les zones qu'un picto de la série 1 ou 2
+ * montre mieux que celui de leur pièce sont nommées ici ; les autres, et toute zone nouvelle publiée par le CRM,
+ * prennent le picto de la pièce (`pictoDeZone`).
+ */
+export const PICTO_DE_ZONE: Partial<Record<string, string>> = {
+  "plan-de-travail": "picto-plan-de-travail",
+  "meuble-vasque": "picto-meuble-vasque",
+  "carrelage-mural": "picto-murs",
+  "portes-dressing": "picto-placard-coulissant",
+  "meuble-complet": "picto-commode",
+  "mobilier-pro": "picto-mobilier",
+  "rangements-pro": "picto-placard-coulissant",
+  "habillage-mural": "picto-murs",
+};
+
+export function pictoDeZone(zoneId: string, pieceId: string): string {
+  return PICTO_DE_ZONE[zoneId] ?? pictoDeLaPiece(pieceId);
+}
 
 export function pieceDe(zones: ZonesSimulateur, projetId: string): PieceSimulateur {
   return zones.pieces.find((p) => p.id === projetId) ?? zones.pieces[0];

@@ -1,77 +1,9 @@
 /**
- * Les images de l'espace client : les pictogrammes (familles, éléments, plans de cuisine), le logo réexporté et les
- * petites icônes d'interface au trait. Site 3.0, lot C6 : les dessins au trait des pièces (salle de bain, mobilier,
- * local professionnel, murs) ont cédé la place aux pictogrammes ; reste la cuisine de face, que l'écran Photo du
- * simulateur montre encore (lot E2), aux jetons du thème (`var(--color-*)`), plus aucune couleur écrite ici.
+ * Les images de l'espace client et du simulateur : les pictogrammes (familles, éléments, plans de cuisine), le logo
+ * réexporté et les petites icônes d'interface au trait. Site 3.0, lot C6 : les dessins au trait des pièces (salle de
+ * bain, mobilier, local professionnel, murs) ont cédé la place aux pictogrammes ; lot E2 : la cuisine de face aussi
+ * (l'écran Photo du simulateur montre le picto de la pièce). Plus aucun dessin de pièce ici.
  */
-
-const ENCRE = "var(--color-encre)";
-const MEUBLE = "var(--color-fond-2)";
-const CLAIR = "var(--color-fond)";
-const TRAIT = "var(--color-trait)";
-const SOL = "var(--color-encre-2)";
-
-export type ZoneCuisine = "meubles-hauts" | "meubles-bas" | "plan-de-travail" | "credence";
-
-/** Cuisine de face ; `allume` : zones recouvertes (voile d'encre léger) ; `cadre` : ce que la photo doit contenir. */
-export function CuisineDeFace({ allume = [], cadre, className }: { allume?: string[]; cadre?: "ensemble" | "hauts" | "bas" | "plan" | "detail"; className?: string }) {
-  const on = (zone: ZoneCuisine) => allume.includes(zone);
-  /** Une zone allumée : l'encre, en voile (16 %, 28 % pour le plan) et en trait plein. */
-  const zone = (z: ZoneCuisine, fond: string, opacite = 0.16) => (on(z) ? { fill: ENCRE, fillOpacity: opacite, stroke: ENCRE } : { fill: fond, stroke: ENCRE });
-  const cadres: Record<string, { x: number; y: number; w: number; h: number }> = {
-    ensemble: { x: 3, y: 3, w: 114, h: 86 },
-    hauts: { x: 5, y: 5, w: 110, h: 31 },
-    bas: { x: 5, y: 50, w: 110, h: 39 },
-    plan: { x: 4, y: 40, w: 112, h: 20 },
-    detail: { x: 60, y: 57, w: 26, h: 22 },
-  };
-  const c = cadre ? cadres[cadre] : null;
-  return (
-    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
-      {/* Mur, crédence */}
-      <rect x="8" y="32" width="104" height="20" {...(on("credence") ? { fill: ENCRE, fillOpacity: 0.16, stroke: ENCRE } : { fill: CLAIR, stroke: TRAIT })} strokeWidth="0.8" strokeDasharray={on("credence") ? undefined : "2 2"} />
-      {/* Meubles hauts */}
-      {[
-        [8, 21],
-        [29, 21],
-        [74, 19],
-        [93, 19],
-      ].map(([x, w]) => (
-        <g key={`h${x}`}>
-          <rect x={x} y="8" width={w} height="24" rx="0.8" {...zone("meubles-hauts", MEUBLE)} strokeWidth="1.1" />
-          <line x1={x + w / 2 + (x < 60 ? 6 : -6)} y1="25" x2={x + w / 2 + (x < 60 ? 6 : -6)} y2="29" stroke={ENCRE} strokeWidth="1.1" />
-        </g>
-      ))}
-      {/* Hotte */}
-      <path d="M56 8 h12 v10 l5 8 h-22 l5 -8 z" fill={CLAIR} stroke={ENCRE} strokeWidth="1.1" />
-      {/* Plan de travail */}
-      <rect x="6" y="52" width="108" height="4" rx="0.6" {...zone("plan-de-travail", TRAIT, 0.28)} strokeWidth="1.1" />
-      {/* Évier et robinet */}
-      <path d="M36 52 v-6 q0 -3 3 -3 h3" stroke={ENCRE} strokeWidth="1.1" />
-      <rect x="31" y="51" width="14" height="1.6" fill={SOL} />
-      {/* Meubles bas */}
-      {[
-        [8, 26],
-        [34, 26],
-        [60, 26],
-      ].map(([x, w]) => (
-        <g key={`b${x}`}>
-          <rect x={x} y="56" width={w} height="28" rx="0.8" {...zone("meubles-bas", MEUBLE)} strokeWidth="1.1" />
-          <line x1={x + w - 5} y1="60" x2={x + w - 5} y2="66" stroke={ENCRE} strokeWidth="1.1" />
-        </g>
-      ))}
-      {[56, 65.3, 74.6].map((y) => (
-        <g key={`t${y}`}>
-          <rect x="86" y={y} width="26" height="9.3" rx="0.8" {...zone("meubles-bas", MEUBLE)} strokeWidth="1.1" />
-          <line x1="95" y1={y + 3} x2="103" y2={y + 3} stroke={ENCRE} strokeWidth="1.1" />
-        </g>
-      ))}
-      {/* Plinthe, sol */}
-      <line x1="8" y1="86" x2="112" y2="86" stroke={SOL} strokeWidth="1" />
-      {c ? <rect x={c.x} y={c.y} width={c.w} height={c.h} rx="2.5" stroke={ENCRE} strokeWidth="1.6" strokeDasharray="4 3" /> : null}
-    </svg>
-  );
-}
 
 /**
  * Mission 19 : les pictogrammes en image (« petites maquettes » détourées, fond transparent, AVIF + WebP en deux
