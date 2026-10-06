@@ -1,15 +1,15 @@
 # Direction artistique du site — site 3.0, « La Revue »
 
 Mission 21, lots B1 (jetons, polices, grain, contrastes), B2 (le rouge réservé aux actions), B3 (les teintes des
-prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`) et C5
-(`/realisations`).
+prestations, les règles, les composants de base, ce qu'on a jeté de la maquette), B5 (le gabarit), B6 (l'accueil), C1 (les pages de prestation), C2 (`/pro`), C3 (`/comment-ca-marche`, les blocs aux filets), C4 (`/inspirations`), C5
+(`/realisations`) et C6 (l'espace client).
 
 Le site est un artisan qui montre ce qu'il fait et donne envie d'essayer, pas un magazine : la maquette
 (`maquette-11-la-revue.html`) donne la grammaire (titres serif très grands, filets fins, grands numéros, cartels de
 matière, blocs papier et encre), pas un gabarit à recopier.
 
 Plan : [Jetons et contrastes](#jetons-et-contrastes) · [Les règles](#les-règles) · [Le rouge
-réservé aux actions](#le-rouge-réservé-aux-actions) · [Les composants de base](#les-composants-de-base) · [Ce qu'on a
+réservé aux actions](#le-rouge-réservé-aux-actions) · [Les composants de base](#les-composants-de-base) · [L'espace client](#lespace-client) · [Ce qu'on a
 jeté de la maquette](#ce-quon-a-jeté-de-la-maquette).
 
 ## Jetons et contrastes
@@ -24,10 +24,9 @@ Les jetons vivent dans le bloc `@theme` de `src/app/globals.css`, et nulle part 
   lots suivants) lisent ce même bloc par `lireJetons()` de `scripts/jetons.mjs`, qui exporte aussi `contraste()` ;
 - pas de `jetons.ts`, pas de `tailwind.config` : `theme.test.ts` y veille.
 
-Exceptions connues, à résorber : l'espace client (`src/components/espace/`) écrit encore ses couleurs en dur (table
-de correspondance et remplacement au lot C6) ; les dessins au trait d'`espace/Illustrations.tsx` et
-d'`EcranPhoto.tsx` aussi (lots C6 et E2). `--color-google` garde le gris imposé par Google pour la mention « Google
-Maps ».
+Exceptions connues, à résorber : le dessin au trait d'`EcranPhoto.tsx` (lot E2). L'espace client
+(`src/components/espace/`) est passé aux jetons au lot C6 (voir « L'espace client »). `--color-google` garde le gris
+imposé par Google pour la mention « Google Maps ».
 
 ### Les couleurs
 
@@ -207,10 +206,10 @@ papier et encre.
 - **La marque** : le logo (`Logo.tsx`), losange et « Swap ».
 
 Nulle part ailleurs : ni un titre, ni un grand numéro, ni un surtitre, ni une sélection, ni un favori, ni une erreur.
-`src/app/theme.test.ts` (« le rouge réservé aux actions ») relit toutes les sources `.ts`/`.tsx` hors tests et hors
-espace client et échoue si une classe au rouge (`bg-`, `text-`, `border-`, `ring-`, `outline-`, `fill-`,
-`stroke-`… `accent`), `--color-accent`, `#B3261E` ou `#8F1E18` paraît hors de ces quatre fichiers. L'espace client
-(`src/components/espace/`) y entre au lot C6, quand ses couleurs écrites en dur passent aux jetons.
+`src/app/theme.test.ts` (« le rouge réservé aux actions ») relit toutes les sources `.ts`/`.tsx` hors tests, espace
+client compris depuis le lot C6, et échoue si une classe au rouge (`bg-`, `text-`, `border-`, `ring-`, `outline-`,
+`fill-`, `stroke-`… `accent`), `--color-accent`, `#B3261E` ou `#8F1E18` paraît hors de ces quatre fichiers. Les
+boutons principaux de l'espace prennent `TEINTE_PRINCIPALE` de `Bouton.tsx` : aucun fichier de plus.
 
 ### Les boutons
 
@@ -547,6 +546,62 @@ Lot C4, `src/app/inspirations/page.tsx`, ordre dans `_components/ordre.ts`, filt
   sont des liens de page (pas `Link`, dont la navigation ne pose pas `:target` ; le « Vue dans » de `/matieres`, qui
   navigue par le routeur, est à passer en lien de page avec la phase D). La page passe de 18 800 à 3 700 px de haut à
   1 440 px de large, et mesure 8 800 px à 390 px.
+
+## L'espace client
+
+Lot C6, `src/components/espace/` (énoncé, § C.2) : **les écrans prennent les jetons, rien d'autre ne change** (formes,
+tailles, textes et logique de la mission 18 intacts : étapes, `devisASigner`, `prochainPas`, paiement). Testé par
+`theme.test.ts` (« lot C6 ») : aucune valeur hexadécimale ni couleur de la palette Tailwind dans le dossier (aucune
+exception à ce jour), le rouge sur les boutons principaux seulement.
+
+### La table de correspondance
+
+| Valeur d'avant | Jeton | Où |
+|---|---|---|
+| `#1A1A1A` | `encre` | texte, contours, boutons et pastilles pleins à l'encre, focus |
+| `#333` (appui sur l'encre) | `encre-survol` | |
+| `#111` | `sombre` | le plein écran d'une simulation |
+| `#3F3B36` | `encre` | texte des annonces, quasi noir |
+| `#4F4A44`, `#5F5A53`, `#6B665F` | `encre-2` | texte secondaire (6,14:1 sur le blanc, 4,78 sur fond-2) |
+| `#8A857E` | `encre-2` | texte, placeholder, contour des cases à cocher, pastille du cadenas (blanc dessus : 6,14:1) — l'ancien gris tenait 3,6:1 |
+| `#9A958E` | `encre-2/70` | libellé d'un onglet pas encore ouvert (3,16:1 au lieu de 2,9) |
+| `#BDB8B0` | `trait` (soulignés, contours des pastilles de coche), `encre-2` (placeholder) | |
+| `#C9C4BC`, `#CFCAC2`, `#D3CFC8`, `#E2DFD9`, `#E3DFD8`, `#E6E3DD`, `#ECE9E3`, `#EEEBE6` | `trait` | bordures, séparateurs, étoiles vides |
+| `#DDD9D2`, `#D9D6D0` | `trait` | appui sur fond-2, bouton principal désactivé (comme `Bouton`) |
+| `#F5F4F1`, `#F6F5F2`, `#F7F6F3`, `#FAF9F7` | `fond` | le fond de l'espace, cadres des pictogrammes, appuis légers |
+| `#ECEAE5`, `#F1EFEA`, `#F2F0EC`, `#E9E6E0`, `#EEEBE6` (fond) | `fond-2` | pastilles, bulles, appuis |
+| `#FFFFFF`, `white` | `blanc` | les cartes, le texte sur l'encre ou le vert |
+| `#1F7A4D`, `#17563A`, `#1F6B45`, `#2F5E46`, `#3F5F4E` | `succes` | validé, payé, signé (blanc dessus : 6,70:1) |
+| `#E7F3EC`, `#F3FAF6` ; `#BFDCCB` | `succes-fond` ; `border-succes/30` | |
+| `#FFF1C7`, `#FFF4DB`, `#FFF4E0`, `#FFF8EC`, `#FBEFD9`, `#F2EADB` | `alerte-fond` | avertissements (coordonnées à compléter, aperçu, en cours) |
+| `#5C4200`, `#6B4A00`, `#8A4B00`, `#E08A00` ; `#F0C98A` | `alerte-texte` ; `border-alerte-texte/40` | |
+| `#FBE9E7` ; `#8F1D12`, `#A5281B`, `#8A2A00`, `#C0392B` | `alerte-fond` ; `alerte-texte` | erreurs : le brun, jamais le rouge |
+| `#CC0000`, `#A80000` sur un **bouton principal** | `TEINTE_PRINCIPALE` (`accent`, `accent-survol`) | `BoutonPrincipal`, `LienPrincipal`, « Réessayer » |
+| `#CC0000`, `#B00000` ailleurs | `encre` | icône du téléphone, trait de l'onglet actif, point « prochaine étape », puces, étoiles, « Ouvrir », lien du PDF, pastilles « Nouveau », surtitres (ton `fort`), « Copier » |
+| `#CC0000` sur le « à éviter » des conseils photo | `alerte-texte` | la croix d'un mauvais exemple (blanc dessus : 8,60:1) |
+| `#FDECEC` / `#9E1A1A` (« À vous », « Nouveau ») | `bg-encre text-blanc` | |
+| `#EEF0F7` / `#2F3D6B` (« CoverSwap ») | `bg-fond-2 text-encre` | |
+| `black/10`, `black/55` | `encre/10`, `sombre/55` | liserés des vignettes, bandeau d'envoi sur une photo |
+
+Restent en `rgba()` : les ombres portées (`rgba(26,26,26,…)`) et le reflet blanc du « contre-jour » d'un conseil photo,
+des effets, pas des couleurs d'interface. La signature trace à la couleur calculée de sa toile (`text-encre`).
+
+### Ce qui a bougé avec la règle du rouge
+
+- Une action principale rouge par écran : sur « Contact », « Envoyer mon message » reste rouge et « Appeler » passe à
+  l'encre pleine (les deux étaient rouges).
+- Le surtitre `ton="rouge"` devient `ton="fort"` (l'encre) : « Donner mon accord », « Acompte à régler »…
+- Les montants (devis, lignes, acompte, solde, paiement) passent en `font-sans tabular-nums` (comme `BlocPrix`), les
+  totaux gardent leur taille ; dans une phrase, le montant est en `tabular-nums`.
+
+### Les pictogrammes
+
+- Les cartes de pièce sans photo (`CartesPieces`, l'espace) montrent le pictogramme de la famille (`DessinFamille
+  enSvg`) au lieu du dessin au trait ; « Quelles photos prendre » (cuisine) montre le pictogramme de la cuisine, celui du
+  plan de travail pour la prise du plan, à 96 px dans le cadre d'avant.
+- Les dessins de la salle de bain, du mobilier, du local professionnel et des murs sont supprimés ; reste
+  `CuisineDeFace`, aux jetons (`var(--color-*)`, la zone allumée en voile d'encre), pour l'écran Photo du simulateur
+  (lot E2).
 
 ## Ce qu'on a jeté de la maquette
 

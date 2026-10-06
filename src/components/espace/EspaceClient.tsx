@@ -10,6 +10,7 @@ import { EtapeSimulations } from "./EtapeSimulations";
 import { MesCoordonnees, PastilleCoordonnees } from "./Coordonnees";
 import { CataloguePage, Contact, EcranConfirmation, MesDocuments, MesProjets, NouveauProjet, ProjetConsultation } from "./EspaceCompte";
 import { DessinFamille, IconeAppareil, IconeCadenas, IconeCoche, IconeDevis, IconePaiement, IconeProjet, IconeSimulation, IconeTelephone, Logo } from "./Illustrations";
+import { TEINTE_PRINCIPALE } from "@/components/simulation/Bouton";
 import { Annonce, BoutonPrincipal, FOCUS, Verrou, cx } from "./ui";
 
 /**
@@ -255,8 +256,8 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
   const avecOnglets = dansUnProjet && !fige && etat !== null;
 
   return (
-    <div className="min-h-[100dvh] bg-[#F5F4F1] text-[#1A1A1A] [color-scheme:light]">
-      <header className="sticky top-0 z-30 bg-[#F5F4F1]/95 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+    <div className="min-h-[100dvh] bg-fond text-encre [color-scheme:light]">
+      <header className="sticky top-0 z-30 bg-fond/95 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="mx-auto flex max-w-xl items-center justify-between gap-3 px-4 py-2">
           <button type="button" onClick={() => (confirmation ? undefined : aller(etat ? "accueil" : "projets"))} aria-label="Accueil de votre espace CoverSwap" className={cx("-ml-1 rounded-xl p-1", FOCUS)}>
             <Logo />
@@ -264,30 +265,30 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
           <a
             href={`tel:${marque.telephoneLien}`}
             aria-label={`Appeler CoverSwap au ${marque.telephone}`}
-            className={cx("flex min-h-[44px] items-center gap-2 rounded-full border border-[#D3CFC8] bg-white px-4 text-[15.5px] font-semibold text-[#1A1A1A] shadow-[0_1px_2px_rgba(26,26,26,0.06)] active:bg-[#F2F0EC]", FOCUS)}
+            className={cx("flex min-h-[44px] items-center gap-2 rounded-full border border-trait bg-blanc px-4 text-[15.5px] font-semibold text-encre shadow-[0_1px_2px_rgba(26,26,26,0.06)] active:bg-fond-2", FOCUS)}
           >
-            <span className="text-[#CC0000]">
+            <span className="text-encre">
               <IconeTelephone />
             </span>
             Appeler
           </a>
         </div>
-        {client.apercu ? <p className="bg-[#FFF1C7] px-4 py-2 text-center text-[14px] font-medium text-[#5C4200]">Aperçu&nbsp;: l&apos;espace tel que votre client le voit. Rien n&apos;est enregistré, vos visites ne comptent pas.</p> : null}
-        {!enLigne ? <p className="bg-[#1A1A1A] px-4 py-2 text-center text-[14px] text-white">Pas de réseau&nbsp;: vous voyez la dernière version. Rien n&apos;est perdu.</p> : null}
+        {client.apercu ? <p className="bg-alerte-fond px-4 py-2 text-center text-[14px] font-medium text-alerte-texte">Aperçu&nbsp;: l&apos;espace tel que votre client le voit. Rien n&apos;est enregistré, vos visites ne comptent pas.</p> : null}
+        {!enLigne ? <p className="bg-encre px-4 py-2 text-center text-[14px] text-blanc">Pas de réseau&nbsp;: vous voyez la dernière version. Rien n&apos;est perdu.</p> : null}
         {/* Dans un projet : son nom, et le chemin discret vers tous ses projets. */}
         {!confirmation && etat && vue !== "projets" ? (
           <div className="mx-auto flex max-w-xl items-center gap-2 px-4 pb-1.5">
-            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] shrink-0 items-center gap-1 rounded-lg px-1 text-[15px] font-medium whitespace-nowrap text-[#4F4A44] active:bg-[#ECEAE5]", FOCUS)}>
+            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] shrink-0 items-center gap-1 rounded-lg px-1 text-[15px] font-medium whitespace-nowrap text-encre-2 active:bg-fond-2", FOCUS)}>
               <span aria-hidden className="text-[19px] leading-none">‹</span> Mes projets
             </button>
-            {(VUES_COMPTE as string[]).includes(vue) ? null : <span className="min-w-0 truncate text-[15px] font-semibold text-[#1A1A1A]">· {etat.nomProjet ?? etat.projet}</span>}
+            {(VUES_COMPTE as string[]).includes(vue) ? null : <span className="min-w-0 truncate text-[15px] font-semibold text-encre">· {etat.nomProjet ?? etat.projet}</span>}
             {/* Ses coordonnées, visibles dans tout le projet : orange tant qu'il manque quelque chose, vert ensuite. */}
             {!fige && !(VUES_COMPTE as string[]).includes(vue) ? <PastilleCoordonnees etat={etat} actif={vue === "coordonnees"} onOuvrir={() => aller("coordonnees")} /> : null}
           </div>
         ) : null}
         {!confirmation && !etat && vue !== "projets" && (VUES_COMPTE as string[]).includes(vue) ? (
           <div className="mx-auto flex max-w-xl items-center px-4 pb-1.5">
-            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] items-center gap-1 rounded-lg px-1 text-[15px] font-medium text-[#4F4A44] active:bg-[#ECEAE5]", FOCUS)}>
+            <button type="button" onClick={allerMesProjets} className={cx("-ml-1 flex min-h-[40px] items-center gap-1 rounded-lg px-1 text-[15px] font-medium text-encre-2 active:bg-fond-2", FOCUS)}>
               <span aria-hidden className="text-[19px] leading-none">‹</span> Mes projets
             </button>
           </div>
@@ -296,9 +297,9 @@ export default function EspaceClient({ jeton, baseApi, apercu, projetInitial }: 
 
       <main className={cx("mx-auto max-w-xl px-4 pt-1", avecOnglets ? "pb-[calc(6.25rem+env(safe-area-inset-bottom))]" : "pb-[calc(2rem+env(safe-area-inset-bottom))]")}>
         {contenu}
-        <footer className="px-2 pt-10 pb-2 text-center text-[13px] leading-relaxed text-[#6B665F]">
+        <footer className="px-2 pt-10 pb-2 text-center text-[13px] leading-relaxed text-encre-2">
           Une question&nbsp;? CoverSwap vous répond au{" "}
-          <a href={`tel:${marque.telephoneLien}`} className="font-semibold whitespace-nowrap text-[#1A1A1A] underline decoration-[#BDB8B0] underline-offset-2">
+          <a href={`tel:${marque.telephoneLien}`} className="font-semibold whitespace-nowrap text-encre underline decoration-trait underline-offset-2">
             {marque.telephone}
           </a>
           .
@@ -318,7 +319,7 @@ function BarreOnglets({ etat, vue, aller }: { etat: Etat; vue: Vue; aller: (vue:
   const parCle = new Map(etat.etapes.map((e) => [e.cle, e]));
   const suivante = pasDuProjet(etat).vue;
   return (
-    <nav aria-label="Les étapes de votre projet" className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E3DFD8] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
+    <nav aria-label="Les étapes de votre projet" className="fixed inset-x-0 bottom-0 z-30 border-t border-trait bg-blanc/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
       <ul className="mx-auto grid max-w-xl grid-cols-5">
         {ONGLETS.map(({ vue: cible, cle, libelle, Icone }) => {
           const e = parCle.get(cle);
@@ -336,24 +337,24 @@ function BarreOnglets({ etat, vue, aller }: { etat: Etat; vue: Vue; aller: (vue:
                 aria-current={actif ? "page" : undefined}
                 aria-label={`${libelle}${etatDit}`}
                 className={cx(
-                  "relative flex h-[62px] w-full flex-col items-center justify-center gap-[5px] text-[12.5px] leading-none font-semibold tracking-[-0.02em] transition-colors active:bg-[#F2F0EC]",
-                  actif ? "text-[#1A1A1A]" : verrou ? "text-[#9A958E]" : "text-[#5F5A53]",
+                  "relative flex h-[62px] w-full flex-col items-center justify-center gap-[5px] text-[12.5px] leading-none font-semibold tracking-[-0.02em] transition-colors active:bg-fond-2",
+                  actif ? "text-encre" : verrou ? "text-encre-2/70" : "text-encre-2",
                   FOCUS
                 )}
               >
-                {actif ? <span aria-hidden className="absolute inset-x-4 top-0 h-[3px] rounded-b-full bg-[#CC0000]" /> : null}
+                {actif ? <span aria-hidden className="absolute inset-x-4 top-0 h-[3px] rounded-b-full bg-encre" /> : null}
                 <span className="relative" aria-hidden>
                   <Icone taille={24} />
                   {fait ? (
-                    <span className="absolute -top-1.5 -right-2.5 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#1F7A4D] text-white ring-2 ring-white">
+                    <span className="absolute -top-1.5 -right-2.5 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-succes text-blanc ring-2 ring-blanc">
                       <IconeCoche taille={10} />
                     </span>
                   ) : verrou ? (
-                    <span className="absolute -top-1.5 -right-2.5 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#8A857E] text-white ring-2 ring-white">
+                    <span className="absolute -top-1.5 -right-2.5 flex h-[17px] w-[17px] items-center justify-center rounded-full bg-encre-2 text-blanc ring-2 ring-blanc">
                       <IconeCadenas taille={10} />
                     </span>
                   ) : aFaire ? (
-                    <span className="absolute -top-0.5 -right-1.5 h-[11px] w-[11px] rounded-full bg-[#CC0000] ring-2 ring-white" />
+                    <span className="absolute -top-0.5 -right-1.5 h-[11px] w-[11px] rounded-full bg-encre ring-2 ring-blanc" />
                   ) : null}
                 </span>
                 <span>{libelle}</span>
@@ -390,22 +391,22 @@ function ChoixFamille({ etat, client, prestations, onEtat, onSuite }: { etat: Et
   return (
     <section aria-labelledby="titre-choix-famille" className="space-y-5 py-4">
       <div>
-        <p className="text-[17px] text-[#5F5A53]">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</p>
-        <h1 id="titre-choix-famille" className="mt-1.5 font-display text-[30px] leading-[1.13] font-semibold tracking-tight text-balance text-[#1A1A1A]">
+        <p className="text-[17px] text-encre-2">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</p>
+        <h1 id="titre-choix-famille" className="mt-1.5 font-display text-[30px] leading-[1.13] font-semibold tracking-tight text-balance text-encre">
           Qu&apos;est-ce que vous voulez rénover&nbsp;?
         </h1>
-        <p className="mt-2 text-[16.5px] text-[#4F4A44]">Touchez votre pièce. Vous pourrez en ajouter une autre ensuite.</p>
+        <p className="mt-2 text-[16.5px] text-encre-2">Touchez votre pièce. Vous pourrez en ajouter une autre ensuite.</p>
       </div>
       <ul className="space-y-2.5">
         {prestations.familles.map((f) => (
           <li key={f.id}>
-            <button type="button" onClick={() => void choisir(f.id)} disabled={occupe !== null} className={cx("flex w-full items-center gap-3 rounded-2xl border-2 border-[#E2DFD9] bg-white p-3 text-left active:bg-[#F6F5F2] disabled:opacity-60", FOCUS)}>
-              <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-[#F7F6F3] p-1" />
+            <button type="button" onClick={() => void choisir(f.id)} disabled={occupe !== null} className={cx("flex w-full items-center gap-3 rounded-2xl border-2 border-trait bg-blanc p-3 text-left active:bg-fond disabled:opacity-60", FOCUS)}>
+              <DessinFamille famille={f.id} className="h-16 w-20 shrink-0 rounded-xl bg-fond p-1" />
               <span className="min-w-0 flex-1">
-                <span className="block text-[18px] leading-snug font-semibold text-[#1A1A1A]">{occupe === f.id ? "Un instant…" : f.libelle}</span>
-                <span className="mt-0.5 block text-[14.5px] leading-snug text-[#5F5A53]">{f.aide}</span>
+                <span className="block text-[18px] leading-snug font-semibold text-encre">{occupe === f.id ? "Un instant…" : f.libelle}</span>
+                <span className="mt-0.5 block text-[14.5px] leading-snug text-encre-2">{f.aide}</span>
               </span>
-              <span aria-hidden className="text-[22px] text-[#8A857E]">›</span>
+              <span aria-hidden className="text-[22px] text-encre-2">›</span>
             </button>
           </li>
         ))}
@@ -423,27 +424,27 @@ function AccueilProjet({ etat, aller, plusieurs, onNouveau }: { etat: Etat; alle
   // Tout tient entre l'en-tête et la barre d'onglets, même sur un petit iPhone avec les barres de Safari.
   return (
     <section aria-label="Votre prochaine étape" className="flex min-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-12.5rem)] flex-col justify-center py-5">
-      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-[#CC0000] shadow-[0_6px_20px_rgba(26,26,26,0.08)] ring-1 ring-[#E6E3DD]" aria-hidden>
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blanc text-encre shadow-[0_6px_20px_rgba(26,26,26,0.08)] ring-1 ring-trait" aria-hidden>
         <Icone taille={26} />
       </span>
-      <p className="mt-6 text-[17px] text-[#5F5A53]">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</p>
-      <h1 className="mt-1.5 font-display text-[30px] leading-[1.13] font-semibold tracking-tight text-balance text-[#1A1A1A] [@media(max-height:620px)]:text-[26px]">{pas.phrase}</h1>
+      <p className="mt-6 text-[17px] text-encre-2">{etat.prenom ? `Bonjour ${etat.prenom},` : "Bonjour,"}</p>
+      <h1 className="mt-1.5 font-display text-[30px] leading-[1.13] font-semibold tracking-tight text-balance text-encre [@media(max-height:620px)]:text-[26px]">{pas.phrase}</h1>
       <BoutonPrincipal className="mt-7" onClick={() => aller(pas.vue)}>
         {pas.bouton}
       </BoutonPrincipal>
       {/* « Vérifiez vos coordonnées » : bien visible, jamais sur le chemin (il continue sans). */}
       {!etat.coordonnees.completes ? (
-        <button type="button" onClick={() => aller("coordonnees")} className={cx("mt-4 flex w-full items-center gap-3 rounded-2xl border border-[#F0C98A] bg-[#FFF8EC] px-4 py-3 text-left active:bg-[#FBEFD9]", FOCUS)}>
-          <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#E08A00]" />
+        <button type="button" onClick={() => aller("coordonnees")} className={cx("mt-4 flex w-full items-center gap-3 rounded-2xl border border-alerte-texte/40 bg-alerte-fond px-4 py-3 text-left active:bg-alerte-fond", FOCUS)}>
+          <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-alerte-texte" />
           <span className="min-w-0 flex-1">
-            <span className="block text-[16px] font-semibold text-[#1A1A1A]">Vérifiez vos coordonnées</span>
-            <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{(etat.coordonnees.manque ?? []).length ? `Il manque ${(etat.coordonnees.manque ?? []).join(", ")}.` : "Pour votre devis et votre facture."}</span>
+            <span className="block text-[16px] font-semibold text-encre">Vérifiez vos coordonnées</span>
+            <span className="block text-[14.5px] leading-snug text-encre-2">{(etat.coordonnees.manque ?? []).length ? `Il manque ${(etat.coordonnees.manque ?? []).join(", ")}.` : "Pour votre devis et votre facture."}</span>
           </span>
-          <span aria-hidden className="text-[22px] text-[#8A857E]">›</span>
+          <span aria-hidden className="text-[22px] text-encre-2">›</span>
         </button>
       ) : null}
       {!plusieurs ? (
-        <button type="button" onClick={onNouveau} className={cx("mt-4 min-h-[44px] self-center px-2 text-[15px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4", FOCUS)}>
+        <button type="button" onClick={onNouveau} className={cx("mt-4 min-h-[44px] self-center px-2 text-[15px] font-medium text-encre-2 underline decoration-trait underline-offset-4", FOCUS)}>
           Un autre projet&nbsp;? Nouveau projet
         </button>
       ) : null}
@@ -499,17 +500,17 @@ function prochainPas(etat: Etat): Pas {
 
 function Chargement({ horsLigne, onReessayer }: { horsLigne: boolean; onReessayer: () => void }) {
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-[#F5F4F1] px-6 text-center">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-fond px-6 text-center">
       <Logo />
       {horsLigne ? (
         <>
-          <p className="text-[17px] text-[#3F3B36]">Pas de réseau pour ouvrir votre espace. Rien n&apos;est perdu.</p>
-          <button type="button" onClick={onReessayer} className="min-h-[52px] rounded-2xl bg-[#1A1A1A] px-6 text-[16px] font-semibold text-white">
+          <p className="text-[17px] text-encre">Pas de réseau pour ouvrir votre espace. Rien n&apos;est perdu.</p>
+          <button type="button" onClick={onReessayer} className="min-h-[52px] rounded-2xl bg-encre px-6 text-[16px] font-semibold text-blanc">
             Réessayer
           </button>
         </>
       ) : (
-        <p className="animate-pulse text-[16px] text-[#5F5A53] motion-reduce:animate-none">Ouverture de votre espace…</p>
+        <p className="animate-pulse text-[16px] text-encre-2 motion-reduce:animate-none">Ouverture de votre espace…</p>
       )}
     </div>
   );
@@ -519,10 +520,10 @@ function LienInvalide({ erreur, onReessayer }: { erreur: ErreurEspace; onReessay
   const desactive = erreur.raison === "expire" || erreur.raison === "revoque";
   const reseau = erreur.status === 0 || erreur.status >= 500 || erreur.status === 429;
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#F5F4F1] px-6 text-center text-[#1A1A1A]">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-fond px-6 text-center text-encre">
       <Logo />
       <h1 className="mt-8 font-display text-[26px] leading-tight font-semibold text-balance">{reseau ? "Impossible d'ouvrir votre espace" : desactive ? "Ce lien n'est plus actif" : "Ce lien n'est pas valide"}</h1>
-      <p className="mt-3 max-w-sm text-[16.5px] leading-relaxed text-[#4F4A44]">
+      <p className="mt-3 max-w-sm text-[16.5px] leading-relaxed text-encre-2">
         {reseau
           ? erreur.message
           : desactive
@@ -530,11 +531,11 @@ function LienInvalide({ erreur, onReessayer }: { erreur: ErreurEspace; onReessay
             : "Vérifiez que vous avez ouvert le lien en entier, tel que vous l'avez reçu. Sinon, appelez-nous : nous vous en envoyons un nouveau."}
       </p>
       {reseau ? (
-        <button type="button" onClick={onReessayer} className="mt-6 min-h-[56px] w-full max-w-xs rounded-2xl bg-[#CC0000] text-[17px] font-semibold text-white">
+        <button type="button" onClick={onReessayer} className={`mt-6 min-h-[56px] w-full max-w-xs rounded-2xl text-[17px] font-semibold ${TEINTE_PRINCIPALE}`}>
           Réessayer
         </button>
       ) : null}
-      <a href="tel:+33670352869" className={cx("flex min-h-[56px] w-full max-w-xs items-center justify-center gap-2 rounded-2xl text-[16.5px] font-semibold", reseau ? "mt-3 border border-[#D3CFC8] bg-white text-[#1A1A1A]" : "mt-6 bg-[#1A1A1A] text-white")}>
+      <a href="tel:+33670352869" className={cx("flex min-h-[56px] w-full max-w-xs items-center justify-center gap-2 rounded-2xl text-[16.5px] font-semibold", reseau ? "mt-3 border border-trait bg-blanc text-encre" : "mt-6 bg-encre text-blanc")}>
         <IconeTelephone /> Appeler CoverSwap · 06 70 35 28 69
       </a>
     </div>

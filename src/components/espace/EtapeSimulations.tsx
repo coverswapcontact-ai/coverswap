@@ -283,14 +283,14 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
         <BoutonSecondaire onClick={() => ouvrirCreation()}>
           <IconePlus /> {creation.restantes > 0 ? "Créer une autre simulation" : "Demander d'autres simulations"}
         </BoutonSecondaire>
-        <p className="text-center text-[14px] text-[#5F5A53]">
+        <p className="text-center text-[14px] text-encre-2">
           {creation.restantes > 0 ? `Il vous en reste ${creation.restantes} sur ${creation.gratuites + creation.accordees}.` : `Vous avez utilisé vos ${creation.gratuites + creation.accordees} simulations.`}
         </p>
       </div>
     ) : null;
 
   const sousOnglets = (
-    <div role="tablist" aria-label="Simulations" className="grid grid-cols-2 gap-1 rounded-2xl bg-[#E9E6E0] p-1">
+    <div role="tablist" aria-label="Simulations" className="grid grid-cols-2 gap-1 rounded-2xl bg-fond-2 p-1">
       {(
         [
           { cle: "mes", libelle: sims.length > 0 ? `Mes simulations (${sims.length})` : "Mes simulations" },
@@ -303,7 +303,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
           role="tab"
           aria-selected={sousOnglet === o.cle}
           onClick={() => (o.cle === "creer" ? (sousOnglet === "creer" ? undefined : ouvrirCreation()) : setSousOnglet("mes"))}
-          className={cx("min-h-[48px] rounded-xl px-2 text-[15px] leading-tight font-semibold transition-colors", sousOnglet === o.cle ? "bg-white text-[#1A1A1A] shadow-[0_1px_3px_rgba(26,26,26,0.12)]" : "text-[#5F5A53] active:bg-[#DDD9D2]", FOCUS)}
+          className={cx("min-h-[48px] rounded-xl px-2 text-[15px] leading-tight font-semibold transition-colors", sousOnglet === o.cle ? "bg-blanc text-encre shadow-[0_1px_3px_rgba(26,26,26,0.12)]" : "text-encre-2 active:bg-trait", FOCUS)}
         >
           {o.libelle}
         </button>
@@ -376,15 +376,15 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             const validee = choixUne === s.id || (etat.choix?.mode === "COMPOSITE" && etat.choix.zones.some((z) => z.simulationId === s.id));
             return (
               <li key={s.id}>
-                <button type="button" onClick={() => setOuverte(s.id)} className={cx("block w-full overflow-hidden rounded-2xl border bg-white text-left shadow-[0_1px_2px_rgba(26,26,26,0.05)] active:bg-[#FAF9F7]", validee ? "border-2 border-[#1F7A4D]" : "border-[#E6E3DD]", FOCUS)}>
-                  <span className={cx("relative block bg-[#ECEAE5]", triees.length > 1 ? "aspect-[4/3]" : "aspect-[3/2]")}>
+                <button type="button" onClick={() => setOuverte(s.id)} className={cx("block w-full overflow-hidden rounded-2xl border bg-blanc text-left shadow-[0_1px_2px_rgba(26,26,26,0.05)] active:bg-fond", validee ? "border-2 border-succes" : "border-trait", FOCUS)}>
+                  <span className={cx("relative block bg-fond-2", triees.length > 1 ? "aspect-[4/3]" : "aspect-[3/2]")}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- image privée servie par le CRM */}
                     <img src={client.url(`/simulations/${s.id}`)} alt="" className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
-                    {validee ? <span className="absolute top-2 left-2 rounded-full bg-[#1F7A4D] px-2.5 py-1 text-[12.5px] font-semibold text-white">✓ Validée</span> : s.nouvelle ? <span className="absolute top-2 left-2 rounded-full bg-[#CC0000] px-2.5 py-1 text-[12.5px] font-semibold text-white">Nouveau</span> : null}
+                    {validee ? <span className="absolute top-2 left-2 rounded-full bg-succes px-2.5 py-1 text-[12.5px] font-semibold text-blanc">✓ Validée</span> : s.nouvelle ? <span className="absolute top-2 left-2 rounded-full bg-encre px-2.5 py-1 text-[12.5px] font-semibold text-blanc">Nouveau</span> : null}
                   </span>
                   <span className="block px-3 py-2.5">
-                    <span className="block truncate text-[15.5px] font-semibold text-[#1A1A1A]">{noms.get(s.id)}</span>
-                    <span className="block truncate text-[13px] text-[#6B665F]">
+                    <span className="block truncate text-[15.5px] font-semibold text-encre">{noms.get(s.id)}</span>
+                    <span className="block truncate text-[13px] text-encre-2">
                       {ORIGINE[s.source]} · {dateCourte(s.le)}
                     </span>
                   </span>
@@ -397,7 +397,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
         <Annonce>CoverSwap prépare une proposition pour vous&nbsp;: elle apparaîtra ici, et vous serez prévenu par e-mail.</Annonce>
       ) : suivies.length === 0 ? (
         <Carte className="space-y-3 text-center">
-          <p className="text-[17px] leading-relaxed text-[#1A1A1A]">Vous n&apos;avez pas encore de simulation.</p>
+          <p className="text-[17px] leading-relaxed text-encre">Vous n&apos;avez pas encore de simulation.</p>
           <BoutonPrincipal onClick={() => ouvrirCreation()}>
             <IconePlus /> Créer ma simulation
           </BoutonPrincipal>
@@ -414,12 +414,12 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
       {composable && modifiable ? (
         <Carte>
           <Surtitre>Composer mon mélange</Surtitre>
-          <p className="mt-1 text-[15px] leading-relaxed text-[#4F4A44]">Une teinte vous plaît sur une simulation, une autre ailleurs&nbsp;? Choisissez zone par zone, puis validez le mélange.</p>
+          <p className="mt-1 text-[15px] leading-relaxed text-encre-2">Une teinte vous plaît sur une simulation, une autre ailleurs&nbsp;? Choisissez zone par zone, puis validez le mélange.</p>
           {composer ? (
             <div className="mt-3 space-y-4">
               {[...options.entries()].map(([cle, liste]) => (
                 <fieldset key={cle}>
-                  <legend className="text-[15.5px] font-semibold text-[#1A1A1A]">{liste[0].libelle}</legend>
+                  <legend className="text-[15.5px] font-semibold text-encre">{liste[0].libelle}</legend>
                   <div className="mt-2 grid gap-2" role="radiogroup" aria-label={liste[0].libelle}>
                     {liste.map((o) => {
                       const actif = (composition[cle] ?? liste[0].simulationId) === o.simulationId;
@@ -430,15 +430,15 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
                           role="radio"
                           aria-checked={actif}
                           onClick={() => setComposition((c) => ({ ...c, [cle]: o.simulationId }))}
-                          className={cx("flex min-h-[64px] w-full items-center gap-3 rounded-2xl border-2 p-2.5 text-left", actif ? "border-[#1A1A1A] bg-[#FAF9F7]" : "border-[#E2DFD9] bg-white")}
+                          className={cx("flex min-h-[64px] w-full items-center gap-3 rounded-2xl border-2 p-2.5 text-left", actif ? "border-encre bg-fond" : "border-trait bg-blanc")}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element -- vignette servie par le CRM */}
-                          <img src={vignette(client, o.ref)} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-black/10" loading="lazy" referrerPolicy="no-referrer" />
+                          <img src={vignette(client, o.ref)} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-encre/10" loading="lazy" referrerPolicy="no-referrer" />
                           <span className="min-w-0 flex-1">
-                            <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{o.nomTeinte}</span>
-                            <span className="block text-[13.5px] text-[#5F5A53]">{o.nom}</span>
+                            <span className="block text-[16px] leading-snug font-semibold text-encre">{o.nomTeinte}</span>
+                            <span className="block text-[13.5px] text-encre-2">{o.nom}</span>
                           </span>
-                          <span aria-hidden className={cx("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", actif ? "border-[#1A1A1A] bg-[#1A1A1A] text-white" : "border-[#C9C4BC]")}>
+                          <span aria-hidden className={cx("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", actif ? "border-encre bg-encre text-blanc" : "border-trait")}>
                             {actif ? "✓" : null}
                           </span>
                         </button>
@@ -478,20 +478,20 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             </BoutonSecondaire>
           ) : (
             <div className="mt-3 space-y-2.5">
-              <label htmlFor="autre" className="block text-[15px] text-[#3F3B36]">
+              <label htmlFor="autre" className="block text-[15px] text-encre">
                 Dites-nous ce que vous aimeriez (plus clair, un bois plus chaud, garder les portes blanches…)
               </label>
-              <textarea id="autre" rows={3} maxLength={1000} value={demande} onChange={(e) => setDemande(e.target.value)} className="w-full rounded-2xl border border-[#D3CFC8] bg-white px-4 py-3 text-[17px] focus:border-[#1A1A1A] focus:outline-none" />
+              <textarea id="autre" rows={3} maxLength={1000} value={demande} onChange={(e) => setDemande(e.target.value)} className="w-full rounded-2xl border border-trait bg-blanc px-4 py-3 text-[17px] focus:border-encre focus:outline-none" />
               <BoutonPrincipal disabled={occupe !== null} onClick={() => void demanderProposition()}>
                 {occupe === "proposition" ? "Envoi…" : "Envoyer ma demande"}
               </BoutonPrincipal>
             </div>
           )}
           {etat.propositionDemandeeLe ? (
-            <div className="mt-3 space-y-2 rounded-2xl bg-[#F1EFEA] p-3">
-              <p className="text-[15px] leading-snug text-[#3F3B36]">
+            <div className="mt-3 space-y-2 rounded-2xl bg-fond-2 p-3">
+              <p className="text-[15px] leading-snug text-encre">
                 Demande envoyée le {dateCourte(etat.propositionDemandeeLe)}&nbsp;: CoverSwap s&apos;en occupe.
-                {etat.propositionMessage ? <span className="mt-1 block whitespace-pre-wrap text-[#1A1A1A]">« {etat.propositionMessage} »</span> : null}
+                {etat.propositionMessage ? <span className="mt-1 block whitespace-pre-wrap text-encre">« {etat.propositionMessage} »</span> : null}
               </p>
               <BoutonAConfirmer libelle="Retirer ma demande" question="Retirer votre demande ?" confirmer="Oui, retirer" occupe={occupe === "retrait-proposition"} onConfirme={() => void retirerDemande()} className="bg-transparent" />
             </div>
@@ -516,7 +516,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
                 <BoutonPrincipal onClick={() => aller("devis")}>Voir mon devis</BoutonPrincipal>
               ) : (
                 <div className="space-y-1.5">
-                  <p className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-[#E7F3EC] px-4 text-center text-[16px] font-semibold text-[#17563A]">✓ Validée&nbsp;: CoverSwap prépare votre devis</p>
+                  <p className="flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-succes-fond px-4 text-center text-[16px] font-semibold text-succes">✓ Validée&nbsp;: CoverSwap prépare votre devis</p>
                   <BoutonAConfirmer libelle="Annuler ma validation" question="Annuler votre validation ?" confirmer="Oui, annuler" occupe={occupe === "devalidation"} onConfirme={() => void annulerValidation()} />
                 </div>
               )
@@ -542,7 +542,7 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
           <div className="space-y-4 pt-1">
             {erreurVue ? <Annonce ton="erreur">{erreurVue}</Annonce> : null}
             <FonduRendu cle={simOuverte.id} actif={arrivee === simOuverte.id} apres={client.url(`/simulations/${simOuverte.id}`)} avant={simOuverte.avant ? client.url(`/simulations/${simOuverte.id}/avant`) : null} alt={noms.get(simOuverte.id) ?? "Simulation"} />
-            {simOuverte.avant ? <p className="-mt-2 text-center text-[14px] text-[#5F5A53]">Glissez sur l&apos;image pour comparer avant et après.</p> : null}
+            {simOuverte.avant ? <p className="-mt-2 text-center text-[14px] text-encre-2">Glissez sur l&apos;image pour comparer avant et après.</p> : null}
             <div className="flex flex-wrap gap-2">
               <BoutonSecondaire className="w-auto flex-1" disabled={partage === "envoi"} onClick={() => void telecharger(simOuverte, noms.get(simOuverte.id) ?? "simulation", false)}>
                 {partage === "envoi" ? "Préparation…" : "Télécharger"}
@@ -558,20 +558,20 @@ export function EtapeSimulations({ etat, client, jeton, onEtat, recharger, aller
             </div>
             {partage === "erreur" ? <Annonce ton="erreur">Le rendu n&apos;a pas pu être récupéré : réessayez dans un instant.</Annonce> : null}
             {simOuverte.zones.length > 0 ? (
-              <ul className="divide-y divide-[#EEEBE6] rounded-2xl border border-[#E6E3DD] bg-white">
+              <ul className="divide-y divide-trait rounded-2xl border border-trait bg-blanc">
                 {simOuverte.zones.map((z) => (
                   <li key={`${cleZone(z)}-${z.ref}`} className="flex items-center gap-3 px-3 py-2.5">
                     {/* eslint-disable-next-line @next/next/no-img-element -- vignette servie par le CRM */}
-                    <img src={vignette(client, z.ref)} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-black/10" loading="lazy" referrerPolicy="no-referrer" />
+                    <img src={vignette(client, z.ref)} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-encre/10" loading="lazy" referrerPolicy="no-referrer" />
                     <span className="min-w-0 text-[15.5px] leading-snug">
-                      <span className="block text-[13.5px] text-[#5F5A53]">{z.libelle || z.zone}</span>
-                      <span className="block font-semibold text-[#1A1A1A]">{z.nom || z.ref}</span>
+                      <span className="block text-[13.5px] text-encre-2">{z.libelle || z.zone}</span>
+                      <span className="block font-semibold text-encre">{z.nom || z.ref}</span>
                     </span>
                   </li>
                 ))}
               </ul>
             ) : null}
-            {simOuverte.description ? <p className="px-1 text-[15px] leading-relaxed text-[#4F4A44]">{simOuverte.description}</p> : null}
+            {simOuverte.description ? <p className="px-1 text-[15px] leading-relaxed text-encre-2">{simOuverte.description}</p> : null}
             {!modifiable && choixUne !== simOuverte.id ? (
               <Annonce>Votre devis est établi sur la simulation validée. Pour en changer, appelez CoverSwap&nbsp;: nous le refaisons avec vous.</Annonce>
             ) : null}

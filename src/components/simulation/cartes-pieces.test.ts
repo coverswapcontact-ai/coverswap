@@ -34,6 +34,13 @@ describe("CartesPieces avec photos", () => {
     assert.ok(!html.includes("<picture") && !html.includes("<img") && !html.includes("Ambiance"));
   });
 
+  test("site 3.0, lot C6 : sans photo, le dessin est le pictogramme de la famille de la pièce", () => {
+    const pictos = [...rendre().matchAll(/<image href="\/images\/pictos\/([a-z-]+)-256\.webp"/g)].map((m) => m[1]);
+    const ATTENDUS: Record<string, string> = { cuisine: "picto-cuisine", "salle-de-bain": "picto-salle-de-bain", meubles: "picto-mobilier", "mur-plafond": "picto-murs", professionnel: "picto-pro" };
+    assert.deepEqual(pictos, PIECES.map((p) => ATTENDUS[p.id]));
+    for (const nom of pictos) assert.ok(existsSync(path.join(process.cwd(), "public", "images", "pictos", `${nom}-256.webp`)), nom);
+  });
+
   test("une photo préparée remplace le dessin de SA carte (carré, « Ambiance »), les autres gardent le leur", { skip: PREPAREE ? false : "manifeste vide" }, () => {
     const html = rendre({ cuisine: PREPAREE, "salle-de-bain": "piece-inexistante-du-manifeste" });
     const [cuisine, sdb, ...autres] = boutons(html);

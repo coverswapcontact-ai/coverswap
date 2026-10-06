@@ -75,11 +75,11 @@ export function EcranPhotoEspace({ photos, photoId, urlPhoto, envoi, apercu, onA
             const choisie = photoId === p.id;
             return (
               <li key={p.id}>
-                <button type="button" onClick={() => onChoisirPhoto(p.id)} aria-pressed={choisie} aria-label={choisie ? "Photo choisie" : "Choisir cette photo"} className={cx("relative block aspect-square w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond-2 transition-[opacity] duration-[var(--duree-courte)]", choisie ? "ring-2 ring-encre ring-offset-2 ring-offset-fond" : "ring-1 ring-black/10", !choisie && photoId && "opacity-70")}>
+                <button type="button" onClick={() => onChoisirPhoto(p.id)} aria-pressed={choisie} aria-label={choisie ? "Photo choisie" : "Choisir cette photo"} className={cx("relative block aspect-square w-full overflow-hidden rounded-[var(--rayon-sm)] bg-fond-2 transition-[opacity] duration-[var(--duree-courte)]", choisie ? "ring-2 ring-encre ring-offset-2 ring-offset-fond" : "ring-1 ring-encre/10", !choisie && photoId && "opacity-70")}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- photo privée servie par le CRM */}
                   <img src={urlPhoto(p.id)} alt="" className="h-full w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
                   {choisie ? (
-                    <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-encre text-white">
+                    <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-encre text-blanc">
                       <IconeCoche />
                     </span>
                   ) : null}
@@ -92,7 +92,7 @@ export function EcranPhotoEspace({ photos, photoId, urlPhoto, envoi, apercu, onA
 
       <div className="rounded-[var(--rayon-md)] border-2 border-dashed border-trait p-3 sm:p-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <label onClick={toucher} className={`${BOUTON_FICHIER} bg-encre text-white hover:bg-encre-survol ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+          <label onClick={toucher} className={`${BOUTON_FICHIER} bg-encre text-blanc hover:bg-encre-survol ${occupe ? "pointer-events-none opacity-60" : ""}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" />
               <circle cx="12" cy="13" r="3" />
@@ -100,7 +100,7 @@ export function EcranPhotoEspace({ photos, photoId, urlPhoto, envoi, apercu, onA
             {envoi !== null ? `Envoi… ${Math.round(envoi * 100)} %` : "Prendre une photo"}
             <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={occupe} onChange={prendre} />
           </label>
-          <label onClick={toucher} className={`${BOUTON_FICHIER} border border-encre bg-white text-encre hover:bg-fond-2 ${occupe ? "pointer-events-none opacity-60" : ""}`}>
+          <label onClick={toucher} className={`${BOUTON_FICHIER} border border-encre bg-blanc text-encre hover:bg-fond-2 ${occupe ? "pointer-events-none opacity-60" : ""}`}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="9" cy="9" r="2" />
@@ -150,7 +150,7 @@ export function EcranMatieresEspace({ piece, choix, photo, analyse, conseilIgnor
 
   return (
     <section aria-labelledby="creation-matieres" className="space-y-5 pb-36">
-      <div className="overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-white">
+      <div className="overflow-hidden rounded-[var(--rayon-md)] border border-trait bg-blanc">
         {/* Le CRM ne donne pas les dimensions de la photo : une boîte au rapport fixe (bornée en hauteur) réserve la place,
             la photo s'y inscrit entière — rien ne bouge quand elle arrive. */}
         <div className="aspect-[4/3] max-h-[46vh] w-full bg-fond-2">
@@ -168,7 +168,7 @@ export function EcranMatieresEspace({ piece, choix, photo, analyse, conseilIgnor
       </div>
 
       {conseil ? (
-        <div role="status" className="rounded-[var(--rayon-md)] border border-trait bg-white p-4">
+        <div role="status" className="rounded-[var(--rayon-md)] border border-trait bg-blanc p-4">
           <p className="text-[16px] font-semibold text-encre">{conseil.titre}</p>
           {conseil.texte ? <p className="mt-1 text-[14.5px] leading-relaxed text-encre-2">{conseil.texte}</p> : null}
           <div className="mt-3 flex flex-wrap gap-2">
@@ -196,7 +196,7 @@ export function EcranMatieresEspace({ piece, choix, photo, analyse, conseilIgnor
           const bloque = !teinte && plafond;
           const raison = nonVisible ? "Non visible sur la photo" : bloque ? `${zonesMax} zones au plus par simulation` : null;
           return (
-            <li key={zone.zone} className={cx("rounded-[var(--rayon-md)] border bg-white p-3 transition-colors duration-[var(--duree-courte)]", teinte ? "border-encre" : "border-trait", nonVisible && "opacity-60")}>
+            <li key={zone.zone} className={cx("rounded-[var(--rayon-md)] border bg-blanc p-3 transition-colors duration-[var(--duree-courte)]", teinte ? "border-encre" : "border-trait", nonVisible && "opacity-60")}>
               <div className="flex min-h-[56px] items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {teinte ? (
@@ -224,7 +224,7 @@ export function EcranMatieresEspace({ piece, choix, photo, analyse, conseilIgnor
                     disabled={!teinte && (nonVisible || bloque)}
                     aria-label={`${teinte ? "Modifier" : "Choisir"} la matière : ${zone.libelle}`}
                     onClick={() => onOuvrir(zone.zone)}
-                    className={cx("min-h-[44px] rounded-[var(--rayon-sm)] px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] disabled:cursor-not-allowed disabled:opacity-50", teinte ? "border border-encre bg-white text-encre hover:bg-fond-2" : "bg-encre text-white hover:bg-encre-survol")}
+                    className={cx("min-h-[44px] rounded-[var(--rayon-sm)] px-4 text-[14.5px] font-medium transition-colors duration-[var(--duree-courte)] disabled:cursor-not-allowed disabled:opacity-50", teinte ? "border border-encre bg-blanc text-encre hover:bg-fond-2" : "bg-encre text-blanc hover:bg-encre-survol")}
                   >
                     {teinte ? "Modifier" : "Choisir"}
                   </button>

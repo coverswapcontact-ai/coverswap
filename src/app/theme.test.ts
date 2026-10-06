@@ -219,13 +219,16 @@ describe("composants et pages (hors espace client) : plus rien du thème sombre"
 });
 
 describe("site 3.0, lot B2 : le rouge réservé aux actions", () => {
-  /** Le rouge s'écrit dans ces fichiers seulement : les boutons, le lien « Simuler » de l'en-tête, la pastille « 497 matières » (lot B3) et la marque. */
+  /**
+   * Le rouge s'écrit dans ces fichiers seulement : les boutons, le lien « Simuler » de l'en-tête, la pastille « 497 matières » (lot B3) et la marque.
+   * Lot C6 : l'espace client y entre ; ses boutons principaux prennent `TEINTE_PRINCIPALE` de `Bouton.tsx` (aucun fichier de plus).
+   */
   const PERMIS = ["components/simulation/Bouton.tsx", "components/EnteteSite.tsx", "components/revue/Pastille497.tsx", "components/Logo.tsx"];
   /** Une classe Tailwind au rouge (`bg-accent`, `hover:text-accent-survol`, `ring-accent/40`…), sa variable CSS ou sa valeur. */
   const ROUGE = /(?<![\w-])(?:bg|text|border(?:-[trblxy])?|ring|outline|fill|stroke|decoration|from|via|to|shadow|divide|caret|placeholder)-accent(?![\w])|--color-accent|#B3261E|#8F1E18/i;
-  const SOURCES = [...fichiers(SRC, ".tsx"), ...fichiers(SRC, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f) && !nom(f).startsWith("components/espace/"));
+  const SOURCES = [...fichiers(SRC, ".tsx"), ...fichiers(SRC, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f));
 
-  test(`${SOURCES.length} sources (hors espace client et tests) : le rouge n'apparaît que dans ${PERMIS.length} fichiers`, () => {
+  test(`${SOURCES.length} sources (hors tests, espace client compris) : le rouge n'apparaît que dans ${PERMIS.length} fichiers`, () => {
     assert.ok(SOURCES.length > 100, `${SOURCES.length} sources`);
     const constats: string[] = [];
     for (const f of SOURCES) {
@@ -268,5 +271,73 @@ describe("site 3.0, lot B2 : le rouge réservé aux actions", () => {
   test("sélections et favoris à l'encre", () => {
     assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /choisie \? "border-encre ring-1 ring-encre"/);
     assert.match(lire(join(SRC, "components", "simulation", "ElementsCatalogue.tsx")), /favori \? "text-encre" : "text-encre-2"/);
+  });
+});
+
+describe("site 3.0, lot C6 : l'espace client aux jetons", () => {
+  const DOSSIER_ESPACE = join(SRC, "components", "espace");
+  const ESPACE = [...fichiers(DOSSIER_ESPACE, ".tsx"), ...fichiers(DOSSIER_ESPACE, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f));
+  /**
+   * Les exceptions (fichier → raison) : aucune à ce jour. Les ombres et le reflet du « contre-jour » restent en `rgba()`
+   * (des effets, pas des couleurs d'interface) ; la signature prend la couleur calculée de sa toile (`text-encre`).
+   */
+  const EXCEPTIONS: Record<string, string> = {};
+  const PALETTE = /(?<![\w-])(?:bg|text|border|ring|divide|outline|decoration|fill|stroke|placeholder:text)-(?:white|black|gray|grey|slate|zinc|neutral|stone|red|orange|amber|yellow|green|emerald|blue|rose)(?![\w-])/;
+
+  test(`${ESPACE.length} sources de components/espace/ : aucune valeur hexadécimale, aucune couleur de la palette Tailwind`, () => {
+    assert.ok(ESPACE.length >= 15, `${ESPACE.length} sources`);
+    const constats: string[] = [];
+    for (const f of ESPACE) {
+      if (nom(f) in EXCEPTIONS) continue;
+      lire(f).split("\n").forEach((ligne, i) => {
+        if (/#[0-9a-fA-F]{3,8}\b/.test(ligne)) constats.push(`${nom(f)}:${i + 1} hexa`);
+        if (PALETTE.test(ligne)) constats.push(`${nom(f)}:${i + 1} palette Tailwind`);
+      });
+    }
+    assert.deepEqual(constats, []);
+    // Le motif attrape bien les formes d'avant.
+    for (const avant of ['"text-[#1A1A1A]"', "bg-[#CC0000]", "ring-black/10", "text-white", 'ctx.strokeStyle = "#1A1A1A"']) assert.ok(/#[0-9a-fA-F]{3,8}\b/.test(avant) || PALETTE.test(avant), avant);
+  });
+
+  test("le rouge sur les boutons principaux seulement : BoutonPrincipal, LienPrincipal et « Réessayer » prennent TEINTE_PRINCIPALE", () => {
+    const ui = lire(join(DOSSIER_ESPACE, "ui.tsx"));
+    assert.match(ui, /import \{ TEINTE_PRINCIPALE \} from "@\/components\/simulation\/Bouton";/);
+    const principal = ui.slice(ui.indexOf("export function BoutonPrincipal"), ui.indexOf("export function BoutonSecondaire"));
+    assert.match(principal, /\$\{TEINTE_PRINCIPALE\} disabled:bg-trait disabled:text-encre-2/);
+    const lien = ui.slice(ui.indexOf("export function LienPrincipal"), ui.indexOf("export function Carte"));
+    assert.match(lien, /TEINTE_PRINCIPALE, FOCUS, className/);
+    // Les seuls emplois : les deux boutons d'ui.tsx et le « Réessayer » d'un espace qui n'a pas pu s'ouvrir.
+    const emplois = ESPACE.filter((f) => /\bTEINTE_PRINCIPALE\b/.test(lire(f))).map(nom).sort();
+    assert.deepEqual(emplois, ["components/espace/EspaceClient.tsx", "components/espace/ui.tsx"]);
+    // Les surtitres ne sont jamais rouges : « fort » (l'encre), « vert » (le succès), gris par défaut.
+    assert.match(ui, /ton\?: "gris" \| "fort" \| "vert"/);
+    assert.doesNotMatch(ESPACE.map(lire).join("\n"), /ton="rouge"/);
+  });
+
+  test("les dessins des pièces ont laissé la place aux pictogrammes ; la cuisine de face (écran Photo du simulateur) aux jetons", () => {
+    const illustrations = lire(join(DOSSIER_ESPACE, "Illustrations.tsx"));
+    const toutes = [...fichiers(SRC, ".tsx"), ...fichiers(SRC, ".ts")].filter((f) => !/\.test\.tsx?$/.test(f));
+    for (const retire of ["SalleDeBainDeFace", "MobilierDeFace", "ProfessionnelDeFace", "MursDeFace"]) {
+      for (const f of toutes) assert.ok(!lire(f).includes(retire), `${retire} dans ${nom(f)}`);
+    }
+    assert.doesNotMatch(illustrations, /rgba|#[0-9a-f]{3,8}\b/i);
+    const photos = lire(join(DOSSIER_ESPACE, "EtapePhotos.tsx"));
+    assert.doesNotMatch(photos, /CuisineDeFace/);
+    assert.match(photos, /<Picto nom=\{pictoDeLaPrise\(prise\.cadre\)\} className="h-24 w-24" \/>/);
+    assert.match(photos, /cadre === "plan" \? PICTOS_ELEMENTS\["plan-de-travail"\] : PICTOS_FAMILLES\.CUISINE/);
+    assert.match(lire(join(SRC, "components", "simulation", "CartesPieces.tsx")), /<DessinFamille famille=\{FAMILLES\[p\.id\] \?\? "CUISINE"\} enSvg className="h-full w-full" \/>/);
+  });
+
+  test("les montants : chiffres alignés, dans la police du texte", () => {
+    for (const f of ["EtapeDevis.tsx", "EtapePaiement.tsx", "EspaceCompte.tsx"]) {
+      const lignes = lire(join(DOSSIER_ESPACE, f))
+        .split("\n")
+        .filter((l) => /\{euros\(/.test(l) && /className=/.test(l) && !/aria-label=\{`/.test(l));
+      assert.ok(lignes.length > 0, f);
+      for (const l of lignes) {
+        assert.match(l, /tabular-nums/, `${f} : ${l.trim().slice(0, 120)}`);
+        assert.doesNotMatch(l, /font-display/, `${f} : ${l.trim().slice(0, 120)}`);
+      }
+    }
   });
 });

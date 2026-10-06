@@ -781,3 +781,52 @@ plus », la case → 52 ; ancre dans la suite montrée en haut d'écran. Capture
 **Problèmes** : le « Vue dans » de `/matieres` navigue par le routeur (`router.push`) : une ambiance de la suite n'y est
 pas montrée à l'arrivée (on reste en haut de /inspirations) — à passer en lien de page avec la phase D, qui refait les
 fiches. Le HTML de la page pèse ≈ 400 Ko non compressé (93 `<picture` avec leurs sources) ; à surveiller en F6.
+
+## C6 — Espace client (06/10/2026)
+
+**Fait** (aucune génération, aucun envoi ; `docs/DESIGN.md` « L'espace client », table écrite avant le remplacement)
+- **Les jetons partout dans `src/components/espace/`** : 522 couleurs écrites en dur remplacées par la table (neutres →
+  `encre` / `encre-2` / `trait` / `fond` / `fond-2` / `blanc`, verts → `succes*`, ambres et rouges d'erreur →
+  `alerte-*`, `black/…` → `encre` / `sombre`), puis les cas tranchés à la main. Formes, tailles, textes et logique de la
+  mission 18 (étapes, `devisASigner`, `prochainPas`, paiement) inchangés.
+- **Le rouge sur les boutons principaux seulement** : `BoutonPrincipal`, `LienPrincipal` et « Réessayer » prennent
+  `TEINTE_PRINCIPALE` de `Bouton.tsx` ; tout le reste du rouge passe à l'encre (icône du téléphone, trait de l'onglet
+  actif, point « prochaine étape », puces, étoiles, « Ouvrir », lien du PDF, pastilles « Nouveau » et « À vous »,
+  « Copier »), la croix d'un mauvais exemple photo au brun. Surtitre `ton="rouge"` → `ton="fort"` (encre).
+- **Montants** en `font-sans tabular-nums` (devis, lignes, acompte, solde, paiement), comme `BlocPrix` ; dans une phrase,
+  `tabular-nums`.
+- **Pictos** : « Quelles photos prendre » (cuisine) montre `picto-cuisine` (`picto-plan-de-travail` pour la prise du
+  plan) à 96 px ; les cartes de pièce sans photo (`CartesPieces`, l'espace) montrent le picto de la famille
+  (`DessinFamille enSvg`, toujours un `<svg>` par carte). Supprimés : `SalleDeBainDeFace`, `MobilierDeFace`,
+  `ProfessionnelDeFace`, `MursDeFace` ; `CuisineDeFace` reste pour l'écran Photo du simulateur (lot E2), passé aux
+  `var(--color-*)` (zone allumée en voile d'encre).
+- La signature trace à la couleur calculée de sa toile (`text-encre`) au lieu d'un hexa.
+
+**Décisions prises seul**
+1. « Contact » avait deux boutons rouges : « Envoyer mon message » reste principal, « Appeler » passe à l'encre pleine.
+2. Les pastilles de « Mes projets » : « À vous » en encre pleine, « CoverSwap prépare » en fond-2, « En cours » en
+   brun (alerte), « Terminé » en vert. Le point « prochaine étape » de la barre d'onglets est à l'encre.
+3. Les gris trop pâles des textes (`#8A857E`, 3,6:1 ; `#9A958E`, 2,9:1) montent à `encre-2` (6,14:1) et `encre-2/70`
+   (3,16:1, onglet pas encore ouvert) ; les contours des cases à cocher carrées à `encre-2`.
+4. Les ombres (`rgba(26,26,26,…)`) et le reflet du « contre-jour » restent en `rgba()` : des effets, pas des couleurs ;
+   le test ne vise que l'hexa et la palette Tailwind. Aucune exception hexa.
+5. Les sous-parties (« Meubles hauts », « Crédence »…) n'avaient pas de dessin : pas de picto ajouté (rien d'autre ne
+   change).
+
+**Tests** : 410 → 415, tous réussis. `theme.test.ts` : le « rouge réservé » relit maintenant l'espace (même liste de
+quatre fichiers permis) ; nouveau bloc « lot C6 » (4) : aucun hexa ni palette Tailwind dans `components/espace/`, le
+rouge sur `BoutonPrincipal` / `LienPrincipal` / « Réessayer » seulement et plus de surtitre rouge, dessins des pièces
+retirés et pictos posés, montants en `tabular-nums` sans `font-display`. `cartes-pieces.test.ts` : + 1 (le picto de la
+famille de chaque pièce, fichier présent). Tests existants de l'espace (`lib/espace/*`, `ambiances`, `elements`)
+inchangés et verts. `npx eslint .` et `npm run build` passent.
+
+**Vérification visuelle** : build local, `next start -p 3100` (arrêté ensuite), Playwright + Edge avec un état d'essai
+injecté par interception (un client fictif, deux scénarios : devis à signer, acompte à régler) ; TOUTES les requêtes
+hors de localhost interceptées (le GET de l'espace répondu par l'état d'essai, les images par des images du dépôt, les
+gestes POST répondus en local) : aucun espace réel, rien envoyé au CRM. Accueil, photos, projet, simulations (et
+« Créer une simulation »), devis, devis signé, paiement verrouillé et ouvert, mes projets, contact à 390 et 1 440 px,
+cinq écrans à 360 px : aucun débordement, un seul bouton rouge plein par écran (plus le losange du logo). Captures hors
+dépôt dans `scratchpad/m21/c6/captures`, script `c6/espace-essai.mjs`.
+
+**Problèmes** : aucun bloquant. L'espace garde son dessin propre (cartes blanches arrondies, 17 px) : seules les
+couleurs ont changé, comme demandé ; son fond est le papier uni (`bg-fond` posé sur le grain du `body`), comme avant.

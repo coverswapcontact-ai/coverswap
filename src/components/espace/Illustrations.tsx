@@ -1,21 +1,23 @@
 /**
- * Dessins au trait de l'espace client : une cuisine vue de face (pour dire
- * quoi photographier et ce que l'on recouvre), une salle de bain, du mobilier,
- * un local professionnel (les quatre familles de prestations), et des plans vus
- * de dessus (pour estimer la longueur de meubles). Le client reconnaît sa pièce,
- * pas un schéma technique.
+ * Les images de l'espace client : les pictogrammes (familles, éléments, plans de cuisine), le logo réexporté et les
+ * petites icônes d'interface au trait. Site 3.0, lot C6 : les dessins au trait des pièces (salle de bain, mobilier,
+ * local professionnel, murs) ont cédé la place aux pictogrammes ; reste la cuisine de face, que l'écran Photo du
+ * simulateur montre encore (lot E2), aux jetons du thème (`var(--color-*)`), plus aucune couleur écrite ici.
  */
 
-const TRAIT = "#1A1A1A";
-const MEUBLE = "#ECEAE5";
-const ROUGE = "#CC0000";
-const ROUGE_FOND = "rgba(204,0,0,0.16)";
+const ENCRE = "var(--color-encre)";
+const MEUBLE = "var(--color-fond-2)";
+const CLAIR = "var(--color-fond)";
+const TRAIT = "var(--color-trait)";
+const SOL = "var(--color-encre-2)";
 
 export type ZoneCuisine = "meubles-hauts" | "meubles-bas" | "plan-de-travail" | "credence";
 
-/** Cuisine de face ; `allume` : zones recouvertes (fond rouge léger) ; `cadre` : ce que la photo doit contenir. */
+/** Cuisine de face ; `allume` : zones recouvertes (voile d'encre léger) ; `cadre` : ce que la photo doit contenir. */
 export function CuisineDeFace({ allume = [], cadre, className }: { allume?: string[]; cadre?: "ensemble" | "hauts" | "bas" | "plan" | "detail"; className?: string }) {
   const on = (zone: ZoneCuisine) => allume.includes(zone);
+  /** Une zone allumée : l'encre, en voile (16 %, 28 % pour le plan) et en trait plein. */
+  const zone = (z: ZoneCuisine, fond: string, opacite = 0.16) => (on(z) ? { fill: ENCRE, fillOpacity: opacite, stroke: ENCRE } : { fill: fond, stroke: ENCRE });
   const cadres: Record<string, { x: number; y: number; w: number; h: number }> = {
     ensemble: { x: 3, y: 3, w: 114, h: 86 },
     hauts: { x: 5, y: 5, w: 110, h: 31 },
@@ -27,7 +29,7 @@ export function CuisineDeFace({ allume = [], cadre, className }: { allume?: stri
   return (
     <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
       {/* Mur, crédence */}
-      <rect x="8" y="32" width="104" height="20" fill={on("credence") ? ROUGE_FOND : "#F7F6F3"} stroke={on("credence") ? ROUGE : "#CFCBC4"} strokeWidth="0.8" strokeDasharray={on("credence") ? undefined : "2 2"} />
+      <rect x="8" y="32" width="104" height="20" {...(on("credence") ? { fill: ENCRE, fillOpacity: 0.16, stroke: ENCRE } : { fill: CLAIR, stroke: TRAIT })} strokeWidth="0.8" strokeDasharray={on("credence") ? undefined : "2 2"} />
       {/* Meubles hauts */}
       {[
         [8, 21],
@@ -36,17 +38,17 @@ export function CuisineDeFace({ allume = [], cadre, className }: { allume?: stri
         [93, 19],
       ].map(([x, w]) => (
         <g key={`h${x}`}>
-          <rect x={x} y="8" width={w} height="24" rx="0.8" fill={on("meubles-hauts") ? ROUGE_FOND : MEUBLE} stroke={on("meubles-hauts") ? ROUGE : TRAIT} strokeWidth="1.1" />
-          <line x1={x + w / 2 + (x < 60 ? 6 : -6)} y1="25" x2={x + w / 2 + (x < 60 ? 6 : -6)} y2="29" stroke={TRAIT} strokeWidth="1.1" />
+          <rect x={x} y="8" width={w} height="24" rx="0.8" {...zone("meubles-hauts", MEUBLE)} strokeWidth="1.1" />
+          <line x1={x + w / 2 + (x < 60 ? 6 : -6)} y1="25" x2={x + w / 2 + (x < 60 ? 6 : -6)} y2="29" stroke={ENCRE} strokeWidth="1.1" />
         </g>
       ))}
       {/* Hotte */}
-      <path d="M56 8 h12 v10 l5 8 h-22 l5 -8 z" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
+      <path d="M56 8 h12 v10 l5 8 h-22 l5 -8 z" fill={CLAIR} stroke={ENCRE} strokeWidth="1.1" />
       {/* Plan de travail */}
-      <rect x="6" y="52" width="108" height="4" rx="0.6" fill={on("plan-de-travail") ? "rgba(204,0,0,0.28)" : "#D9D5CE"} stroke={on("plan-de-travail") ? ROUGE : TRAIT} strokeWidth="1.1" />
+      <rect x="6" y="52" width="108" height="4" rx="0.6" {...zone("plan-de-travail", TRAIT, 0.28)} strokeWidth="1.1" />
       {/* Évier et robinet */}
-      <path d="M36 52 v-6 q0 -3 3 -3 h3" stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="31" y="51" width="14" height="1.6" fill="#BDB8B0" />
+      <path d="M36 52 v-6 q0 -3 3 -3 h3" stroke={ENCRE} strokeWidth="1.1" />
+      <rect x="31" y="51" width="14" height="1.6" fill={SOL} />
       {/* Meubles bas */}
       {[
         [8, 26],
@@ -54,122 +56,19 @@ export function CuisineDeFace({ allume = [], cadre, className }: { allume?: stri
         [60, 26],
       ].map(([x, w]) => (
         <g key={`b${x}`}>
-          <rect x={x} y="56" width={w} height="28" rx="0.8" fill={on("meubles-bas") ? ROUGE_FOND : MEUBLE} stroke={on("meubles-bas") ? ROUGE : TRAIT} strokeWidth="1.1" />
-          <line x1={x + w - 5} y1="60" x2={x + w - 5} y2="66" stroke={TRAIT} strokeWidth="1.1" />
+          <rect x={x} y="56" width={w} height="28" rx="0.8" {...zone("meubles-bas", MEUBLE)} strokeWidth="1.1" />
+          <line x1={x + w - 5} y1="60" x2={x + w - 5} y2="66" stroke={ENCRE} strokeWidth="1.1" />
         </g>
       ))}
       {[56, 65.3, 74.6].map((y) => (
         <g key={`t${y}`}>
-          <rect x="86" y={y} width="26" height="9.3" rx="0.8" fill={on("meubles-bas") ? ROUGE_FOND : MEUBLE} stroke={on("meubles-bas") ? ROUGE : TRAIT} strokeWidth="1.1" />
-          <line x1="95" y1={y + 3} x2="103" y2={y + 3} stroke={TRAIT} strokeWidth="1.1" />
+          <rect x="86" y={y} width="26" height="9.3" rx="0.8" {...zone("meubles-bas", MEUBLE)} strokeWidth="1.1" />
+          <line x1="95" y1={y + 3} x2="103" y2={y + 3} stroke={ENCRE} strokeWidth="1.1" />
         </g>
       ))}
       {/* Plinthe, sol */}
-      <line x1="8" y1="86" x2="112" y2="86" stroke="#9C978F" strokeWidth="1" />
-      {c ? <rect x={c.x} y={c.y} width={c.w} height={c.h} rx="2.5" stroke={ROUGE} strokeWidth="1.6" strokeDasharray="4 3" /> : null}
-    </svg>
-  );
-}
-
-/** Salle de bain de face : miroir, meuble vasque, carrelage. Même trait que la cuisine. */
-export function SalleDeBainDeFace({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
-      {/* Carrelage du mur */}
-      {[0, 1, 2, 3].map((l) => (
-        <line key={`l${l}`} x1="10" y1={14 + l * 12} x2="110" y2={14 + l * 12} stroke="#DDD9D2" strokeWidth="0.8" />
-      ))}
-      {[0, 1, 2, 3, 4, 5, 6].map((c) => (
-        <line key={`c${c}`} x1={10 + c * 16.6} y1="8" x2={10 + c * 16.6} y2="52" stroke="#DDD9D2" strokeWidth="0.8" />
-      ))}
-      {/* Miroir */}
-      <rect x="40" y="12" width="40" height="26" rx="3" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="47" y1="30" x2="55" y2="20" stroke="#CFCBC4" strokeWidth="1" />
-      {/* Plan vasque et vasque */}
-      <rect x="30" y="52" width="60" height="4" rx="0.6" fill="#D9D5CE" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M50 52 q10 -6 20 0" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M60 46 v-4 h4" stroke={TRAIT} strokeWidth="1.1" />
-      {/* Meuble vasque */}
-      <rect x="32" y="56" width="27" height="26" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="61" y="56" width="27" height="26" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="54" y1="62" x2="54" y2="68" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="66" y1="62" x2="66" y2="68" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="8" y1="86" x2="112" y2="86" stroke="#9C978F" strokeWidth="1" />
-    </svg>
-  );
-}
-
-/** Dressing et meuble TV de face. */
-export function MobilierDeFace({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
-      {/* Dressing : trois portes */}
-      {[10, 27, 44].map((x) => (
-        <g key={x}>
-          <rect x={x} y="8" width="17" height="76" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-          <line x1={x + (x === 27 ? 3 : 14)} y1="42" x2={x + (x === 27 ? 3 : 14)} y2="50" stroke={TRAIT} strokeWidth="1.1" />
-        </g>
-      ))}
-      {/* Écran et meuble TV */}
-      <rect x="72" y="36" width="38" height="22" rx="1.5" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="68" y="66" width="46" height="18" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="91" y1="66" x2="91" y2="84" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="85" y1="75" x2="88" y2="75" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="94" y1="75" x2="97" y2="75" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="6" y1="86" x2="114" y2="86" stroke="#9C978F" strokeWidth="1" />
-    </svg>
-  );
-}
-
-/** Comptoir d'accueil et rangements d'un local professionnel. */
-export function ProfessionnelDeFace({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
-      {/* Rangements muraux */}
-      {[10, 30].map((x) => (
-        <rect key={x} x={x} y="10" width="18" height="30" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      ))}
-      <line x1="25" y1="22" x2="25" y2="28" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="33" y1="22" x2="33" y2="28" stroke={TRAIT} strokeWidth="1.1" />
-      {/* Écran sur le comptoir */}
-      <rect x="70" y="30" width="18" height="12" rx="1" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="79" y1="42" x2="79" y2="46" stroke={TRAIT} strokeWidth="1.1" />
-      {/* Comptoir : plateau et façade */}
-      <rect x="44" y="46" width="70" height="4" rx="0.6" fill="#D9D5CE" stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="46" y="50" width="66" height="34" rx="0.8" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      <line x1="62" y1="54" x2="62" y2="80" stroke="#CFCBC4" strokeWidth="1" />
-      <line x1="79" y1="54" x2="79" y2="80" stroke="#CFCBC4" strokeWidth="1" />
-      <line x1="96" y1="54" x2="96" y2="80" stroke="#CFCBC4" strokeWidth="1" />
-      <line x1="6" y1="86" x2="114" y2="86" stroke="#9C978F" strokeWidth="1" />
-    </svg>
-  );
-}
-
-/** Murs et plafond de face (mission 15, partie 4) : un mur principal avec un cadre, un pan de retour, le plafond et sa suspension, un fauteuil devant. */
-export function MursDeFace({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 120 92" className={className} aria-hidden fill="none" strokeLinejoin="round" strokeLinecap="round">
-      {/* Plafond et sa ligne */}
-      <path d="M8 6 h104" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M8 6 L14 14 h92 L112 6" stroke="#CFCBC4" strokeWidth="0.9" />
-      <line x1="14" y1="14" x2="106" y2="14" stroke={TRAIT} strokeWidth="1.1" />
-      {/* Suspension */}
-      <line x1="60" y1="14" x2="60" y2="26" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M52 32 h16 l-3 -6 h-10 z" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
-      {/* Mur principal, mur de retour à droite */}
-      <rect x="14" y="14" width="74" height="66" fill="#F7F6F3" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M88 14 L106 14 L106 80 L88 80 Z" fill={MEUBLE} stroke={TRAIT} strokeWidth="1.1" />
-      {/* Cadre au mur, interrupteur */}
-      <rect x="28" y="28" width="22" height="16" rx="0.8" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
-      <path d="M31 41 l6 -7 l5 5 l4 -3 l4 5" stroke="#CFCBC4" strokeWidth="1" />
-      <rect x="76" y="46" width="5" height="5" rx="0.6" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1" />
-      {/* Plinthe et sol */}
-      <line x1="14" y1="80" x2="106" y2="80" stroke="#9C978F" strokeWidth="1" />
-      <line x1="8" y1="86" x2="112" y2="86" stroke="#9C978F" strokeWidth="1" />
-      {/* Fauteuil devant le mur */}
-      <path d="M40 80 v-16 q0 -4 4 -4 h20 q4 0 4 4 v16" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="36" y="66" width="8" height="14" rx="1.5" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
-      <rect x="64" y="66" width="8" height="14" rx="1.5" fill="#FFFFFF" stroke={TRAIT} strokeWidth="1.1" />
+      <line x1="8" y1="86" x2="112" y2="86" stroke={SOL} strokeWidth="1" />
+      {c ? <rect x={c.x} y={c.y} width={c.w} height={c.h} rx="2.5" stroke={ENCRE} strokeWidth="1.6" strokeDasharray="4 3" /> : null}
     </svg>
   );
 }

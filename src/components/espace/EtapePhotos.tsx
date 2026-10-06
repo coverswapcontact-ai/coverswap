@@ -4,8 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { envoyerPhoto, ErreurEspace, famillesDe, MESSAGE_APERCU, motsDe, type Client, type Etat, type Prestations, type PrisePhoto } from "./api";
 import { COTE_MAX_DOSSIER, reduirePhoto } from "@/lib/simulateur/photo";
 import { mettreEnFile, photosEnFile, retirerDeLaFile, type PhotoEnFile } from "./file-photos";
-import { CuisineDeFace, IconeAppareil, IconeCoche, IconeGalerie } from "./Illustrations";
+import { IconeAppareil, IconeCoche, IconeGalerie, Picto, PICTOS_ELEMENTS, PICTOS_FAMILLES } from "./Illustrations";
 import { Annonce, BoutonPrincipal, BoutonSecondaire, Carte, EnteteEtape, Surtitre, cx } from "./ui";
+
+/** Site 3.0, lot C6 : le pictogramme d'une prise de cuisine (le plan de travail pour la prise du plan, la cuisine sinon). */
+const pictoDeLaPrise = (cadre: PrisePhoto["cadre"]) => (cadre === "plan" ? PICTOS_ELEMENTS["plan-de-travail"] : PICTOS_FAMILLES.CUISINE);
 
 /**
  * Onglet Photos — le point de bascule. Un guide qui se lit en dix
@@ -163,7 +166,7 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
           <IconeGalerie /> Choisir dans mes photos
         </BoutonSecondaire>
         {aperculu ? <Annonce>{MESSAGE_APERCU}</Annonce> : null}
-        <p className="text-center text-[14px] text-[#5F5A53]">Plusieurs d&apos;un coup, c&apos;est possible. Formats iPhone acceptés.</p>
+        <p className="text-center text-[14px] text-encre-2">Plusieurs d&apos;un coup, c&apos;est possible. Formats iPhone acceptés.</p>
       </Carte>
 
       {recues > 0 || attente.length > 0 ? (
@@ -174,37 +177,37 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
           </Surtitre>
           <ul className="mt-3 grid grid-cols-3 gap-2">
             {attente.map((e) => (
-              <li key={e.cle} className="relative aspect-square overflow-hidden rounded-xl bg-[#ECEAE5]">
+              <li key={e.cle} className="relative aspect-square overflow-hidden rounded-xl bg-fond-2">
                 {/* eslint-disable-next-line @next/next/no-img-element -- aperçu local, pas encore envoyé */}
                 <img src={e.apercu} alt="" className={cx("h-full w-full object-cover", e.etat !== "echec" && "opacity-70")} />
-                <div className="absolute inset-x-0 bottom-0 bg-black/55 px-2 py-1.5 text-[12px] font-medium text-white" aria-live="polite">
+                <div className="absolute inset-x-0 bottom-0 bg-sombre/55 px-2 py-1.5 text-[12px] font-medium text-blanc" aria-live="polite">
                   {e.etat === "echec" ? (e.message ? "Refusée" : "En attente") : e.etat === "envoi" ? `Envoi… ${Math.round(e.part * 100)}\u00a0%` : "En file"}
-                  <span className="mt-1 block h-1 overflow-hidden rounded-full bg-white/30">
-                    <span className="block h-full bg-white transition-[width]" style={{ width: `${Math.round(e.part * 100)}%` }} />
+                  <span className="mt-1 block h-1 overflow-hidden rounded-full bg-blanc/30">
+                    <span className="block h-full bg-blanc transition-[width]" style={{ width: `${Math.round(e.part * 100)}%` }} />
                   </span>
                 </div>
               </li>
             ))}
             {etat.photos.map((p) => (
               <li key={p.id} className="flex flex-col gap-1">
-                <div className="relative aspect-square overflow-hidden rounded-xl bg-[#ECEAE5]">
+                <div className="relative aspect-square overflow-hidden rounded-xl bg-fond-2">
                   {/* eslint-disable-next-line @next/next/no-img-element -- photo privée servie par le CRM */}
                   <img src={client.url(`/photos/${p.id}`)} alt="Photo déposée" className={cx("h-full w-full object-cover", aRetirer === p.id && "opacity-40")} loading="lazy" referrerPolicy="no-referrer" />
-                  <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#1F7A4D] text-white" aria-label="Reçue">
+                  <span className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-succes text-blanc" aria-label="Reçue">
                     <IconeCoche />
                   </span>
                 </div>
                 {aRetirer === p.id ? (
                   <div className="grid grid-cols-2 gap-1" role="group" aria-label="Retirer cette photo ?">
-                    <button type="button" onClick={() => setARetirer(null)} className="min-h-[44px] rounded-lg border border-[#D3CFC8] bg-white text-[14px] font-medium text-[#1A1A1A] active:bg-[#F2F0EC]">
+                    <button type="button" onClick={() => setARetirer(null)} className="min-h-[44px] rounded-lg border border-trait bg-blanc text-[14px] font-medium text-encre active:bg-fond-2">
                       Non
                     </button>
-                    <button type="button" disabled={retrait} onClick={() => void retirer(p.id)} className="min-h-[44px] rounded-lg bg-[#1A1A1A] text-[14px] font-semibold text-white disabled:opacity-50">
+                    <button type="button" disabled={retrait} onClick={() => void retirer(p.id)} className="min-h-[44px] rounded-lg bg-encre text-[14px] font-semibold text-blanc disabled:opacity-50">
                       {retrait ? "…" : "Retirer"}
                     </button>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => (apercu ? setAperculu(true) : setARetirer(p.id))} aria-label="Retirer cette photo" className="min-h-[44px] rounded-lg text-[14px] font-medium text-[#4F4A44] underline decoration-[#BDB8B0] underline-offset-4 active:bg-[#F2F0EC]">
+                  <button type="button" onClick={() => (apercu ? setAperculu(true) : setARetirer(p.id))} aria-label="Retirer cette photo" className="min-h-[44px] rounded-lg text-[14px] font-medium text-encre-2 underline decoration-trait underline-offset-4 active:bg-fond-2">
                     Retirer
                   </button>
                 )}
@@ -232,9 +235,11 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
           <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-4">
             {familles[0].photos.map((prise) => (
               <li key={prise.titre} className="flex flex-col gap-1.5">
-                <CuisineDeFace cadre={prise.cadre} className="w-full rounded-xl bg-[#F7F6F3] p-1.5" />
-                <span className="text-[15px] leading-tight font-semibold text-[#1A1A1A]">{prise.titre}</span>
-                <span className="text-[13.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
+                <span className="flex aspect-[120/92] w-full items-center justify-center rounded-xl bg-fond p-1.5">
+                  <Picto nom={pictoDeLaPrise(prise.cadre)} className="h-24 w-24" />
+                </span>
+                <span className="text-[15px] leading-tight font-semibold text-encre">{prise.titre}</span>
+                <span className="text-[13.5px] leading-snug text-encre-2">{prise.aide}</span>
               </li>
             ))}
           </ul>
@@ -243,16 +248,16 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
           <div className="mt-3 space-y-4">
             {(familles.length ? familles : [null]).map((f) => (
               <div key={f?.id ?? "general"}>
-                {familles.length > 1 && f ? <p className="mb-2 text-[15px] font-semibold text-[#1A1A1A]">{f.libelle}</p> : null}
+                {familles.length > 1 && f ? <p className="mb-2 text-[15px] font-semibold text-encre">{f.libelle}</p> : null}
                 <ul className="space-y-3">
                   {(f?.photos ?? PRISES_GENERALES).map((prise) => (
                     <li key={prise.titre} className="flex items-start gap-3">
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1EFEA] text-[#1A1A1A]" aria-hidden>
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-fond-2 text-encre" aria-hidden>
                         <IconeAppareil taille={18} />
                       </span>
                       <span>
-                        <span className="block text-[16px] leading-snug font-semibold text-[#1A1A1A]">{prise.titre}</span>
-                        <span className="block text-[14.5px] leading-snug text-[#5F5A53]">{prise.aide}</span>
+                        <span className="block text-[16px] leading-snug font-semibold text-encre">{prise.titre}</span>
+                        <span className="block text-[14.5px] leading-snug text-encre-2">{prise.aide}</span>
                       </span>
                     </li>
                   ))}
@@ -273,15 +278,15 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
               { bon: false, titre: "Pas à contre-jour", style: { filter: "brightness(0.42) contrast(1.35)" } },
             ].map((exemple) => (
               <li key={exemple.titre} className="flex flex-col gap-1.5">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#ECEAE5]">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-fond-2">
                   {/* eslint-disable-next-line @next/next/no-img-element -- illustration du site */}
                   <img src="/images/fonds/photo-1639405069836-f82aa6dcb900-800.jpg" alt="" className="h-full w-full object-cover" style={exemple.style} />
                   {!exemple.bon && exemple.titre.includes("contre-jour") ? <span className="absolute inset-0 bg-[radial-gradient(circle_at_18%_40%,rgba(255,255,255,0.95),rgba(255,255,255,0)_45%)]" aria-hidden /> : null}
-                  <span className={cx("absolute bottom-1.5 left-1.5 flex h-7 w-7 items-center justify-center rounded-full text-[15px] font-bold text-white", exemple.bon ? "bg-[#1F7A4D]" : "bg-[#CC0000]")} aria-hidden>
+                  <span className={cx("absolute bottom-1.5 left-1.5 flex h-7 w-7 items-center justify-center rounded-full text-[15px] font-bold text-blanc", exemple.bon ? "bg-succes" : "bg-alerte-texte")} aria-hidden>
                     {exemple.bon ? "✓" : "✕"}
                   </span>
                 </div>
-                <span className="text-[13.5px] leading-tight font-medium text-[#1A1A1A]">{exemple.titre}</span>
+                <span className="text-[13.5px] leading-tight font-medium text-encre">{exemple.titre}</span>
               </li>
             ))}
           </ul>
@@ -292,8 +297,8 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
               { bon: false, texte: "Pas de trop près : on doit tout voir" },
               { bon: false, texte: "Pas à contre-jour, face à une fenêtre" },
             ].map((conseil) => (
-              <li key={conseil.texte} className="flex items-center gap-3 text-[15.5px] text-[#1A1A1A]">
-                <span className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white", conseil.bon ? "bg-[#1F7A4D]" : "bg-[#CC0000]")} aria-hidden>
+              <li key={conseil.texte} className="flex items-center gap-3 text-[15.5px] text-encre">
+                <span className={cx("flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-blanc", conseil.bon ? "bg-succes" : "bg-alerte-texte")} aria-hidden>
                   {conseil.bon ? "✓" : "✕"}
                 </span>
                 {conseil.texte}
@@ -301,11 +306,11 @@ export function EtapePhotos({ etat, client, jeton, prestations, onEtat, onSuite 
             ))}
           </ul>
         )}
-        <p className="mt-3 text-[14.5px] leading-relaxed text-[#4F4A44]">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: seuls les meubles comptent.</p>
+        <p className="mt-3 text-[14.5px] leading-relaxed text-encre-2">Allumez les lumières, ouvrez les volets, et gardez les portes fermées. Le désordre n&apos;est pas un problème&nbsp;: seuls les meubles comptent.</p>
       </Carte>
 
       {recues > 0 && !recu ? <BoutonPrincipal onClick={onSuite}>Continuer&nbsp;: mon projet</BoutonPrincipal> : null}
-      <p className="px-1 text-[13.5px] leading-relaxed text-[#6B665F]">Vos photos restent privées&nbsp;: elles servent uniquement à préparer votre projet et ne sont jamais publiées sans votre accord.</p>
+      <p className="px-1 text-[13.5px] leading-relaxed text-encre-2">Vos photos restent privées&nbsp;: elles servent uniquement à préparer votre projet et ne sont jamais publiées sans votre accord.</p>
     </div>
   );
 }

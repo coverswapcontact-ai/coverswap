@@ -160,10 +160,10 @@ export function CreationSimulation({ etat, client, jeton, onEtat, favoris, onFav
   if (creation.restantes <= 0 && creation.enCours.length === 0) {
     return (
       <Carte className="space-y-3">
-        <p className="text-[17px] leading-relaxed font-semibold text-[#1A1A1A]">{texteQuota(0, total)} Demandez-en d&apos;autres à CoverSwap.</p>
-        {creation.faitesSite ? <p className="text-[15px] leading-relaxed text-[#5F5A53]">Celles que vous avez faites sur coverswap.fr comptent aussi ({creation.faitesSite}).</p> : null}
+        <p className="text-[17px] leading-relaxed font-semibold text-encre">{texteQuota(0, total)} Demandez-en d&apos;autres à CoverSwap.</p>
+        {creation.faitesSite ? <p className="text-[15px] leading-relaxed text-encre-2">Celles que vous avez faites sur coverswap.fr comptent aussi ({creation.faitesSite}).</p> : null}
         {creation.demandeesLe ? (
-          <p className="text-[15.5px] text-[#1F6B45]">Demande envoyée le {dateCourte(creation.demandeesLe)}&nbsp;: CoverSwap vous répond très vite.</p>
+          <p className="text-[15.5px] text-succes">Demande envoyée le {dateCourte(creation.demandeesLe)}&nbsp;: CoverSwap vous répond très vite.</p>
         ) : (
           <BoutonPrincipal onClick={onDemanderPlus} disabled={demandeEnCours}>
             {demandeEnCours ? "Envoi…" : "Demander d'autres simulations"}
