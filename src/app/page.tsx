@@ -3,7 +3,7 @@ import { Fragment, type ReactNode } from "react";
 import { AvisPrix } from "@/components/accueil/AvisPrix";
 import { CommentOnTravaille } from "@/components/accueil/CommentOnTravaille";
 import { CuisinesCommeLaVotre } from "@/components/accueil/CuisinesCommeLaVotre";
-import { choisirOuverture, imageObjetOuverture, partageOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
+import { choisirOuverture, imageObjetOuverture, prechargementsOuverture } from "@/components/accueil/etudes";
 import { Ouverture } from "@/components/accueil/Ouverture";
 import { ParOuCommencer } from "@/components/accueil/ParOuCommencer";
 import { Presentoir } from "@/components/accueil/Presentoir";
@@ -32,12 +32,8 @@ import { chargerPublications } from "@/lib/publications";
  */
 export const revalidate = 300;
 
-/** Mission 16 (partie 5) : les métadonnées de toutes les pages passent par `metadonneesPage` ; site 3.0 : l'image de partage suit l'ouverture (`partageOuverture`). */
-export async function generateMetadata(): Promise<Metadata> {
-  const { realisations } = await chargerPublications();
-  const image = partageOuverture(choisirOuverture(realisations));
-  return metadonneesPage({ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "/", image });
-}
+/** Mission 16 (partie 5) : les métadonnées de toutes les pages passent par `metadonneesPage` ; l'image de partage est celle dessinée pour l'accueil (`IMAGES_DEDIEES`, 07/10/2026). */
+export const metadata: Metadata = metadonneesPage({ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "/" });
 
 /** La bande de matière posée après une section (la référence du catalogue, `BANDES_ACCUEIL`). */
 function bandeApres(id: IdSectionAccueil): ReactNode {

@@ -109,8 +109,8 @@ describe("les neuf sections, dans l'ordre de l'énoncé (§ C.1)", () => {
     assert.ok(DESCRIPTION_META_ACCUEIL.includes(PRIX_PLAGE));
     assert.ok(DESCRIPTION_META_ACCUEIL.includes("Montpellier"));
     const page = lire("src/app/page.tsx");
-    assert.match(page, /metadonneesPage\(\{ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "\/", image \}\)/);
-    assert.match(page, /const image = partageOuverture\(choisirOuverture\(realisations\)\);/);
+    // 07/10/2026 : l'image de partage de l'accueil est celle dessinée pour lui (`IMAGES_DEDIEES`), plus celle de l'ouverture.
+    assert.match(page, /metadonneesPage\(\{ titre: TITRE_META_ACCUEIL, description: DESCRIPTION_META_ACCUEIL, chemin: "\/" \}\)/);
   });
 
   test("le titre : 7 mots au plus, la durée d'offre.ts", () => {
@@ -230,13 +230,14 @@ describe("1. Ouverture", () => {
   test("une image d'ambiance n'est jamais partagée sans son étiquette ; son ImageObject dit « Ambiance · avant / après »", () => {
     const choix = choisirOuverture([]);
     // Site 3.0 (lot F2) : l'avant / après composé avec son bandeau « Ambiance · avant / après » (scripts/og.mjs), jamais l'après seul.
-    assert.deepEqual(partageOuverture(choix), {
+    // 07/10/2026 : l'accueil partage son image dessinée (`IMAGES_DEDIEES`) ; la règle vaut pour les pages qui suivent leur ouverture (même paire ici).
+    assert.deepEqual(partageOuverture(choix, "/prestations/cuisine"), {
       url: "https://coverswap.fr/images/og/cuisine-bordeaux-brillante-apres-couleur.jpg",
       largeur: 1200,
       hauteur: 630,
       alt: "Ambiance · avant / après, image d'ambiance : Cuisine en L d'appartement des années 2000, façades bordeaux brillantes, plan de travail gris moucheté",
     });
-    assert.ok(!partageOuverture(choix).url.includes("/images/prep/"), "jamais une image de la bibliothèque sans son étiquette");
+    assert.ok(!partageOuverture(choix, "/prestations/cuisine").url.includes("/images/prep/"), "jamais une image de la bibliothèque sans son étiquette");
     const objet = imageObjetOuverture(choix);
     assert.equal(objet?.["@type"], "ImageObject");
     assert.equal(objet?.caption, LEGENDE_OUVERTURE);

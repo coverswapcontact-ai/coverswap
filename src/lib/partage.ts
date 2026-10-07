@@ -17,14 +17,31 @@ import type { Publication } from "./publications";
  *  - sinon l'avant / après de la page (`paireDePartage`), composé par `npm run og` (`scripts/og.mjs`, sharp, aucun
  *    appel d'API) en 1 200 × 630 avec le bandeau « Ambiance · avant / après » : une image générée n'est jamais
  *    partagée sans son étiquette ; un fichier par paire, `public/images/og/<après>.jpg` ;
- *  - sinon l'image du site (`og-image.jpg`, `scripts/generate-assets.mjs`).
+ *  - sinon l'image du site (`IMAGE_PARTAGE` : celle de l'accueil).
+ * Avant tout cela, cinq pages ont une image dessinée pour les aperçus de liens (SMS, WhatsApp, iMessage ; 07/10/2026) :
+ * `IMAGES_DEDIEES`, fichiers `public/images/partage/`, prioritaires sur l'avant / après de la page (ces pages ne passent pas de réalisation).
  * Pur (testé : `partage.test.ts`) ; rien ici n'importe `metadonnees` (qui l'importe).
  */
 
 export type ImagePartage = { url: string; largeur: number; hauteur: number; alt?: string };
 
-/** L'image de partage du site (`scripts/generate-assets.mjs` : 1200 × 630, papier, encre, le rouge). */
-export const IMAGE_PARTAGE: ImagePartage = { url: `${ENTREPRISE.site}/og-image.jpg`, largeur: 1200, hauteur: 630 };
+/** Les images dessinées pour les aperçus de liens (1 200 × 630), sous `public/images/partage/`. */
+export const DOSSIER_IMAGES_DEDIEES = "/images/partage";
+const dediee = (nom: string, alt: string): ImagePartage => ({ url: `${ENTREPRISE.site}${DOSSIER_IMAGES_DEDIEES}/${nom}.jpg`, largeur: 1200, hauteur: 630, alt });
+
+/** L'image de partage du site, celle de l'accueil : la cuisine bordeaux passée en vert profond, avant / après. */
+export const IMAGE_PARTAGE: ImagePartage = dediee("partage-accueil", "CoverSwap : votre cuisine, transformée en une journée, sans travaux. Avant / après.");
+
+/** L'image de l'espace client (`/e/[jeton]`, hors `metadonneesPage`). */
+export const IMAGE_PARTAGE_ESPACE: ImagePartage = dediee("partage-espace", "Votre espace CoverSwap : vos simulations, votre devis et vos échantillons au même endroit.");
+
+/** Les pages qui ont leur image dessinée, prioritaire sur toute autre (chemin sans barre finale). */
+export const IMAGES_DEDIEES: Record<string, ImagePartage> = {
+  "/": IMAGE_PARTAGE,
+  "/simulateur": dediee("partage-simulateur", "CoverSwap : votre cuisine sur votre photo, avec les matières de votre choix. Gratuit."),
+  "/contact": dediee("partage-echantillons", "CoverSwap : les vrais échantillons chez vous, les mesures prises, votre devis sous 48 h."),
+  "/matieres": dediee("partage-matieres", "CoverSwap : 497 matières Cover Styl', à voir en vrai, échantillons apportés chez vous."),
+};
 
 /** Le bandeau posé sur chaque image composée, et le dossier des images composées (sous `public/`). */
 export const ETIQUETTE_PARTAGE = "Ambiance · avant / après";
@@ -68,11 +85,9 @@ export function paireDePartage(chemin: string): PairePartage | null {
   return null;
 }
 
-/** Toutes les pages qui partagent un avant / après (celles que `scripts/og.mjs` compose), dans un ordre stable. */
+/** Toutes les pages qui partagent un avant / après (celles que `scripts/og.mjs` compose ; hors `IMAGES_DEDIEES`), dans un ordre stable. */
 export function pagesAvecPaire(): { chemin: string; paire: PairePartage }[] {
   const chemins = [
-    "/",
-    "/simulateur",
     "/realisations",
     "/pro",
     "/inspirations",
@@ -109,6 +124,8 @@ export function realisationPartagee(p: Pick<Publication, "titre" | "ville" | "ph
 export function imagePartage(chemin: string, reelle?: RealisationPartagee | null): ImagePartage {
   // La photo du CRM, réduite à 1 600 px (WebP, au cadre 3 / 2 des réalisations), comme à l'ouverture de l'accueil.
   if (reelle) return { url: `${reelle.photo}?l=1600`, largeur: 1600, hauteur: 1067, alt: reelle.legende };
+  const dedieeDeLaPage = IMAGES_DEDIEES[chemin.replace(/\/$/, "") || "/"];
+  if (dedieeDeLaPage) return dedieeDeLaPage;
   const p = paireDePartage(chemin);
   if (!p) return IMAGE_PARTAGE;
   return { url: `${ENTREPRISE.site}${fichierPartage(p.apres)}`, largeur: LARGEUR_PARTAGE, hauteur: HAUTEUR_PARTAGE, alt: altPartage(p) };

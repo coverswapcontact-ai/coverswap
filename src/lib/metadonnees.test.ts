@@ -11,7 +11,7 @@ import { TITRE_ZONES, descriptionVille, descriptionZones, titreVille } from "@/a
 import { DESCRIPTION_META_ACCUEIL, TITRE_META_ACCUEIL } from "@/components/accueil/sections";
 import { SLUGS_FAMILLES } from "./pages-familles";
 import { parametresDesFiches } from "./fiches-matieres";
-import { IMAGE_PARTAGE, LONGUEUR_MAX_DESCRIPTION, LONGUEUR_MAX_TITRE, couperDescription, imagePartage, metadonneesPage, urlAbsolue } from "./metadonnees";
+import { LONGUEUR_MAX_DESCRIPTION, LONGUEUR_MAX_TITRE, couperDescription, imagePartage, metadonneesPage, urlAbsolue } from "./metadonnees";
 
 /**
  * Mission 16 (partie 5) — les métadonnées de chaque page par `metadonneesPage` : canonical absolu, Open Graph complet
@@ -47,7 +47,7 @@ function verifierComplet(m: Metadata, chemin: string) {
   assert.ok(fichier && existsSync(fichier), `${chemin} : ${og.images[0].url} existe`);
   assert.deepEqual([og.images[0].width, og.images[0].height], [1200, 630]);
   assert.ok(og.images[0].alt);
-  if (og.images[0].url !== IMAGE_PARTAGE.url) assert.ok(og.images[0].alt.startsWith("Ambiance · avant / après"), `${chemin} : l'image composée dit ce qu'elle est`);
+  if (!og.images[0].url.includes("/images/partage/")) assert.ok(og.images[0].alt.startsWith("Ambiance · avant / après"), `${chemin} : l'image composée dit ce qu'elle est`);
   assert.ok(String(titre).length <= LONGUEUR_MAX_TITRE, `${chemin} : titre de ${String(titre).length} caractères`);
   const twitter = m.twitter as { card?: string; title?: string; images?: string[] };
   assert.equal(twitter.card, "summary_large_image");
@@ -115,7 +115,7 @@ describe("toutes les pages publiques passent par metadonneesPage", () => {
       verifierComplet(await realisations.generateMetadata(), "/realisations");
       // Site 3.0 (lot B6) : l'accueil choisit son image de partage d'après l'ouverture (une réalisation publiée).
       const accueil = await import("@/app/page");
-      verifierComplet(await accueil.generateMetadata(), "/");
+      verifierComplet(accueil.metadata, "/");
       // Site 3.0 (lot F2) : /pro, les pages par pièce et les fiches lisent les publications pour leur image de partage.
       const pro = await import("@/app/pro/page");
       verifierComplet(await pro.generateMetadata(), "/pro");

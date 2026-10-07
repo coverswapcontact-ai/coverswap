@@ -13,7 +13,7 @@ import { CAS_PRESTATIONS } from "@/data/cas-prestations";
 import { exemplesSimulateur } from "./exemples-simulateur";
 import { ambiancesDeLaFiche } from "./fiches-matieres";
 import { ambiancesDeFamille } from "./pages-familles";
-import { DOSSIER_PARTAGE, ETIQUETTE_PARTAGE, IMAGE_PARTAGE, fichierPartage, imagePartage, pagesAvecPaire, paireDePartage, realisationPartagee } from "./partage";
+import { DOSSIER_PARTAGE, ETIQUETTE_PARTAGE, IMAGES_DEDIEES, IMAGE_PARTAGE, IMAGE_PARTAGE_ESPACE, fichierPartage, imagePartage, pagesAvecPaire, paireDePartage, realisationPartagee } from "./partage";
 
 /**
  * Site 3.0 (lot F2) — l'image de partage de chaque page (`lib/partage`, la seule source ; `docs/SEO.md`) : l'avant /
@@ -63,7 +63,7 @@ describe("paireDePartage : l'avant / après que la page montre", () => {
   });
 
   test("les pages sans avant / après gardent l'image du site", () => {
-    for (const chemin of ["/comment-ca-marche", "/matieres", "/zones", "/zones/covering-lattes", "/contact", "/cgv", "/mentions-legales", "/politique-confidentialite"]) {
+    for (const chemin of ["/comment-ca-marche", "/zones", "/zones/covering-lattes", "/cgv", "/mentions-legales", "/politique-confidentialite"]) {
       assert.equal(paireDePartage(chemin), null, chemin);
       assert.deepEqual(imagePartage(chemin), IMAGE_PARTAGE, chemin);
     }
@@ -89,7 +89,7 @@ describe("imagePartage : la seule source", () => {
       alt: "Ambiance · avant / après, image d'ambiance : Accueil d'un cabinet, comptoir effet hêtre au dessus gris, chaises d'attente",
     });
     assert.equal(fichierPartage("x"), "/images/og/x.jpg");
-    assert.equal(IMAGE_PARTAGE.url, "https://coverswap.fr/og-image.jpg");
+    assert.equal(IMAGE_PARTAGE.url, "https://coverswap.fr/images/partage/partage-accueil.jpg");
   });
 
   test("une réalisation publiée la remplace : sa photo « après » du CRM, réduite, et sa légende", () => {
@@ -118,7 +118,7 @@ describe("les images composées (scripts/og.mjs)", () => {
       const { width, height, format } = await sharp(join(DOSSIER, nom)).metadata();
       assert.deepEqual([width, height, format], [1200, 630, "jpeg"], nom);
     }
-    assert.ok(existsSync(join(RACINE, "public", "og-image.jpg")));
+    assert.ok(existsSync(join(RACINE, "public", "images", "partage", "partage-accueil.jpg")));
   });
 
   test("le bandeau « Ambiance · avant / après » est posé, sans aucun appel d'API", () => {
@@ -129,5 +129,38 @@ describe("les images composées (scripts/og.mjs)", () => {
     assert.match(script, /pastille\(DEMI \+ FILET, "Après"\)/);
     assert.doesNotMatch(script, /fetch\(|openai|api\./i);
     assert.match(lire("package.json"), /"og": "node --import tsx scripts\/og\.mjs"/);
+  });
+});
+
+describe("les images dessinées pour les aperçus de liens (07/10/2026)", () => {
+  test("cinq pages, leur fichier en 1 200 × 630 JPEG, prioritaire sur l'avant / après de la page", async () => {
+    const attendues: [string, string][] = [
+      ["/", "partage-accueil"],
+      ["/simulateur", "partage-simulateur"],
+      ["/contact", "partage-echantillons"],
+      ["/matieres", "partage-matieres"],
+    ];
+    for (const [chemin, nom] of attendues) {
+      const url = `https://coverswap.fr/images/partage/${nom}.jpg`;
+      assert.equal(imagePartage(chemin).url, url, chemin);
+      assert.equal(imagePartage(`${chemin}/`).url, url, chemin);
+      assert.ok(imagePartage(chemin).alt, chemin);
+    }
+    assert.equal(Object.keys(IMAGES_DEDIEES).length, 4);
+    assert.equal(IMAGE_PARTAGE, IMAGES_DEDIEES["/"], "l'image par défaut du site est celle de l'accueil");
+    assert.equal(IMAGE_PARTAGE_ESPACE.url, "https://coverswap.fr/images/partage/partage-espace.jpg");
+    for (const nom of ["partage-accueil", "partage-simulateur", "partage-echantillons", "partage-matieres", "partage-espace"]) {
+      const { width, height, format } = await sharp(join(RACINE, "public", "images", "partage", `${nom}.jpg`)).metadata();
+      assert.deepEqual([width, height, format], [1200, 630, "jpeg"], nom);
+    }
+    // Les autres pages gardent leur image.
+    assert.equal(imagePartage("/pro").url, `https://coverswap.fr${fichierPartage(PAIRE_COMPTOIR_PRO.apres)}`);
+    assert.ok(imagePartage("/matieres/couleur/NF13").url.includes("/images/og/"));
+  });
+
+  test("l'espace client porte la sienne en og:image et twitter:image", () => {
+    const page = lire("src/app/e/[jeton]/page.tsx");
+    assert.match(page, /images: \[\{ url: IMAGE_PARTAGE_ESPACE\.url/);
+    assert.match(page, /images: \[IMAGE_PARTAGE_ESPACE\.url\]/);
   });
 });

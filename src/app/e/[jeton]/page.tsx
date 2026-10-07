@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import EspaceClient from "@/components/espace/EspaceClient";
+import { IMAGE_PARTAGE_ESPACE } from "@/lib/partage";
 
 /**
  * Espace client : la page personnelle et PERMANENTE d'un client (tous ses
@@ -15,7 +16,13 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
   referrer: "no-referrer",
   alternates: { canonical: null },
-  openGraph: { title: "Votre espace CoverSwap", description: "Vos projets de rénovation, étape par étape." },
+  // L'aperçu du lien envoyé par SMS ou WhatsApp : l'image dessinée pour l'espace (`lib/partage`).
+  openGraph: {
+    title: "Votre espace CoverSwap",
+    description: "Vos projets de rénovation, étape par étape.",
+    images: [{ url: IMAGE_PARTAGE_ESPACE.url, width: IMAGE_PARTAGE_ESPACE.largeur, height: IMAGE_PARTAGE_ESPACE.hauteur, alt: IMAGE_PARTAGE_ESPACE.alt }],
+  },
+  twitter: { card: "summary_large_image", title: "Votre espace CoverSwap", description: "Vos projets de rénovation, étape par étape.", images: [IMAGE_PARTAGE_ESPACE.url] },
 };
 
 export const viewport: Viewport = { themeColor: "#F4EDE2", width: "device-width", initialScale: 1, viewportFit: "cover" };
